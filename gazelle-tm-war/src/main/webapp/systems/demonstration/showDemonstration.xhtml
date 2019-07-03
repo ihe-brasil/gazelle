@@ -1,0 +1,66 @@
+<s:div xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+       xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+       xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+        <ui:param name="panel_id" value="showDemonstrationPanel"/>
+        <ui:define name="panel_title">#{messages['gazelle.systems.demonstration.DisplayDemonstrationLabel1']}
+        </ui:define>
+        <f:subview id="subview_17">
+            <ui:include src="showDemonstrationData.xhtml"/>
+        </f:subview>
+        <s:decorate template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.systems.demonstration.isActivated']}</ui:define>
+            <h:outputText value="#{messages['gazelle.common.Yes']}"
+                          rendered="#{demonstrationManager.selectedDemonstration.active}"/>
+            <h:outputText value="#{messages['gazelle.common.No']}"
+                          rendered="#{not demonstrationManager.selectedDemonstration.active}"/>
+        </s:decorate>
+        <h:panelGrid columns="3" rendered="#{not empty demonstrationManager.selectedDemonstration.testingSessions}">
+            <h:outputText value="#{messages['gazelle.systems.testingSession']}" style="font-weight:bold;"/>
+
+            <rich:list value="#{demonstrationManager.selectedDemonstration.testingSessions}" var="ts"
+                       type="unordered">
+                <h:outputText value="#{ts.description}"/>
+            </rich:list>
+        </h:panelGrid>
+        <br/>
+        <br/>
+        <s:div id="systemsInSessionDiv"
+               rendered="#{not empty demonstrationManager.systemsInSessionLinkedToDemonstration}">
+            <h:outputText value="#{messages['gazelle.systems.demonstration.registeredSystems']}"/>
+            <br/>
+            <br/>
+            <rich:dataTable value="#{demonstrationManager.systemsInSessionLinkedToDemonstration}" var="sis">
+                <g:column>
+                    <ui:define name="header">#{messages['gazelle.common.Institution']}</ui:define>
+                    <!-- this method returns the institution's keyword -->
+                    #{systemManager.displayInstitutionForSystem(sis.system)}
+                </g:column>
+                <g:column>
+                    <ui:define name="header">#{messages['gazelle.systems.system.SystemKeyword']}</ui:define>
+                    <g:link value="#{sis.system}"/>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">#{messages['gazelle.systems.testingSession']}</ui:define>
+                    #{sis.testingSession.description}
+                </g:column>
+            </rich:dataTable>
+        </s:div>
+        <br/>
+        <br/>
+
+        <div  id="divButtons">
+            <a4j:commandButton id="EditForAdmin" styleClass="gzl-btn-blue"
+                               value="#{messages['gazelle.common.button.Edit']}"
+                               actionListener="#{demonstrationManager.editSelectedDemonstration()}"
+                               render="globalDiv, editDemonstrationPanel"/>
+            <a4j:commandButton id="backForAdmin" styleClass="gzl-btn"
+                               value="#{messages['gazelle.testmanagement.object.Back']}"
+                               actionListener="#{demonstrationManager.displayAllDemonstrations()}"
+                               render="globalDiv, showDemonstrationPanel"/>
+        </div>
+    </ui:decorate>
+
+</s:div>

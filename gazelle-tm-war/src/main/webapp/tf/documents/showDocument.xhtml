@@ -1,0 +1,95 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['net.ihe.gazelle.tm.ShowDocument']}"/>
+    <ui:define name="body">
+        <s:div>
+            <h:form id="globalForm" styleClass="form-horizontal">
+                <s:token allowMultiplePosts="true"/>
+                <h:inputHidden id="filterUrlParameters" name="filterUrlParameters"
+                               value="#{documentManager.filter.urlParameters}"/>
+                <script>
+                    updateUrl("globalform:filterUrlParameters");
+                    $("#globalform\\:filterUrlParameters").bind('change',
+                            function () {
+                                updateUrl("globalform:filterUrlParameters");
+                            });
+                </script>
+
+                #{documentManager.parseURLParameters("view")}
+
+
+                <ui:decorate template="/layout/panels/_panel_title_footer.xhtml">
+                    <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.Document']}</ui:define>
+                    <ui:include src="/tf/documents/_documentDetails.xhtml">
+                        <ui:param name="documentToDisplay" value="#{documentManager.selectedDocument}"/>
+                    </ui:include>
+
+                    <ui:define name="panel_footer">
+                        <a4j:commandButton styleClass="gzl-btn" id="BackButton"
+                                           value="#{messages['net.ihe.gazelle.tm.BackToDocumentList']}"
+                                           action="/tf/documents/document.seam" execute="@this"/>
+                        <a4j:commandButton styleClass="gzl-btn-blue" id="EditButton"
+                                           value="#{messages['net.ihe.gazelle.tm.EditDocument']}"
+                                           rendered="#{s:hasRole('tests_editor_role') and applicationManager.isMasterModel()}"
+                                           action="#{documentManager.edit(documentManager.selectedDocument)}"
+                                           execute="@this"/>
+                    </ui:define>
+                </ui:decorate>
+                <ui:decorate template="/layout/panels/_panel.xhtml">
+                    <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                        <div class="col-lg-5">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter" value="#{documentManager.sectionFilter}"/>
+                                <ui:param name="filterWidth" value="240"/>
+                                <ui:param name="filterId" value="type"/>
+                                <ui:param name="filterName"
+                                          value="#{messages['gazelle.systems.session.Type']}"/>
+                                <ui:param name="filterForm" value="globalForm"/>
+                            </ui:include>
+                        </div>
+                    </ui:decorate>
+
+                    <s:div id="results">
+                        <s:div rendered="#{documentManager.documentSections.size() == 0}">
+                            <h:outputText
+                                    value="#{documentManager.documentSections.size()} #{messages['net.ihe.gazelle.tm.DocumentSectionsForThisDocument']}"/>
+                        </s:div>
+                        <s:div rendered="#{documentManager.documentSections.size() &gt; 0}">
+                            <h:outputText
+                                    value="#{documentManager.documentSections.size()} #{messages['net.ihe.gazelle.tm.DocumentSectionsForThisSearch']}"/>
+                        </s:div>
+                        <rich:dataTable id="documentSessionTable" var="documentSection"
+                                        value="#{documentManager.documentSections}"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+
+
+                                        render="ds">
+                            <g:column sortBy="#{'section'}" filterBy="#{'section'}"
+                                      filterEvent="onkeyup" sortOrder="ascending" sortMode="ASCENDING">
+                                <ui:define name="header">#{messages['net.ihe.gazelle.tm.Section']}</ui:define>
+                                <ui:include src="/tf/documents/_documentSection.xhtml">
+                                    <ui:param name="documentSectionParam" value="#{documentSection}"/>
+                                    <ui:param name="displayedName" value="#{documentSection.section}"/>
+                                </ui:include>
+                            </g:column>
+                            <g:column sortBy="#{'type'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['net.ihe.gazelle.tm.SectionType']}</ui:define>
+                                <h:outputText id="documentSectionTypeOutputText"
+                                              value="#{documentSection.type}"/>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId" value="documentSessionTable"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </s:div>
+                </ui:decorate>
+            </h:form>
+        </s:div>
+    </ui:define>
+</ui:composition>

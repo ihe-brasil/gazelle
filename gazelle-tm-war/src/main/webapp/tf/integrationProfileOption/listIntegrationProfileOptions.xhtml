@@ -1,0 +1,98 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{integrationProfileOptionManager.getLstTitle()}"/>
+    <ui:define name="body">
+
+        <h:form id="integrationProfileOptionSearchResultsForm">
+            <s:token allowMultiplePosts="true"/>
+            <div align="right" class="actionButtons">
+                <h:commandButton styleClass="gzl-btn-green"
+                                 value="#{messages['gazelle.tf.integrationProfileOption.button.AddNewIntegrationProfileOption']}"
+                                 action="#{integrationProfileOptionManager.addNewIntegrationProfileOptionButton()}"
+                                 rendered="#{s:hasPermission('MasterModel', 'edit', null)}"/>
+            </div>
+        </h:form>
+
+        <h:form id="integrationProfileOptionForm">
+            <s:token allowMultiplePosts="true"/>
+            <a4j:queue requestDelay="300" ignoreDupResponses="true"/>
+            #{dataTableStateHolder.setAscendingOn('keyword')}
+            <rich:dataTable id="integrationProfileOptionTable" var="option"
+                            value="#{integrationProfileOptionManager.integrationProfileOptionsDataModel()}"
+                            rows="#{userManagerExtra.selectedUserPreferences.numberOfResultsPerPage}"
+                            render="ds">
+                <g:column sortBy="#{'id'}" sortOrder="#{dataTableStateHolder.sortOrders['id']}">
+                    <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                    #{option.id}
+                </g:column>
+                <g:column sortBy="#{'keyword'}" sortOrder="#{dataTableStateHolder.sortOrders['keyword']}" filterBy="#{'keyword'}"
+                          filterEvent="onkeyup">
+                    <ui:define name="header">#{messages['gazelle.tf.table.Keyword']}</ui:define>
+                    #{option.keyword}
+                </g:column>
+                <g:column sortBy="#{'name'}" sortOrder="#{dataTableStateHolder.sortOrders['name']}" filterBy="#{'name'}"
+                          filterEvent="onkeyup">
+                    <ui:define name="header">#{messages['gazelle.tf.table.Name']}</ui:define>
+                    #{option.name}
+                </g:column>
+                <g:column width="450">
+                    <ui:define name="header">#{messages['gazelle.tf.table.Description']}</ui:define>
+                    <h:panelGroup rendered="#{option.description != null  and !(empty option.description)}">
+                        <pre style="word-wrap: break-word;word-break:break-all;white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -o-pre-wrap;">
+                            <g:safehtml value="#{option.description}"/>
+                        </pre>
+                    </h:panelGroup>
+                </g:column>
+                <g:column sortBy="#{'reference'}" sortOrder="#{dataTableStateHolder.sortOrders['reference']}">
+                    <ui:define name="header">#{messages['gazelle.tf.table.TFReference']}</ui:define>
+                    #{option.reference}
+                </g:column>
+                <g:column rendered="#{s:hasPermission('MasterModel', 'edit', null)}">
+                    <ui:define name="header"># #{messages['net.ihe.gazelle.tm.AIPOWithoutDocSection']}
+                    </ui:define>
+                    <h:outputText
+                            value="#{integrationProfileOptionManager.countAipoWithoutDocSectionLinkedToThisIntegrationProfileOption(option)}"/>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">#{messages['gazelle.tf.table.Action']}</ui:define>
+                    <div class="gzl-never-wrap">
+                        <a4j:commandLink
+                                title="#{messages['gazelle.common.button.View']}"
+                                action="#{integrationProfileOptionManager.viewIntegrationProfileOption(option)}"
+                                onRowMouseOver="this.style.cursor='pointer'">
+                            <span class="gzl-icon-search"/>
+                        </a4j:commandLink>
+
+                        <a4j:commandLink
+                                action="#{integrationProfileOptionManager.editIntegrationProfileOption(option)}"
+                                rendered="#{s:hasPermission('MasterModel', 'edit', null)}"
+                                title="#{messages['gazelle.common.button.Edit']}"
+                                onRowMouseOver="this.style.cursor='pointer'">
+                            <span class="gzl-icon-pencil"/>
+                        </a4j:commandLink>
+
+                        <a4j:commandLink
+                                action="#{integrationProfileOptionManager.showIntegrationProfileOptionDeleteSideEffects(option)}"
+                                onRowMouseOver="this.style.cursor='pointer'"
+                                rendered="#{s:hasPermission('MasterModel', 'edit', null)}"
+                                title="#{messages['gazelle.common.button.Delete']}">
+                            <span class="gzl-icon-trash-o"/>
+                        </a4j:commandLink>
+                    </div>
+                </g:column>
+                <f:facet name="footer">
+                    <ui:include src="/util/datatableFooter.xhtml">
+                        <ui:param name="dataScrollerId" value="ds"/>
+                        <ui:param name="dataTableId" value="integrationProfileOptionTable"/>
+                    </ui:include>
+                </f:facet>
+            </rich:dataTable>
+            <h:commandLink id="DOWNASCVS" action="#{gazelleExcelExporterJboss7.export('integrationProfileOptionForm:integrationProfileOptionTable')}">
+                <h:outputText value="#{messages['gazelle.common.export.ExportAsExcel']}"/>
+            </h:commandLink>
+        </h:form>
+    </ui:define>
+</ui:composition>

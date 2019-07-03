@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.3.final using JasperReports Library version 6.0.3  -->
+<!-- 2015-03-23T15:08:19 -->
+<jasperReport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://jasperreports.sourceforge.net/jasperreports" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="createInvoiceForGivenCompany2014_subreport1" pageWidth="200" pageHeight="200" columnWidth="200" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="b9ad1b77-a9e2-4b48-bdf0-f3e4ef35c968">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gazelle EU-CAT Production"/>
+	<parameter name="companyKeyword" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA["EOS"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="VATString" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA["BBBBBB"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+     usr_institution."id" AS usr_institution_id,
+     usr_institution."name" AS usr_institution_name,
+     usr_address."address" AS usr_address_address,
+     usr_address."city" AS usr_address_city,
+     usr_address."fax" AS usr_address_fax,
+     usr_address."phone" AS usr_address_phone,
+     usr_address."state" AS usr_address_state,
+     usr_address."zip_code" AS usr_address_zip_code,
+     usr_address."address_line_2" AS usr_address_address_line_2,
+     usr_iso_3166_country_code."name" AS usr_address_country,
+  usr_person.firstname,
+  usr_person.lastname
+
+FROM
+  public.usr_person,
+  public.usr_institution,
+  public.usr_persons_functions,
+  public.usr_address,
+  public.usr_iso_3166_country_code
+
+WHERE
+  usr_person.institution_id = usr_institution.id AND
+  usr_person.address_id = usr_address.id AND
+ usr_address.country = usr_iso_3166_country_code.iso and
+  usr_persons_functions.person_id = usr_person.id AND
+  usr_persons_functions.person_id = usr_persons_functions.person_id and
+usr_persons_functions.person_function_id = 998 and usr_institution.keyword = $P{companyKeyword}]]>
+	</queryString>
+	<field name="usr_institution_id" class="java.lang.Integer"/>
+	<field name="usr_institution_name" class="java.lang.String"/>
+	<field name="usr_address_address" class="java.lang.String"/>
+	<field name="usr_address_city" class="java.lang.String"/>
+	<field name="usr_address_fax" class="java.lang.String"/>
+	<field name="usr_address_phone" class="java.lang.String"/>
+	<field name="usr_address_state" class="java.lang.String"/>
+	<field name="usr_address_zip_code" class="java.lang.String"/>
+	<field name="usr_address_address_line_2" class="java.lang.String"/>
+	<field name="usr_address_country" class="java.lang.String"/>
+	<field name="firstname" class="java.lang.String"/>
+	<field name="lastname" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="145" splitType="Stretch">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="10" y="0" width="190" height="20" uuid="56ead806-6946-4e7a-bd83-dbfd95ff8eec"/>
+				<textElement>
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{usr_institution_name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="10" y="44" width="190" height="20" uuid="fb661419-3334-4f42-9314-2ba3a2d0520e"/>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{usr_address_address}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="10" y="104" width="100" height="20" uuid="44162069-819e-4e5f-902d-cde34e20babf">
+					<printWhenExpression><![CDATA[!$F{usr_address_address_line_2}.isEmpty()]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{usr_address_country}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="59" y="84" width="100" height="20" uuid="dbd1db91-0343-4280-b539-6dbbcf5facaf">
+					<printWhenExpression><![CDATA[!$F{usr_address_address_line_2}.isEmpty()]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{usr_address_city}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="10" y="84" width="49" height="20" uuid="8eecb89b-1427-426d-996e-993d14378cce">
+					<printWhenExpression><![CDATA[!$F{usr_address_address_line_2}.isEmpty()]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{usr_address_zip_code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="10" y="64" width="190" height="20" uuid="476b9079-2db5-47ef-891e-e1cba148bf63">
+					<printWhenExpression><![CDATA[!$F{usr_address_address_line_2}.isEmpty()]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{usr_address_address_line_2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="10" y="64" width="49" height="20" uuid="c402d0f8-6307-4d34-ac32-17d0192efeee">
+					<printWhenExpression><![CDATA[$F{usr_address_address_line_2}.isEmpty()]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{usr_address_zip_code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="59" y="64" width="100" height="20" uuid="80992c72-0c7b-4ff0-b109-4057195d5894">
+					<printWhenExpression><![CDATA[$F{usr_address_address_line_2}.isEmpty()]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{usr_address_city}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="10" y="84" width="100" height="20" uuid="f500ee11-1179-4b50-9291-fdc864a6e427">
+					<printWhenExpression><![CDATA[$F{usr_address_address_line_2}.isEmpty()]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{usr_address_country}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="10" y="24" width="190" height="20" uuid="0cd0c254-2a28-4516-be1f-08154f8fd8e6"/>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{firstname} + " " + $F{lastname}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" x="10" y="125" width="190" height="20" uuid="f9f59f8e-3397-4fa8-9a2b-1696b9d17dc4">
+					<printWhenExpression><![CDATA[!$F{usr_address_address_line_2}.isEmpty()]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{VATString}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" x="10" y="105" width="190" height="20" uuid="0eafe75b-1953-45c6-9066-f457ad1d2d1c">
+					<printWhenExpression><![CDATA[$F{usr_address_address_line_2}.isEmpty()]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{VATString}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,183 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{actorManager.selectedActor.name}"/>
+    <ui:define name="body">
+        <h:form id="actorDeleteConfirmation">
+            <s:token allowMultiplePosts="true"/>
+            <h:outputText value="#{messages['gazelle.tf.ActorDelete.Confirmation']}"/>
+            <h:commandButton id="delete" styleClass="gzl-btn-red"
+                             value="#{messages['gazelle.common.button.Delete']}"
+                             action="#{actorManager.deleteActor( )}"/>
+            <h:commandButton id="cancel" styleClass="gzl-btn"
+                             value="#{messages['gazelle.common.button.Cancel']}"
+                             action="#{actorManager.listActors()}"/>
+        </h:form>
+
+        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+            <ui:define name="panel_title">#{messages['gazelle.tf.actor.ActorUnlinkIntegrationProfilesSection']}
+            </ui:define>
+            <h:form id="actorUnlinkIntegrationProfilesSection">
+                <s:token allowMultiplePosts="true"/>
+                <rich:dataTable id="unlinkedIntegrationProfiles" var="ip"
+                                value="#{actorManager.integrationProfilesForActor}"
+
+
+                                rendered="#{actorManager.integrationProfilesForActor.size&gt;0}">
+                    <g:column sortBy="#{'keyword'}" width="400">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Keyword']}</ui:define>
+                        #{ip.keyword}
+                    </g:column>
+                    <g:column sortBy="#{'name'}" width="500">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Name']}</ui:define>
+                        #{ip.name}
+                    </g:column>
+                </rich:dataTable>
+
+            </h:form>
+
+        </ui:decorate>
+
+
+        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+            <ui:define name="panel_title">#{messages['gazelle.tf.actor.ActorUnlinkIntegrationProfileOptionsSection']}
+            </ui:define>
+            <h:form id="actorUnlinkIntegrationProfileOptionsSection">
+                <s:token allowMultiplePosts="true"/>
+                <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                              rendered="#{actorManager.getIpIpoCount()==0}"/>
+                <rich:dataTable id="linkedIpIpoDataTableId" var="ipIpo"
+                                value="#{actorManager.integrationProfilesAndIntegrationProfileOptionsForActor}"
+                                rendered="#{actorManager.getIpIpoCount()&gt;0}">
+                    <g:column sortBy="#{'actorIntegrationProfile.integrationProfile.keyword'}">
+                        <ui:define name="header">#{messages['gazelle.tf.table.IntegrationProfile']}</ui:define>
+                        <h:outputText
+                                value="#{ipIpo.actorIntegrationProfile.integrationProfile.keyword} - #{ipIpo.actorIntegrationProfile.integrationProfile.name}"/>
+                    </g:column>
+                    <g:column sortBy="#{'integrationProfileOption.keyword'}">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Option']}</ui:define>
+                        <h:outputText
+                                value="#{ipIpo.integrationProfileOption.keyword} - #{ipIpo.integrationProfileOption.name}"/>
+                    </g:column>
+                </rich:dataTable>
+            </h:form>
+        </ui:decorate>
+
+        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+            <ui:define name="panel_title">#{messages['gazelle.tf.actor.ActorUnlinkTransactionsSection']}</ui:define>
+            <h:form id="actorUnlinkTransactionsSection">
+                <s:token allowMultiplePosts="true"/>
+                <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                              rendered="#{actorManager.getAllTransactionCount()==0}"/>
+                <rich:dataTable id="allTransactionsDataTableId" var="transaction"
+                                value="#{actorManager.allTransactionsForActor}"
+                                rendered="#{actorManager.getAllTransactionCount()&gt;0}">
+                    <g:column sortBy="#{'keyword'}" sortOrder="ascending">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Transaction']}</ui:define>
+                        <h:outputText value="#{transaction.keyword} - #{transaction.name}"/>
+                    </g:column>
+                </rich:dataTable>
+            </h:form>
+        </ui:decorate>
+
+        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+            <ui:define name="panel_title">
+                #{messages['gazelle.tf.actor.ActorUnlinkIntegrationProfileTransactionsSection']}
+            </ui:define>
+            <h:form id="actorUnlinkIntegrationProfileTransactionsSection">
+                <s:token allowMultiplePosts="true"/>
+                <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                              rendered="#{actorManager.getIpTransCount()==0}"/>
+                <rich:dataTable id="linkedIpTransDataTableId" var="ipTrans"
+                                value="#{actorManager.integrationProfilesAndTransactionsForActor}"
+                                rendered="#{actorManager.getIpTransCount()&gt;0}">
+                    <g:column sortBy="#{'actorIntegrationProfile.integrationProfile.keyword'}"
+                              sortOrder="ascending">
+                        <ui:define name="header">#{messages['gazelle.tf.table.IntegrationProfile']}</ui:define>
+                        <h:outputText
+                                value="#{ipTrans.actorIntegrationProfile.integrationProfile.keyword} - #{ipTrans.actorIntegrationProfile.integrationProfile.name}"/>
+                    </g:column>
+                    <g:column sortBy="#{'transaction.keyword'}" sortOrder="ascending">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Transaction']}</ui:define>
+                        <h:outputText
+                                value="#{ipTrans.transaction.keyword} - #{ipTrans.transaction.name}"/>
+                    </g:column>
+                    <g:column sortBy="#{'transactionOptionType.name'}" sortOrder="ascending">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Optionality']}</ui:define>
+                        <h:outputText value="#{ipTrans.transactionOptionType.name}"/>
+                    </g:column>
+                </rich:dataTable>
+            </h:form>
+        </ui:decorate>
+
+        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+            <ui:define name="panel_title">#{messages['gazelle.tf.actor.DeleteTransactionLinksSection']}</ui:define>
+            <h:form id="actorDeleteTransactionLinksSection">
+                <s:token allowMultiplePosts="true"/>
+                <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                              rendered="#{actorManager.getTlCount()==0}"/>
+                <rich:dataTable id="transactionLinksTableId" var="tl"
+                                value="#{actorManager.transactionLinksForActor}"
+                                rendered="#{actorManager.getTlCount()&gt;0}">
+                    <g:column sortBy="#{'fromActor.keyword'}" sortOrder="ascending">
+                        <ui:define name="header">#{messages['gazelle.tf.fromActorsTab']}</ui:define>
+                        <h:outputText value="#{tl.fromActor.keyword} - #{tl.fromActor.name}"/>
+                    </g:column>
+                    <g:column sortBy="#{'toActor.keyword'}" sortOrder="ascending">
+                        <ui:define name="header">#{messages['gazelle.tf.toActorsTab']}</ui:define>
+                        <h:outputText value="#{tl.toActor.keyword} - #{tl.toActor.name}"/>
+                    </g:column>
+                    <g:column sortBy="#{'transaction.keyword'}" sortOrder="ascending">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Transactions']}</ui:define>
+                        <h:outputText value="#{tl.transaction.keyword} - #{tl.transaction.name}"/>
+                    </g:column>
+                </rich:dataTable>
+            </h:form>
+        </ui:decorate>
+
+        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+            <ui:define name="panel_title">#{messages['gazelle.tf.domain.DE.DeleteHl7MessageProfileSection']}</ui:define>
+            <h:form id="actordeletehl7mpsection">
+                <s:token allowMultiplePosts="true"/>
+                <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                              rendered="#{actorManager.hl7MessageProfilesForActor.size==0}"/>
+                <rich:dataTable id="deletedHl7mp" var="mp" value="#{actorManager.hl7MessageProfilesForActor}"
+
+
+                                rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                                rendered="#{actorManager.hl7MessageProfilesForActor.size&gt;0}" render="ds">
+                    <g:column sortBy="#{'id'}" width="100">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                        #{mp.id}
+                    </g:column>
+                    <g:column sortBy="#{'profileOid'}" width="350">
+                        <ui:define name="header">#{messages['gazelle.tf.table.profileOid']}</ui:define>
+                        #{mp.profileOid}
+                    </g:column>
+                    <g:column sortBy="#{'hl7Version'}" width="200">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Hl7Version']}</ui:define>
+                        #{mp.hl7Version}
+                    </g:column>
+                    <g:column sortBy="#{'transaction'}" width="250">
+                        <ui:define name="header">#{messages['gazelle.tf.table.mptrans']}</ui:define>
+                        #{mp.messageType}
+                    </g:column>
+                    <g:column sortBy="#{'messageOrderControlCode'}" width="250">
+                        <ui:define name="header">#{messages['gazelle.tf.table.messageOrderControlCode']}</ui:define>
+                        #{mp.messageOrderControlCode}
+                    </g:column>
+                    <f:facet name="footer">
+                        <ui:include src="/util/datatableFooter.xhtml">
+                            <ui:param name="dataScrollerId" value="ds"/>
+                            <ui:param name="dataTableId" value="deletedHl7mp"/>
+                        </ui:include>
+                    </f:facet>
+                </rich:dataTable>
+
+            </h:form>
+        </ui:decorate>
+
+    </ui:define>
+</ui:composition>

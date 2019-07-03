@@ -1,0 +1,187 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <h:panelGrid style="width: 100%;" columns="2" columnClasses="gridContent"
+                 rendered="#{not empty connecthatonTestingManager.foundTestRolesParticipantsResult}">
+        <s:div>
+            <h:outputText
+                    value="#{connecthatonTestingManager.foundTestRolesParticipantsResult.size()} #{messages['gazelle.tm.TestsToDo']}."/>
+        </s:div>
+        <s:div>
+            <h:outputText value="#{messages['net.ihe.gazelle.tm.LastUpdateOfPartnersCounters']} : "/>
+            <g:date tooltip="true" value="#{userManagerExtra.selectedTestingSession.resultsCompute}"/>
+        </s:div>
+    </h:panelGrid>
+    <rich:dataTable id="testTable"
+                    rendered="#{connecthatonTestingManager.selectedSystemInSession!=null and connecthatonTestingManager.foundTestRolesParticipantsResult!=null}"
+
+
+                    var="currentTestRolesParticipantsResult"
+                    value="#{connecthatonTestingManager.foundTestRolesParticipantsResult}">
+        <f:facet name="header">
+            <h:outputText value="#{messages['gazelle.tm.test.TestInstances']}"/>
+        </f:facet>
+        <g:column sortBy="#{'testRoles.test.keyword'}">
+            <ui:define name="header">
+                <h:outputText value="#{messages['gazelle.tests.test']}"/>
+            </ui:define>
+            <g:link target="_blank" value="#{currentTestRolesParticipantsResult.testRoles.test}"/>
+        </g:column>
+        <g:column rendered="#{!gazelleDAO.getSelectedTestingSession().testingSessionClosedForUser()}">
+            <ui:define name="header">
+                <h:outputText value="#{messages['gazelle.tm.test.Start']}"/>
+            </ui:define>
+            <h:panelGroup rendered="#{currentTestRolesParticipantsResult.isConnectedUserAllowedToStartTest}">
+                <center>
+                    <a4j:commandLink title="#{messages['gazelle.tm.testing.addTestInstance']}"
+                            action="#{connecthatonTestingManager.initializeTestInstanceParticipantsCreation(connecthatonTestingManager.selectedSystemInSession,currentTestRolesParticipantsResult.testRoles)}"
+                            onRowMouseOver="this.style.cursor='pointer'" immediate="true">
+                        <span class="gzl-icon-plus"/>
+                    </a4j:commandLink>
+                </center>
+            </h:panelGroup>
+        </g:column>
+        <g:column rendered="#{connecthatonTestingManager.selectedTestPeerType==null}">
+            <ui:define name="header">
+                <h:outputText value="#{messages['gazelle.tm.monitors.TestType']}"/>
+            </ui:define>
+            <h:outputText
+                    value="#{messages[currentTestRolesParticipantsResult.testPeerType.labelToDisplay]}"/>
+        </g:column>
+        <g:column>
+            <ui:define name="header">
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.Partners']}"/>
+            </ui:define>
+            <s:div>
+                <ui:include src="/testing/partnersList.xhtml">
+                    <ui:param name="partners" value="#{currentTestRolesParticipantsResult.partners}"/>
+                </ui:include>
+            </s:div>
+        </g:column>
+        <g:column
+                sortBy="#{'systemActorProfiles.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.keyword'}"
+                rendered="#{connecthatonTestingManager.selectedIntegrationProfile==null}">
+            <ui:define name="header">
+                <h:outputText value="#{messages['gazelle.tf.IntegrationProfileAcronym']}"/>
+            </ui:define>
+            <h:outputText
+                    value="#{currentTestRolesParticipantsResult.systemActorProfiles.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.keyword}"/>
+        </g:column>
+        <g:column
+                sortBy="#{'systemActorProfiles.actorIntegrationProfileOption.actorIntegrationProfile.actor.keyword'}"
+                rendered="#{connecthatonTestingManager.selectedActor==null}">
+            <ui:define name="header">
+                <h:outputText value="#{messages['gazelle.tf.Actor']}"/>
+            </ui:define>
+            <h:outputText
+                    value="#{currentTestRolesParticipantsResult.systemActorProfiles.actorIntegrationProfileOption.actorIntegrationProfile.actor.keyword}"/>
+        </g:column>
+        <g:column>
+            <ui:define name="header">
+                <h:outputText value="#{messages['gazelle.tf.IntegrationProfileOptionAcronym']}"/>
+            </ui:define>
+            <h:outputText
+                    value="#{currentTestRolesParticipantsResult.systemActorProfiles.actorIntegrationProfileOption.integrationProfileOption.getKeywordFiltered()}"/>
+        </g:column>
+        <g:column>
+            <ui:define name="header">
+                <h:outputText value="#{messages['gazelle.tests.test.testOptionAcronym']}"/>
+            </ui:define>
+            <h:outputText value="#{currentTestRolesParticipantsResult.testRoles.testOption.keyword}"/>
+        </g:column>
+        <g:column>
+            <ui:define name="header">
+                <h:outputText value="#{messages['gazelle.systems.TestingTypeAcronym']}"/>
+            </ui:define>
+            <h:outputText
+                    value="#{currentTestRolesParticipantsResult.systemActorProfiles.testingType.keyword}"/>
+        </g:column>
+        <g:column>
+            <ui:define name="header">
+                <h:outputText value="#" title="#{messages[gazelle.tm.testing.numberTestsToDo]}"/>
+            </ui:define>
+            <h:outputText value="#{currentTestRolesParticipantsResult.testRoles.numberOfTestsToRealize}"/>
+        </g:column>
+        <g:column>
+            <ui:define name="header">
+                <h:outputText value="#{messages['gazelle.tm.testing.status.verified']}"/>
+            </ui:define>
+            <a4j:repeat value="#{currentTestRolesParticipantsResult.getVerifiedTests()}"
+                        var="currentTestInstanceParticipants">
+                <s:div>
+                    <g:link value="#{currentTestInstanceParticipants.testInstance}" target="_blank"/>
+                </s:div>
+            </a4j:repeat>
+        </g:column>
+        <g:column>
+            <ui:define name="header">
+                #{messages['gazelle.tm.testing.status.partially']}
+                <br/>
+                #{messages['gazelle.tm.testing.status.verified']}
+            </ui:define>
+            <a4j:repeat value="#{currentTestRolesParticipantsResult.getPartiallyVerifiedTests()}"
+                        var="currentTestInstanceParticipants">
+                <s:div>
+                    <g:link value="#{currentTestInstanceParticipants.testInstance}" target="_blank"/>
+                </s:div>
+            </a4j:repeat>
+        </g:column>
+        <g:column rendered="#{gazelleDAO.getSelectedTestingSession().isCriticalStatusEnabled}">
+            <ui:define name="header">
+                <h:outputText value="#{messages['gazelle.tm.testing.status.critical']}"/>
+            </ui:define>
+            <a4j:repeat value="#{currentTestRolesParticipantsResult.getCriticalTests()}"
+                        var="currentTestInstanceParticipants">
+                <s:div>
+                    <g:link value="#{currentTestInstanceParticipants.testInstance}" target="_blank"/>
+                </s:div>
+            </a4j:repeat>
+        </g:column>
+        <g:column>
+            <ui:define name="header">
+                <h:outputText value="#{messages['gazelle.tm.testing.status.completed']}"/>
+            </ui:define>
+            <a4j:repeat value="#{currentTestRolesParticipantsResult.getCompletedTests()}"
+                        var="currentTestInstanceParticipants">
+                <s:div>
+                    <g:link value="#{currentTestInstanceParticipants.testInstance}" target="_blank"/>
+                </s:div>
+            </a4j:repeat>
+        </g:column>
+        <g:column>
+            <ui:define name="header">
+                <h:outputText value="#{messages['gazelle.tm.testing.status.running']}"/>
+            </ui:define>
+            <a4j:repeat value="#{currentTestRolesParticipantsResult.getStartedTests()}"
+                        var="currentTestInstanceParticipants">
+                <s:div>
+                    <g:link value="#{currentTestInstanceParticipants.testInstance}" target="_blank"/>
+                </s:div>
+            </a4j:repeat>
+        </g:column>
+        <g:column>
+            <ui:define name="header">
+                <h:outputText value="#{messages['gazelle.tm.testing.status.paused']}"/>
+            </ui:define>
+            <a4j:repeat value="#{currentTestRolesParticipantsResult.getPausedTests()}"
+                        var="currentTestInstanceParticipants">
+                <s:div>
+                    <g:link value="#{currentTestInstanceParticipants.testInstance}" target="_blank"/>
+                </s:div>
+            </a4j:repeat>
+        </g:column>
+        <g:column>
+            <ui:define name="header">
+                <h:outputText value="#{messages['gazelle.tm.testing.status.failed']}"/>
+            </ui:define>
+            <a4j:repeat value="#{currentTestRolesParticipantsResult.getFailedTests()}"
+                        var="currentTestInstanceParticipants">
+                <s:div>
+                    <g:link value="#{currentTestInstanceParticipants.testInstance}" target="_blank"/>
+                </s:div>
+            </a4j:repeat>
+        </g:column>
+    </rich:dataTable>
+</ui:composition>

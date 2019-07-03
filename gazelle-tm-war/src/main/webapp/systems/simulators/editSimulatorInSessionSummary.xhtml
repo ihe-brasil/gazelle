@@ -1,0 +1,82 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <a4j:region id="institutionRegion" rendered="#{simulatorInSessionManager.selectedSimulatorInSession.id!=null}">
+        <s:decorate id="institutionDecoration" template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.users.institution.InstitutionName']}</ui:define>
+            #{systemManager.displayInstitutionForSystem(simulatorInSessionManager.selectedSimulatorInSession.system )}
+        </s:decorate>
+    </a4j:region>
+    <a4j:region id="nameRegion">
+        <s:decorate id="nameDecoration" template="/layout/form/_edit.xhtml">
+            <ui:param name="id" value="systemname"/>
+            <ui:define name="label">#{messages['gazelle.systems.system.SystemName']}</ui:define>
+            <a4j:commandLink id="onChangeSystemName" render="nameDecoration,keywordReg"/>
+            <h:inputText  styleClass=" form-control" id="systemname" maxlength="128" size="30"
+                         value="#{simulatorInSessionManager.selectedSimulatorInSession.system.name}"
+                          required="true"/>
+        </s:decorate>
+    </a4j:region>
+    <a4j:region id="typeRegion" rendered="#{s:hasRole('admin_role')}">
+        <s:decorate id="typeDecorationBeforeDeadline" template="/layout/form/_edit.xhtml">
+            <ui:define name="label">#{messages['gazelle.systems.system.SystemType']}</ui:define>
+            <a4j:commandLink id="onChangeSystemType" render="keywordReg"/>
+            <h:selectOneMenu styleClass="form-control gzl-form-control" id="SystemTypeListBoxBeforeDeadline"
+                             value="#{simulatorInSessionManager.selectedSimulatorInSession.system.systemType}"
+                             required="true">
+                <s:selectItems value="#{simulatorInSessionManager.possibleSystemTypes}" var="systemTypeFromList"
+                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                               label="#{systemTypeFromList.systemTypeKeyword}"/>
+            </h:selectOneMenu>
+        </s:decorate>
+    </a4j:region>
+    <s:div id="keywordReg">
+        <s:decorate id="keywordDecorationBeforeDeadline"
+                    rendered="#{s:hasRole('admin_role') and not empty simulatorInSessionManager.selectedSimulatorInSession.system.systemType }"
+                    template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.systems.system.SystemKeyword']}</ui:define>
+            <h:panelGrid columns="2">
+                <s:div id="keywordEditDiv">
+                    <h:outputText id="systemkeywordEditOutAdmin"
+                                  rendered="#{not empty simulatorInSessionManager.selectedSimulatorInSession.system.systemType}"
+                                  value="#{simulatorInSessionManager.getKeywordWithoutSuffixForSelectedSimu()}"/>
+                    <h:outputText id="underscoreOutputCreate"
+                                  rendered="#{(simulatorInSessionManager.selectedSimulatorInSession.system.keywordSuffix.length() &gt; 0) and (not empty simulatorInSessionManager.selectedSimulatorInSession.system.systemType.systemTypeKeyword)}"
+                                  value="_"/>
+                </s:div>
+                <h:inputText  styleClass=" form-control" id="systemkeywordIn" maxlength="20" size="20"
+                             value="#{simulatorInSessionManager.selectedSimulatorInSession.system.keywordSuffix}"
+                             rendered="#{not empty simulatorInSessionManager.selectedSimulatorInSession.system.systemType}">
+                    <a4j:ajax event="keyup" render="keywordEditDiv" execute="@this"/>
+                </h:inputText>
+            </h:panelGrid>
+        </s:decorate>
+    </s:div>
+    <s:decorate id="versionDecoration" template="/layout/form/_edit.xhtml">
+        <ui:param name="id" value="version"/>
+        <ui:define name="label">#{messages['gazelle.systems.system.SystemVersion']}</ui:define>
+        <h:inputText  styleClass=" form-control" id="version" maxlength="64" size="30"
+                     value="#{simulatorInSessionManager.selectedSimulatorInSession.system.version}" required="true"/>
+    </s:decorate>
+    <a4j:region id="urlRegion">
+        <s:decorate id="urlDecoration" template="/layout/form/_edit.xhtml">
+            <ui:param name="id" value="urlinp"/>
+            <ui:define name="label">#{messages['gazelle.tm.testing.URL']}</ui:define>
+            <h:inputText  styleClass=" form-control" id="urlinp" maxlength="255" size="100"
+                         value="#{simulatorInSessionManager.selectedSimulatorInSession.system.url}">
+            </h:inputText>
+        </s:decorate>
+    </a4j:region>
+    <a4j:region id="ownerRegion" rendered="#{s:hasRole('admin_role') }">
+        <s:decorate id="ownerDecoration" template="/layout/form/_edit.xhtml">
+            <ui:define name="label">#{messages['gazelle.systems.system.OwnerUser']}</ui:define>
+            <h:selectOneMenu styleClass="form-control gzl-form-control" id="OwnerList"
+                             value="#{simulatorInSessionManager.selectedSimulatorInSession.system.ownerUser}">
+                <s:selectItems value="#{simulatorInSessionManager.getAllowedUsersToManageSimulators()}"
+                               var="userFromList" noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                               label="#{userFromList.username}"/>
+            </h:selectOneMenu>
+        </s:decorate>
+    </a4j:region>
+</ui:composition>

@@ -1,0 +1,179 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <h:panelGroup rendered="#{s:hasRole('admin_role')}">
+        <!-- ======================= 	-->
+        <!-- System summary section		-->
+        <!-- ======================= 	-->
+
+        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+            <ui:define name="panel_title">#{messages['gazelle.systems.system.admin.SummaryManagementForIHEAdmin']}
+            </ui:define>
+            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.SystemInfos']}</ui:define>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">
+                        <h:outputText value="#{messages['gazelle.common.SystemId']}"/>
+                    </ui:define>
+                    <h:outputText style="color: blue;font-weight: bold;"
+                                  value="#{systemInSessionEditor.getSystem().id}"/>
+                </s:decorate>
+                <s:decorate id="instAdminDecoration" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.users.institution.InstitutionName']}</ui:define>
+                    <h:outputText style="color: blue;font-weight: bold;"
+                                  value="#{systemManager.displayInstitutionForSystem( systemInSessionEditor.getSystem() )}"/>
+                </s:decorate>
+                <s:decorate id="systAdminDecoration" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.systems.system.SystemName']}
+                        (#{messages['gazelle.systems.system.SystemVersion']})
+                    </ui:define>
+                    <h:outputText style="font-weight: bold;"
+                                  value="#{systemInSessionEditor.getSystem().name} (#{systemInSessionEditor.getSystem().version})"/>
+                </s:decorate>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.OwnerUser']}"/>
+                    </ui:define>
+                    <h:outputText style="color: blue;font-weight: bold;"
+                                  value="#{systemInSessionEditor.getSystem().ownerUser.username}"/>
+                </s:decorate>
+            </ui:decorate>
+
+            <s:decorate template="/layout/display/_display.xhtml">
+                <ui:define name="label">
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.IntegrationStatementURL']}"/>
+                </ui:define>
+                <h:outputLink target="_blank"
+                              value="#{systemInSessionEditor.getSystem().integrationStatementUrl}">
+                    <h:outputText
+                            value="#{prManager.downloadISLabel(systemInSessionEditor.getSystem())}"/>
+                </h:outputLink>
+            </s:decorate>
+            <s:decorate template="/layout/display/_display.xhtml">
+                <ui:define name="label">
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.StatusOfIntegrationStatement']}"/>
+                </ui:define>
+                <h:outputText style="color: blue;font-weight: bold;"
+                              value="#{systemInSessionEditor.getSystem().prStatus.details}"/>
+            </s:decorate>
+            <h:panelGrid columns="3" columnClasses="gridContent">
+                <!-- User -->
+                <h:outputText style="color: blue;font-weight: bold;"
+                              value="#{messages['net.ihe.gazelle.tm.DeclaredByUser']}"/>
+                <!-- Crawler -->
+                <h:outputText style="color: blue;font-weight: bold;"
+                              value="#{messages['net.ihe.gazelle.tm.SetByCrawler']}"/>
+                <!-- Admin -->
+                <h:outputText style="color: blue;font-weight: bold;"
+                              value="#{messages['net.ihe.gazelle.tm.SetByAdmin']}"/>
+                <!-- User -->
+                <s:div>
+                    <s:decorate template="/layout/display/_display.xhtml">
+                        <ui:define name="label">
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.IntegrationStatementDate']}"/>
+                        </ui:define>
+                        <g:date time="false"
+                                value="#{systemInSessionEditor.getSystem().integrationStatementDate}"/>
+                    </s:decorate>
+                    <s:decorate template="/layout/display/_display.xhtml">
+                        <ui:define name="label">
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.GeneratedIntegrationStatementDate']}"/>
+                        </ui:define>
+                        <g:date tooltip="true"
+                                value="#{systemInSessionEditor.getSystem().prDateGenerated}"/>
+                    </s:decorate>
+                    <s:decorate template="/layout/display/_display.xhtml">
+                        <ui:define name="label">
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.AskForPublicationDate']}"/>
+                        </ui:define>
+                        <g:date tooltip="true"
+                                value="#{systemInSessionEditor.getSystem().prDateAskForPublicationDate}"/>
+                    </s:decorate>
+                </s:div>
+                <!-- Crawler -->
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.ValidatedByCrawlerDate']}"/>
+                    </ui:define>
+                    <g:date tooltip="true"
+                            value="#{systemInSessionEditor.getSystem().prDateValidatedByCrawler}"/>
+                </s:decorate>
+                <!-- Admin -->
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.AdminIntegrationStatementStatusDate']}"/>
+                    </ui:define>
+                    <g:date tooltip="true"
+                            value="#{systemInSessionEditor.getSystem().prDateValidatedByAdmin}"/>
+                </s:decorate>
+                <!-- User -->
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.GeneratedIntegrationStatementChecksum']}"/>
+                    </ui:define>
+                    <h:outputText value="#{systemInSessionEditor.getSystem().prChecksumGenerated}"/>
+                </s:decorate>
+                <!-- Crawler -->
+                <s:div>
+                    <s:decorate template="/layout/display/_display.xhtml">
+                        <ui:define name="label">
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.CrawlerUnmatchedCounter']}"/>
+                        </ui:define>
+                        <h:outputText style="color: blue;font-weight: bold;"
+                                      value="#{systemInSessionEditor.getSystem().prCounterCrawlerUnmatchingHashcode}"/>
+                    </s:decorate>
+                    <s:decorate template="/layout/display/_display.xhtml">
+                        <ui:define name="label">
+                            <h:outputText
+                                    value="#{messages['net.ihe.gazelle.tm.CrawlerMailSentBecauseOfUnmatchedFiles']}"/>
+                        </ui:define>
+                        <h:outputText style="color: blue;font-weight: bold;"
+                                      value="#{systemInSessionEditor.getSystem().prMailSentBecauseUnmatchingHashcode}"/>
+                    </s:decorate>
+                    <s:decorate template="/layout/display/_display.xhtml">
+                        <ui:define name="label">
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.CrawlerUnreachableCounter']}"/>
+                        </ui:define>
+                        <h:outputText style="color: blue;font-weight: bold;"
+                                      value="#{systemInSessionEditor.getSystem().prCounterCrawlerUnreachableUrl}"/>
+                    </s:decorate>
+                    <s:decorate template="/layout/display/_display.xhtml">
+                        <ui:define name="label">
+                            <h:outputText
+                                    value="#{messages['net.ihe.gazelle.tm.CrawlerMailSentBecauseOfUnreachableURL']}"/>
+                        </ui:define>
+                        <h:outputText style="color: blue;font-weight: bold;"
+                                      value="#{systemInSessionEditor.getSystem().prMailSentBecauseUnreachableUrl}"/>
+                    </s:decorate>
+                </s:div>
+                <!-- Admin -->
+                <s:div>
+                    <s:decorate template="/layout/display/_display.xhtml">
+                        <ui:define name="label">
+                            <h:outputText
+                                    value="#{messages['net.ihe.gazelle.tm.ValidatedIntegrationStatementChecksum']}"/>
+                        </ui:define>
+                        <h:outputText value="#{systemInSessionEditor.getSystem().prChecksumValidated}"/>
+                    </s:decorate>
+                    <s:decorate template="/layout/display/_display.xhtml">
+                        <ui:define name="label">
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.AdminComment']}"/>
+                        </ui:define>
+                        <h:outputText
+                                value="#{systemInSessionEditor.getSystem().prCommentValidatedByAdmin}"/>
+                    </s:decorate>
+                </s:div>
+            </h:panelGrid>
+            <s:decorate id="historyAdminDecoration" template="/layout/display/_display.xhtml">
+                <ui:define name="label">#{messages['gazelle.common.History']}</ui:define>
+                <h:form id="systemeventsForm">
+                    <s:token allowMultiplePosts="true"/>
+                    <ui:include src="/pr/systemEvents.xhtml">
+                        <ui:param name="system" value="#{systemInSessionEditor.getSystem()}"/>
+                    </ui:include>
+                </h:form>
+            </s:decorate>
+        </ui:decorate>
+    </h:panelGroup>
+</ui:composition>

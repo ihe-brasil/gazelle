@@ -1,0 +1,69 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['net.ihe.gazelle.tm.AddStandardToTransaction']}"/>
+    <ui:define name="body">
+
+        <s:decorate template="/layout/panels/_panel_title_id.xhtml">
+            <ui:param name="panel_id" value="transactionDescription"/>
+            <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.AddStandardsToTransaction']}</ui:define>
+            <h:form id="transactionDetailsForm">
+                <h:outputText
+                        value="#{messages['net.ihe.gazelle.tm.YouAreAboutToAddStandardsToTheFollowingTransacti']}"/>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.testmanagement.object.keyword']}</ui:define>
+                    <h:outputText value="#{standardManager.selectedTransaction.keyword}"/>
+                </s:decorate>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.testmanagement.object.Name']}</ui:define>
+                    <h:outputText value="#{standardManager.selectedTransaction.name}"/>
+                </s:decorate>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.menu.Standards']}</ui:define>
+                    <a4j:repeat value="#{standardManager.selectedTransaction.standards}" var="std"
+                                rendered="#{not empty standardManager.selectedTransaction.standards}">
+                        <h:panelGrid columns="2">
+                            <h:outputLink value="#{std.url}">
+                                <h:outputText value="#{std.name}"/>
+                            </h:outputLink>
+                            <a4j:commandLink event="click" execute="@this" render="transactionDescription"
+                                             height="18" title="#{messages['net.ihe.gazelle.tm.RemoveThisStandard']}"
+                                             actionListener="#{standardManager.deleteStandardFromTransaction(std)}">
+                                <span class="gzl-icon-trash-o"/>
+                            </a4j:commandLink>
+
+                        </h:panelGrid>
+                    </a4j:repeat>
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.None']}"
+                                  rendered="#{empty transactionManager.selectedTransaction.standards}"/>
+                </s:decorate>
+                <a4j:commandLink action="#{transactionManager.editTransaction(standardManager.selectedTransaction, true)}"
+                                 rendered="#{s:hasPermission('MasterModel', 'edit', null)}"
+                                 title="#{messages['net.ihe.gazelle.tm.GoBackToTransaction']}"
+                                 styleClass="gzl-btn">
+                    <span class="gzl-icon-back"/>
+                </a4j:commandLink>
+            </h:form>
+        </s:decorate>
+
+        <h:form id="globalform">
+            <s:token allowMultiplePosts="true"/>
+            <s:decorate template="/tf/standard/suggestFilters.xhtml">
+                <ui:param name="managedBean" value="#{standardManager}"/>
+            </s:decorate>
+            <s:decorate template="/tf/standard/standardTable.xhtml">
+                <ui:param name="standards" value="#{standardManager.standards}"/>
+                <ui:define name="actions">
+                    <a4j:commandLink event="click" render=":transactionDetailsForm"
+                                     title="#{messages['net.ihe.gazelle.tm.AddStandard']}"
+                                     rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}"
+                                     actionListener="#{standardManager.addStandardToTransaction(std)}">
+                        <span class="gzl-icon-plus"/>
+                    </a4j:commandLink>
+
+                </ui:define>
+            </s:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

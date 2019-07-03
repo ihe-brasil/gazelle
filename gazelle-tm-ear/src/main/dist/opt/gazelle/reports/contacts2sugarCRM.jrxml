@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version last-->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="contacts2sugarCRM" pageWidth="802" pageHeight="555" orientation="Landscape" columnWidth="802" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" >
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[SELECT
+uuid_generate_v4() as id,
+     usr_person."cell_phone" AS usr_person_cell_phone,
+     usr_person."email" AS usr_person_email,
+     usr_person."firstname" AS usr_person_firstname,
+     usr_person."lastname" AS usr_person_lastname,
+     usr_person."personal_fax" AS usr_person_personal_fax,
+     usr_person."personal_phone" AS usr_person_personal_phone,
+     usr_person_function."id" AS usr_person_function_id,
+     usr_person_function."last_changed" AS usr_person_function_last_changed,
+     usr_person_function."last_modifier_id" AS usr_person_function_last_modifier_id,
+     usr_person_function."description" AS usr_person_function_description,
+     usr_person_function."is_billing" AS usr_person_function_is_billing,
+     usr_person_function."name" AS usr_person_function_name,
+     usr_person_function."keyword" AS usr_person_function_keyword,
+     usr_address."address" AS usr_address_address,
+     usr_address."address_line_2" AS usr_address_address_line_2,
+     usr_address."city" AS usr_address_city,
+     usr_address."fax" AS usr_address_fax,
+     usr_address."phone" AS usr_address_phone,
+     usr_address."state" AS usr_address_state,
+     usr_address."zip_code" AS usr_address_zip_code,
+     usr_address."country" AS usr_address_country,
+     usr_institution."name" AS usr_institution_name
+FROM
+     "public"."usr_address" usr_address INNER JOIN "public"."usr_person" usr_person ON usr_address."id" = usr_person."address_id"
+     INNER JOIN "public"."usr_persons_functions" usr_persons_functions ON usr_person."id" = usr_persons_functions."person_id"
+     INNER JOIN "public"."usr_institution" usr_institution ON usr_person."institution_id" = usr_institution."id"
+     AND usr_address."id" = usr_institution."mailing_address_id"
+     INNER JOIN "public"."usr_person_function" usr_person_function ON usr_persons_functions."person_function_id" = usr_person_function."id"]]>
+	</queryString>
+	<field name="id" class="java.lang.Object"/>
+	<field name="usr_person_cell_phone" class="java.lang.String"/>
+	<field name="usr_person_email" class="java.lang.String"/>
+	<field name="usr_person_firstname" class="java.lang.String"/>
+	<field name="usr_person_lastname" class="java.lang.String"/>
+	<field name="usr_person_personal_fax" class="java.lang.String"/>
+	<field name="usr_person_personal_phone" class="java.lang.String"/>
+	<field name="usr_person_function_id" class="java.lang.Integer"/>
+	<field name="usr_person_function_last_changed" class="java.sql.Timestamp"/>
+	<field name="usr_person_function_last_modifier_id" class="java.lang.String"/>
+	<field name="usr_person_function_description" class="java.lang.String"/>
+	<field name="usr_person_function_is_billing" class="java.lang.Boolean"/>
+	<field name="usr_person_function_name" class="java.lang.String"/>
+	<field name="usr_person_function_keyword" class="java.lang.String"/>
+	<field name="usr_address_address" class="java.lang.String"/>
+	<field name="usr_address_address_line_2" class="java.lang.String"/>
+	<field name="usr_address_city" class="java.lang.String"/>
+	<field name="usr_address_fax" class="java.lang.String"/>
+	<field name="usr_address_phone" class="java.lang.String"/>
+	<field name="usr_address_state" class="java.lang.String"/>
+	<field name="usr_address_zip_code" class="java.lang.String"/>
+	<field name="usr_address_country" class="java.lang.String"/>
+	<field name="usr_institution_name" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<rectangle>
+				<reportElement  x="0" y="0" width="802" height="20"/>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<textField>
+				<reportElement  x="0" y="0" width="802" height="20"/>
+				<textElement>
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{usr_person_firstname}+","+$F{usr_person_lastname}+","+$F{id}+",,,,"+$F{usr_institution_name}+","+$F{usr_person_email}+","+$F{usr_person_cell_phone}+","+$F{usr_person_personal_phone}+",,,"+$F{usr_person_personal_fax}+","+$F{usr_address_address}+","+$F{usr_address_address_line_2}+","+$F{usr_address_city}+","+$F{usr_address_state}+","+$F{usr_address_zip_code}+","+$F{usr_address_country}+",,,,,,,,,,,,,,,,,,,,0"]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

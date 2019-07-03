@@ -1,0 +1,40 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.common.menu.SessionOverview']}"/>
+    <ui:define name="body">
+        <h:panelGroup rendered="#{s:hasRole('admin_role')}">
+
+            <!-- ======================================= -->
+            <!-- Companies without participants section	 -->
+            <!-- ======================================= -->
+            #{connectathonParticipantManager.initializeListOfCompaniesWithoutParticipants()}
+
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation"  class="active">
+                    <a href="#companyWithoutParticipantsSummaryTab" aria-controls="home"
+                       role="tab" data-toggle="tab">#{messages['gazelle.testmanagement.session.CompaniesWithoutParticipants']}</a>
+                </li>
+                <li role="presentation">
+                    <a href="#testsOverviewForSystemsSummaryTab" aria-controls="profile"
+                       role="tab" data-toggle="tab">#{messages['gazelle.testmanagement.session.TestsOverviewForSystems']}</a>
+                </li>
+                <li role="presentation">
+                    <a href="#tiOverviewTab" aria-controls="messages" role="tab"
+                       data-toggle="tab">#{messages['gazelle.testmanagement.session.testInstanceOverview']}</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="companyWithoutParticipantsSummaryTab">
+                    <ui:include id="companiesWithoutParticipants"
+                                src="sessionOverview/companiesWithoutParticipantsSection.xhtml"/>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="testsOverviewForSystemsSummaryTab">
+                    <ui:include id="testsOverviewForSystems"
+                                src="sessionOverview/testsOverviewForSystemsSection.xhtml"/>
+                </div>
+            </div>
+        </h:panelGroup>
+    </ui:define>
+</ui:composition>

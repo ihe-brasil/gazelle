@@ -1,0 +1,39 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <!-- treeNodeToDisplay = treeNodeImpl to display in this treeNode -->
+    <!-- id : identifier for the tree -->
+    <rich:tree id="TreeOfSampleForReading" value="#{treeNodeToDisplay}" var="node"
+               rendered="#{treeNodeToDisplay != null}" adviseNodeSelected="#{objectManager.adviseNodeSelected}"
+               style="vertical-align:top" nodeType="#{node.data.class.simpleName}" toggleType="client">
+
+        <rich:treeNode type="ObjectType" id="treenodObjtyp" width="15" height="15" iconClass="gzl-icon-sample"
+                       expanded="#{node.expanded}">
+            <h:outputText value="#{node.data.keyword}"/>
+
+            <h:panelGroup rendered="#{objectManager.canDownloadAllSampleOfType(node.data)}">
+                <h:commandLink id="downoi" action="#{objectManager.downloadAllSampleOfType(node.data)}"
+                               title="#{messages['gazelle.testmanagement.object.DownloadAllSample']}"
+                               target="_blank">
+                    <span class="gzl-icon-download"/>
+                </h:commandLink>
+            </h:panelGroup>
+        </rich:treeNode>
+
+        <rich:treeNode type="SystemInSession" id="treeNodSIS" width="15" height="15" iconClass="gzl-icon-system"
+                       expanded="#{node.expanded}">
+            <h:outputText value="#{node.data.system.keyword}"/>
+        </rich:treeNode>
+        <rich:treeNode type="ObjectInstance" width="15" height="15"
+                       selectedClass="selectedNodeStyle" id="treeNodObjIns" iconClass="gzl-icon-save"
+                       expanded="#{node.expanded}">
+            <a4j:commandLink id="link" actionListener="#{objectManager.setSelectedObjectInstance(node.data)}"
+                             title="#{messages['gazelle.testmanagement.search.button.View']}"
+                             render=" selectedSamplePanel,:editbutForm,:validationDecorationForm,:annotationForReaderOnCreateForm,:currentObjectInstanceFileForm"
+                             onclick="decolorNode('ReadersForm:subview_2:TreeOfSampleForReading',this)">
+                <h:outputText value="#{node.data.name} #{objectManager.getValidationStatusValue(node.data)}"/>
+            </a4j:commandLink>
+        </rich:treeNode>
+    </rich:tree>
+</ui:composition>

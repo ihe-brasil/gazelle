@@ -1,0 +1,1 @@
+UPDATE usr_users SET last_login='01/01/00' where last_login is null;

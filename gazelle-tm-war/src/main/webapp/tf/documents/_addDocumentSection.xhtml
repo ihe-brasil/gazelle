@@ -1,0 +1,40 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <div id="displayDiv">
+
+          <span style="display: block; color: #334d55;" id="firstCellSpan" class="name">
+						#{messages['net.ihe.gazelle.tm.DocumentSection']} </span>
+
+        <s:span rendered="#{(not empty documentSectionParam) and ( s:hasRole('admin_role') || s:hasRole('tests_editor_role'))}">
+            <ui:include src="/tf/documents/_documentSection.xhtml">
+                <ui:param name="documentSectionParam" value="#{documentSectionParam}"/>
+                <ui:param name="displayedName" value="#{documentSectionParam.getReferenceTitle()}"/>
+            </ui:include>
+        </s:span>
+        <s:span rendered="#{(empty documentSectionParam) and ( s:hasRole('admin_role') || s:hasRole('tests_editor_role'))}">
+            <h:outputText value="#{messages['net.ihe.gazelle.tm.None']}"/>
+        </s:span>
+
+        <h:panelGroup id="globalForm" rendered="#{displayActionsParam}">
+            <h:panelGroup id="deleteSectionForm"
+                          rendered="#{(not empty documentSectionParam) and (s:hasRole('admin_role') || s:hasRole('tests_editor_role'))}">
+                <a4j:commandLink event="click" execute="@this" render="globalForm,#{formToRefresh}"
+                                 title="#{messages['net.ihe.gazelle.tm.RemoveThisSection']}"
+                                 actionListener="#{managerBeanParam.deleteSection()}">
+                    <span class="gzl-icon-trash-o"/>
+                </a4j:commandLink>
+
+            </h:panelGroup>
+            <h:panelGroup id="addSectionForm"
+                          rendered="#{(empty documentSectionParam) and ( s:hasRole('admin_role') || s:hasRole('tests_editor_role'))}">
+                <h:outputLink title="#{messages['gazelle.tf.selectedActor.profileLinks.Add']}"
+                              value="addDocumentSection.seam?auditMessageId=#{auditMessageManager.currentAuditMessage.id}">
+                    <span class="gzl-icon-plus"/>
+                </h:outputLink>
+            </h:panelGroup>
+
+        </h:panelGroup>
+    </div>
+</ui:composition>

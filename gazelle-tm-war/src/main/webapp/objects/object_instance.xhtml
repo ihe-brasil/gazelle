@@ -1,0 +1,93 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <s:div id="selectedSamplePanel" styleClass="col-md-6">
+        <h:panelGroup rendered="#{objectManager.selectedObjectInstance != null}">
+            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                <ui:define name="panel_title">
+                    <span data-toggle="tooltip" data-placement="bottom"
+                          title="#{messages['net.ihe.gazelle.tm.SampleType']}">#{objectManager.selectedObjectInstance.object.keyword} -
+                        #{objectManager.selectedObjectInstance.object.description} </span>|
+                    <span data-toggle="tooltip" data-placement="bottom"
+                          title="#{messages['net.ihe.gazelle.tm.SampleName']}">#{objectManager.selectedObjectInstance.name}</span>
+                </ui:define>
+                <s:div id="selectedSampleDiv" rendered="#{objectManager.selectedObjectInstance != null}">
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.SelectASampleInTheTreeAtLeft']}"
+                                  rendered="#{objectManager.selectedObjectInstance == null}"/>
+                    <ui:decorate template="/objects/sampleDescription.xhtml">
+                        <ui:param name="managedBean" value="#{objectManager}"/>
+                        <ui:define name="moreButtons">
+                            <a4j:commandButton styleClass="gzl-btn-red" id="DeleteObjectInstanceButton"
+                                               value="#{messages['gazelle.testmanagement.object.DeleteSample']}"
+                                               oncomplete="jq162('#DeleteSelectedObjectInstance').modal('show');"
+                                               render=" :confirmationDeleteObjectInstance"
+                                               rendered="#{objectManager.currentUserCanEditSample()}" immediate="true"
+                                               execute="@this"/>
+                        </ui:define>
+                        <ui:define name="treeOfFilesUploadedByReaders">
+                            <h:form>
+                                <s:token allowMultiplePosts="true"/>
+                                <rich:tree id="TreeOfSampleOfReaderOnReading"
+                                           rendered="#{objectManager.getTreeNodeOfReaderInstanceFile(objectManager.selectedObjectInstance) !=null}"
+                                           value="#{objectManager.getTreeNodeOfReaderInstanceFile(objectManager.selectedObjectInstance)}"
+                                           var="node" style="vertical-align:top"
+                                           nodeType="#{node.data.class.simpleName}"
+                                           toggleType="client">
+                                    <rich:treeNode type="SystemInSession" width="15" height="15"
+                                                   iconClass="gzl-icon-system" expanded="#{true}">
+
+                                        <h:outputText value="#{node.data.system.keyword}"/>
+
+                                        <a4j:commandLink id="EditObjectInstanceButtonOnRead"
+                                                         actionListener="#{objectInstanceManager.setSelectedObjectInstance(objectManager.selectedObjectInstance)}"
+                                                         action="/objects/editReaderSample.xhtml"
+                                                         title="#{messages['gazelle.testmanagement.object.AddFilestosample']}"
+                                                         rendered="#{node.data.equals(objectManager.selectedSystemInSession) and !objectManager.selectedSystemInSession.testingSession.testingSessionClosedForUser()}"
+                                                         immediate="true" render="EditSelectedObjectInstance"
+                                                         execute="@this">
+                                            <span class="gzl-icon-plus"/>
+                                        </a4j:commandLink>
+                                    </rich:treeNode>
+                                    <rich:treeNode type="ObjectInstanceFile" width="15"
+                                                   height="15"
+                                                   expanded="#{true}">
+                                        <a4j:region>
+                                            <h:commandLink id="downloadCommandLinkOnROnReading"
+                                                           value="#{node.data.file.type.keyword} : #{node.data.url}"
+                                                           action="#{objectManager.displayFileOnScreen(node.data,false)}"
+                                                           target="_blank">
+                                            </h:commandLink>
+
+                                            <h:commandLink id="NonDicomFileCommandLinkOnROnReading"
+                                                           title="#{messages['gazelle.testmanagement.object.Download']}"
+                                                           action="#{objectManager.displayFileOnScreen(node.data,true)}"
+                                                           target="_blank">
+                                                <span class="gzl-icon-download"/>
+                                            </h:commandLink>
+
+                                            <h:commandLink id="DeleteObjectInstanceButtonOnRead2"
+                                                           actionListener="#{objectInstanceManager.setSelectedObjectInstance(objectManager.selectedObjectInstance)}"
+                                                           action="/objects/editReaderSample.xhtml"
+                                                           title="#{messages['gazelle.testmanagement.object.DeleteFilesAdded']}"
+                                                           rendered="#{node.data.system.equals(objectManager.selectedSystemInSession) and !objectManager.selectedSystemInSession.testingSession.testingSessionClosedForUser() }"
+                                                           immediate="true" render="EditSelectedObjectInstance"
+                                                           execute="@this">
+                                                <span class="gzl-icon-trash-o"/>
+                                            </h:commandLink>
+                                        </a4j:region>
+                                    </rich:treeNode>
+                                </rich:tree>
+                            </h:form>
+                        </ui:define>
+                    </ui:decorate>
+                </s:div>
+            </ui:decorate>
+        </h:panelGroup>
+        <script>
+            jq162(function () {
+                jq162('[data-toggle="tooltip"]').tooltip()
+            })
+        </script>
+    </s:div>
+</ui:composition>

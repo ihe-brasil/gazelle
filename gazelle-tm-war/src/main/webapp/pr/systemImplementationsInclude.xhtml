@@ -1,0 +1,110 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+        <ui:define name="panel_title">#{messages['gazelle.systems.system.DisplayIntegrationStatementLabel1']}
+            #{system.name}
+        </ui:define>
+        <s:div>
+            <s:decorate id="institutionDecoration" template="/layout/display/_display.xhtml">
+                <ui:define name="label">#{messages['gazelle.tm.InstitutionName']}</ui:define>
+                #{system.uniqueInstitution.keyword}
+            </s:decorate>
+            <s:decorate id="nameDecoration" template="/layout/display/_display.xhtml">
+                <ui:define name="label">#{messages['gazelle.systems.system.SystemName']}</ui:define>
+                #{system.name}
+            </s:decorate>
+            <s:decorate id="versionDecoration" template="/layout/display/_display.xhtml">
+                <ui:define name="label">#{messages['gazelle.systems.system.SystemVersion']}</ui:define>
+                #{system.version}
+            </s:decorate>
+            <s:decorate id="dateDecoration" template="/layout/display/_display.xhtml">
+                <ui:define name="label">#{messages['gazelle.systems.system.ISDate']}</ui:define>
+                <g:date date="true" time="false" value="#{system.integrationStatementDate}"/>
+            </s:decorate>
+            <s:decorate id="urlDecoration" template="/layout/display/_display.xhtml">
+                <ui:define name="label">#{messages['gazelle.systems.system.ISURL']}</ui:define>
+                <a4j:commandLink rendered="${not forReview}" value="#{prManager.downloadISLabel(system)}"
+                                 action="#{prManager.downloadIS(system)}" target="_blank"/>
+                <h:outputLink rendered="${forReview}" target="_blank" value="#{system.integrationStatementUrl}">
+                    <h:outputText value="#{prManager.downloadISLabel(system)}"/>
+                </h:outputLink>
+            </s:decorate>
+            <s:decorate id="urlHL7ISDecoration" template="/layout/display/_display.xhtml">
+                <ui:define name="label">#{messages['gazelle.systems.system.LinksToHL7Conformance']}</ui:define>
+                <a href="#{system.HL7ConformanceStatementUrl}">
+                    #{system.HL7ConformanceStatementUrl} </a>
+            </s:decorate>
+            <s:decorate id="urlDicomISDecoration" template="/layout/display/_display.xhtml">
+                <ui:define name="label">#{messages['gazelle.systems.system.LinksToDicomConformance']}</ui:define>
+                <a href="#{system.dicomConformanceStatementUrl}">
+                    #{system.dicomConformanceStatementUrl} </a>
+            </s:decorate>
+            <!--  We retrieve the IHE implementation for this system -->
+
+            <div style="height:400px;overflow-x: hidden">
+                <rich:dataTable var="aipo" value="#{prManager.getAIPOs(system)}"
+                                columnClasses="center">
+                    <g:column style="text-align:right" rendered="${not forReview}">
+                        <ui:define name="header">#{messages['gazelle.tf.table.IntegrationProfile']}</ui:define>
+                        <h:outputText
+                                value="#{aipo.actorIntegrationProfile.integrationProfile.toString()}"/>
+                    </g:column>
+                    <g:column style="text-align:left" rendered="${not forReview}">
+                        <ui:define name="header">#{messages['gazelle.testmanagement.system.label.Actor']}</ui:define>
+                        <h:outputText value="#{aipo.actorIntegrationProfile.actor.toString()}"/>
+                    </g:column>
+                    <g:column style="text-align:left" rendered="${not forReview}">
+                        <ui:define name="header">#{messages['gazelle.tf.table.IntegrationProfileOption']}</ui:define>
+                        <h:outputText value="#{aipo.integrationProfileOption.getSelectableLabel()}"/>
+                    </g:column>
+                    <g:column style="text-align:right" rendered="${forReview}">
+                        <ui:define name="header">#{messages['gazelle.tf.table.IntegrationProfile']}</ui:define>
+                        <a4j:commandLink value="#{aipo.actorIntegrationProfile.integrationProfile.keyword}"
+                                         onclick="searchPdf(this);"/>
+                        <h:outputText value=" - "/>
+                        <a4j:commandLink value="#{aipo.actorIntegrationProfile.integrationProfile.name}"
+                                         onclick="searchPdf(this);"/>
+                    </g:column>
+                    <g:column style="text-align:left" rendered="${forReview}">
+                        <ui:define name="header">#{messages['gazelle.testmanagement.system.label.Actor']}</ui:define>
+                        <a4j:commandLink value="#{aipo.actorIntegrationProfile.actor.keyword}"
+                                         onclick="searchPdf(this);"/>
+                        <h:outputText value=" - "/>
+                        <a4j:commandLink value="#{aipo.actorIntegrationProfile.actor.name}"
+                                         onclick="searchPdf(this);"/>
+                    </g:column>
+                    <g:column style="text-align:left" rendered="${forReview}">
+                        <ui:define name="header">#{messages['gazelle.tf.table.IntegrationProfileOption']}</ui:define>
+                        <a4j:commandLink value="#{aipo.integrationProfileOption.keyword}"
+                                         onclick="searchPdf(this);"/>
+                        <h:outputText value=" - "/>
+                        <a4j:commandLink value="#{aipo.integrationProfileOption.name}"
+                                         onclick="searchPdf(this);"/>
+                    </g:column>
+                    <g:column style="text-align:left" rendered="${forReview}">
+                        <ui:define name="header">#{messages['net.ihe.gazelle.tm.OK']}</ui:define>
+                        <h:selectBooleanCheckbox styleClass="form-control-static" id="validateAdminBox"/>
+                    </g:column>
+                    <g:column style="text-align:left" rendered="${forReview}">
+                        <ui:define name="header">#{messages['net.ihe.gazelle.tm.NOK']}</ui:define>
+                        <h:selectBooleanCheckbox styleClass="form-control-static" id="issueAdminBox"/>
+                    </g:column>
+                </rich:dataTable>
+            </div>
+
+            <h:panelGroup rendered="#{empty prManager.getAIPOs(system)}">
+                <ui:decorate template="/layout/panels/_panel.xhtml">
+                    <span class="gzl-icon-exclamation-triangle"/>
+                    <h:outputText id="noSystemLabel"
+                                  value="#{messages['gazelle.systems.system.NoIHEImplementationLabel1']}"
+                                  style="font-style:italic"/>
+                </ui:decorate>
+            </h:panelGroup>
+
+        </s:div>
+    </ui:decorate>
+
+</ui:composition>

@@ -1,0 +1,31 @@
+<html
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns="http://www.w3.org/1999/xhtml">
+
+#{kpiTest.loadTest()}
+
+<h:head>
+    <meta name="MSSmartTagsPreventParsing" content="true"/>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>#{kpiTest.test.keyword}</title>
+    <!-- TODO delete this page if really not used check with ABE-->
+    <script language="javascript" type="text/javascript" src="../../tf/jscript/prototype/prototype.js"/>
+    <script language="javascript" type="text/javascript" src="../../tf/jscript/path/path.js"/>
+    <script language="javascript" type="text/javascript" src="../../tf/jscript/canviz.js"/>
+    <script language="javascript" type="text/javascript" src="../../jscript/canvizLoader.js"/>
+    <script type="text/javascript">
+        function loadCanviz() {
+            doLoadCanviz("#{kpiTest.getXDotBase64()}");
+        }
+    </script>
+</h:head>
+
+<h:body>
+    <div style="position: fixed; z-index: 50; top: 0px; left: 0px; width: 100%;">
+        <span class="gzl-icon-zoom-out gzl-icon-action" onclick="set_graph_scale(-0.05)"></span>
+        <span class="gzl-icon-zoom-in gzl-icon-action" onclick="set_graph_scale(0.05)"></span>
+    </div>
+    <div id="canviz_container" style="margin-left: auto; margin-right: auto;"/>
+</h:body>
+
+</html>

@@ -1,0 +1,243 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.users.user.ManageUsersLabel1']}"/>
+    <ui:define name="body">
+
+        #{userManager.initializePanelsAndFilter()}
+        <s:div id="testListDiv">
+            <ui:include src="listUser.xhtml"/>
+        </s:div>
+
+
+        <h:form id="formToEditUser" styleClass="form-horizontal">
+            <s:div rendered="#{userManager.displayEditPanel}">
+                <ui:include id="a4jIncludeForEdit"
+                            src="editUser.xhtml"/>
+            </s:div>
+        </h:form>
+
+        <h:form id="formToViewUser">
+            <s:div rendered="#{userManager.displayViewPanel}">
+                <ui:include id="a4jIncludeForView"
+                            src="showUser.xhtml"/>
+            </s:div>
+        </h:form>
+
+
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Delete user confirmation Modal Panel								-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="formForModalPanels">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteConfirmationModalPanel"/>
+                <ui:define name="popup_title">#{messages['gazelle.users.user.confirmation.delete.header']}</ui:define>
+                <a4j:queue requestDelay="300" ignoreDupResponses="true"/>
+                #{ userManagerExtra.outjectSelectedUser() }
+                <p>
+                    <f:subview id="subview_3">
+                        <ui:include id="a4jIncludeForMonitor" src="extraPageForMonitor.xhtml"/>
+                    </f:subview>
+                </p>
+                <br/>
+                <s:decorate id="userNameDeleteDecorate" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.users.user.UserName']}</ui:define>
+                    #{userManagerExtra.selectedUser.firstname} #{userManagerExtra.selectedUser.lastname}
+                </s:decorate>
+                <s:decorate id="userUsernameDeleteDecorate" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.users.user.UserUsername']}</ui:define>
+                    #{userManagerExtra.selectedUser.username}
+                </s:decorate>
+                <s:decorate id="userEmailDeleteDecorate" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.users.user.UserEmail']}</ui:define>
+                    <h:outputText id="selectedUserEmailOutputText"
+                                  value="#{userManagerExtra.selectedUser.email}"
+                                  style="color: grey;font-style: italic;"/>
+                </s:decorate>
+                <br/><!-- SELECT A NEW VENDOR ADMIN FOR THE INSTITUTION -->
+                <s:div id="newVendorAdmin">
+                    <h:panelGroup rendered="#{userManagerExtra.selectNewVendorAdmin}">
+                        <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                            <ui:param name="panel_id" value="newVendorAdminPanel"/>
+                            <h:outputText value="#{messages['gazelle.users.userIsVendorAdmin']}"/>
+                            <br/><br/>
+                            <rich:dataTable
+                                    value="#{userManager.getNoVendorAdminUsersForInstitutionDM(userManagerExtra.selectedUser.institution)}"
+                                    var="user" id="adminTable"
+                                    rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds2">
+                                <g:column name="select">
+                                    <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+                                    <div class="gzl-never-wrap">
+                                        <a4j:commandLink id="selectUserLinkSupport"
+                                                         actionListener="#{userManagerExtra.addRoleVendorAdminToUser(user)}"
+                                                         immediate="true"
+                                                         render="confirmationModalPanelDecoration"
+                                                         value="#{messages['gazelle.users.user.Select']}"/>
+                                    </div>
+                                </g:column>
+                                <g:column sortBy="#{'username'}" sortOrder="ascending"
+                                          filterBy="#{'username'}" filterEvent="onkeyup">
+                                    <ui:define name="header">#{messages['gazelle.users.user.UserUsername']}
+                                    </ui:define>
+                                    #{user.username}
+                                </g:column>
+                                <g:column sortBy="#{'lastname'}" filterBy="#{'lastname'}"
+                                          filterEvent="onkeyup">
+                                    <ui:define name="header">#{messages['gazelle.users.user.UserName']}
+                                    </ui:define>
+                                    #{user.lastname} #{user.firstname}
+                                </g:column>
+                                <f:facet name="footer">
+                                    <ui:include src="/util/datatableFooter.xhtml">
+                                        <ui:param name="dataScrollerId" value="ds2"/>
+                                        <ui:param name="dataTableId" value="adminTable"/>
+                                    </ui:include>
+                                </f:facet>
+                            </rich:dataTable>
+                        </ui:decorate>
+                    </h:panelGroup>
+                </s:div>
+                <h:outputText id="CannotDeleteUserOwnerWarningLabelOutputText"
+                              value="#{messages['gazelle.users.user.ThisUserCannotBeDeleted1']} #{userManagerExtra.systemsWithOwnerToDelete.size()} #{messages['gazelle.users.user.ThisUserCannotBeDeleted2']}"
+                              rendered="#{userManagerExtra.systemsWithOwnerToDelete.size() &gt; 0}"/>
+                <br/><br/><!-- SELECT A NEW OWNER FOR THE SYSTEMS -->
+                <s:div id="divReassign">
+                    <h:panelGroup id="r" rendered="#{userManagerExtra.reassignPanelRendered}">
+
+                        #{messages['gazelle.users.ReassignTheOwnerOf']}
+                        #{userManagerExtra.systemToReassign.name} -
+                        #{userManagerExtra.systemToReassign.version} #{messages['gazelle.users.To']} :
+                        <rich:dataTable id="usersReassignTable" var="userToReassign"
+                                        value="#{userManager.getUsersForReassignementDM(userManagerExtra.selectedUser)}"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds3">
+                            <g:column>
+                                <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+                                <div class="gzl-never-wrap">
+                                    <a4j:commandLink id="assignUserLinkSupport"
+                                                     actionListener="#{userManagerExtra.assignOwner(userToReassign)}"
+                                                     immediate="true"
+                                                     render="confirmationModalPanelDecoration"
+                                                     value="#{messages['gazelle.users.user.Assign']}"/>
+                                </div>
+                            </g:column>
+                            <g:column sortBy="#{'institution.name'}"
+                                      filterBy="#{'institution.name'}" filterEvent="onkeyup"
+                                      rendered="#{s:hasRole('admin_role') || s:hasRole('systems_editor_role') || s:hasRole('institution_editor_role') || s:hasRole('project-manager_role')}">
+                                <ui:define name="header">
+                                    #{messages['gazelle.users.institution.InstitutionKeyword']}
+                                </ui:define>
+                                #{userToReassign.institution.keyword}
+                            </g:column>
+                            <g:column sortBy="#{'username'}"
+                                      sortOrder="ascending" filterBy="#{'username'}"
+                                      filterEvent="onkeyup">
+                                <ui:define name="header">#{messages['gazelle.users.user.UserUsername']}
+                                </ui:define>
+                                <h:outputText id="usernameOfUserToReassignOutputText"
+                                              value="#{userToReassign.username}"
+                                              style="font-weight:bold;color: #4A75B5;"
+                                              rendered="#{roleManagerBean.isUserAdmin(userToReassign)}"/>
+                                <h:outputText id="usernameOfUserToReassign2OutputText"
+                                              value="#{userToReassign.username}"
+                                              style="font-weight:bold;color: grey;"
+                                              rendered="#{roleManagerBean.isUserVendorAdmin(userToReassign) and !roleManagerBean.isUserAdmin(userToReassign) }"/>
+                                <h:outputText id="usernameOfUserToReassign3OutputText"
+                                              value="#{userToReassign.username}"
+                                              rendered="#{!roleManagerBean.isUserAdmin(userToReassign) and !roleManagerBean.isUserVendorAdmin(userToReassign) }"/>
+                            </g:column>
+                            <g:column sortBy="#{'lastname'}"
+                                      filterBy="#{'lastname'}" filterEvent="onkeyup">
+                                <ui:define name="header">#{messages['gazelle.users.user.UserName']}</ui:define>
+                                <a href="mailto:#{userToReassign.email}">
+                                    <h:outputText id="nameOfUserToReassignOutputText"
+                                                  value="#{userToReassign.firstname} #{userToReassign.lastname}"
+                                                  style="font-weight:bold;color: #4A75B5;"
+                                                  rendered="#{roleManagerBean.isUserAdmin(userToReassign)}"/>
+                                    <h:outputText id="nameOfUserToReassign2OutputText"
+                                                  value="#{userToReassign.firstname} #{userToReassign.lastname}"
+                                                  style="font-weight:bold;color: grey;"
+                                                  rendered="#{roleManagerBean.isUserVendorAdmin(userToReassign) and !roleManagerBean.isUserAdmin(userToReassign) }"/>
+                                    <h:outputText id="nameOfUserToReassign3OutputText"
+                                                  value="#{userToReassign.firstname} #{userToReassign.lastname}"
+                                                  rendered="#{!roleManagerBean.isUserAdmin(userToReassign) and !roleManagerBean.isUserVendorAdmin(userToReassign) }"/>
+                                </a></g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds3"/>
+                                    <ui:param name="dataTableId" value="usersReassignTable"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+
+                    </h:panelGroup>
+                    <s:div rendered="#{!userManagerExtra.selectedUser.blocked and userManagerExtra.hasSystemInSessionUserObject(userManagerExtra.selectedUser) and (userManagerExtra.systemsWithOwnerToDelete.size() == 0)}">
+                        <h:outputText id="blockUserOutputText"
+                                      value="#{messages['gazelle.users.user.delete.UserReferenced']} #{messages['gazelle.users.user.delete.YouCanBlock']}"/>
+                        <br/>
+
+                        <div id="blockConfirmationPanelDiv" align="right">
+                            <a4j:commandButton id="blockConfirmationPanelButton"
+                                               value="#{messages['gazelle.common.button.Block']}"
+                                               styleClass="gzl-btn-red"
+                                               actionListener="#{userManager.blockSelectedUser()}"
+                                               onclick="jq162('#DeleteConfirmationModalPanel').modal('hide');"
+                                               render="testListUserTable" execute="@this"/>
+                            <a4j:commandButton id="blockButtonConfirm"
+                                               value="#{messages['gazelle.common.button.Cancel']}"
+                                               immediate="true"
+                                               onclick="jq162('#DeleteConfirmationModalPanel').modal('hide');"
+                                               styleClass="gzl-btn"/>
+                        </div>
+                    </s:div>
+                    <s:div rendered="#{userManagerExtra.selectedUser.blocked and userManagerExtra.hasSystemInSessionUserObject(userManagerExtra.selectedUser) and (userManagerExtra.systemsWithOwnerToDelete.size() == 0)}">
+                        <h:outputText id="alreadyBlockedUserOutputText"
+                                      value="#{messages['gazelle.users.user.delete.UserReferenced']} #{messages['gazelle.users.user.delete.AlreadyBlocked']} "/>
+                        <br/></s:div>
+                    <br/><br/></s:div>
+                <h:outputText id="systemsWithOwnerToDeleteWarningLabelOutputText"
+                              value="#{userManagerExtra.systemsWithOwnerToDelete.size()} #{messages['gazelle.users.user.SystemsToReassign']}"
+                              rendered="#{userManagerExtra.systemsWithOwnerToDelete.size() &gt; 0}"/>
+                <br/>
+                <rich:list id="systemsWithOwnerToDeleteDataList" var="sys"
+                           value="#{userManagerExtra.systemsWithOwnerToDelete}"
+                           rendered="#{userManagerExtra.systemsWithOwnerToDelete.size() &gt; 0}"
+                           type="unordered">
+                    <h:panelGrid id="systemAddress" columns="7">
+                        <h:outputText id="systemNameOutputText" value="#{sys.name}"/>
+                        <br/>
+
+                        <a4j:commandLink id="ReassignImage"
+                                         actionListener="#{userManagerExtra.showReassignPanel(sys)}"
+                                         render="divReassign" execute="@this">
+                            <span class="gzl-icon-refresh"/>
+                        </a4j:commandLink>
+
+                        <a4j:commandLink id="ReassignLinkSupport"
+                                         actionListener="#{userManagerExtra.showReassignPanel(sys)}"
+                                         render="divReassign" execute="@this"
+                                         value="#{messages['gazelle.users.user.ReassignOwner']}"/>
+                    </h:panelGrid>
+                    <h:outputText id="systemVersionOutputText" value="#{sys.version}"
+                                  style="color: grey;font-style: italic;"/>
+                </rich:list>
+
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="deleteConfirmationPanelButton"
+                                       value="#{messages['gazelle.common.button.Confirm']}"
+                                       styleClass="gzl-btn-red"
+                                       actionListener="#{userManager.deleteSelectedUser()}"
+                                       onclick="jq162('#DeleteConfirmationModalPanel').modal('hide');"
+                                       rendered="#{(!userManagerExtra.hasSystemInSessionUserObject(userManagerExtra.selectedUser) and userManagerExtra.systemsWithOwnerToDelete.size() == 0)}"
+                                       render="testListUserTable,messageForUser"
+                                       execute="@this"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

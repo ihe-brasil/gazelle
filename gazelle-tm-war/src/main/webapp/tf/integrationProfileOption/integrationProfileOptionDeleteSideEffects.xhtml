@@ -1,0 +1,45 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle"
+              value="#{integrationProfileOptionManager.selectedIntegrationProfileOption.name}"/>
+    <ui:define name="body">
+        <h:form id="integrationProfileOptionDeleteConfirmation">
+            <s:token allowMultiplePosts="true"/>
+            <h:outputText value="#{messages['gazelle.tf.IntegrationProfileOptionDelete.Confirmation']}"/>
+            <h:commandButton id="delete" styleClass="gzl-btn-red"
+                             value="#{messages['gazelle.common.button.Delete']}"
+                             action="#{integrationProfileOptionManager.deleteIntegrationProfileOption( )}"/>
+            <h:commandButton id="cancel" styleClass="gzl-btn"
+                             value="#{messages['gazelle.common.button.Cancel']}"
+                             action="#{integrationProfileOptionManager.listIntegrationProfileOptions()}"/>
+        </h:form>
+        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+            <ui:define name="panel_title">#{messages['gazelle.tf.ipo.unlinkedActorIntegrationProfileSection']}
+            </ui:define>
+            <h:form id="unlinkedActorIPSection">
+                <s:token allowMultiplePosts="true"/>
+                <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                              rendered="#{integrationProfileOptionManager.getAipoCount()==0}"/>
+                <rich:dataTable id="unlinkedActorIntegrationProfiles" var="aipo"
+                                value="#{integrationProfileOptionManager.actorsAndIntegrationProfileForIntegrationProfileOption}"
+
+
+                                rendered="#{integrationProfileOptionManager.getAipoCount()&gt;0}">
+                    <g:column sortBy="#{'actorIntegrationProfile.actor.keyword'}" sortOrder="ascending" width="400">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Actor']}</ui:define>
+                        #{aipo.actorIntegrationProfile.actor.keyword} - #{aipo.actorIntegrationProfile.actor.name}
+                    </g:column>
+                    <g:column sortBy="#{'actorIntegrationProfile.integrationProfile.keyword'}" sortOrder="ascending"
+                              width="400">
+                        <ui:define name="header">#{messages['gazelle.tf.table.IntegrationProfile']}</ui:define>
+                        #{aipo.actorIntegrationProfile.integrationProfile.keyword} -
+                        #{aipo.actorIntegrationProfile.integrationProfile.name}
+                    </g:column>
+                </rich:dataTable>
+            </h:form>
+
+        </ui:decorate>
+    </ui:define>
+</ui:composition>

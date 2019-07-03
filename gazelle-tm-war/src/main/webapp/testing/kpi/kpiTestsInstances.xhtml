@@ -1,0 +1,255 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.common.menu.KPITestsInstances']}"/>
+    <ui:define name="body">
+        <h:form id="globalform" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <h:inputHidden id="filterUrlParameters" name="filterUrlParameters"
+                           value="#{kpiTestsInstances.filter.urlParameters}"/>
+            <script>
+                updateUrl("globalform:filterUrlParameters");
+                $("#globalform\\:filterUrlParameters").bind('change',
+                    function () {
+                        updateUrl("globalform:filterUrlParameters");
+                    });
+            </script>
+            <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        <!--  Testing session -->
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{kpiTestsInstances.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="testing_session"/>
+                            <ui:param name="filterName" value="#{messages['gazelle.systems.testingSession']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <!--  AIPO selection -->
+                <ui:include src="/testing/research/filterAIPO.xhtml">
+                    <ui:param name="filter" value="#{kpiTestsInstances.filter}"/>
+                    <ui:param name="filterForm" value="globalform"/>
+                </ui:include>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{kpiTestsInstances.filter}"/>
+                            <ui:param name="filterId" value="testType"/>
+                            <ui:param name="filterName" value="#{messages['gazelle.tm.monitors.TestType']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{kpiTestsInstances.filter}"/>
+                            <ui:param name="filterId" value="testStatus"/>
+                            <ui:param name="filterName" value="#{messages['gazelle.tm.TestStatus']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{kpiTestsInstances.filter}"/>
+                            <ui:param name="filterId" value="testPeerType"/>
+                            <ui:param name="filterName" value="#{messages['gazelle.tm.TestPeerType']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{kpiTestsInstances.filter}"/>
+                            <ui:param name="filterId" value="testVersion"/>
+                            <ui:param name="filterName" value="#{messages['gazelle.tm.TestVersion']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{kpiTestsInstances.filter}"/>
+                            <ui:param name="filterId" value="lastModifier"/>
+                            <ui:param name="filterName" value="#{messages['gazelle.tm.TestLastModifier']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+
+                <ui:define name="filter_buttons">
+                    <a4j:commandLink actionListener="#{kpiTestsInstances.filter.clear()}"
+                                     title="#{messages['gazelle.users.reset']}" type="submit" execute="@this"
+                                     render="globalform">
+                        <span class="fa fa-times-circle"/>
+                    </a4j:commandLink>
+                </ui:define>
+            </ui:decorate>
+            <rich:dataTable id="t" var="currentElement"
+                            value="#{kpiTestsInstances.elements}" rowKeyVar="rowNumber"
+                            rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds"
+                            rowClasses="#{kpiTestsInstances.styleClassIfNoMonitor(currentElement)}">
+                <g:column sortBy="#{'item.keyword'}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['gazelle.testmanagement.object.keyword']}"/>
+                    </ui:define>
+                    <g:link value="#{currentElement.item}" detailed="false"/>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['gazelle.testmanagement.search.button.View']}"/>
+                    </ui:define>
+                    <h:outputLink
+                            value="#{applicationPreferenceManager.getApplicationUrl()}testing/kpi/timeline/kpiTestTimeline.seam?id=#{currentElement.item.id}&amp;testingSessionId=#{kpiTestsInstances.getTestingSessionId()}"
+                            target="_blank">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.Timeline']}"/>
+                    </h:outputLink>
+                    <h:outputText value=" - "/>
+                    <h:outputLink
+                            value="#{applicationPreferenceManager.getApplicationUrl()}testing/kpi/kpiTestCanviz.seam?id=#{currentElement.item.id}&amp;testingSessionId=#{kpiTestsInstances.getTestingSessionId()}"
+                            target="_blank">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.Graph']}"/>
+                    </h:outputLink>
+                </g:column>
+                <g:column sortBy="#{'counts[0]'}">
+                    <ui:define name="header">
+                        <h:outputText value="##{messages['gazelle.tm.M']}"
+                                      title="#{messages['net.ihe.gazelle.tm.NumberOfDifferentMonitorsWhoReviewedTestInstance']}"/>
+                    </ui:define>
+                    <a4j:commandLink value="#{currentElement.counts[0]}"
+                                     actionListener="#{kpiTestsInstances.searchMonitorsInSession(currentElement, 0)}"
+                                     oncomplete="jq162('#MonitorList').modal('show');"
+                                     render="globalform, :MonitorListForm"/>
+                </g:column>
+                <g:column sortBy="#{'counts[11]'}">
+                    <ui:define name="header">
+                        <h:outputText value="##{messages['gazelle.tm.M']}2"
+                                      title="#{messages['net.ihe.gazelle.tm.NumberOfMonitorsAssignedToThisTest']}"/>
+                    </ui:define>
+                    <a4j:commandLink value="#{currentElement.counts[11]}"
+                                     actionListener="#{kpiTestsInstances.searchMonitorsInSession(currentElement, 11)}"
+                                     oncomplete="jq162('#MonitorList').modal('show');"
+                                     render="globalform, :MonitorListForm"/>
+                </g:column>
+                <g:column sortBy="#{'counts[1]'}">
+                    <ui:define name="header">
+                        <h:outputText value="##{messages['gazelle.tm.S']}"
+                                      title="#{messages['net.ihe.gazelle.tm.NumberOfSystemsAssignedToThisTest']}"/>
+                    </ui:define>
+                    <a4j:commandLink value="#{currentElement.counts[1]}"
+                                     actionListener="#{kpiTestsInstances.searchSystemInSessions(currentElement, 1)}"
+                                     oncomplete="jq162('#SystemInSessionList').modal('show');"
+                                     render="globalform, :SystemInSessionListForm"/>
+                </g:column>
+                <g:column sortBy="#{'counts[2]'}">
+                    <ui:define name="header">
+                        <h:outputText
+                                value="##{messages['gazelle.tests.testInstance.testInstancePageTitle']}"
+                                title="#{messages['net.ihe.gazelle.tm.NumberOfTestInstanceStartedToThisTest']}"/>
+                    </ui:define>
+                    <a4j:commandLink value="#{currentElement.counts[2]}"
+                                     actionListener="#{kpiTestsInstances.searchTestInstancesInSession(currentElement, 2)}"
+                                     oncomplete="jq162('#TestInstanceList').modal('show');"
+                                     render="globalform, :TestInstanceListForm"/>
+                </g:column>
+                <g:column sortBy="#{'counts[3]'}">
+                    <ui:define name="header">
+                        <h:outputText value="##{messages['gazelle.tm.TIStarted']}"/>
+                    </ui:define>
+                    <a4j:commandLink value="#{currentElement.counts[3]}"
+                                     actionListener="#{kpiTestsInstances.searchTestInstancesInSession(currentElement, 3)}"
+                                     oncomplete="jq162('#TestInstanceList').modal('show');"
+                                     render="globalform, :TestInstanceListForm"/>
+                </g:column>
+                <g:column sortBy="#{'counts[4]'}">
+                    <ui:define name="header">
+                        <h:outputText value="##{messages['gazelle.tm.TICompleted']}"/>
+                    </ui:define>
+                    <a4j:commandLink value="#{currentElement.counts[4]}"
+                                     actionListener="#{kpiTestsInstances.searchTestInstancesInSession(currentElement, 4)}"
+                                     oncomplete="jq162('#TestInstanceList').modal('show');"
+                                     render="globalform, :TestInstanceListForm"/>
+                </g:column>
+                <g:column sortBy="#{'counts[5]'}">
+                    <ui:define name="header">
+                        <h:outputText value="##{messages['gazelle.tm.TIPaused']}"/>
+                    </ui:define>
+                    <a4j:commandLink value="#{currentElement.counts[5]}"
+                                     actionListener="#{kpiTestsInstances.searchTestInstancesInSession(currentElement, 5)}"
+                                     oncomplete="jq162('#TestInstanceList').modal('show');"
+                                     render="globalform, :TestInstanceListForm"/>
+                </g:column>
+                <g:column sortBy="#{'counts[6]'}">
+                    <ui:define name="header">
+                        <h:outputText value="##{messages['gazelle.tm.TIVerified']}"/>
+                    </ui:define>
+                    <a4j:commandLink value="#{currentElement.counts[6]}"
+                                     actionListener="#{kpiTestsInstances.searchTestInstancesInSession(currentElement, 6)}"
+                                     oncomplete="jq162('#TestInstanceList').modal('show');"
+                                     render="globalform, :TestInstanceListForm"/>
+                </g:column>
+                <g:column sortBy="#{'counts[7]'}">
+                    <ui:define name="header">
+                        <h:outputText value="##{messages['gazelle.tm.TIAborted']}"/>
+                    </ui:define>
+                    <a4j:commandLink value="#{currentElement.counts[7]}"
+                                     actionListener="#{kpiTestsInstances.searchTestInstancesInSession(currentElement, 7)}"
+                                     oncomplete="jq162('#TestInstanceList').modal('show');"
+                                     render="globalform, :TestInstanceListForm"/>
+                </g:column>
+                <g:column sortBy="#{'counts[8]'}">
+                    <ui:define name="header">
+                        <h:outputText value="##{messages['gazelle.tm.TIPartial']}"/>
+                    </ui:define>
+                    <a4j:commandLink value="#{currentElement.counts[8]}"
+                                     actionListener="#{kpiTestsInstances.searchTestInstancesInSession(currentElement, 8)}"
+                                     oncomplete="jq162('#TestInstanceList').modal('show');"
+                                     render="globalform, :TestInstanceListForm"/>
+                </g:column>
+                <g:column sortBy="#{'counts[9]'}">
+                    <ui:define name="header">
+                        <h:outputText value="##{messages['gazelle.tm.TIFailed']}"/>
+                    </ui:define>
+                    <a4j:commandLink value="#{currentElement.counts[9]}"
+                                     actionListener="#{kpiTestsInstances.searchTestInstancesInSession(currentElement, 9)}"
+                                     oncomplete="jq162('#TestInstanceList').modal('show');"
+                                     render="globalform, :TestInstanceListForm"/>
+                </g:column>
+                <g:column sortBy="#{'counts[10]'}">
+                    <ui:define name="header">
+                        <h:outputText value="##{messages['gazelle.tm.TICritical']}"/>
+                    </ui:define>
+                    <a4j:commandLink value="#{currentElement.counts[10]}"
+                                     actionListener="#{kpiTestsInstances.searchTestInstancesInSession(currentElement, 10)}"
+                                     oncomplete="jq162('#TestInstanceList').modal('show');"
+                                     render="globalform, :TestInstanceListForm"/>
+                </g:column>
+                <f:facet name="footer">
+                    <ui:include src="/util/datatableFooter.xhtml">
+                        <ui:param name="dataScrollerId" value="ds"/>
+                        <ui:param name="dataTableId" value="t"/>
+                    </ui:include>
+                </f:facet>
+            </rich:dataTable>
+            <h:commandLink value="#{messages['gazelle.common.export.ExportAsExcel']}"
+                           action="#{gazelleExcelExporterJboss7.export('globalform:t')}"/>
+        </h:form>
+
+        <ui:include src="/testing/kpi/panelMonitors.xhtml">
+            <ui:param name="items" value="#{kpiTestsInstances.getMonitorsDisplay()}"/>
+        </ui:include>
+
+        <ui:include src="/testing/kpi/panelTestInstances.xhtml">
+            <ui:param name="items" value="#{kpiTestsInstances.getTestInstancesInSessionDisplay()}"/>
+        </ui:include>
+
+        <ui:include src="/testing/kpi/panelSystems.xhtml">
+            <ui:param name="items" value="#{kpiTestsInstances.getSystemsDisplay()}"/>
+        </ui:include>
+    </ui:define>
+</ui:composition>

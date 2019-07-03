@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<datasources xmlns="http://www.jboss.org/ironjacamar/schema">
+    <datasource jta="true" enabled="true" use-java-context="true"
+                pool-name="${seamName}DS" jndi-name="java:jboss/datasources/${seamName}DS">
+        <connection-url>${jdbc.connection.url}</connection-url>
+        <driver>postgresql</driver>
+        <security>
+            <user-name>${jdbc.user}</user-name>
+            <password>${jdbc.password}</password>
+        </security>
+        <pool>
+            <min-pool-size>${min.pool.size}</min-pool-size>
+            <max-pool-size>${max.pool.size}</max-pool-size>
+            <prefill>false</prefill>
+            <use-strict-min>false</use-strict-min>
+            <flush-strategy>FailingConnectionOnly</flush-strategy>
+        </pool>
+        <validation>
+            <check-valid-connection-sql>select 1</check-valid-connection-sql>
+            <validate-on-match>false</validate-on-match>
+            <background-validation>false</background-validation>
+            <use-fast-fail>false</use-fast-fail>
+        </validation>
+        <timeout>
+            <idle-timeout-minutes>10</idle-timeout-minutes>
+            <blocking-timeout-millis>30000</blocking-timeout-millis>
+        </timeout>
+        <statement>
+            <prepared-statement-cache-size>30</prepared-statement-cache-size>
+            <track-statements>false</track-statements>
+        </statement>
+    </datasource>
+</datasources>

@@ -1,0 +1,145 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.testmanagement.session.AcceptedSystems']}"/>
+    <ui:define name="body">
+        <s:div>
+            <h:form id="systemsInSessionForm">
+                <s:token allowMultiplePosts="true"/>
+                <a4j:queue requestDelay="300" ignoreDupResponses="true"/>
+                <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                    <ui:include src="/filter/filter.xhtml">
+                        <ui:param name="filterName" value="#{messages['net.ihe.gazelle.tm.Institution']}"/>
+                        <ui:param name="filterId" value="institution"/>
+                        <ui:param name="filter" value="#{testInstancesOverviewManager.filter}"/>
+                        <ui:param name="filterForm" value="systemsInSessionForm"/>
+                    </ui:include>
+                    <ui:include src="/filter/filter.xhtml">
+                        <ui:param name="filterName" value="#{messages['gazelle.configuration.system.system']}"/>
+                        <ui:param name="filterId" value="system"/>
+                        <ui:param name="filter" value="#{testInstancesOverviewManager.filter}"/>
+                        <ui:param name="filterForm" value="systemsInSessionForm"/>
+                    </ui:include>
+
+                    <ui:define name="filter_buttons">
+                        <a4j:commandLink title="#{messages['gazelle.common.button.Refresh']}"
+                                         render="systemsInSessionForm">
+                            <span class="fa fa-refresh"></span>
+                        </a4j:commandLink>
+                        <a4j:commandLink title="#{messages['net.ihe.gazelle.tm.ResetCriteria']}"
+                                         actionListener="#{testInstancesOverviewManager.filter.clear()}"
+                                         render="systemsInSessionForm">
+                            <span class="fa fa-times-circle"></span>
+                        </a4j:commandLink>
+                    </ui:define>
+                </ui:decorate>
+                <s:div>
+                    <a4j:commandButton styleClass="gzl-btn-green"
+                                       value="#{messages['net.ihe.gazelle.tm.AcceptAllListedSystems']}..."
+                                       oncomplete="jq162('#acceptAllListedSystems').modal('show');"
+                                       execute="@this"
+                                       render=" :acceptAllListedSystemsForm"
+                                       rendered="#{!testingSessionManager.isInternetTesting()}"/>
+                    <a4j:commandButton styleClass="gzl-btn-red"
+                                       oncomplete="jq162('#notAcceptAllListedSystems').modal('show');"
+                                       value="#{messages['net.ihe.gazelle.tm.NotAcceptAllListedSystems']}..."
+                                       execute="@this"
+                                       render=" :notAcceptAllListedSystemsForm"
+                                       rendered="#{!testingSessionManager.isInternetTesting()}"/>
+                </s:div>
+
+                <s:div id="infoDiv">
+                    <rich:dataTable id="systemsDatatable" var="sis"
+                                    value="#{testInstancesOverviewManager.listSystemInSessionsForCompany()}"
+                                    rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                        <g:column>
+                            <ui:define name="header">#{messages['gazelle.financial.invoice.InstitutionKeyword']}
+                            </ui:define>
+                            <h:outputText id="companyDetails"
+                                          value="#{systemManager.displayInstitutionForSystem(sis.system)} "/>
+                        </g:column>
+                        <g:column sortBy="#{'system.keyword'}" sortOrder="ascending">
+                            <ui:define name="header">#{messages['gazelle.testmanagement.object.keyword']}</ui:define>
+                            <g:link value="#{sis.system}" detailed="true"/>
+                        </g:column>
+                        <g:column sortBy="#{'system.name'}"
+                                  sortOrder="#{dataTableStateHolder.sortOrders['system.name']}">
+                            <ui:define name="header">#{messages['gazelle.testmanagement.object.Name']}</ui:define>
+                            <h:outputText id="sisNameOut" value="#{sis.system.name}"
+                                          rendered="#{not empty sis.system}"/>
+                        </g:column>
+                        <g:column sortBy="#{'acceptedToSession'}"
+                                  sortOrder="#{dataTableStateHolder.sortOrders['acceptedToSession']}">
+                            <ui:define name="header">#{messages['gazelle.tm.Accepted']} ?</ui:define>
+
+                            <h:selectBooleanCheckbox styleClass="form-control-static" id="acceptedRow"
+                                                     rendered="#{(s:hasRole('admin_role') || s:hasRole('systems_editor_role') || s:hasRole('project-manager_role')) and (sis.registrationStatus.weight!=1)}"
+                                                     value="#{sis.acceptedToSession}">
+                                <a4j:ajax event="click"
+                                          execute="@this" render="infoDiv"
+                                          listener="#{systemInSessionManager.saveAcceptedToSession(sis)}"/>
+                            </h:selectBooleanCheckbox>
+                            <s:span rendered="#{sis.registrationStatus.weight ==1}"
+                                    styleClass="#{sis.registrationStatus.cssStyle}" style="font-size: 100%;">
+                                <h:outputText rendered="#{sis.registrationStatus.weight ==1}"
+                                              value="#{messages[sis.registrationStatus.labelToDisplay]}"/>
+                            </s:span>
+
+                            <s:span styleClass="gzl-icon-checked"
+                                    rendered="#{sis.acceptedToSession and !(s:hasRole('admin_role') || s:hasRole('systems_editor_role') || s:hasRole('project-manager_role'))}"/>
+
+                        </g:column>
+                        <f:facet name="footer">
+                            <ui:include src="/util/datatableFooter.xhtml">
+                                <ui:param name="dataScrollerId" value="ds"/>
+                                <ui:param name="dataTableId" value="systemsDatatable"/>
+                            </ui:include>
+                        </f:facet>
+                    </rich:dataTable>
+                </s:div>
+            </h:form>
+        </s:div>
+        <h:form id="notAcceptAllListedSystemsForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="notAcceptAllListedSystems"/>
+                <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.NotAcceptAllListedSystems']}</ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.AreYouSureTo']}
+                    #{messages['net.ihe.gazelle.tm.NotAcceptAllListedSystems']}</p>
+                <ui:define name="popup_footer">
+                    <a4j:commandButton id="deleteConfirmationPanelButton" styleClass="gzl-btn-red"
+                                       ignoreDupResponses="true"
+                                       value="#{messages['net.ihe.gazelle.tm.Perform']}"
+                                       actionListener="#{testInstancesOverviewManager.acceptListedSystems(false)}"
+                                       onclick="jq162('#notAcceptAllListedSystems').modal('hide');"
+                                       render="systemsInSessionForm"/>
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <h:form id="acceptAllListedSystemsForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="acceptAllListedSystems"/>
+                <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.AcceptAllListedSystems']}</ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.AreYouSureTo']}
+                    #{messages['net.ihe.gazelle.tm.AcceptAllListedSystems']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="acceptConfirmationPanelButton" styleClass="gzl-btn-green"
+                                       ignoreDupResponses="true"
+                                       value="#{messages['net.ihe.gazelle.tm.Perform']}"
+                                       actionListener="#{testInstancesOverviewManager.acceptListedSystems(true)}"
+                                       onclick="jq162('#acceptAllListedSystems').modal('hide');"
+                                       render="systemsInSessionForm"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

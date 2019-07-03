@@ -1,0 +1,110 @@
+<div xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:s="http://jboss.org/schema/seam/taglib"
+     xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <!-- ======================= -->
+    <!-- System summary section					  -->
+    <!-- ======================= -->
+
+    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+        <ui:define name="panel_title">
+            #{messages['gazelle.systems.system.DisplaySystemLabel1']}
+        </ui:define>
+
+        <div id="viewsystemInSessionDiv">
+            <s:fragment id="viewsystemInSessionFragment">
+                <a4j:region id="viewisCopyRegion">
+                    <s:decorate id="viewnameDecoration" template="/layout/display/_display.xhtml">
+                        <ui:define name="label"> #{messages['gazelle.systems.systemInSession.isACopy']}
+                        </ui:define>
+                        <h:outputText value="#{messages['gazelle.common.Yes']}"
+                                      rendered="#{ systemInSessionViewer.systemInSession.isCopy}"/>
+                        <h:outputText value="#{messages['gazelle.common.No']} "
+                                      rendered="#{ (systemInSessionViewer.systemInSession.isCopy == null) or (!systemInSessionViewer.systemInSession.isCopy) }"/>
+                        <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                            <ui:param name="id" value="copy"/>
+                            <ui:param name="placement" value="bottom"/>
+                            <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                            <ui:define name="content">
+                                <span class="gzl-never-wrap">#{messages['gazelle.systems.system.help.IsACopy1']}</span>
+                            </ui:define>
+                        </ui:decorate>
+                    </s:decorate>
+                </a4j:region>
+                <a4j:region id="viewpowerRegion" rendered="false">
+                    <s:decorate id="viewpowerDecoration" template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['gazelle.tm.Power']}</ui:define>
+                        <h:inputText styleClass=" form-control" id="viewpower" maxlength="10" size="10"
+                                     value="#{systemInSessionViewer.systemInSession.power}"/>
+                    </s:decorate>
+                </a4j:region>
+                <a4j:region id="viewskypeRegion">
+                    <s:decorate id="viewskypeDecoration" template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['gazelle.systems.systemInSession.skype']}
+                        </ui:define>
+                        <h:outputText value="#{systemInSessionViewer.systemInSession.skype}"/>
+                        <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                            <ui:param name="id" value="s"/>
+                            <ui:param name="placement" value="bottom"/>
+                            <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                            <ui:define name="content">
+                                <div class="gzl-never-wrap">
+                                    #{messages['gazelle.systems.system.help.Skype1']}<br/>
+                                    #{messages['gazelle.systems.system.help.Skype2']}
+                                </div>
+                            </ui:define>
+                        </ui:decorate>
+
+                    </s:decorate>
+                </a4j:region>
+                <a4j:region id="viewblogRegion" rendered="false">
+                    <s:decorate id="viewblogDecoration" template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['gazelle.systems.systemInSession.blog']}
+                        </ui:define>
+                        <h:inputText styleClass=" form-control" id="viewblog" maxlength="30" size="30"
+                                     value="#{systemInSessionViewer.systemInSession.blog}"/>
+                    </s:decorate>
+                </a4j:region>
+                <a4j:region id="viewtableLabelRegion">
+                    <s:decorate id="viewtableLabelDecoration" template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['gazelle.systems.systemInSession.tableLabel']}
+                        </ui:define>
+                        <h:outputText value="#{systemInSessionViewer.systemInSession.tableLabel}"/>
+                        <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                            <ui:param name="id" value="t"/>
+                            <ui:param name="placement" value="bottom"/>
+                            <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                            <ui:define name="content">
+                                <div class="gzl-never-wrap">
+                                    #{messages['gazelle.systems.system.help.TableLabel1']}
+                                    #{messages['gazelle.systems.system.help.TableLabel2']}
+                                </div>
+                            </ui:define>
+                        </ui:decorate>
+                    </s:decorate>
+                </a4j:region>
+                <a4j:region id="viewtableRegionView">
+                    <s:decorate id="viewtableViewDecoration" template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['gazelle.systems.systemInSession.table']}
+                        </ui:define>
+                        <h:outputText id="viewtableView"
+                                      value="#{systemInSessionViewer.systemInSession.tableSession.tableKeyword}"/>
+                        <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                            <ui:param name="id" value="ta"/>
+                            <ui:param name="placement" value="bottom"/>
+                            <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                            <ui:define name="content">
+                                <div class="gzl-never-wrap">
+                                    #{messages['gazelle.systems.system.help.TableName1']} <br/>
+                                    #{messages['gazelle.systems.system.help.TableName2']} <br/>
+                                    #{messages['gazelle.systems.system.help.TableName3']}
+                                </div>
+                            </ui:define>
+                        </ui:decorate>
+
+                    </s:decorate>
+                </a4j:region>
+            </s:fragment>
+        </div>
+    </ui:decorate>
+</div>

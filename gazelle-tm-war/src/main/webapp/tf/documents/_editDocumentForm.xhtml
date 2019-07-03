@@ -1,0 +1,133 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <div class="row">
+        <div class="col-lg-6 col-lg-offset-3">
+            <ui:decorate template="/layout/panels/_panel_title_footer_id.xhtml">
+                <ui:param name="panel_id" value="addPanel"/>
+                <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.EditDocument']}</ui:define>
+                <s:decorate id="newDocumentPanelDecoration">
+                    <s:decorate id="urlDecoration" template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="newDocumentUrlInput"/>
+                        <ui:define name="label">#{messages['net.ihe.gazelle.tm.url']}</ui:define>
+                        <h:inputText styleClass=" form-control" id="newDocumentUrlInput"
+                                     value="#{documentManager.selectedDocument.url}" size="160"
+                                     required="true">
+                            <a4j:ajax event="blur" execute="@this"
+                                      render="newDocumentPanelDecoration"/>
+                        </h:inputText>
+                        <a4j:commandButton id="newDocumentAnalyzeButtonConfirm"
+                                           value="#{messages['net.ihe.gazelle.tm.CheckUrl']}"
+                                           actionListener="#{documentManager.analyzeUrl()}" styleClass="gzl-btn"
+                                           render="addPanel" execute="@this">
+                            <a4j:ajax event="mouseover" execute="@this"/>
+                        </a4j:commandButton>
+
+                        <h:outputText value="#{documentManager.analyseUrlOk}" styleClass="gzl-label gzl-label-green"/>
+
+                        <a4j:commandLink value="#{messages['net.ihe.gazelle.tm.ShowPdf']}"
+                                         rendered="#{not empty documentManager.selectedDocument.url}"
+                                         action="#{documentManager.showPDF(documentManager.selectedDocument)}"
+                                         target="Specification" immediate="true">
+                            <a4j:ajax event="click" execute="@this"/>
+                        </a4j:commandLink>
+                    </s:decorate>
+                    <s:decorate id="domainDecorationDecoration" template="/layout/form/_edit.xhtml">
+                        <ui:define name="label">#{messages['gazelle.productregistry.system.label.Domain']}</ui:define>
+                        <h:selectOneMenu styleClass="form-control gzl-form-control" id="domainListBox"
+                                         value="#{documentManager.selectedDocument.domain}" required="true">
+                            <s:selectItems value="#{gazelleDAO.getPossibleDomains()}" var="domainFromList"
+                                           noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                           label="#{domainFromList.name}"/>
+                            <s:convertEntity/>
+                            <a4j:ajax event="blur" render="domainDecorationDecoration" execute="@this"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                    <s:decorate id="typeDecoration" template="/layout/form/_edit.xhtml">
+                        <ui:define name="label">#{messages['net.ihe.gazelle.tm.Type']}</ui:define>
+                        <h:selectOneMenu styleClass="form-control gzl-form-control" id="typeListBox"
+                                         value="#{documentManager.selectedDocument.type}"
+                                         requiredMessage="#{messages['gazelle.common.PleaseSelect']}" required="true">
+                            <f:selectItem itemValue="#{null}" itemLabel="#{messages['gazelle.common.PleaseSelect']}"/>
+                            <f:selectItems value="#{documentManager.documentTypeList()}"/>
+                            <a4j:ajax event="blur" render="typeDecoration" execute="@this"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                    <s:decorate id="lifecyclestatusDecoration" template="/layout/form/_edit.xhtml">
+                        <ui:define name="label">#{messages['net.ihe.gazelle.tm.LifeCycleStatus']}</ui:define>
+                        <h:selectOneMenu styleClass="form-control gzl-form-control" id="lifecyclestatusListBox"
+                                         value="#{documentManager.selectedDocument.lifecyclestatus}"
+                                         requiredMessage="#{messages['gazelle.common.PleaseSelect']}" required="false">
+                            <f:selectItem itemValue="#{null}" itemLabel="#{messages['gazelle.common.PleaseSelect']}"/>
+                            <f:selectItems value="#{documentManager.documentLifeCycleStatusList()}"/>
+                            <a4j:ajax event="blur" render="lifecyclestatusDecoration" execute="@this"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                    <s:decorate id="volumeDecoration" template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="newDocumentvolumeInput"/>
+                        <ui:define name="label">#{messages['net.ihe.gazelle.tm.Volume']}</ui:define>
+                        <h:inputText styleClass=" form-control" id="newDocumentvolumeInput"
+                                     value="#{documentManager.selectedDocument.volume}" size="40"
+                                     required="false">
+                            <a4j:ajax event="blur" render="volumeDecoration" execute="@this"/>
+                        </h:inputText>
+                    </s:decorate>
+                    <s:decorate id="revisionDecoration" template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="newDocumentRevisionInput"/>
+                        <ui:define name="label">#{messages['net.ihe.gazelle.tm.Revision']}</ui:define>
+                        <h:inputText styleClass=" form-control" id="newDocumentRevisionInput"
+                                     value="#{documentManager.selectedDocument.revision}"
+                                     size="40">
+                            <a4j:ajax event="blur" render="revisionDecoration" execute="@this"/>
+                        </h:inputText>
+                    </s:decorate>
+                    <a4j:region id="dateOfpublicationDecorationRegion">
+                        <s:decorate id="dateOfpublicationDecoration"
+                                    template="/layout/form/_form_field_horizontal_inline.xhtml">
+                            <ui:define name="label">#{messages['net.ihe.gazelle.tm.DateOfPublication']}</ui:define>
+                            <a4j:outputPanel id="calendar" layout="block">
+                                <rich:calendar value="#{documentManager.selectedDocument.dateOfpublication}"
+                                               popup="true"
+                                               showApplyButton="false" cellWidth="24px"
+                                               datePattern="#{dateDisplay.calendarPatternDate}"
+                                               locale="#{dateDisplay.calendarLocale}"
+                                               timeZone="#{dateDisplay.calendarTimeZoneDate}" cellHeight="22px"
+                                               style="width:200px" required="true" render="nameDecoration">
+                                </rich:calendar>
+                            </a4j:outputPanel>
+                        </s:decorate>
+                    </a4j:region>
+                    <s:decorate id="titleDecoration" template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="newDocumentTitleInput"/>
+                        <ui:define name="label">#{messages['net.ihe.gazelle.tm.Title']}</ui:define>
+                        <h:inputText styleClass=" form-control" id="newDocumentTitleInput"
+                                     value="#{documentManager.selectedDocument.title}" size="80"
+                                     required="false">
+                            <a4j:ajax event="blur" render="titleDecoration" execute="@this"/>
+                        </h:inputText>
+                    </s:decorate>
+                    <s:decorate id="nameDecoration" template="/layout/form/_edit.xhtml">
+                        <ui:define name="label">#{messages['net.ihe.gazelle.tm.Name']}</ui:define>
+                        <h:outputText id="newDocumentNameInput" value="#{documentManager.selectedDocument.name}"
+                                      size="40">
+                        </h:outputText>
+                    </s:decorate>
+                </s:decorate>
+
+                <ui:define name="panel_footer">
+                    <a4j:commandButton id="newDocumentPanelButton" value="#{messages['gazelle.common.button.Save']}"
+                                       styleClass="gzl-btn-green"
+                                       rendered="#{s:hasRole('tests_editor_role') and applicationManager.isMasterModel()}"
+                                       action="#{documentManager.saveDocument()}" render="globalform"/>
+                    <a4j:commandButton id="newDocumentcancelButtonConfirm"
+                                       value="#{messages['gazelle.common.button.Cancel']}"
+                                       action="#{documentManager.cancelDocument()}" immediate="true"
+                                       styleClass="gzl-btn"
+                                       render="globalform"/>
+                </ui:define>
+            </ui:decorate>
+        </div>
+    </div>
+</ui:composition>

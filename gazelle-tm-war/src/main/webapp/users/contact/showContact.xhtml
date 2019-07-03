@@ -1,0 +1,29 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+        <ui:define name="panel_title">#{messages['gazelle.users.contact.DisplayContactLabel1']}</ui:define>
+        <div  id="contactManagerViewDiv">
+            <!-- ======================== -->
+            <!-- Contact Full Panel information section -->
+            <!-- ======================== -->
+            <ui:include src="/users/contact/showContactFullPanel.xhtml">
+                <ui:param name="panelLabel" value="#{messages['gazelle.users.contact.ContactInformation']}"/>
+                <ui:param name="panelId" value="Contact"/>
+                <ui:param name="contactVariableIn" value="#{personManager.selectedContact}"/>
+                <ui:param name="addressVariableIn" value="#{personManager.selectedContact.address}"/>
+                <ui:param name="countryVariableIn"
+                          value="#{personManager.selectedContact.address.iso3166CountryCode}"/>
+            </ui:include>
+            <div  id="contactManagerBean">
+                <a4j:commandButton id="showContactEditButton" styleClass="gzl-btn-blue"
+                                   value="#{messages['gazelle.common.button.Edit']}"
+                                   actionListener="#{personManager.updateContact( )}" execute="@this"
+                                   render="#{panelsToReRender}"/>
+                <a4j:commandButton id="showContactCancelButton" styleClass="gzl-btn"
+                                   value="#{messages['gazelle.common.button.Cancel']}"
+                                   actionListener="#{personManager.closeAddEditPanel()}" immediate="true"
+                                   render="#{panelsToReRender}"/>
+            </div>
+        </div>
+    </ui:decorate>
+</ui:composition>

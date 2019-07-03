@@ -1,0 +1,144 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <ui:decorate template="_menu_template.xhtml">
+        <ui:define name="menu_title">
+            <h:outputLink styleClass="navbar-brand"
+                          value="/#{applicationPreferenceManager.getApplicationUrlBaseName()}/home.seam">
+                <h:outputText
+                        rendered="#{not identity.loggedIn or not applicationManager.isTestManagement()}"
+                        value="#{applicationPreferenceManager.getApplicationName()}"/>
+                <h:outputText
+                        rendered="#{applicationManager.isTestManagement() and identity.loggedIn}"
+                        value="#{applicationPreferenceManager.getApplicationName()} - #{gazelleDAO.getSelectedTestingSession().description}"/>
+                <s:span styleClass="label label-danger"
+                        rendered="#{applicationManager.isTestManagement() and gazelleDAO.getSelectedTestingSession().sessionClosed}">
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.Closed']}"/>
+                </s:span>
+            </h:outputLink>
+            <h:outputLink styleClass="navbar-brand"
+                          rendered="#{applicationManager.isTestManagement() and identity.loggedIn}"
+                          value="/#{applicationPreferenceManager.getApplicationUrlBaseName()}/systems/session/changeSession.seam">
+                <small class="input-sm btn-default">
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.Switch']}"/>
+                </small>
+            </h:outputLink>
+        </ui:define>
+        <ui:define name="menu_logo">
+            <h:outputLink target="_blank"
+                          rendered="#{identity.loggedIn and (not empty gazelleDAO.getSelectedTestingSession().getLogoUrl())}"
+                          value="#{gazelleDAO.getSelectedTestingSession().getLogoLinkUrl()}">
+                <h:graphicImage library="img" value="#{gazelleDAO.getSelectedTestingSession().logoUrl}" height="34"
+                                rendered="#{gazelleDAO.getSelectedTestingSession().isLogoIsURL()}"/>
+                <h:graphicImage library="img" alt="#{messages['gazelle.tm.Logo']}" height="34"
+                                name="#{gazelleDAO.getSelectedTestingSession().getLogoUrl()}"
+                                rendered="#{!gazelleDAO.getSelectedTestingSession().isLogoIsURL()}"/>
+            </h:outputLink>
+            <h:outputLink value="http://gazelle.ihe.net/" target="_blank"
+                          rendered="#{!identity.loggedIn or (empty gazelleDAO.getSelectedTestingSession().getLogoUrl())}">
+                <h:graphicImage library="img" alt="#{messages['gazelle.tm.IHELogo']}"
+                                name="gazelle.png" height="34"/>
+            </h:outputLink>
+        </ui:define>
+        <ui:define name="menu_navigation_links">
+            <c:set var="menu" scope="session" value="#{applicationManager.getMenu()}"/>
+
+            <ui:include src="_generate_navigation_links.xhtml">
+                <ui:param name="menu" value="#{menu}"/>
+                <ui:param name="url_base_name" value="#{applicationPreferenceManager.getApplicationUrlBaseName()}"/>
+                <ui:param name="icon_template" value="/layout/menu/_fontawesome_icon_template.xhtml"/>
+            </ui:include>
+        </ui:define>
+        <ui:define name="menu_search_box">
+            <h:panelGroup rendered="#{identity.loggedIn}">
+                <ui:include src="_search_box.xhtml"/>
+            </h:panelGroup>
+        </ui:define>
+        <ui:define name="menu_user_actions_right">
+            <h:panelGroup rendered="#{not identity.loggedIn}">
+                <li>
+                    <s:link id="NoAccountLink_" view="/users/user/register.xhtml"
+                            value="#{messages['gazelle.users.registration.CreateAccount']}"/>
+                </li>
+            </h:panelGroup>
+            <h:panelGroup rendered="#{not identity.loggedIn}">
+                <li>
+                    <s:link id="loginLink" view="/users/login/login.xhtml"
+                            value="#{messages['gazelle.users.registration.Login']}"/>
+                </li>
+            </h:panelGroup>
+            <h:panelGroup rendered="#{not identity.loggedIn and applicationPreferenceManager.getCASEnabled()}">
+                <li>
+                    <h:outputLink id="loginCASLink" value="#{applicationPreferenceManager.getStringValue('application_url')}/cas/login">
+                        <h:outputText value="#{messages['gazelle.users.registration.LoginCAS']}"/>
+                        <f:param name="request" value="#{request.requestURL}" disable="#{request.queryString != null}"/>
+                        <f:param name="request" value="#{request.requestURL}?#{request.queryString}" disable="#{request.queryString == null}"/>
+                    </h:outputLink>
+                </li>
+            </h:panelGroup>
+            <h:panelGroup rendered="#{identity.loggedIn}">
+                <li>
+                    <h:outputLink rendered="#{applicationManager.isShowHelp()}"
+                                  alt="#{messages['net.ihe.gazelle.tm.Help_2']}"
+                                  value="#{applicationManager.getHelpUrl()}" target="_blank">
+                        <span class="gzl-icon-question-circle"/>
+                    </h:outputLink>
+                </li>
+                <h:panelGroup
+                        rendered="#{applicationManager.isTestManagement() and monitorInSessionAdministrationManager.isConnectedUserMonitorForSelectedSession()}">
+                    <li>
+                        <a id="monitorTests"
+                           href="/#{applicationPreferenceManager.getApplicationUrlBaseName()}/testing/research/testInstancesMonitor.seam">
+                            <span class="badge">#{testInstancesOverview.getTotalTestTodo()}</span> #{messages['net.ihe.gazelle.tm.Worklist']}
+                        </a>
+                    </li>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{applicationManager.isTestManagement()}">
+                    <li>
+                        <a id="connectathonShortcut" href="/#{applicationPreferenceManager.getApplicationUrlBaseName()}/testing/test/cat.seam">
+                            <span class="fa gzl-icon-play-black"></span>
+                            <h:outputText  value="#{messages['net.ihe.gazelle.tm.CAT']}"/>
+                        </a>
+                    </li>
+                </h:panelGroup>
+                <li>
+                    <h:panelGroup rendered="#{applicationManager.isUseMessages()}">
+                        <a id="messagesCount" href="#" data-toggle="modal" onclick="setLastMessagesFrame();"
+                           data-target="#lastMessagesModalPanel"><span class="badge"><h:outputText
+                                id="messageCounterButton"
+                                value="#{messageManager.getUnreadCount()}"/></span>
+                            #{messages['gazelle.common.messages.Messages']}</a>
+                    </h:panelGroup>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                       aria-expanded="false">
+                        <s:span id="userPicMin">
+                            <h:graphicImage class="gzl-menu-image img-rounded"
+                                            value="#{userPreferencesManager.userPreferences.photoUrlSmall}"/>
+                        </s:span>
+                        <h:outputText value="#{identity.username}"/>
+                        <span class="caret"/>
+                    </a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li>
+                            <h:outputLink
+                                    value="/#{applicationPreferenceManager.getApplicationUrlBaseName()}/users/user/userPreferences.seam">
+                                <h:outputText value="#{messages['net.ihe.gazelle.tm.Preferences']}"/>
+                            </h:outputLink>
+                        </li>
+                        <li class="divider"/>
+                        <li>
+                            <h:form styleClass="navbar-form navbar-left">
+                                <h:commandLink immediate="true"
+                                               action="#{identity.logout}"
+                                               value="#{messages['gazelle.users.registration.Logout']}"/>
+                            </h:form>
+                        </li>
+                    </ul>
+                </li>
+            </h:panelGroup>
+        </ui:define>
+    </ui:decorate>
+</ui:composition>

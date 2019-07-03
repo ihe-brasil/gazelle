@@ -1,0 +1,57 @@
+<f:view xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://jboss.org/schema/seam/pdf" xmlns:g="http://www.ihe.net/gazelle">
+    <!-- params: details -->
+    <p:table columns="6" widthPercentage="100" spacingBefore="10" spacingAfter="20" headerRows="1" widths="4 1 1 2 2 2">
+        <f:facet name="defaultCell">
+            <p:cell horizontalAlignment="center" verticalAlignment="middle"/>
+        </f:facet>
+        <!-- header -->
+        <ui:include src="headerCell.xhtml">
+            <ui:param name="title" value="#{messages['gazelle.tests.test']} (#{messages['gazelle.tm.test.MetaTest']})"/>
+        </ui:include>
+        <ui:include src="headerCell.xhtml">
+            <ui:param name="title" value="#"/>
+        </ui:include>
+        <ui:include src="headerCell.xhtml">
+            <ui:param name="title" value="#{messages['gazelle.tests.test.testOptionAcronym']}"/>
+        </ui:include>
+        <ui:include src="headerCell.xhtml">
+            <ui:param name="title" value="#{messages['gazelle.tm.testing.status.verified']}"/>
+        </ui:include>
+        <ui:include src="headerCell.xhtml">
+            <ui:param name="title" value="#{messages['gazelle.tm.testing.status.failed']}"/>
+        </ui:include>
+        <ui:include src="headerCell.xhtml">
+            <ui:param name="title" value="#{messages['gazelle.tm.PartiallyV']}"/>
+        </ui:include>
+        <!-- values -->
+        <ui:repeat value="#{details}" var="entry">
+            <p:cell colspan="1">
+                <p:paragraph><g:pdffont size="8" color="blue"><p:anchor reference="#{entry.getLink()}">#{connectathonReport.getTestTitle(entry)}</p:anchor></g:pdffont>
+                </p:paragraph>
+            </p:cell>
+            <p:cell colspan="1">
+                <p:paragraph><g:pdffont size="8">#{entry.getCount()}</g:pdffont></p:paragraph>
+            </p:cell>
+            <p:cell colspan="1">
+                <p:paragraph><g:pdffont size="8">#{entry.getOpt()}</g:pdffont></p:paragraph>
+            </p:cell>
+            <p:cell colspan="1" horizontalAlignment="left" >
+                <ui:repeat value="#{entry.getInstances('VERIFIED')}" var="ti">
+                    <p:paragraph spacingAfter="0" spacingBefore="0" alignment="left"><g:pdffont size="8" style="UNDERLINE" color="blue"><p:anchor reference="#{applicationPreferenceManager.getApplicationUrl()}testInstance.seam?id=#{ti.id}">#{ti.id}</p:anchor></g:pdffont><g:pdffont  size="8"><p:text value=" (#{ti.monitorInSession.user.username})"/></g:pdffont></p:paragraph>
+                </ui:repeat>
+            </p:cell>
+            <p:cell colspan="1"  horizontalAlignment="left">
+                <ui:repeat value="#{entry.getInstances('FAILED')}" var="ti">
+                    <p:paragraph spacingAfter="0" spacingBefore="0" alignment="left"><g:pdffont size="8" style="UNDERLINE" color="blue"><p:anchor reference="#{applicationPreferenceManager.getApplicationUrl()}testInstance.seam?id=#{ti.id}">#{ti.id}</p:anchor></g:pdffont><g:pdffont  size="8"><p:text value=" (#{ti.monitorInSession.user.username})"/></g:pdffont>
+                    </p:paragraph>
+                </ui:repeat>
+            </p:cell>
+            <p:cell colspan="1"  horizontalAlignment="left">
+                <ui:repeat value="#{entry.getInstances('PARTIALLY_VERIFIED')}" var="ti">
+                    <p:paragraph spacingAfter="0" spacingBefore="0" alignment="left"><g:pdffont size="8" style="UNDERLINE" color="blue"><p:anchor reference="#{applicationPreferenceManager.getApplicationUrl()}testInstance.seam?id=#{ti.id}">#{ti.id}</p:anchor></g:pdffont><g:pdffont  size="8"><p:text value=" (#{ti.monitorInSession.user.username})"/></g:pdffont></p:paragraph>
+                </ui:repeat>
+            </p:cell>
+        </ui:repeat>
+    </p:table>
+</f:view>

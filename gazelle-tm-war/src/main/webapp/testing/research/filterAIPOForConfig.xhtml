@@ -1,0 +1,33 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <!-- domain -->
+    <div class="row">
+        <ui:include src="/filter/filter.xhtml">
+            <ui:param name="filter" value="#{filter}"/>
+            <ui:param name="filterWidth" value="240"/>
+            <ui:param name="filterId" value="domain"/>
+            <ui:param name="filterName" value="#{messages['gazelle.tf.Domain']}"/>
+            <ui:param name="filterForm" value="#{filterForm}"/>
+        </ui:include>
+    </div>
+    <div class="row">
+        <!-- integrationProfile -->
+        <ui:include src="/filter/filter.xhtml">
+            <ui:param name="filter" value="#{filter}"/>
+            <ui:param name="filterWidth" value="240"/>
+            <ui:param name="filterId" value="integrationProfile"/>
+            <ui:param name="filterName" value="#{messages['gazelle.tf.integrationProfile']}"/>
+            <ui:param name="filterForm" value="#{filterForm}"/>
+        </ui:include>
+    </div>
+    <div class="row">
+        <!-- actor -->
+        <ui:include src="/filter/filter.xhtml">
+            <ui:param name="filter" value="#{filter}"/>
+            <ui:param name="filterWidth" value="240"/>
+            <ui:param name="filterId" value="actor"/>
+            <ui:param name="filterName" value="#{messages['gazelle.testmanagement.object.Actor']}"/>
+            <ui:param name="filterForm" value="#{filterForm}"/>
+        </ui:include>
+    </div>
+</ui:composition>

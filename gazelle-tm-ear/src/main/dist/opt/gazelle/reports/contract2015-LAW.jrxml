@@ -1,0 +1,850 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.1.0.final using JasperReports Library version 6.1.0  -->
+<!-- 2015-06-19T09:32:46 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="50" bottomMargin="20" uuid="a84bce80-ea8f-45ee-9141-60e44e728f03">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="176"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="New Data Adapter "/>
+	<style name="Arial" isDefault="true"/>
+	<style name="contentText" style="Arial" markup="html" fontName="Arial" fontSize="10">
+		<paragraph lineSpacing="Single" spacingAfter="20"/>
+	</style>
+	<style name="ChapterTitle" style="Arial"/>
+	<style name="ChapterSubTitle" style="Arial"/>
+	<subDataset name="dataset1" uuid="0c6028b3-2fbd-413a-8d74-239f1e5e3911"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA["/opt/gazelle/reports/"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="institutionId" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[461]]></defaultValueExpression>
+	</parameter>
+	<parameter name="testingSessionId" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[33]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT DISTINCT
+   usr_institution."name" AS usr_institution_name,
+   usr_institution."id" AS usr_institution_id,
+   usr_address."address" AS usr_address_address,
+   usr_address."address_line_2" AS usr_address_address_line_2,
+   usr_address."city" AS usr_address_city,
+   usr_address."state" AS usr_address_state,
+   usr_address."zip_code" AS usr_address_zip_code,
+   usr_iso_3166_country_code."printable_name" AS usr_iso_3166_country_code_printable_name,
+   usr_institution."url" AS usr_institution_url,
+   usr_institution."integration_statements_repository_url" AS usr_institution_integration_statements_repository_url,
+   usr_currency."keyword" AS usr_currency_keyword,
+   tm_invoice."fees_amount" AS tm_invoice_fees_amount,
+   tm_invoice."fees_discount" AS tm_invoice_fees_discount,
+   tm_invoice."reasons_for_discount" AS tm_reasons_for_discount,
+   tm_invoice."number_participant" AS tm_number_participant,
+   tm_invoice."number_system" AS tm_number_system,
+   tm_invoice."number_extra_participant" AS tm_number_extra_participant
+FROM
+   "public"."usr_address" usr_address INNER JOIN "public"."usr_institution" usr_institution ON usr_address."id" = usr_institution."mailing_address_id"
+   INNER JOIN "public"."usr_institution_address" usr_institution_address ON usr_address."id" = usr_institution_address."address_id"
+   AND usr_institution."id" = usr_institution_address."institution_id"
+   INNER JOIN "public"."tm_institution_system" tm_institution_system ON usr_institution."id" = tm_institution_system."institution_id"
+   INNER JOIN "public"."tm_invoice" tm_invoice ON usr_institution."id" = tm_invoice."institution_id"
+   INNER JOIN "public"."tm_testing_session" tm_testing_session ON tm_invoice."testing_session_id" = tm_testing_session."id"
+   INNER JOIN "public"."tm_system_in_session" tm_system_in_session ON tm_testing_session."id" = tm_system_in_session."testing_session_id"
+   INNER JOIN "public"."usr_currency" usr_currency ON tm_testing_session."currency_id" = usr_currency."keyword"
+   AND tm_institution_system."system_id" = tm_system_in_session."system_id"
+   INNER JOIN "public"."usr_iso_3166_country_code" usr_iso_3166_country_code ON usr_address."country" = usr_iso_3166_country_code."iso"
+WHERE
+   usr_institution."id" = $P{institutionId}
+ AND tm_system_in_session."testing_session_id" = $P{testingSessionId}]]>
+	</queryString>
+	<field name="usr_institution_name" class="java.lang.String"/>
+	<field name="usr_institution_id" class="java.lang.Integer"/>
+	<field name="usr_address_address" class="java.lang.String"/>
+	<field name="usr_address_address_line_2" class="java.lang.String"/>
+	<field name="usr_address_city" class="java.lang.String"/>
+	<field name="usr_address_state" class="java.lang.String"/>
+	<field name="usr_address_zip_code" class="java.lang.String"/>
+	<field name="usr_iso_3166_country_code_printable_name" class="java.lang.String"/>
+	<field name="usr_institution_url" class="java.lang.String"/>
+	<field name="usr_institution_integration_statements_repository_url" class="java.lang.String"/>
+	<field name="usr_currency_keyword" class="java.lang.String"/>
+	<field name="tm_invoice_fees_amount" class="java.math.BigDecimal"/>
+	<field name="tm_invoice_fees_discount" class="java.math.BigDecimal"/>
+	<field name="tm_reasons_for_discount" class="java.lang.String"/>
+	<field name="tm_number_participant" class="java.lang.Integer"/>
+	<field name="tm_number_system" class="java.lang.Integer"/>
+	<field name="tm_number_extra_participant" class="java.lang.Integer"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="96" splitType="Stretch">
+			<staticText>
+				<reportElement key="staticText" mode="Transparent" x="114" y="0" width="435" height="63" forecolor="#660099" uuid="8e80d553-6a78-4e55-bd99-d97e9337ce2f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[LAW Profile Virtual Connectathon Registration]]></text>
+			</staticText>
+			<line>
+				<reportElement key="line" x="1" y="15" width="555" height="1" uuid="53109ded-588b-40b5-8897-5d4f57156e53"/>
+			</line>
+			<staticText>
+				<reportElement x="230" y="42" width="185" height="20" uuid="de094d86-eab4-4457-9361-4ff405c172e5"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Application / Contract]]></text>
+			</staticText>
+			<line>
+				<reportElement key="line" positionType="FixRelativeToBottom" x="1" y="64" width="555" height="1" uuid="8e858457-3b6f-4dbc-b4ea-dde40649eedb"/>
+			</line>
+			<staticText>
+				<reportElement style="contentText" x="0" y="67" width="555" height="26" uuid="0bbf592e-2978-4a38-8866-17d670c304e0"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[This is an application and contract for participation in the IHE-Europe - IICC LAW 2015 virtual connectathon here after denominated as the CONNECTATHON. Please review carefully the terms of participation before completing the application. ]]></text>
+			</staticText>
+			<image>
+				<reportElement x="2" y="17" width="131" height="45" uuid="49cd4cc8-120e-4fbb-af6e-931f906bb4be"/>
+				<imageExpression><![CDATA["ihe.gif"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<detail>
+		<band height="244" splitType="Immediate">
+			<rectangle radius="10">
+				<reportElement x="3" y="65" width="555" height="120" backcolor="#CCCCCC" uuid="675210c6-8a65-4317-b11c-908c147b766f"/>
+				<graphicElement>
+					<pen lineColor="#CCCCCC"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle radius="10">
+				<reportElement x="0" y="62" width="555" height="120" backcolor="#FAFAFA" uuid="9a186d9f-04da-4bc3-85b0-d6cba219cedf"/>
+			</rectangle>
+			<staticText>
+				<reportElement style="ChapterTitle" x="0" y="0" width="182" height="20" uuid="9e472fa2-14c8-4917-b5f4-6438bd341a3e"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Company Information]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" x="0" y="21" width="555" height="36" uuid="efd64aef-8f5e-42e8-a338-9abe3418b8e2"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[Enter information about the company ("Participant") applying to test its system(s) at the Virtual Connectathon as it will appear in IHE publications and promotional materials. Please review the list for accuracy and, if necessary, use the online registration system to modify your entry and generate a revised application/contract via the online registration tool.  ]]></text>
+			</staticText>
+			<textField hyperlinkType="Reference">
+				<reportElement x="88" y="62" width="467" height="20" uuid="54481d7c-e230-4e48-b96d-c2b42b510706"/>
+				<box leftPadding="5">
+					<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{usr_institution_name}]]></textFieldExpression>
+				<hyperlinkReferenceExpression><![CDATA[$F{usr_institution_name}]]></hyperlinkReferenceExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="82" width="89" height="20" uuid="b57cfd80-55d8-47f3-a0e2-ca0c1d46498e"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Address :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="64" width="89" height="20" uuid="d1be86ba-5ec0-416e-844d-67279f9bd876"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Company Name :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="102" width="89" height="20" uuid="c359dcd9-ea07-4372-a69e-9573625edae7"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[City :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="122" width="89" height="20" uuid="bcb319c1-d5c8-4db6-9590-e49a87889f6f"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[State :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="214" y="122" width="25" height="20" uuid="de55a01b-87f3-43d7-88b0-a7973c64f579"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Zip :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="323" y="122" width="47" height="20" uuid="194b8e67-30a0-4c4b-b2b9-64700b9f810a"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Country :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="142" width="89" height="20" uuid="a588f87e-7bac-49ff-895c-71deebc27438"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[URL :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="88" y="82" width="467" height="20" uuid="b659b2db-19f4-4917-914e-9fa4cdc6724f"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{usr_address_address}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="88" y="92" width="467" height="20" uuid="0bce2490-89cf-4867-a564-0162076c7cfa"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{usr_address_address_line_2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="88" y="102" width="467" height="20" uuid="765ab898-6344-476c-adad-18898bfcc2d0"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{usr_address_city}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="88" y="122" width="102" height="20" uuid="93e9ea26-7d85-441d-b998-1d29af364629"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{usr_address_state}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="239" y="122" width="84" height="20" uuid="da6226f0-c13b-4cca-aba3-df317f06b214"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{usr_address_zip_code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="370" y="122" width="184" height="20" uuid="ba8ae8b8-4edb-47cb-83f5-5d98e8163c26"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{usr_iso_3166_country_code_printable_name}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="Reference">
+				<reportElement x="88" y="142" width="467" height="20" uuid="ad985a92-37f0-4961-be8a-b40486f17962"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{usr_institution_url}]]></textFieldExpression>
+				<hyperlinkReferenceExpression><![CDATA[$F{usr_institution_url}]]></hyperlinkReferenceExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="162" width="89" height="20" uuid="b974cb47-8324-401c-b8fd-3ce5e727996b"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Int. Stat. URL :]]></text>
+			</staticText>
+			<textField hyperlinkType="Reference">
+				<reportElement x="88" y="162" width="467" height="20" uuid="2e81749f-cd60-4af4-b49f-84da562887ee"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{usr_institution_integration_statements_repository_url}]]></textFieldExpression>
+				<hyperlinkReferenceExpression><![CDATA[$F{usr_institution_integration_statements_repository_url}]]></hyperlinkReferenceExpression>
+			</textField>
+			<staticText>
+				<reportElement style="ChapterTitle" x="0" y="194" width="182" height="20" uuid="1b31f514-1b0b-4e4f-a51e-01a7ba1235c4"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Contact Information]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" x="0" y="214" width="555" height="26" uuid="65fb2f31-f530-48a1-8011-c8ddb5f5e32e"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[List the primary Participant contacts to receive information regarding the administrative, marketing and technical aspects of participation. ]]></text>
+			</staticText>
+		</band>
+		<band height="65" splitType="Immediate">
+			<staticText>
+				<reportElement style="ChapterSubTitle" x="0" y="4" width="267" height="20" uuid="c129e754-a73c-47f8-b2b6-d04bcc8a39d7"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Company Financial representative]]></text>
+			</staticText>
+			<subreport>
+				<reportElement positionType="Float" x="1" y="24" width="555" height="37" uuid="e82f7512-9acf-4cf6-8b8e-ce4d9df70d31"/>
+				<subreportParameter name="institutionId">
+					<subreportParameterExpression><![CDATA[$P{institutionId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="functionTypeId">
+					<subreportParameterExpression><![CDATA[998]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[new File($P{SUBREPORT_DIR} + File.separatorChar + "contactsBasedOnInstitutionIdAndFunctionType.jasper")]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="60" splitType="Immediate">
+			<staticText>
+				<reportElement style="ChapterSubTitle" positionType="Float" x="0" y="0" width="267" height="20" uuid="162cda06-41c0-4355-9b56-581d41f29029"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Commercial/Marketing Contacts ]]></text>
+			</staticText>
+			<subreport>
+				<reportElement positionType="Float" x="0" y="20" width="555" height="37" uuid="71491ab4-0338-4dc9-b7b9-3a100f469c7f"/>
+				<subreportParameter name="institutionId">
+					<subreportParameterExpression><![CDATA[$P{institutionId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="functionTypeId">
+					<subreportParameterExpression><![CDATA[1]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[new File($P{SUBREPORT_DIR} + File.separatorChar + "contactsBasedOnInstitutionIdAndFunctionType.jasper")]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="60" splitType="Immediate">
+			<staticText>
+				<reportElement style="ChapterSubTitle" positionType="Float" x="0" y="0" width="267" height="20" uuid="d62b1461-d3cf-422e-aa63-ab8e6fd3c638"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Technical Contacts ]]></text>
+			</staticText>
+			<subreport>
+				<reportElement positionType="Float" x="0" y="20" width="555" height="37" uuid="6bd2672b-9872-4213-ad98-eb26a5f3697d"/>
+				<subreportParameter name="institutionId">
+					<subreportParameterExpression><![CDATA[$P{institutionId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="functionTypeId">
+					<subreportParameterExpression><![CDATA[2]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[new File($P{SUBREPORT_DIR} + File.separatorChar + "contactsBasedOnInstitutionIdAndFunctionType.jasper")]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="149" splitType="Immediate">
+			<staticText>
+				<reportElement style="contentText" positionType="Float" x="0" y="20" width="555" height="77" uuid="c0faa0d4-a7f8-40e1-a91a-dedff7d4a734"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[Please provide information for each system Participant intends to test at the Virtual Connectathon: The sections below present information that Participant has entered into the online registration system to describe the systems registered for the Virtual Connectathon. Please review the list for accuracy and, if necessary, use the online registration system to modify your entry and generate a revised application/contract. The number of systems tested, and the number of IHE Integration Profile/Actor combinations ("Profile/Actors") supported by each system will vary. Please refer to the Terms of Participation below for important qualifications. ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="ChapterTitle" positionType="Float" x="0" y="0" width="182" height="20" uuid="f996ed7b-d20f-45f0-848c-5ae8cfd9ac3e"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[System Information]]></text>
+			</staticText>
+			<subreport>
+				<reportElement positionType="Float" x="0" y="94" width="555" height="37" uuid="d8694e5a-28c4-4554-8e29-b38cd04062f7"/>
+				<subreportParameter name="testingSessionId">
+					<subreportParameterExpression><![CDATA[$P{testingSessionId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="institutionId">
+					<subreportParameterExpression><![CDATA[$P{institutionId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[new File($P{SUBREPORT_DIR} + File.separatorChar + "systemsBasedOnInstitutionId.jasper")]]></subreportExpression>
+			</subreport>
+			<break>
+				<reportElement x="0" y="139" width="554" height="1" uuid="231cdea1-034e-4dc0-a37b-a8b7976c6d74"/>
+			</break>
+		</band>
+		<band height="51" splitType="Immediate">
+			<staticText>
+				<reportElement style="ChapterTitle" positionType="Float" x="0" y="0" width="182" height="20" uuid="4f22c935-098b-4f09-966e-80581ea98f40"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Terms of Participation]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" x="0" y="20" width="555" height="23" uuid="f9a2a1f1-2f9a-422c-9a6a-6315ec5f5ff4"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[IHE-Europe and IICC (IVD Industry Connectivity Consortium) will organize and conduct a testing process culminating in a on-line interoperability testing event, the Virtual Connectathon to be held July 6-10th 2015. ]]></text>
+			</staticText>
+		</band>
+		<band height="134" splitType="Immediate">
+			<staticText>
+				<reportElement style="ChapterTitle" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="182" height="20" uuid="136883fa-9af8-40d9-bdf9-96ebb26fd7e6"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[General ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="22" width="555" height="108" uuid="631a9a6a-2746-4d26-af58-dc748674ddc6"/>
+				<textElement markup="html"/>
+				<text><![CDATA[<ol><li> The purpose of the testing process and Virtual Connectathon event is to test implementation of IHE capabilities in commercially available systems. Successful completion of the Virtual Connectathon is also a prerequisite for participation in the IICC demonstrations at the AACC Annual Meeting in Atlanta, July 2015.</li>
+<li> The IHE Technical Project Managers coordinate all testing activities in the testing process, under the supervision of IHE-Europe. The Technical Project Managers are also responsible for ensuring that all participants comply with the terms of participation defined in this document.</li>
+<li>IHE-Europe has the responsibility for all administrative aspects of the IHE project in Europe and are the primary contact points for all such matters.</li>
+</ol>
+]]></text>
+			</staticText>
+		</band>
+		<band height="334" splitType="Immediate">
+			<staticText>
+				<reportElement style="ChapterTitle" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="182" height="20" uuid="8fbaf089-d54b-4189-ba92-6f1b4dd6b087"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Participation Fees ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="21" width="555" height="278" uuid="68a190c9-fd4f-46d4-81f4-1d6a0b334352"/>
+				<textElement markup="html"/>
+				<text><![CDATA[<ol>
+<li>Participation fees are proportional to the number of systems being tested. Participation Fee is 4000 Euros per system.</li> 
+<li>There is no domain fee</li>
+<li>All prices (in Euros) are subject to Belgium VAT(21%) which might be reclaimed by your company.</li>
+<li>If the performance of the Agreement by either Party or any obligation hereunder is prevented, restricted, or interfered with by reason of a Force Majeure, the Party whose performance is so affected, upon giving prompt notice in writing within fourteen (14) days after the occurrence of such Force Majeure to the other party and shall act to mitigate the damages caused by such Force Majeure, if possible. If a Force Majeure occurs, no Party shall be responsible for any damages, increased costs, or losses that the other Party may sustain by reason of such failure or delay in performance. The Party claiming Force Majeure shall be excused from such performance to the extent of such Force Majeure event, provided however, that the Party so affected shall take all reasonable steps to avoid or remove such causes of non-performance and shall resume performance of its obligations hereunder with dispatch whenever such causes are removed. Should these events of circumstances continue for more than three (3) months, each Party may lawfully and by registered letter terminate the Agreement, without any compensation to the other Party being due.</li>
+<li>The period of retraction is one (1) week. Participation fees will be invoiced following the registration. Participation fees are non-refundable after the retraction period.</li>
+<li>Participation fees or purchase order are due by no later than June 30th 2015. An extra Late Payment Fee (12%) will be charged when payment has not been received on the IHE-Bank Account or purchase order has not been provided on July 1st 2015. IHE-Europe reserves the right to refuse participation in the Virtual Connectathon if Payment of Participation Fees has not been received on the IHE-Europe Bank Account before the actual start of the event.</li>
+<li>The IHE Review Committee, reserves the right to refuse participation to systems containing combinations of Actors it deems to be inappropriate or not reflective of practical systems architecture. The IHE Review Committee will make this determination in consultation with the Project Management Team. Participants may be asked to revise their applications to limit the number and type of IHE Actors included in a single system.</li>
+</ol>]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="ChapterTitle" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="300" width="554" height="20" uuid="4822d0f8-bb4b-4fa0-a0b9-a1ff837d3077"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[IICC Demonstrations at the 2015 AACC Annual meeting in Atlanta]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="320" width="555" height="14" uuid="062661be-82e7-42f6-89b7-e4970835b988">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+				<textElement markup="html"/>
+				<text><![CDATA[Information about demonstrations at the AACC Annual meeting in Atlanta can be obtained from IICC]]></text>
+			</staticText>
+		</band>
+		<band height="290" splitType="Prevent">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+			<staticText>
+				<reportElement style="ChapterTitle" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="555" height="141" uuid="d8d61f60-dac1-492f-93f1-4c5db0dd97e3"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Participation Benefits ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="20" width="555" height="270" uuid="0da7fae6-a166-4b41-9902-75c475e43460">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html"/>
+				<text><![CDATA[<ol>
+<li>Testing and Virtual Connectathon: The testing process leading up to and including the Virtual Connectathon offers Participants a unique opportunity to test IHE integration capabilities implemented in their systems and to publicize their success in implementing these capabilities. </li>
+<li>Gazelle Test Tools: Gazelle test tools will be made available to participants for preliminary testing in advance of the Virtual Connectathon. Access to these test tools is contingent on participation in the Virtual Connectathon testing process.</li>
+<li>Exhibition and Promotional Effort: Each participating company will be listed in materials describing successful testing at the LAW Virtual Virtual Connectathon. This information will be provided to attendees of the annual meetings of each Sponsor via printed documents, signage, multimedia presentations and the Internet.</li>
+<ul><li>Some of these materials will remain available throughout the 2015 calendar year (approximately) and will be distributed at gatherings sponsored by other relevant medical professional associations.</li>
+<li>Relevant details (as determined by the IHE Review Committee) of each company's successful participation, including all IHE Actors and Integration profiles successfully tested, will be highlighted in these educational and promotional materials, including the table of Virtual Connectathon Results available at www.ihe.net.</li>
+<li>No reports of Participants' failure to complete testing will be included in these published materials.</li>
+<li>At the Sponsors' meetings, these materials will be distributed at points of high visibility and discussed in informational presentations.</li>
+<li>All marketing materials of participating companies referring to IHE or incorporating IHE logos require prior review and approval by IHE-Europe.</li>
+</ul>
+</ol>]]></text>
+			</staticText>
+		</band>
+		<band height="442" splitType="Stretch">
+			<staticText>
+				<reportElement style="ChapterTitle" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="217" height="20" uuid="1c038335-a042-4d2a-a7e8-e4edf45a8fe2"/>
+				<textElement textAlignment="Justified">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Participant Responsibilities ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" stretchType="RelativeToBandHeight" x="0" y="20" width="555" height="38" uuid="607b2b57-612d-49fc-9af3-72adf5a38eee"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[The testing process and Virtual Connectathon will include the steps described below, each of which must be completed as scheduled in order to qualify for participation in the Virtual Connectathon. There will be no refund of registration fees for Participants failing to perform these required steps.
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" stretchType="RelativeToBandHeight" x="-1" y="60" width="555" height="179" uuid="82ba2929-d4b4-4c05-8225-29d08ecf3847"/>
+				<textElement textAlignment="Justified" markup="html"/>
+				<text><![CDATA[<ol><li>Kick-off meeting: A kick-off meeting will be held in June, 17th. The agenda will include the organization of the virtual connectathon testing process.</li>
+<li>Weekly webinar: a one-hour weekly webinar will be held each week before the testing session starts. The agenda will include Q&A with the connectathon managers as well as planning of the testing week.</li>
+<li>Test logs: Participants are required to submit success logs for each Profile/Actor to be tested at the Virtual Connectathon, using the Gazelle test tools provided by the Technical Project Manager, to verify that their software supports the transactions required. These data will be generated during trials conducted by the prospective participant using the IHE Test Simulators, Test Plan and Test Data Set to be provided by the Technical Project Managers. Additionally, Participants are required to report to the Technical Project Mangers any problems encountered with the test tools during testing, following procedures defined by the Technical Project Manager and posted on http://www.ihe-europe.net . For all domains, these success logs must be submitted by June 30th, 2015.
+</li>
+<li>Virtual Connectathon: Participation must involved at least one qualified technical specialist to the Virtual Connectathon for each registered system to be tested. </li>
+<li>The following additional requirements also apply:
+</li>
+</ol>
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="238" width="555" height="20" uuid="f1e2c12d-f7a1-479b-856b-8f4b10e873a2"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[- IHE-Europe bears no responsibility for any damage to Participants' equipment incurred during the Virtual Connectathon.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="257" width="555" height="46" uuid="b3aa9cd7-4931-4103-8e97-c5b97ce312c8"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[- All systems to be tested must be configured, have access to and be accessible over the Internet and operational by Monday, July 6th at 08:00  CDT / 15:00 CEST. At that time participants will begin testing by sending appropriate messages to other participants systems through the Gazelle Proxy (IP address: 94.23.247.108, port 13000 to 14000) as designated by the Technical Project Manager]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="326" width="555" height="25" uuid="49d0160f-fbff-41a4-a9ad-6bbb81e3b60a"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[- Participants hereby agree not to disclose information learned at the Virtual Connectathon regarding other Participants' systems and test results as outlined in the Nondisclosure Agreement below.
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="350" width="555" height="25" uuid="34e11d6a-561e-4661-8656-adc4cd18a33e"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[- Participant must, prior to the conclusion of the Virtual Connectathon, successfully demonstrate interoperability with designated partners in a number of test configurations determined by the Technical Project Managers.
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="374" width="555" height="26" uuid="90944720-149a-4965-b86f-e369e0a2e906"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[- Participant must successfully complete any additional interoperability testing deemed necessary by the Technical Project Managers and IHE Review Committee.
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="302" width="555" height="25" uuid="07fca122-7daf-4b26-b591-cf90062ffa1a"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[- During the virtual connectathon week , participants shall attend the daily meeting and are available during the testing hours (from 8:00 to 11:00 CDT / 15:00 to 18:00 CEST) ]]></text>
+			</staticText>
+		</band>
+		<band height="137" splitType="Prevent">
+			<staticText>
+				<reportElement style="ChapterTitle" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="200" height="20" uuid="62f76905-23fa-4325-b058-e3af39486b26"/>
+				<textElement textAlignment="Justified">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Timeline]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="5" y="23" width="140" height="14" uuid="3d9754da-8729-49e3-85ca-f97688dd298c"/>
+				<box leftPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font isBold="true" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" x="145" y="23" width="409" height="14" uuid="f5209425-c4d1-4c85-9733-941d90b6c73b"/>
+				<box leftPadding="5" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[EVENT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" x="5" y="37" width="140" height="14" uuid="74eb7e6e-4192-48ee-b912-861fde49f243">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box leftPadding="5" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<text><![CDATA[June, 2nd to June 10th]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" x="5" y="51" width="140" height="14" uuid="83448506-88b5-4faf-805d-1703cccc699e"/>
+				<box leftPadding="5" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<text><![CDATA[June, 15th]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" x="5" y="65" width="140" height="14" uuid="c7708177-55a2-4fc3-ba3f-ddd233fdb1f8"/>
+				<box leftPadding="5" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<text><![CDATA[Week of June 15th]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" x="5" y="79" width="140" height="14" uuid="88c26802-b913-49c5-96ff-a4c86df4494d"/>
+				<box leftPadding="5" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<text><![CDATA[Week of June 22nd, 29th]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" x="5" y="93" width="140" height="14" uuid="7a88ab7d-6e63-41d8-9809-0ac559cb33f8"/>
+				<box leftPadding="5" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<text><![CDATA[June, 30th]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" x="145" y="37" width="409" height="14" uuid="ba0ae5c3-c994-4e31-8f14-01cf0009960c">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box leftPadding="5" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<text><![CDATA[Registration in Gazelle TM]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" x="145" y="51" width="409" height="14" uuid="f761eff7-02d8-4655-b11c-02110e436888"/>
+				<box leftPadding="5" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<text><![CDATA[Delivery of Gazelle tools updated according to LAW 1.4]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" x="145" y="65" width="409" height="14" uuid="c9bee1bd-f70b-483e-a7a5-ed17ddaa0712"/>
+				<box leftPadding="5" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<text><![CDATA[(date/time to be defined) Kick-off meeting with all participants]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" x="145" y="79" width="409" height="14" uuid="7b7d3f07-aeb9-4d57-b8c3-e2c094cefabd"/>
+				<box leftPadding="5" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<text><![CDATA[(date/time to be defined) weekly meeting for QA about Virtual Connectathon and tools]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" x="145" y="93" width="409" height="14" uuid="931c2141-0c08-4d9d-ac04-f92adc315305"/>
+				<box leftPadding="5" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<text><![CDATA[Pre-connectathon logs deadline]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" x="5" y="107" width="140" height="14" uuid="01335172-d07c-4899-a218-3210863d682b"/>
+				<box leftPadding="5" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<text><![CDATA[July, 6th - July, 10th]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" x="145" y="107" width="409" height="14" uuid="c606f1fa-c5e6-41b4-8e68-48aab6d788a7"/>
+				<box leftPadding="5" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<text><![CDATA[Virtual connectathon (detailed schedule to be defined)]]></text>
+			</staticText>
+		</band>
+		<band height="531" splitType="Immediate">
+			<staticText>
+				<reportElement style="ChapterTitle" positionType="Float" x="0" y="0" width="217" height="20" uuid="52fd4605-33ae-4ff2-a7ee-4dfdab4c91dd"/>
+				<textElement textAlignment="Justified">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nondisclosure Agreement ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" x="0" y="23" width="555" height="39" uuid="44cd08df-168f-4dd5-80ea-531686306249"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[The Integrating the Healthcare Enterprise ("IHE") initiative has the goal of stimulating integration of information and imaging systems used in the delivery of healthcare. IHE develops guidelines and supports a testing process and other activities to encourage the implementation of standards to enable communication among such systems.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" x="0" y="64" width="555" height="254" uuid="a841639f-ee7a-4229-b979-7917d29dd5b9"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[1. In order to encourage the exchange of information among participants necessary to the testing process, it is important that both IHE-Europe and each Participant be protected against improper disclosure of technical or commercial information by any other Participant. Furthermore, the Virtual Connectathon process requires participants to resolve as expediently as possible and in a spirit of cooperation any software bugs and interoperability issues that arise during the testing process. The Participant thus agrees to keep confidential and forbear from using for any commercial purposes any information obtained from other participants in the course of the testing process to the extent that such information (i) is identified in writing as "confidential", (ii) is directly related to the IHE testing process for the receiving Participant's system, and (iii) is disclosed only after written consent by the receiving Participant to the receipt of such information under this non-disclosure and non-use obligation. The Participant further agrees to respect all other Participants and their systems and equipment.The undersigned Participant shall not be obligated to keep information secret and in confidence and shall not be obligated from using such information if it can show that such information:
+- appears in printed publications distributed by IHE-Europe in the public domain;
+- was public knowledge at the time of its receipt;
+- became public knowledge after its receipt without breach of this agreement by the undersigned Participant;
+- was rightfully disclosed to the Participant by a third party without an obligation of confidentiality;
+- is provably independently developed by the undersigned Participant's personnel without access to the confidential information;
+- is required to be disclosed pursuant to a legal, judicial or administrative proceeding or by law; or
+- is approved for release by the prior written authorization of all other organizations in question; or
+- was disclosed to the receiving Participant without the written consent of the receiving Participant; or
+- was not directly related to the IHE testing process of the receiving Participant's system.
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" x="0" y="318" width="555" height="76" uuid="5e29cc57-eb8e-4172-bab9-f7957df583bb"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[2. IHE-Europe agrees to take reasonable steps to provide a work atmosphere conducive to a successful testing process, including discouraging the improper disclosure and use of information by Participants. In consideration of being permitted by IHE-Europe to participate in the IHE testing process, the undersigned Participant agrees to hold IHE-Europe harmless from any judgments, fines, amounts paid in settlement and reasonable expenses, including attorney's fees incurred by them in connection with the defense of any lawsuit or other claim which involves conduct of the undersigned Participant constituting a breach of the nondisclosure and nonuse obligations described in the preceding paragraphs.
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" x="0" y="398" width="555" height="72" uuid="22ff8ae9-bd33-4960-b81c-1f6cd14dd9d3"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[3. Supporting information and documents developed by IHE for use within the IHE testing process, including but not limited to specifications, test data and marketing materials are the copyrighted property of IHE. In the spirit of collaboration and in keeping with copyright law, no Participant may lay claim to the information created for the IHE testing and demonstration process without written consent from IHE. After software, technical information or documentation is formally released into the public domain by IHE in order to further the purposes of the IHE initiative, the foregoing restrictions on disclosure or use will no longer apply to any software and/or technical information or documentation that is so released.
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" x="0" y="473" width="555" height="57" uuid="ed19700d-9518-4c61-a151-64873f568894"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[4. For the purposes of sharing information with their membership and the public and promoting the IHE initiative, IHE-Europe intends to acquire and reproduce representative images of systems being tested by Participants at the Virtual Connectathon. Any such images acquired may potentially be used in printed publications, Web pages and multimedia presentations promoting the IHE initiative. Such images will not be used by IHE-Europe for any other purpose.
+]]></text>
+			</staticText>
+		</band>
+		<band height="216" splitType="Immediate">
+			<staticText>
+				<reportElement style="contentText" positionType="Float" x="0" y="142" width="555" height="73" uuid="35b7ab28-b5df-4556-8401-deda294a727e"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[7. Finally, the undersigned Participant acknowledges and agrees that certain software and related technical information and documentation which will eventually be released into the public domain by IHE in connection with the implementation of the IHE initiative (the "IHE Software") will be made available on an "as is" basis and that neither IHE-Europe nor any other Participant will make the warranty about the IHE Software, its performance, its merchantability or fitness for any particular use, its freedom from any computer diseases, or its conformity to any specification and that all risk as to the quality and performance of the IHE Software will be with the users of the IHE Software. ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" x="0" y="6" width="555" height="87" uuid="641a278a-36d6-4564-94dc-996df7898852"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[5. The undersigned Participant, in consideration of being permitted by IHE-Europe to participate in the IHE initiative, hereby grants IHE-Europe the absolute and irrevocable right and unrestricted permission to use, re-use, display, distribute, transmit, publish, re-publish, copy, or otherwise exploit, either in whole or in part, either digitally, in print, or in any other medium now or hereafter known, photograph taken of its personnel and unaltered and fully assembled equipment, or in which its personnel and unaltered and fully assembled equipment may be included;  and to copyright the same. The undersigned understands and agrees that IHE-Europe may or may not, as they choose, use the Participant's name in conjunction with the photographs taken.
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" x="0" y="93" width="555" height="49" uuid="bba9e488-1989-461f-9496-b28a2c4f477d"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[6. The Participant also hereby releases and discharges IHE-Europe and their agents, representatives, and assignees from any and all claims and demands arising out of or in connection with the use of the photographs in the manner described above, including without limitation any and all claims for invasion of privacy, right of publicity, and improper disclosure of commercial information.
+]]></text>
+			</staticText>
+		</band>
+		<band height="59" splitType="Prevent">
+			<staticText>
+				<reportElement style="ChapterTitle" positionType="Float" x="0" y="0" width="217" height="20" uuid="082bedaf-c2ae-426f-bac3-45f0da93325e"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Registration Fees ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="20" width="556" height="39" uuid="3c65dd2b-d566-435f-a37e-0cf490360a96"/>
+				<textFieldExpression><![CDATA["You have registered " + $F{tm_number_system}.toString() + " systems and "+ $F{tm_number_participant}.toString() +" persons. Your Connectathon fees are : " + $F{usr_currency_keyword} + " " + $F{tm_invoice_fees_amount}.toString() +" (excluding VAT)"]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="226" splitType="Prevent">
+			<staticText>
+				<reportElement style="ChapterTitle" positionType="Float" x="0" y="0" width="217" height="20" uuid="cf7ee0d8-fdc8-49a6-93d3-1d68ee096765"/>
+				<textElement textAlignment="Justified">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Signature]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" x="0" y="31" width="555" height="54" uuid="201b85fb-6411-4d5e-8033-d04bb4581132"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[The Participant agrees to abide by the Terms of Participation of this application/contract, which are made part of this contract by reference and are fully incorporated herein. IN WITNESS WHEREOF, the undersigned representative of the Participant, who is empowered to enter into contracts on behalf of the Participant, has executed this Agreement on behalf of the Participant. This is not a binding contract until signed by representatives of IHE-Europe.
+
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" x="0" y="84" width="555" height="128" uuid="9b7e649c-985b-4ade-a083-ab455530c09e"/>
+				<textElement textAlignment="Left"/>
+				<text><![CDATA[Return signed and completed application/contract by EMAIL to :
+European Society of Radiology
+IHE-Europe Secretariat,
+Attn: Ms. Ulrike Mayerhofer-Sebera,
+Neutorgasse 9,
+1010 Vienna, Austria.
+Tel :  +43-1-533-4064-530
+Fax : +43-1-535-70-41
+
+Email : office@ihe-europe.net AND technical.manager@ihe-europe.net]]></text>
+			</staticText>
+		</band>
+		<band height="212" splitType="Prevent">
+			<staticText>
+				<reportElement style="contentText" positionType="Float" x="0" y="27" width="555" height="168" uuid="b8f8385c-6886-4ddc-a86d-9260f1cb8966"/>
+				<textElement textAlignment="Left"/>
+				<text><![CDATA[ Agreed to for Participation by:
+
+
+________________________________________________________________________________________________
+Signature of authorized representative                                                      Date
+
+
+
+ Accepted by IHE-Europe:
+
+
+________________________________________________________________________________________________
+IHE-Europe Coordinator                                                                            Date
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="0" y="0" width="555" height="20" uuid="eafe7ec6-af8a-4080-9dfd-ba17251a8ec5"/>
+				<textElement textAlignment="Justified">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[LAW Profile Virtual Connectathon Registration]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="38" splitType="Stretch">
+			<textField>
+				<reportElement x="434" y="0" width="80" height="20" uuid="b73b6713-6798-4986-a106-be73853bce79"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="514" y="0" width="40" height="20" uuid="bbd5852e-f9cd-4dc3-a9b6-1252ded5304f"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy HH.mm.ss">
+				<reportElement x="0" y="0" width="145" height="19" uuid="096b20b3-9170-4252-8ccf-d1ac041216c9"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="10" y="23" width="515" height="12" forecolor="#000000" backcolor="#000099" uuid="7b3250eb-3ea5-48a3-8146-6aeb3844bf24"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Tel: +32 (0) 2 706 89 60 | Fax: +32 (0) 2 706 89 69 | www.ihe-europe.net | ING 363-0429257-72 | VAT-BE-0898.675.997 RLP Brussels"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="10" y="10" width="515" height="12" forecolor="#000000" backcolor="#FFFFFF" uuid="736a6003-45c5-4220-97bc-9aa9d9cb558b"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA["IHE-Europe aisbl | Diamant Building, Bd A. Reyerslaan 80, 1030 Brussels - Belgium"]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

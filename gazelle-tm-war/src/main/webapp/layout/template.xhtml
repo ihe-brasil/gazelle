@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:g="http://www.ihe.net/gazelle"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:s="http://jboss.org/schema/seam/taglib"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:c="http://java.sun.com/jstl/core"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns="http://www.w3.org/1999/xhtml">
+<h:head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>${pageNameTitle}</title>
+
+    <link type="application/opensearchdescription+xml" rel="search"
+          href="#{applicationPreferenceManager.getApplicationUrl()}search/opensearchdescription.seam"
+          title="Gazelle"/>
+    <link rel="shortcut icon" href="/#{applicationPreferenceManager.getApplicationUrlBaseName()}/resources/img/favicon2.ico"
+          type="image/x-icon"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <h:outputStylesheet library="stylesheet" name="gazelle-tm-${gazelle-assets-version}.min.css"/>
+
+
+    <!--<h:outputStylesheet library="stylesheet" name="gazelle-theme.css"/>-->
+    <!--<h:outputStylesheet library="stylesheet" name="alert.css"/>-->
+    <!--<h:outputStylesheet library="stylesheet" name="bootstrap_dropdown.css"/>-->
+    <!--<h:outputStylesheet library="stylesheet" name="theme-TM.css"/>-->
+    <!--<h:outputStylesheet library="stylesheet" name="chosen.bootstrap.css"/>-->
+    <!--<h:outputStylesheet library="stylesheet" name="daterangepicker.css"/>-->
+    <!--<h:outputStylesheet library="stylesheet" name="summernote.css"/>-->
+    <!--<h:outputStylesheet library="stylesheet" name="status.css"/>-->
+
+    <h:outputStylesheet rendered="#{identity.loggedIn and applicationManager.displayToolTips()}"
+                        library="stylesheet"
+                        name="tooltip.css"/>
+
+    <!--<h:outputScript library="jscript" name="gazelleTools.js"/>-->
+    <!--<h:outputScript library="jscript" name="deployCountdown.js"/>-->
+    <!--<h:outputScript library="jscript" name="logoutCountdown.js"/>-->
+    <!--<h:outputScript library="jscript" name="md5Encryption.js"/>-->
+    <!--<h:outputScript library="jscript" name="savePassword.js"/>-->
+    <!--<h:outputScript library="jscript" name="gazelleEncryptions.js"/>-->
+    <!--<h:outputScript library="jscript" name="messageNotifications.js"/>-->
+    <!--<h:outputScript library="jscript" name="autofocus.js"/>-->
+    <!--<h:outputScript library="jscript" name="activeModal.js"/>-->
+
+    <h:outputScript library="jscript" name="gazelle-tm-${gazelle-assets-version}.min.js"/>
+
+    <ui:insert name="header"/>
+
+    <!--<h:outputScript library="jscript" name="jquery_1_11_2.min.js"/>-->
+    <!--<h:outputScript library="jscript" name="bootstrap.min.js"/>-->
+    <!--<h:outputScript library="jscript" name="chosen.jquery.min.js"/>-->
+    <!--<h:outputScript library="jscript" name="summernote.min.js"/>-->
+    <!--<h:outputScript library="jscript" name="moment.js"/>-->
+    <!--<h:outputScript library="jscript" name="daterangepicker.js"/>-->
+    <!--<h:outputScript library="jscript" name="applicationColor.js"/>-->
+
+    <h:outputScript library="jscript" name="gazelle-tm-deferred-${gazelle-assets-version}.min.js"/>
+    <!--<h:outputScript library="jscript" name="filter.js"/>-->
+    <!--@formatter:off-->
+    <script type="text/javascript">
+
+        jq162 = jQuery.noConflict(true);
+
+        jq162(function () {
+            updateSelects();
+        });
+
+        function updateSelects() {
+            updateSelects_(jq162, {allow_single_deselect: true, display_selected_options: true, width: "90%", search_contains: true});
+        }
+    </script>
+ <!--@formatter:on-->
+</h:head>
+<h:body>
+
+
+    <h:panelGroup
+            rendered="#{empty gazelleDAO.getSelectedTestingSession()}">
+        <!--@formatter:off-->
+        <script type="text/javascript">
+            setApplicationColor('#{applicationManager.getDefaultColor()}');
+        </script>
+     <!--@formatter:on-->
+    </h:panelGroup>
+    <h:panelGroup
+            rendered="#{!empty gazelleDAO.getSelectedTestingSession()}">
+        <!--@formatter:off-->
+        <script type="text/javascript">
+            setApplicationColor('#{gazelleDAO.getSelectedTestingSession().getTargetColor()}');
+        </script>
+     <!--@formatter:on-->
+    </h:panelGroup>
+    <f:view>
+        <a4j:status id="globalStatus" onstop="updateSelects()"/>
+
+        #{userManagerExtra.userDoneAction()}
+        <h:panelGroup rendered="#{applicationManager.isPingEnabled()}">
+            <script type="text/javascript">
+                gazelleAddToBodyOnLoad(function () {
+                    schedulePing(
+                            '#{applicationPreferenceManager.getApplicationUrlBaseName()}',
+                            #{applicationManager.pingTime},
+                            '#{applicationManager.viewId}');
+                });
+            </script>
+        </h:panelGroup>
+        <c:if test="#{applicationManager.incompatibleBrowser}">
+            <div id="incompatibleBrowser" class="incompatible-browser">
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.PleaseUseACompatibleBrowser']}"/>
+                <h:outputLink value="http://www.google.com/chrome/">
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.GoogleChrome']}"/>
+                </h:outputLink>
+                <h:outputText value=" #{messages['gazelle.productregistry.search.easySearch.or']} "/>
+                <h:outputLink value="http://portableapps.com/apps/internet/firefox_portable">
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.MozillaFirefox']}"/>
+                </h:outputLink>
+            </div>
+        </c:if>
+
+        <div id="invalidPageStatus" class="schedule-invisible">
+            <h:outputText
+                    value="#{messages['net.ihe.gazelle.tm.PageExpiredAnyChangeWillBeLostTryToRefreshThePag']}"/>
+        </div>
+
+        <div id="deployScheduled" class="schedule-invisible">
+            <span><h:outputText value="#{messages['gazelle.tm.deploy.scheduled']}"/> : </span>
+            <span id="deployCountdown"/>
+        </div>
+
+        <div id="logoutScheduled" class="schedule-invisible"><span><h:form id="ls">
+            <s:token allowMultiplePosts="true"/>
+            <h:outputText value="#{messages['gazelle.tm.logout.scheduled']}"/>
+            : <span id="lougoutCountdown"/>
+
+            <a4j:commandButton id="bt" styleClass="gzl-btn-green btn-sm"
+                               value="#{messages['net.ihe.gazelle.tm.StayConnected']}"
+                               actionListener="#{userManagerExtra.userDoneAction()}"
+                               onclick="stopCountDownLogout()">
+            </a4j:commandButton>
+        </h:form>
+        </span>
+        </div>
+
+        <div id="deployExecuted" class="schedule-invisible"><span><h:outputText
+                value="#{messages['net.ihe.gazelle.tm.redeployed']}"/></span></div>
+
+        <div id="logoutExecuted" class="schedule-invisible"><span><h:outputText
+                value="#{messages['net.ihe.gazelle.tm.loggedout']}"/></span></div>
+
+        <div id="jbossRestarted" class="schedule-invisible"><span><h:outputText
+                value="#{messages['net.ihe.gazelle.tm.TheServerIsRestartingAnyChangeWillBeLost']}"/></span>
+        </div>
+
+        <ui:include src="/ajaxStatus.xhtml"/>
+
+        <ui:include src="/layout/menu/_menu.xhtml"/>
+
+        <div id="gzl-container">
+            <h:panelGroup rendered="#{pageNameTitle != null}">
+                <h2>
+                    <h:outputText value="${pageNameTitle}"/>
+                </h2>
+            </h:panelGroup>
+            <h:panelGroup rendered="#{pageNameTitle == null}">
+                <br/>
+            </h:panelGroup>
+            <div class="row">
+                <div class="center-block gazelle-alert">
+                    <s:decorate id="gazelle-messages">
+                        <rich:messages globalOnly="true" escape="false"
+                                       styleClass="fade-out-up text-center"
+                                       infoClass="alert gzl-alert-green animated-fast"
+                                       warnClass="alert gzl-alert-orange animated-slow"
+                                       errorClass="alert gzl-alert-red animated-slow">
+                        </rich:messages>
+                    </s:decorate>
+                </div>
+            </div>
+            <a4j:region>
+                <ui:insert name="body"/>
+            </a4j:region>
+        </div>
+
+        <ui:include src="footer/footer.xhtml"/>
+
+        <div class="modal" id="lastMessagesModalPanel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">#{messages['net.ihe.gazelle.tm.X']}</span></button>
+                        <h4 class="modal-title" id="lastMessagesModalPanelLabel">
+                            #{messages['gazelle.common.messages.Messages']}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <iframe id="lastMessagesFrame" src=""
+                                style=" width: 100%; height: 400px; border-width: 0px;"/>
+
+                    </div>
+                    <div class="modal-footer">
+                        <h:form>
+                            <a4j:commandButton styleClass="gzl-btn"
+                                               immediate="true"
+                                               onclick="jq162('#lastMessagesModalPanel').modal('hide');"
+                                               oncomplete="location.reload();"
+                                               value="#{messages['net.ihe.gazelle.assets.Close']}"
+                                               execute="@this"/>
+                        </h:form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            function setLastMessagesFrame() {
+                document.getElementById('lastMessagesFrame').src = '/#{applicationPreferenceManager.getApplicationUrlBaseName()}/users/messages.seam';
+            }
+        </script>
+
+        <h:outputScript library="jscript" name="scheduledPing.js"/>
+
+        <script src='/#{applicationPreferenceManager.getApplicationUrlBaseName()}/javax.faces.resource/scheduledPing.js.seam?ln=jscript'
+                async="true" type="text/javascript"/>
+
+        <ui:include id="googleInclude" rendered="#{applicationPreferenceManager.displayGoogleAnalyticsCode()}"
+                    src="/googleAnalytics.xhtml"/>
+
+        <ui:include src="_scrollup.xhtml"/>
+
+        <!-- This is here to keep the g namespace in place-->
+        <h:panelGroup rendered="1 == 2">
+            <g:imagelink value=""/>
+        </h:panelGroup>
+    </f:view>
+</h:body>
+
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+
+<!--<h:outputScript library="jscript" name="ie10-viewport-bug-workaround.js"/>-->
+
+
+</html>

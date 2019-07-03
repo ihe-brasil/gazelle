@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.2.0.final using JasperReports Library version 6.2.0  -->
+<!-- 2016-03-10T10:14:43 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="feesStatus_subreport2" pageWidth="300" pageHeight="400" columnWidth="300" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="59af1d3d-ac3a-4968-b321-1fe202c41818">
+	<property name="ireport.zoom" value="4.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gazelle Production"/>
+	<parameter name="testingSessionId" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[29]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+  usr_address.country, count(tm_invoice.institution_id )
+FROM
+  public.tm_invoice,
+  public.usr_institution,
+  public.usr_address,
+  public.usr_person,
+  public.usr_persons_functions
+WHERE
+  tm_invoice.institution_id = usr_institution.id AND
+  usr_person.institution_id = usr_institution.id AND
+  usr_person.address_id = usr_address.id AND
+  usr_persons_functions.person_id = usr_person.id AND
+  usr_persons_functions.person_function_id = 998  and testing_session_id = $P{testingSessionId} group by usr_address.country order by count desc;]]>
+	</queryString>
+	<field name="country" class="java.lang.String"/>
+	<field name="count" class="java.lang.Long"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="18">
+			<staticText>
+				<reportElement x="0" y="1" width="60" height="15" uuid="f7bbdfcc-a7c5-44c9-b20c-80c61776f2d4">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Country]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="66" y="1" width="88" height="15" uuid="aaafdf30-5854-4836-ad79-b49217c6a74f">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[# of companies]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15">
+			<textField>
+				<reportElement x="80" y="1" width="60" height="12" uuid="ec41cf86-39cc-45c8-aeb2-c9ada1fb2d4b">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{count}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="20" y="1" width="40" height="12" uuid="6f87d9b8-7975-4d28-9e9c-321b3ef09cad">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{country}]]></textFieldExpression>
+			</textField>
+			<image scaleImage="RetainShape" hAlign="Center" vAlign="Middle" isUsingCache="true" evaluationTime="Auto">
+				<reportElement mode="Transparent" x="0" y="0" width="20" height="13" uuid="857431e7-8590-4765-bd47-e9c77c8fb96a">
+					<printWhenExpression><![CDATA[$F{country}.equals( "-" )?Boolean.FALSE:Boolean.TRUE]]></printWhenExpression>
+				</reportElement>
+				<imageExpression><![CDATA["flags/"+$F{country}.toLowerCase()+".gif"]]></imageExpression>
+				<hyperlinkTooltipExpression><![CDATA[$F{country}]]></hyperlinkTooltipExpression>
+			</image>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,69 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+
+    <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+        <ui:param name="panel_id" value="panelBillingPreview"/>
+        <ui:define name="panel_title">#{messages['gazelle.users.institution.BillingPreview']}</ui:define>
+        <p>#{messages['gazelle.users.contact.financial.preview.info']}</p>
+
+        <!--  Note : No internationalization in billing preview -->
+
+        <ui:decorate template="/layout/panels/_panel_id.xhtml">
+            <ui:param name="panel_id" value="panel2refresh"/>
+            <div align="left">
+                <h:graphicImage library="img" width="48" height="36" name="IHE_bg.gif"/>
+            </div>
+            <div align="right">
+                <h:outputText style="font:bold 12px Arial, Verdana;" value="#{contactVariable.institution.name}"/>
+            </div>
+            <div align="right">
+                <!--  Note : No internationalization in billing preview -->
+                <h:outputText style="font: 12px Arial, Verdana;"
+                              value="#{messages['gazelle.users.ToTheAttentionOf']} "/>
+                <h:outputText style="font:bold 12px Arial, Verdana;"
+                              value=" #{contactVariable.firstname} #{contactVariable.lastname}"/>
+            </div>
+            <div align="right">
+                <h:outputText style="font: 12px Arial, Verdana;" value="#{addressVariable.address} "/>
+                <br/>
+                <h:outputText style="font: 12px Arial, Verdana;" value="#{addressVariable.addressLine2} "/>
+            </div>
+            <div align="right">
+                <h:outputText style="font: 12px Arial, Verdana;" value="#{addressVariable.city}, "/>
+                <h:outputText style="font: 12px Arial, Verdana;" value="#{addressVariable.state}, "
+                              rendered="#{not empty currentInstitution.billingAddress.state}"/>
+                <h:outputText style="font: 12px Arial, Verdana;" value="#{addressVariable.zipCode} "/>
+            </div>
+            <div align="right">
+                <h:outputText style="font: 12px Arial, Verdana;" value="#{countryVariable.name} "/>
+            </div>
+            <!--  Note : No internationalization in billing preview -->
+
+            <div align="left">
+                <h:outputText style="font:bold 12px Arial, Verdana;" value="#{messages['gazelle.users.Invoice']}"/>
+            </div>
+            <div align="left">
+                <h:outputText style="font:bold 12px Arial, Verdana;"
+                              value="#{messages['gazelle.users.PurchaseOrderNumber']} : "/>
+                <h:outputText style="font:bold 12px Arial, Verdana;"
+                              value="#{selectedInvoiceForInstitution.purchaseOrder}"/>
+            </div>
+
+            <div align="center">
+                <h:outputText style="font: 12px Arial, Verdana;"
+                              value=" -- #{messages['gazelle.users.InvoiceContent']} --"/>
+            </div>
+        </ui:decorate>
+
+
+        <a4j:region id="refreshButtonRegion${panelId}">
+            <h:commandButton id="refreshButton" styleClass="gzl-btn"
+                             value="#{messages['gazelle.common.button.Refresh']}">
+                <a4j:ajax event="click" render="panel2refresh"/>
+            </h:commandButton>
+        </a4j:region>
+
+    </ui:decorate>
+</ui:composition>

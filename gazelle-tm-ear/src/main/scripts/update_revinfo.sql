@@ -1,0 +1,1 @@
+select setval('hibernate_sequence', (SELECT max(rev) from revinfo));

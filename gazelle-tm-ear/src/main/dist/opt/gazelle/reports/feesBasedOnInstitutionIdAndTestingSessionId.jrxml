@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="contactsBasedOnInstitutionIdAndFunctionType" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="institutionId" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[283]]></defaultValueExpression>
+	</parameter>
+	<parameter name="testingSessionId" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[21]]></defaultValueExpression>
+	</parameter>
+	<parameter name="currency" class="java.lang.String">
+		<defaultValueExpression><![CDATA["USD"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="amount" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[1234.00]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+     count(distinct tm_system_in_session."id") AS nb_systems,
+     count(distinct tf_domain_profile."domain_id") AS nb_domains
+FROM
+     "public"."usr_institution" usr_institution INNER JOIN "public"."tm_institution_system" tm_institution_system ON usr_institution."id" = tm_institution_system."institution_id"
+     INNER JOIN "public"."tm_system" tm_system ON tm_institution_system."system_id" = tm_system."id"
+     INNER JOIN "public"."tm_system_in_session" tm_system_in_session ON tm_system."id" = tm_system_in_session."system_id"
+     INNER JOIN "public"."tm_system_actor_profiles" tm_system_actor_profiles ON tm_system_in_session."system_id" = tm_system_actor_profiles."system_id"
+     INNER JOIN "public"."tf_actor_integration_profile_option" tf_actor_integration_profile_option ON tm_system_actor_profiles."actor_integration_profile_option_id" = tf_actor_integration_profile_option."id"
+     INNER JOIN "public"."tf_actor_integration_profile" tf_actor_integration_profile ON tf_actor_integration_profile_option."actor_integration_profile_id" = tf_actor_integration_profile."id"
+     INNER JOIN "public"."tf_integration_profile" tf_integration_profile ON tf_actor_integration_profile."integration_profile_id" = tf_integration_profile."id"
+     INNER JOIN "public"."tf_domain_profile" tf_domain_profile ON tf_integration_profile."id" = tf_domain_profile."integration_profile_id"
+WHERE
+     usr_institution."id" = $P{institutionId}
+ AND tm_system_in_session."testing_session_id" = $P{testingSessionId}]]>
+	</queryString>
+	<field name="nb_systems" class="java.lang.Long">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="nb_domains" class="java.lang.Long">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="29" splitType="Prevent">
+			<textField>
+				<reportElement x="0" y="14" width="555" height="15"/>
+				<textElement/>
+				<textFieldExpression><![CDATA["You have registered " + $F{nb_systems}.toString() + " systems for " +$F{nb_domains}.toString() + " domains. Your Connectathon fees are : " + $P{currency} + " " + $P{amount}.toString() +" (excluding VAT)"]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

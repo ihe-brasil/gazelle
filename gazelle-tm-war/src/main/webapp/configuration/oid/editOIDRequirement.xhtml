@@ -1,0 +1,176 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tm.EditOIDRequirement']}"/>
+    <ui:define name="body">
+        <h:form id="globalform">
+            <s:token allowMultiplePosts="true"/>
+
+            <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                <ui:param name="panel_id" value="glpan"/>
+                <ui:define name="panel_title">#{messages['gazelle.tm.EditOIDRequirement']}</ui:define>
+                <s:decorate id="labdec" template="/layout/form/_edit.xhtml">
+                    <ui:param name="id" value="labinp"/>
+                    <ui:define name="label">#{messages['gazelle.tf.table.Label']}</ui:define>
+                    <h:inputText styleClass=" form-control" id="labinp" tabindex="2" maxlength="250" size="100"
+                                 required="false" value="#{oidManager.selectedOIDRequirement.label}">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="rootdec" template="/layout/form/_edit.xhtml">
+                    <ui:param name="id" value="listoiddef"/>
+                    <ui:define name="label">#{messages['gazelle.tm.OIDRoot']}</ui:define>
+                    <h:selectOneMenu styleClass="form-control gzl-form-control" id="listoiddef"
+                                     value="#{oidManager.selectedOIDRequirement.oidRootDefinition}">
+                        <s:selectItems id="ListStatusSelectItems" value="#{gazelleDAO.getAllOIDRootDefinition()}"
+                                       var="selectedOIDRoot"
+                                       noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                       label="#{selectedOIDRoot.getAsStringToView()}"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <h:panelGroup rendered="#{oidManager.selectedOIDRequirement.id != null}">
+                    <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                        <ui:param name="panel_id" value="panaipo"/>
+                        <ui:define name="panel_title">#{messages['gazelle.tm.ListAIPO']}</ui:define>
+                        <rich:dataTable id="aipotab" var="currentAIPO"
+                                        value="#{oidManager.selectedOIDRequirement.actorIntegrationProfileOptionList}">
+                            <g:column>
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                <h:outputText value="#{currentAIPO.id}"/>
+                            </g:column>
+                            <g:column>
+                                <ui:define name="header">#{messages['gazelle.tf.IntegrationProfile']}</ui:define>
+                                <h:outputText
+                                        value="#{currentAIPO.actorIntegrationProfile.integrationProfile.keyword}"/>
+                            </g:column>
+                            <g:column>
+                                <ui:define name="header">#{messages['gazelle.testmanagement.system.label.Actor']}
+                                </ui:define>
+                                <h:outputText value="#{currentAIPO.actorIntegrationProfile.actor.keyword}"/>
+                            </g:column>
+                            <g:column>
+                                <ui:define name="header">#{messages['gazelle.tf.LabelOption']}</ui:define>
+                                <h:outputText value="#{currentAIPO.integrationProfileOption.keyword}"/>
+                            </g:column>
+                            <g:column>
+                                <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+
+                                <a4j:commandLink event="click"
+                                                 title="#{messages['gazelle.tm.DeleteThisActorIntegrationProfileOption']}"
+                                                 oncomplete="jq162('#DeleteSelectedAIPO').modal('show');"
+                                                 render="deleteaipof"
+                                                 actionListener="#{oidManager.setSelectedAIPO(currentAIPO) }">
+                                    <span class="gzl-icon-trash-o"/>
+                                </a4j:commandLink>
+
+
+                            </g:column>
+                        </rich:dataTable>
+                        <br/>
+                        <a4j:commandButton id="addAIPO" styleClass="gzl-btn-green"
+                                           value="#{messages['gazelle.tm.AddAIPO']}"
+                                           actionListener="#{oidManager.initializeSelectedAIPO()}"
+                                           oncomplete="jq162('#ADDAIPOPanel').modal('show');"
+                                           immediate="true"
+                                           render="ADDAIPOPanel,addaipof" execute="@this"/>
+                    </ui:decorate>
+                </h:panelGroup>
+                <a4j:commandButton id="savebut" styleClass="gzl-btn-green"
+                                   action="#{oidManager.saveSelectedOIDRequirement()}"
+                                   value="#{messages['gazelle.tm.SaveModification']}"
+                                   render="messageDecoration,globalform"/>
+                <a4j:commandButton id="backBottom" styleClass="gzl-btn"
+                                   action="/configuration/oid/oidManagement.seam"
+                                   value="#{messages['gazelle.tm.CancelBack']}"/>
+            </ui:decorate>
+
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Delete selected AIPO -->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="deleteaipof">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteSelectedAIPO"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.DeleteSelectedAIPO']}</ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+                <ui:define name="popup_footer">
+                    <a4j:commandButton id="deleteaipobutt" value="#{messages['gazelle.tm.DeleteThisAIPO']}"
+                                       styleClass="gzl-btn-red"
+                                       actionListener="#{oidManager.deleteSelectedAIPOFromSelectedOIDRequirement()}"
+                                       onclick="jq162('#DeleteSelectedAIPO').modal('hide');"
+                                       render="aipotab,messageDecoration"/>
+                    <a4j:commandButton value="#{messages['gazelle.common.button.Cancel']}"
+                                       onclick="jq162('#DeleteSelectedAIPO').modal('hide');"
+                                       styleClass="gzl-btn"
+                                       actionListener="#{oidManager.resetAllAIPO()}"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Add New AIPO -->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="addaipof">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="ADDAIPOPanel"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.AddAIPOToOIDRequirement']}</ui:define>
+                <h:panelGroup rendered="#{oidManager.isAIPOInitialized()}">
+                    <s:decorate id="addaipoDeco" template="/layout/panels/_panel.xhtml">
+                        <s:decorate id="ipDecora" template="/layout/form/_edit.xhtml">
+                            <ui:param name="id" value="ListOfIntegrationProfileForCreator"/>
+                            <ui:define name="label">#{messages['gazelle.tests.test.integrationProfile']}</ui:define>
+                            <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                             id="ListOfIntegrationProfileForCreator"
+                                             value="#{oidManager.selectedAIPO.actorIntegrationProfile.integrationProfile}"
+                                             required="true">
+                                <s:selectItems value="#{oidManager.getPossibleIntegrationProfiles()}"
+                                               var="currentIntP"
+                                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                               label="#{currentIntP.keyword}-#{currentIntP.name}"/>
+                                <a4j:ajax event="change" execute="@this" render="addaipoDeco"
+                                          oncomplete="#{oidManager.resetAIPO(1)}"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                        <s:decorate id="actorsDec" template="/layout/form/_edit.xhtml">
+                            <ui:define name="label">#{messages['gazelle.testmanagement.object.Actor']}</ui:define>
+                            <ui:param name="id" value="ListOfActorsForCreator"/>
+                            <h:selectOneMenu styleClass="form-control gzl-form-control" id="ListOfActorsForCreator"
+                                             value="#{oidManager.selectedAIPO.actorIntegrationProfile.actor}"
+                                             required="true">
+                                <s:selectItems value="#{oidManager.possibleActors}" var="currentAct"
+                                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                               label="#{currentAct.keyword} - #{currentAct.name}">
+                                </s:selectItems>
+                                <a4j:ajax event="change" execute="@this" render="addaipoDeco"
+                                          listener="#{oidManager.resetAIPO(2)}"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                        <s:decorate id="optionDec" template="/layout/form/_edit.xhtml">
+                            <ui:param name="id" value="OptionListBoxForCreator"/>
+                            <ui:define name="label">#{messages['gazelle.testmanagement.object.Option']}</ui:define>
+                            <h:selectOneMenu styleClass="form-control gzl-form-control" id="OptionListBoxForCreator"
+                                             value="#{oidManager.selectedAIPO.integrationProfileOption}"
+                                             required="true">
+                                <s:selectItems value="#{oidManager.possibleOptions}" var="optionFromList"
+                                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                               label="#{optionFromList.keyword} - #{optionFromList.name}"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </s:decorate>
+                </h:panelGroup>
+                <ui:define name="popup_footer">
+                    <a4j:commandButton id="addaipbutt" value="#{messages['gazelle.tm.AddNewAIPO']}"
+                                       styleClass="gzl-btn-green"
+                                       actionListener="#{oidManager.addNewAIPOToOIDRequirement()}"
+                                       onclick="jq162('#ADDAIPOPanel').modal('hide')"
+                                       render="aipotab,messageDecoration"/>
+                    <a4j:commandButton value="#{messages['gazelle.common.button.Cancel']}"
+                                       onclick="jq162('#ADDAIPOPanel').modal('hide')"
+                                       styleClass="gzl-btn"
+                                       actionListener="#{oidManager.resetAllAIPO()}"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

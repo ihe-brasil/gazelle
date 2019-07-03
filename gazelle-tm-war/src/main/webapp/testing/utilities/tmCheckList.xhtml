@@ -1,0 +1,872 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:a4j="http://richfaces.org/a4j" xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tm.TestsDefinitionCheckList']}"/>
+    <ui:define name="body">
+        <h:form id="tmCheckListForm">
+            <s:token allowMultiplePosts="true"/>
+            <a4j:queue requestDelay="300" ignoreDupResponses="true"/>
+            #{tmCheckListManager.initTreeNodeReaderList()}
+
+
+            <ui:decorate template="/layout/panels/_panel_id.xhtml">
+                <ui:param name="panel_id" value="pantab"/>
+                <div class="row">
+                    <div class="col-md-3">
+                        <rich:tree adviseNodeOpened="#{tmCheckListManager.adviseNodeOpened}" id="treeQuestion"
+                                   value="#{tmCheckListManager.treeNodeQuestionList}" var="node"
+                                   style="vertical-align:top" nodeType="#{node.data.level}"
+                                   toggleType="client">
+                            <rich:treeNode type="1" id="treenodmod" width="15" height="15">
+                                <h:outputText value="#{node.data.question}"/>
+                            </rich:treeNode>
+                            <rich:treeNode type="2" id="treenodquest" width="15" height="15">
+                                <a4j:commandLink id="nodeId"
+                                                 value="#{messages[node.data.question]}"
+                                                 actionListener="#{tmCheckListManager.setSelectedQuestion(node.data.identifier)}"
+                                                 render="pandivview"/>
+                            </rich:treeNode>
+                        </rich:tree>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-9">
+                        <s:div id="pandivview" style="vertical-align:top">
+                            <s:div rendered="#{tmCheckListManager.selectedQuestion != null}">
+                                <s:div id="ti3div"
+                                       rendered="#{tmCheckListManager.selectedQuestion.equals('ltiwithnots')}">
+
+                                    <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                                        <ui:param name="panel_id" value="panti3"/>
+                                        <ui:define name="panel_title">
+                                            #{messages['gazelle.testmanagement.checklist.ltiwithnots']}
+                                        </ui:define>
+                                        #{tmCheckListManager.initTIwithNoTSs()}
+                                        <h:outputText
+                                                value="#{messages['gazelle.tm.NumberOfTIWithNoTS']} : #{tmCheckListManager.getNumberOfTIWithNoTSs()}"/>
+                                        <br/>
+
+                                        <s:div rendered="#{(tmCheckListManager.listTIWithNoTS != null) and (tmCheckListManager.listTIWithNoTS.size()&gt;0)}">
+                                            <s:div id="allTestInstancePanel">
+                                                <ui:include src="../research/testInstancesListPanel.xhtml">
+                                                    <ui:param name="dataTableHeader"
+                                                              value="#{messages['gazelle.tests.tests']}"/>
+                                                    <ui:param name="varList"
+                                                              value="#{tmCheckListManager.listTIWithNoTS}"/>
+                                                    <ui:param name="varTableId"
+                                                              value="allTestInstanceDataTable"/>
+                                                    <ui:param name="subHeader"
+                                                              value="#{messages['gazelle.tm.Tests']}."/>
+                                                    <ui:param name="varColor" value="ti-row1,ti-row2"/>
+                                                </ui:include>
+                                                <br/></s:div>
+                                            <a4j:commandButton id="deleteallti3" styleClass="gzl-btn-red"
+                                                               rendered="#{s:hasRole('admin_role')}"
+                                                               oncomplete="jq162('#DeleteAllTIWithNoTS').modal('show');"
+                                                               value="#{messages['gazelle.tm.DeleteAllTIWithNoTS']}..."
+                                                               render=" :formdallti3"
+                                                               execute="@this"/>
+                                        </s:div>
+
+                                        <s:div id="notmanyti3"
+                                               rendered="#{(tmCheckListManager.getNumberOfTIWithNoTSs()==0)}">
+                                            <h:outputText
+                                                    value="#{messages['gazelle.tm.NoTIExistWithNoTSs']}."/>
+                                        </s:div>
+                                    </ui:decorate>
+
+                                </s:div>
+                                <s:div id="test4div"
+                                       rendered="#{tmCheckListManager.selectedQuestion.equals('listaipowithoutconnectathontest') or tmCheckListManager.selectedQuestion.equals('listaipowithoutpreconnectathontest') or tmCheckListManager.selectedQuestion.equals('listaipowithnotest')}">
+
+                                    <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                                        <c:if test="#{tmCheckListManager.selectedQuestion.equals('listaipowithnotest')}">
+                                            <f:facet name="header">
+                                                <h:outputText
+                                                        value="#{tmCheckListManager.actorIntegrationProfileOption.size()} #{messages['net.ihe.gazelle.tm.AIPOWithoutATestInReadyStatus']}"/>
+                                            </f:facet>
+                                        </c:if>
+                                        <c:if test="#{tmCheckListManager.selectedQuestion.equals('listaipowithoutpreconnectathontest')}">
+                                            <f:facet name="header">
+                                                <h:outputText
+                                                        value="#{tmCheckListManager.actorIntegrationProfileOption.size()} #{messages['net.ihe.gazelle.tm.AIPOWithoutPreConnectathonATestInReadyStatus']}"/>
+                                            </f:facet>
+                                        </c:if>
+                                        <c:if test="#{tmCheckListManager.selectedQuestion.equals('listaipowithoutconnectathontest')}">
+                                            <f:facet name="header">
+                                                <h:outputText
+                                                        value="#{tmCheckListManager.actorIntegrationProfileOption.size()} #{messages['net.ihe.gazelle.tm.AIPOWithoutConnectathonATestInReadyStatus']}"/>
+                                            </f:facet>
+                                        </c:if>
+                                        <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+
+
+                                            <ui:include src="/filter/filter.xhtml">
+                                                <ui:param name="filter"
+                                                          value="#{tmCheckListManager.actorIntegrationProfileOptionFilter}"/>
+                                                <ui:param name="filterWidth" value="240"/>
+                                                <ui:param name="filterId" value="domain"/>
+                                                <ui:param name="filterName"
+                                                          value="#{messages['net.ihe.gazelle.tm.SelectADomain']}"/>
+                                                <ui:param name="filterForm" value="tmCheckListForm"/>
+                                            </ui:include>
+                                            <ui:include src="/filter/filter.xhtml">
+                                                <ui:param name="filter"
+                                                          value="#{tmCheckListManager.actorIntegrationProfileOptionFilter}"/>
+                                                <ui:param name="filterWidth" value="240"/>
+                                                <ui:param name="filterId" value="integrationProfile"/>
+                                                <ui:param name="filterName"
+                                                          value="#{messages['gazelle.tf.integrationProfileOption.ShowIntegrationProfileOptionInformationDescription']}"/>
+                                                <ui:param name="filterForm" value="tmCheckListForm"/>
+                                            </ui:include>
+                                            <ui:include src="/filter/filter.xhtml">
+                                                <ui:param name="filter"
+                                                          value="#{tmCheckListManager.actorIntegrationProfileOptionFilter}"/>
+                                                <ui:param name="filterWidth" value="240"/>
+                                                <ui:param name="filterId" value="actor"/>
+                                                <ui:param name="filterName"
+                                                          value="#{messages['gazelle.testmanagement.system.label.Actor']}"/>
+                                                <ui:param name="filterForm" value="tmCheckListForm"/>
+                                            </ui:include>
+                                        </ui:decorate>
+
+                                        <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                                            <ui:param name="panel_id" value="pantest4"/>
+                                            <h:outputText
+                                                    value="#{messages['net.ihe.gazelle.tm.DeprecatedAIPOAreExcluded']}"/>
+                                            <s:div rendered="#{(tmCheckListManager.actorIntegrationProfileOption != null) and (tmCheckListManager.actorIntegrationProfileOption.size()&gt;0)}">
+                                                <div id="tabb">
+                                                    <rich:dataTable id="dataTable1"
+                                                                    rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                                                                    var="currentAIPO"
+                                                                    value="#{tmCheckListManager.actorIntegrationProfileOption}"
+
+
+                                                                    render="ds">
+                                                        <g:column>
+                                                            <ui:define name="header">
+                                                                #{messages['gazelle.tf.domain']}
+                                                            </ui:define>
+                                                            <h:outputText
+                                                                    value="#{tmCheckListManager.checkForDomainOf(currentAIPO)}"/>
+                                                        </g:column>
+                                                        <g:column
+                                                                filterBy="#{'actorIntegrationProfile.integrationProfile.keyword'}"
+                                                                filterEvent="onkeyup"
+                                                                sortBy="#{'actorIntegrationProfile.integrationProfile.keyword'}"
+                                                                sortOrder="ascending">
+                                                            <ui:define name="header">
+                                                                #{messages['gazelle.tf.table.IntegrationProfile']}
+                                                            </ui:define>
+                                                            <h:outputText
+                                                                    value="#{currentAIPO.actorIntegrationProfile.integrationProfile.keyword}"/>
+                                                        </g:column>
+                                                        <g:column
+                                                                filterBy="#{'actorIntegrationProfile.integrationProfile.integrationProfileStatusType.name'}"
+                                                                filterEvent="onkeyup"
+                                                                sortBy="#{'actorIntegrationProfile.integrationProfile.integrationProfileStatusType.name'}"
+                                                                sortOrder="ascending">
+                                                            <ui:define name="header">
+                                                                #{messages['net.ihe.gazelle.tm.IntegrationProfileStatus']}
+                                                            </ui:define>
+                                                            <h:outputText
+                                                                    value="#{currentAIPO.actorIntegrationProfile.integrationProfile.integrationProfileStatusType.name}"/>
+                                                        </g:column>
+                                                        <g:column
+                                                                filterBy="#{'actorIntegrationProfile.actor.keyword'}"
+                                                                filterEvent="onkeyup"
+                                                                sortBy="#{'actorIntegrationProfile.actor.keyword'}"
+                                                                sortOrder="ascending">
+                                                            <ui:define name="header">
+                                                                #{messages['gazelle.testmanagement.system.label.Actor']}
+                                                            </ui:define>
+                                                            <h:outputText
+                                                                    value="#{currentAIPO.actorIntegrationProfile.actor.keyword}"/>
+                                                        </g:column>
+                                                        <g:column
+                                                                filterBy="#{'integrationProfileOption.keyword'}"
+                                                                filterEvent="onkeyup"
+                                                                sortBy="#{'integrationProfileOption.keyword'}"
+                                                                sortOrder="ascending">
+                                                            <ui:define name="header">
+                                                                #{messages['gazelle.tests.test.option']}
+                                                            </ui:define>
+                                                            <h:outputText
+                                                                    value="#{currentAIPO.integrationProfileOption.keyword}"/>
+                                                        </g:column>
+                                                        <g:column sortBy="#{'lastChanged'}"
+                                                                  sortOrder="ascending">
+                                                            <ui:define name="header">
+                                                                #{messages['net.ihe.gazelle.tm.LastChanged']}
+                                                            </ui:define>
+                                                            <g:date tooltip="true"
+                                                                    value="#{currentAIPO.lastChanged}"/>
+                                                        </g:column>
+                                                        <g:column filterBy="#{'lastModifierId'}"
+                                                                  filterEvent="onkeyup"
+                                                                  sortBy="#{'lastModifierId'}"
+                                                                  sortOrder="ascending">
+                                                            <ui:define name="header">
+                                                                #{messages['net.ihe.gazelle.tm.LastModifierId']}
+                                                            </ui:define>
+                                                            <h:outputText
+                                                                    value="#{currentAIPO.lastModifierId}"/>
+                                                        </g:column>
+                                                        <f:facet name="footer">
+                                                            <ui:include src="/util/datatableFooter.xhtml">
+                                                                <ui:param name="dataScrollerId"
+                                                                          value="ds"/>
+                                                                <ui:param name="dataTableId"
+                                                                          value="dataTable1"/>
+                                                            </ui:include>
+                                                        </f:facet>
+                                                    </rich:dataTable>
+                                                </div>
+                                            </s:div>
+
+                                        </ui:decorate>
+                                    </ui:decorate>
+
+                                </s:div>
+                                <s:div id="test3div"
+                                       rendered="#{tmCheckListManager.selectedQuestion.equals('listciwithnots')}">
+
+                                    <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                                        <ui:param name="panel_id" value="pantest3"/>
+                                        <ui:define name="panel_title">
+                                            #{messages['gazelle.tm.ListOfContextualInformationWithNoTestSteps']}
+                                        </ui:define>
+                                        #{tmCheckListManager.initCIWithNoTestSteps()}
+                                        <h:outputText
+                                                value="#{messages['gazelle.tm.NumberOfContextualInformationNotRelatedToTestSte']} : #{tmCheckListManager.getNumberCIWithNoTestSteps()}"/>
+                                        <br/>
+                                        <s:div id="manyci"
+                                               rendered="#{(tmCheckListManager.listCIWithNoTestSteps != null) and (tmCheckListManager.listCIWithNoTestSteps.size()&gt;0)}">
+                                            <rich:dataTable rows="10" var="currentCI"
+                                                            value="#{tmCheckListManager.listCIWithNoTestSteps}"
+                                                            render="ds">
+                                                <g:column>
+                                                    <ui:define name="header">#{messages['gazelle.tm.Id']}
+                                                    </ui:define>
+                                                    <h:outputText value="#{currentCI.id}"/>
+                                                </g:column>
+                                                <g:column>
+                                                    <ui:define name="header">#{messages['gazelle.tm.Label']}
+                                                    </ui:define>
+                                                    <h:outputText value="#{currentCI.label}"/>
+                                                </g:column>
+                                                <g:column>
+                                                    <ui:define name="header">#{messages['gazelle.tm.Path']}
+                                                    </ui:define>
+                                                    <h:outputText value="#{currentCI.path.keyword}"/>
+                                                </g:column>
+                                                <g:column>
+                                                    <ui:define name="header">#{messages['gazelle.tm.Value']}
+                                                    </ui:define>
+                                                    <h:outputText value="#{currentCI.value}"/>
+                                                </g:column>
+                                                <f:facet name="footer">
+                                                    <s:div style="text-align: center;">
+                                                        <rich:dataScroller id="ds" maxPages="10"
+                                                                           renderIfSinglePage="false"
+                                                                           immediate="true"/>
+                                                    </s:div>
+                                                </f:facet>
+                                            </rich:dataTable>
+                                            <a4j:commandButton styleClass="gzl-btn-red"
+                                                               rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"
+                                                               oncomplete="jq162('#DeleteAllCIWithNoTestSteps').modal('show');"
+                                                               render=":formdallci3"
+                                                               value="#{messages['gazelle.tm.DeleteAll']}..."
+                                                               execute="@this"/>
+                                        </s:div>
+                                        <s:div id="notmanyci"
+                                               rendered="#{(tmCheckListManager.listCIWithNoTestSteps == null) or (tmCheckListManager.listCIWithNoTestSteps.size()==0)}">
+                                            <h:outputText
+                                                    value="#{messages['gazelle.tm.NoContextualInformationWithNoTestStepsExists']}."/>
+                                        </s:div>
+                                    </ui:decorate>
+
+                                </s:div>
+                                <s:div id="test1div"
+                                       rendered="#{tmCheckListManager.selectedQuestion.equals('listtsnotassigned')}">
+                                    #{tmCheckListManager.initTestStepsWithNoTests()}
+
+                                    <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                                        <ui:param name="panel_id" value="pantest1"/>
+                                        <ui:define name="panel_title">
+                                            #{messages['gazelle.tm.ListOfTestStepsNotAssignedToTests']}
+                                        </ui:define>
+                                        <h:outputText
+                                                value="#{messages['gazelle.tm.NumberOfTestStepsWithNoTests']} : #{tmCheckListManager.getNumberTestStepsWithNoTests()}"/>
+                                        <br/>
+                                        <s:div id="manyts"
+                                               rendered="#{(tmCheckListManager.testStepsWithNoTests != null) and (tmCheckListManager.testStepsWithNoTests.size()&gt;0)}">
+                                            <rich:dataTable rows="10" var="currentTestStep"
+                                                            value="#{tmCheckListManager.testStepsWithNoTests}"
+                                                            render="ds">
+                                                <g:column>
+                                                    <ui:define name="header">#{messages['gazelle.tm.Id']}
+                                                    </ui:define>
+                                                    <h:outputText value="#{currentTestStep.id}"/>
+                                                </g:column>
+                                                <g:column style="text-align:center" sortOrder="ascending"
+                                                          sortBy="#{'testRolesInitiator.roleInTest.keyword'}">
+                                                    <ui:define name="header">
+                                                        <h:outputText
+                                                                value="#{messages['gazelle.tm.InitiatorRole']}"/>
+                                                    </ui:define>
+                                                    <h:outputText
+                                                            value="#{currentTestStep.testRolesInitiator.roleInTest.keyword}"/>
+                                                </g:column>
+                                                <g:column style="text-align:center" sortOrder="ascending"
+                                                          sortBy="#{'testRolesResponder.roleInTest.keyword'}">
+                                                    <ui:define name="header">
+                                                        <h:outputText
+                                                                value="#{messages['gazelle.tm.ResponderRole']}"/>
+                                                    </ui:define>
+                                                    <h:outputText
+                                                            value="#{currentTestStep.testRolesResponder.roleInTest.keyword}"/>
+                                                </g:column>
+                                                <g:column style="text-align:center" sortOrder="ascending"
+                                                          sortBy="#{'transaction.keyword'}">
+                                                    <ui:define name="header">
+                                                        <h:outputText
+                                                                value="#{messages['gazelle.tf.Transaction']}"/>
+                                                    </ui:define>
+                                                    <h:outputText
+                                                            value="#{currentTestStep.transaction.keyword}"/>
+                                                </g:column>
+                                                <g:column style="text-align:center" sortOrder="ascending"
+                                                          sortBy="#{'messageType'}">
+                                                    <ui:define name="header">
+                                                        <h:outputText
+                                                                value="#{messages['gazelle.tf.table.mptrans']}"/>
+                                                    </ui:define>
+                                                    <h:outputText
+                                                            value="#{currentTestStep.messageType}"/>
+                                                </g:column>
+                                                <f:facet name="footer">
+                                                    <s:div style="text-align: center;">
+                                                        <rich:dataScroller id="ds" maxPages="10"
+                                                                           renderIfSinglePage="false"
+                                                                           immediate="true"/>
+                                                    </s:div>
+                                                </f:facet>
+                                            </rich:dataTable>
+                                            <a4j:commandButton styleClass="gzl-btn-red"
+                                                               rendered="#{s:hasRole('admin_role') || s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"
+                                                               oncomplete="jq162('#DeleteAllTestStepsWithNoTests').modal('show');"
+                                                               value="#{messages['gazelle.tm.DeleteAll']}..."
+                                                               render=" :formdalltst"
+                                                               execute="@this"/>
+                                        </s:div>
+                                        <s:div id="notmanyts"
+                                               rendered="#{(tmCheckListManager.testStepsWithNoTests == null) or (tmCheckListManager.testStepsWithNoTests.size()==0)}">
+                                            <h:outputText
+                                                    value="#{messages['gazelle.tm.NoTestStepsExistOnTheDatabaseWithNoTestsRelated']}."/>
+                                        </s:div>
+                                    </ui:decorate>
+
+                                </s:div>
+                                <s:div id="testinst1div"
+                                       rendered="#{tmCheckListManager.selectedQuestion.equals('tsiwithnoti')}">
+                                    #{tmCheckListManager.initTestStepsInstanceWithNoTestInstances()}
+
+                                    <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                                        <ui:param name="panel_id" value="pantestins1"/>
+                                        <ui:define name="panel_title">
+                                            #{messages['gazelle.tm.ListOfTestStepsInstanceNotAssignedToTestInstance']}
+                                        </ui:define>
+                                        <h:outputText
+                                                value="#{messages['gazelle.tm.NumberOfTestStepsInstanceWithNoTestInstances']} : #{tmCheckListManager.getNumberTestStepsInstanceWithNoTestInstances()}"/>
+                                        <br/>
+                                        <s:div id="manytsins"
+                                               rendered="#{tmCheckListManager.getNumberTestStepsInstanceWithNoTestInstances()&gt;0}">
+                                            <rich:dataTable rows="10" var="currentTestStepsInstance"
+                                                            value="#{tmCheckListManager.testStepsInstanceWithNoTestInstance}"
+                                                            render="ds">
+                                                <g:column>
+                                                    <ui:define name="header">#{messages['gazelle.tm.Id']}
+                                                    </ui:define>
+                                                    <h:outputText
+                                                            value="#{currentTestStepsInstance.id}"/>
+                                                </g:column>
+                                                <g:column styleClass="#{styleClassColumn}">
+                                                    <ui:define name="header">
+                                                        #{messages['gazelle.tf.table.mptrans']}
+                                                    </ui:define>
+                                                    <h:outputText
+                                                            value="#{currentTestStepsInstance.getVersionedTestSteps().messageType}"/>
+                                                </g:column>
+                                                <g:column styleClass="#{styleClassColumn}"
+                                                          sortBy="#{'systemInSessionInitiator.system.keyword'}">
+                                                    <ui:define name="header">
+                                                        #{messages['gazelle.tm.test.SendingActor']}
+                                                    </ui:define>
+                                                    <h:outputText
+                                                            value="#{currentTestStepsInstance.systemInSessionInitiator.system.keyword}"/>
+                                                </g:column>
+                                                <g:column styleClass="#{styleClassColumn}"
+                                                          sortBy="#{'systemInSessionResponder.system.keyword'}">
+                                                    <ui:define name="header">
+                                                        #{messages['gazelle.tm.test.ReceivingActor']}
+                                                    </ui:define>
+                                                    <h:outputText
+                                                            value="#{currentTestStepsInstance.systemInSessionResponder.system.keyword}"/>
+                                                </g:column>
+                                                <g:column styleClass="#{styleClassColumn}">
+                                                    <ui:define name="header">
+                                                        #{messages['gazelle.common.LastChanged']}
+                                                    </ui:define>
+                                                    <g:date tooltip="true"
+                                                            value="#{currentTestStepsInstance.lastChanged}"/>
+                                                </g:column>
+                                                <g:column styleClass="#{styleClassColumn}">
+                                                    <ui:define name="header">
+                                                        #{messages['gazelle.common.LastModifier']}
+                                                    </ui:define>
+                                                    <h:outputText id="testStepsInstanceLastModifier"
+                                                                  value="#{currentTestStepsInstance.lastModifierId}"/>
+                                                </g:column>
+                                                <f:facet name="footer">
+                                                    <s:div style="text-align: center;">
+                                                        <rich:dataScroller id="ds" maxPages="10"
+                                                                           renderIfSinglePage="false"
+                                                                           immediate="true"/>
+                                                    </s:div>
+                                                </f:facet>
+                                            </rich:dataTable>
+                                            <a4j:commandButton styleClass="gzl-btn-red"
+                                                               rendered="#{s:hasRole('admin_role')}"
+                                                               oncomplete="jq162('#DeleteAllTestStepsInstanceWithNoTestsInstances').modal('show');"
+                                                               value="#{messages['gazelle.tm.DeleteAll']}..."
+                                                               render=" :formdalltsiti"
+                                                               execute="@this"/>
+                                        </s:div>
+                                        <s:div id="notmanytsi"
+                                               rendered="#{tmCheckListManager.getNumberTestStepsInstanceWithNoTestInstances()==0}">
+                                            <h:outputText
+                                                    value="#{messages['gazelle.tm.NoTestStepsInstanceExistOnTheDatabaseWithNoTestI']}."/>
+                                        </s:div>
+                                    </ui:decorate>
+
+                                </s:div>
+                                <s:div id="testinst2div"
+                                       rendered="#{tmCheckListManager.selectedQuestion.equals('ciiwithnotsi')}">
+                                    #{tmCheckListManager.initCIIWithNoTestStepsInstances()}
+
+                                    <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                                        <ui:param name="panel_id" value="pantestins2"/>
+                                        <ui:define name="panel_title">
+                                            #{messages['gazelle.tm.ListOfContextualInformationInstancesWithNoTestSt']}
+                                        </ui:define>
+                                        <h:outputText
+                                                value="#{messages['gazelle.tm.NumberOfContextualInformationInstanceWithNoTestS']} : #{tmCheckListManager.getNumberCIIWithNoTSI()}"/>
+                                        <br/>
+                                        <s:div id="manytsins2"
+                                               rendered="#{tmCheckListManager.getNumberCIIWithNoTSI()&gt;0}">
+                                            <rich:dataTable rows="10" var="currentCII"
+                                                            value="#{tmCheckListManager.listCIIWithNoTSI}"
+                                                            render="ds">
+                                                <g:column>
+                                                    <ui:define name="header">#{messages['gazelle.tm.Id']}
+                                                    </ui:define>
+                                                    <h:outputText value="#{currentCII.id}"/>
+                                                </g:column>
+                                                <g:column>
+                                                    <ui:define name="header">#{messages['gazelle.tm.Label']}
+                                                    </ui:define>
+                                                    <h:outputText
+                                                            value="#{currentCII.contextualInformation.label}"/>
+                                                </g:column>
+                                                <g:column>
+                                                    <ui:define name="header">#{messages['gazelle.tm.Path']}
+                                                    </ui:define>
+                                                    <h:outputText
+                                                            value="#{currentCII.contextualInformation.path.keyword}"/>
+                                                </g:column>
+                                                <g:column>
+                                                    <ui:define name="header">
+                                                        #{messages['gazelle.tm.Defaultvalue']}
+                                                    </ui:define>
+                                                    <h:outputText
+                                                            value="#{currentCII.contextualInformation.value}"/>
+                                                </g:column>
+                                                <g:column>
+                                                    <ui:define name="header">#{messages['gazelle.tm.Value']}
+                                                    </ui:define>
+                                                    <h:outputText value="#{currentCII.value}"/>
+                                                </g:column>
+                                            </rich:dataTable>
+                                            <a4j:commandButton styleClass="gzl-btn-red"
+                                                               rendered="#{s:hasRole('admin_role')}"
+                                                               oncomplete="jq162('#DeleteAllContextualInformationInstance').modal('show');"
+                                                               value="#{messages['gazelle.tm.DeleteAllContextualInformationInstance']}..."
+                                                               render=" :formdallciitsi"
+                                                               execute="@this"/>
+                                        </s:div>
+                                        <s:div id="nootsins2"
+                                               rendered="#{tmCheckListManager.getNumberCIIWithNoTSI()==0}">
+                                            <h:outputText
+                                                    value="#{messages['gazelle.tm.NoContextualInformationInstanceExistOnTheDatabas']}."/>
+                                        </s:div>
+                                    </ui:decorate>
+
+                                </s:div>
+                                <s:div id="test2div"
+                                       rendered="#{tmCheckListManager.selectedQuestion.equals('listtestwithnosteps')}">
+                                    #{tmCheckListManager.initTestCATReadyWithNoTestSteps()}
+
+                                    <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                                        <ui:param name="panel_id" value="pantest2"/>
+                                        <ui:define name="panel_title">
+                                            #{messages['gazelle.tm.ListOfTestConnectathonWhichAreReadyWithNoTestSte']}
+                                        </ui:define>
+                                        <h:outputText
+                                                value="#{messages['gazelle.tm.NumberOfTestConnectathonWhichAreReadyWithNoTestS']} : #{tmCheckListManager.getNumberTestCATReadyWithNoTestSteps()}"/>
+                                        <br/>
+                                        <s:div id="manyt2"
+                                               rendered="#{tmCheckListManager.getNumberTestCATReadyWithNoTestSteps()&gt;0}">
+                                            <rich:dataTable rows="10" var="currentTest"
+                                                            value="#{tmCheckListManager.testCATReadyWithNoTestSteps}"
+                                                            render="ds">
+                                                <g:column>
+                                                    <ui:define name="header">
+                                                        <h:outputText
+                                                                id="testsListColumnsTestKeywordHeaderOutputText"
+                                                                value="#{messages['gazelle.tm.Keyword']}"/>
+                                                    </ui:define>
+                                                    <h:outputLink target="_blank"
+                                                                  value="#{testsDefinitionsAdministrationManager.getTestPermalink(currentTest)}">
+                                                        <h:outputText value="#{currentTest.keyword}"/>
+                                                    </h:outputLink>
+                                                </g:column>
+                                                <g:column>
+                                                    <ui:define name="header">
+                                                        <h:outputText
+                                                                value="#{messages['gazelle.systems.system.SystemVersion']}"/>
+                                                    </ui:define>
+                                                    <h:outputText value="#{currentTest.version}"/>
+                                                </g:column>
+                                                <g:column>
+                                                    <ui:define name="header">
+                                                        <h:outputText
+                                                                id="testsListColumnsTestPeerTypeHeaderOutputText"
+                                                                value="#{messages['gazelle.tm.tests.testPeerType']}"/>
+                                                    </ui:define>
+                                                    <h:outputText
+                                                            value="#{messages[currentTest.testPeerType.labelToDisplay]}"/>
+                                                </g:column>
+                                                <g:column>
+                                                    <ui:define name="header">
+                                                        <h:outputText
+                                                                value="#{messages['gazelle.common.LastModifier']}"/>
+                                                    </ui:define>
+                                                    <h:outputText
+                                                            value="#{currentTest.lastModifierId}"/>
+                                                </g:column>
+                                                <g:column>
+                                                    <ui:define name="header">
+                                                        <h:outputText
+                                                                value="#{messages['gazelle.common.LastChanged']}"/>
+                                                    </ui:define>
+                                                    <g:date tooltip="true"
+                                                            value="#{currentTest.lastChanged}"/>
+                                                </g:column>
+                                                <f:facet name="footer">
+                                                    <s:div style="text-align: center;">
+                                                        <rich:dataScroller id="ds" maxPages="10"
+                                                                           renderIfSinglePage="false"
+                                                                           immediate="true"/>
+                                                    </s:div>
+                                                </f:facet>
+                                            </rich:dataTable>
+                                        </s:div>
+                                        <s:div id="notmanyt2"
+                                               rendered="#{tmCheckListManager.getNumberTestCATReadyWithNoTestSteps()==0}">
+                                            <h:outputText
+                                                    value="#{messages['gazelle.tm.NoTestsExistWithNoTestSteps']}."/>
+                                        </s:div>
+                                    </ui:decorate>
+
+                                </s:div>
+                                <s:div id="metatest1div"
+                                       rendered="#{tmCheckListManager.selectedQuestion.equals('metatestwithnotest')}">
+                                    #{tmCheckListManager.initMetaTestsWithNoTests()}
+
+                                    <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                                        <ui:param name="panel_id" value="panmetatest1"/>
+                                        <ui:define name="panel_title">
+                                            #{messages['gazelle.tm.ListOfMetaTestWithNoTests']}
+                                        </ui:define>
+                                        <h:outputText
+                                                value="#{messages['gazelle.tm.NumberOfMetaTestWithNoTests']} : #{tmCheckListManager.getNumberMetaTestsWithNoTests()}"/>
+                                        <br/>
+                                        <s:div id="manymetat1"
+                                               rendered="#{tmCheckListManager.getNumberMetaTestsWithNoTests()&gt;0}">
+                                            <rich:dataTable rows="10" var="currentMetaTest"
+                                                            value="#{tmCheckListManager.metaTestsWithNoTests}"
+                                                            render="ds">
+                                                <g:column>
+                                                    <ui:define name="header">
+                                                        <h:outputText
+                                                                value="#{messages['gazelle.tf.table.Id']}"/>
+                                                    </ui:define>
+                                                    <h:outputLink id="linkmeta" target="_blank"
+                                                                  value="#{metaTestAdministrationManager.getPermalinkToMetaTest(currentMetaTest)}">
+                                                        <h:outputText value="#{currentMetaTest.id}"/>
+                                                    </h:outputLink>
+                                                </g:column>
+                                                <g:column>
+                                                    <ui:define name="header">
+                                                        <h:outputText
+                                                                value="#{messages['gazelle.testmanagement.object.keyword']}"/>
+                                                    </ui:define>
+                                                    <h:outputText value="#{currentMetaTest.keyword}"/>
+                                                </g:column>
+                                                <g:column>
+                                                    <ui:define name="header">
+                                                        <h:outputText
+                                                                value="#{messages['gazelle.tf.table.Description']}"/>
+                                                    </ui:define>
+                                                    <h:outputText
+                                                            value="#{currentMetaTest.description}"/>
+                                                </g:column>
+                                                <f:facet name="footer">
+                                                    <s:div style="text-align: center;">
+                                                        <rich:dataScroller id="ds" maxPages="10"
+                                                                           renderIfSinglePage="false"
+                                                                           immediate="true"/>
+                                                    </s:div>
+                                                </f:facet>
+                                            </rich:dataTable>
+                                        </s:div>
+                                    </ui:decorate>
+
+                                </s:div>
+                                <s:div id="rit1div"
+                                       rendered="#{tmCheckListManager.selectedQuestion.equals('ritwithnotest')}">
+                                    #{tmCheckListManager.initRoleInTestsWithNoTests()}
+
+                                    <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                                        <ui:param name="panel_id" value="rolin1"/>
+                                        <ui:define name="panel_title">
+                                            #{messages['gazelle.tm.ListOfRoleInTestNotRelatedToTests']}
+                                        </ui:define>
+                                        <h:outputText
+                                                value="#{messages['gazelle.tm.NumberOfRoleInTestNotRelatedToTests']} : #{tmCheckListManager.getNumberRoleInTestsWithNoTests()}"/>
+                                        <br/>
+                                        <s:div id="rit1"
+                                               rendered="#{tmCheckListManager.getNumberRoleInTestsWithNoTests()&gt;0}">
+                                            <f:subview id="subview_19">
+                                                <ui:include src="roleInTestList.xhtml">
+                                                    <ui:param name="roleInTestListToDelete"
+                                                              value="#{tmCheckListManager.roleInTestsWithNoTests}"/>
+                                                </ui:include>
+                                            </f:subview>
+                                            <a4j:commandButton id="deleteallrit" styleClass="gzl-btn-red"
+                                                               rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"
+                                                               oncomplete="jq162('#DeleteAllRoleInTest').modal('show');"
+                                                               render=" :formritdall"
+                                                               value="#{messages['gazelle.tm.DeleteAllRoleInTestWithNoTests']}..."
+                                                               execute="@this"/>
+                                        </s:div>
+                                    </ui:decorate>
+
+                                </s:div>
+                                <s:div id="rit2div"
+                                       rendered="#{tmCheckListManager.selectedQuestion.equals('ritwithnotestparticipants')}">
+                                    #{tmCheckListManager.initRoleInTestsWithNoTestParticipants()}
+
+                                    <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                                        <ui:param name="panel_id" value="rolin2"/>
+                                        <ui:define name="panel_title">
+                                            #{messages['gazelle.tm.ListOfRoleInTestNotRelatedToTestParticipants']}
+                                        </ui:define>
+                                        <h:outputText
+                                                value="#{messages['gazelle.tm.NumberOfRoleInTestWithNoTestParticipants']} : #{tmCheckListManager.getNumberRoleInTestsWithNoTestParticipants()}"/>
+                                        <br/>
+                                        <s:div id="rit2"
+                                               rendered="#{tmCheckListManager.getNumberRoleInTestsWithNoTestParticipants()&gt;0}">
+                                            <f:subview id="subview_2">
+                                                <ui:include src="roleInTestList.xhtml">
+                                                    <ui:param name="roleInTestListToDelete"
+                                                              value="#{tmCheckListManager.roleInTestsWithNoTestParticipants}"/>
+                                                </ui:include>
+                                            </f:subview>
+                                            <a4j:commandButton id="deleteallrit2" styleClass="gzl-btn-red"
+                                                               rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"
+                                                               oncomplete="jq162('#DeleteAllRoleInTestWithNoTestParticipants').modal('show');"
+                                                               render=" :formritdall2"
+                                                               value="#{messages['gazelle.tm.DeleteAllRoleInTestWithNoTestParticipants']}..."
+                                                               execute="@this"/>
+                                        </s:div>
+                                    </ui:decorate>
+
+                                </s:div>
+                            </s:div>
+                        </s:div>
+                    </div>
+                </div>
+
+            </ui:decorate>
+        </h:form>
+
+        <h:form id="formritd">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteRoleInTest"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.DeleteSelectedRoleInTest']}</ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="saveCommentbuttonFC"
+                                       value="#{messages['gazelle.tm.DeleteSelectedRoleInTest']}"
+                                       styleClass="gzl-btn-red"
+                                       actionListener="#{tmCheckListManager.deleteSelectedRoleInTest()}"
+                                       onclick="jq162('#DeleteRoleInTest').modal('hide');"
+                                       render="pandivview,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <h:form id="formritdall">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteAllRoleInTest"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.DeleteAllRoleInTestWithNoTests_2']}</ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="delallrbut"
+                                       value="#{messages['gazelle.tm.DeleteAllRoleInTestWithNoTests_2']}"
+                                       styleClass="gzl-btn-red"
+                                       actionListener="#{tmCheckListManager.deleteAllRoleInTestWithNoTests()}"
+                                       onclick="jq162('#DeleteAllRoleInTest').modal('hide');"
+                                       render="pandivview,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <h:form id="formritdall2">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteAllRoleInTestWithNoTestParticipants"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.DeleteAllRoleInTestWithNoTests_2']}</ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="delallrbut2"
+                                       value="#{messages['gazelle.tm.DeleteAllRoleInTestWithNoTestParticipants']}"
+                                       styleClass="gzl-btn-red"
+                                       actionListener="#{tmCheckListManager.deleteAllRoleInTestWithNoTestParticipants()}"
+                                       onclick="jq162('#DeleteAllRoleInTestWithNoTestParticipants').modal('hide');"
+                                       render="pandivview,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <h:form id="formdallti3">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteAllTIWithNoTS"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.DeleteAllTIWithNoTS']}</ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton value="#{messages['gazelle.tm.ConfirmDeleteAllTIWithNoTS']}"
+                                       styleClass="gzl-btn-red"
+                                       actionListener="#{tmCheckListManager.deleteAllTIWithNoTSs()}"
+                                       onclick="jq162('#DeleteAllTIWithNoTS').modal('hide');"
+                                       render="pandivview,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <h:form id="formdallci3">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteAllCIWithNoTestSteps"/>
+                <ui:define name="popup_title">#{messages['gazelle.testmanagement.object.DeleteanObjAttr']}</ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton styleClass="gzl-btn-red"
+                                       actionListener="#{tmCheckListManager.deleteAllCIWithNoTestSteps()}"
+                                       value="#{messages['gazelle.tm.ConfirmDeleteAllCIWithNOTS']}"
+                                       onclick="jq162('#DeleteAllCIWithNoTestSteps').modal('hide');"
+                                       render="pandivview,messageDecoration"
+                                       execute="@this"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <h:form id="formdalltst">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteAllTestStepsWithNoTests"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.DeleteAll']}</ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton styleClass="gzl-btn-red"
+                                       actionListener="#{tmCheckListManager.deleteAllTestStepsWithNoTests()}"
+                                       value="#{messages['gazelle.tm.ConfirmDeleteAllTestStepsWithNoTests']}"
+                                       onclick="jq162('#DeleteAllTestStepsWithNoTests').modal('hide');"
+                                       render="pandivview,messageDecoration"
+                                       execute="@this"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <h:form id="formdalltsiti">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteAllTestStepsInstanceWithNoTestsInstances"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.DeleteAll']}</ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton styleClass="gzl-btn-red"
+                                       actionListener="#{tmCheckListManager.deleteAllTestStepsInstanceWithNoTestsInstances()}"
+                                       value="#{messages['gazelle.tm.DeleteAllTestStepsInstance']}"
+                                       onclick="jq162('#DeleteAllTestStepsInstanceWithNoTestsInstances').modal('hide');"
+                                       render="pandivview,messageDecoration"
+                                       execute="@this"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <h:form id="formdallciitsi">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteAllContextualInformationInstance"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.DeleteAllContextualInformationInstance']}
+                </ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton styleClass="gzl-btn-red"
+                                       actionListener="#{tmCheckListManager.deleteAllCIIWithNoTSIs()}"
+                                       value="#{messages['gazelle.tm.ConfirmDeleteAllContextualInformationInstance']}"
+                                       onclick="jq162('#DeleteAllContextualInformationInstance').modal('hide');"
+                                       render="pandivview,messageDecoration"
+                                       execute="@this"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

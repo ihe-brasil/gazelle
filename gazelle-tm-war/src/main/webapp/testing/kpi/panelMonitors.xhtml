@@ -1,0 +1,45 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <h:form id="MonitorListForm">
+        <s:token allowMultiplePosts="true"/>
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="MonitorList"/>
+            <ui:define name="popup_title">#{messages['gazelle.tm.MonitorList_2']}</ui:define>
+            <rich:dataTable id="monitorTable" value="#{items}" var="monitor"
+                            rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="datascrollerMonitors">
+                <g:column styleClass="#{styleClassColumn}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['gazelle.tm.UserName_2']}"/>
+                    </ui:define>
+                    <g:link value="#{monitor}" detailed="false"/>
+                </g:column>
+                <g:column styleClass="#{styleClassColumn}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['gazelle.contacts.Firstname']}"/>
+                    </ui:define>
+                    <h:outputText value="#{monitor.firstname}"/>
+                </g:column>
+                <g:column styleClass="#{styleClassColumn}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['gazelle.contacts.Lastname']}"/>
+                    </ui:define>
+                    <h:outputText value="#{monitor.lastname}"/>
+                </g:column>
+                <f:facet name="footer">
+                    <ui:include src="/util/datatableFooter.xhtml">
+                        <ui:param name="dataScrollerId" value="datascrollerMonitors"/>
+                        <ui:param name="dataTableId" value="monitorTable"/>
+                    </ui:include>
+                </f:facet>
+            </rich:dataTable>
+            <ui:define name="popup_footer">
+                <button type="button" class="gzl-btn" data-dismiss="modal">
+                    #{messages['gazelle.tm.Cancel']}
+                </button>
+            </ui:define>
+        </ui:decorate>
+    </h:form>
+</ui:composition>

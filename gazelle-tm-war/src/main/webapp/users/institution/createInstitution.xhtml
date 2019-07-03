@@ -1,0 +1,110 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.users.institution.EditInstitutionLabel1']}"/>
+    <!-- ======================= -->
+    <!--
+    /!\ Important recommendation : If you update this page, don't forget to update editInstitution.xhtml as well.
+
+    Note : createInstitution.xhtml and editInstitution.xhtml are the same structure and
+    almost the same form. The differences are in the variable name :
+            - We manage the #{currentInstitution} variable in editInstitution.xhtml, this variable is used by the business layer (InstitutionManager.java)
+            - We manage the #{institution} variable in createInstitution.xhtml, this variable is used by the entity (Institution.java) and we need to use it to reach the address objects from the institution.
+    -->
+    <!-- ======================= -->
+    <ui:define name="body">
+
+        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+            <ui:define name="panel_title">#{messages['gazelle.users.institution.EditInstitutionLabel1']}</ui:define>
+            <p>#{messages['gazelle.users.institution.EditInstitutionLabel2']}</p>
+            <h:panelGrid columns="6" style="vertical align: center;">
+                <span class="gzl-icon-exclamation-triangle"/>
+                #{messages['gazelle.users.registration.IfAlreadyRegisteredLabel']}
+                #{messages['gazelle.users.registration.RegisteredCompaniesLabel1']}
+                <a href="#" onclick="jq162('#registeredCompanies').modal('show')">
+                    #{messages['gazelle.users.registration.RegisteredCompaniesLabel2Link']}</a>
+                #{messages['gazelle.users.registration.RegisteredCompaniesLabel3']}
+            </h:panelGrid>
+            <!-- ******************************************* -->
+            <!-- Modal Panel : All Registered companies		  -->
+            <!-- ******************************************* -->
+            <h:form id="registeredCompaniesForm">
+                <s:token allowMultiplePosts="true"/>
+                <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                    <ui:param name="popup_id" value="registeredCompanies"/>
+                    <ui:define name="popup_title">#{messages['gazelle.users.registration.ListOfAllRegisteredCompanies']}</ui:define>
+                    <h2>#{messages['gazelle.users.registration.ListOfAllRegisteredCompanies']}
+                    </h2>
+                    <p>#{messages['gazelle.users.registration.ListOfAllRegisteredCompaniesLabel']}
+                    </p>
+                    <rich:list var="company" value="#{gazelleDAO.listAllInstitutionsOrderByKeyword()}"
+                               type="unordered">
+                        <h:outputText value="#{company.keyword} - "
+                                      rendered="#{not empty company.keyword}"/>
+                        <h:outputText value="#{company.name}"/>
+                    </rich:list>
+                    <p>
+                        #{messages['gazelle.users.registration.IfAlreadyRegisteredLabel']}
+                        #{messages['gazelle.tm.IfYouDontKnowWhosYourAdminContact']}
+                        #{applicationPreferenceManager.getApplicationAdminName()} (
+                        <a href="#{applicationPreferenceManager.getApplicationAdminEmail()}">
+                            #{applicationPreferenceManager.getApplicationAdminEmail()} </a>
+                        ) #{messages['gazelle.tm.ToGetThisInformation']}.
+                    </p>
+                    <ui:define name="popup_footer">
+                        <button type="button" class="gzl-btn" data-dismiss="modal">
+                            #{messages['gazelle.tm.Cancel']}
+                        </button>
+                    </ui:define>
+                </ui:decorate>
+            </h:form>
+            <!-- ******************************************* -->
+            <!-- Modal Panel :  All Registered companies   -->
+            <!-- ******************************************* -->
+            <div id="institutionManager">
+                <h:form id="register">
+                    <s:token allowMultiplePosts="true"/>
+                    <!-- ======================= -->
+                    <!-- Institution informations section 		  -->
+                    <!-- ======================= -->
+                    <ui:include src="/users/institution/editInstitutionPanel.xhtml">
+                        <ui:param name="institutionVariable"
+                                  value="#{institutionManager.selectedInstitution}"/>
+                    </ui:include>
+                    <!-- ======================= -->
+                    <!-- Mailing address section -->
+                    <!-- ======================= -->
+
+                    <s:decorate template="/layout/panels/_panel_title_id.xhtml" styleClass="form-horizontal">
+                        <ui:param name="panel_id" value="mailPanel"/>
+                        <ui:include src="/users/address/editAddressPanel.xhtml">
+                            <ui:param name="panelLabel"
+                                      value="#{messages['gazelle.users.address.InstitutionMailingAddress']}"/>
+                            <ui:param name="panelId" value="MailingAddress"/>
+                            <ui:param name="panel2refresh" value="mailPanel"/>
+                            <ui:param name="addressVariable"
+                                      value="#{institutionManager.selectedInstitution.mailingAddress}"/>
+                            <ui:param name="countryVariable"
+                                      value="#{institutionManager.selectedInstitution.mailingAddress.iso3166CountryCode}"/>
+                        </ui:include>
+                    </s:decorate>
+
+                    <div>
+                        <a4j:commandButton id="cancel" styleClass="gzl-btn"
+                                           value="#{messages['gazelle.common.button.Cancel']}" action="/home.seam"
+                                           rendered="#{!s:hasRole('admin_role')}" immediate="true"/>
+                        <a4j:commandButton id="cancelAdmin" styleClass="gzl-btn"
+                                           value="#{messages['gazelle.common.button.Cancel']}"
+                                           action="/administration/listInstitutions.xhtml"
+                                           rendered="#{s:hasRole('admin_role')}" immediate="true"/>
+                        <a4j:commandButton id="save" value="#{messages['gazelle.common.button.Save']}"
+                                           action="#{institutionManager.createInstitutionInTM( )}"
+                                           styleClass="gzl-btn-green" render="register"/>
+                    </div>
+                </h:form>
+            </div>
+        </ui:decorate>
+
+    </ui:define>
+</ui:composition>

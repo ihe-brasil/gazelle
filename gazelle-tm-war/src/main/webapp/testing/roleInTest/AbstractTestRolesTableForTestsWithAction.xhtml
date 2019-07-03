@@ -1,0 +1,28 @@
+<rich:dataTable xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns="http://www.w3.org/1999/xhtml" border="0"
+                id="tableOfTestRolesWithAction" var="currentTestRoles" rowClasses="ti-row1, ti-row2"
+                value="#{roleInTestManager.listOfTestRoles}">
+    <ui:include src="AbstractTestRolesTableColumnsForTests.xhtml"/>
+    <g:column>
+        <ui:define name="header">#{messages['gazelle.testmanagement.object.Action']}</ui:define>
+
+        <a4j:commandLink event="click" execute="@this" render="addNewRow"
+                         title="#{messages['gazelle.common.button.Edit']}"
+                         actionListener="#{roleInTestManager.selectTestRolesAndUpdateKeyword(currentTestRoles)}">
+            <span class="gzl-icon-pencil"/>
+        </a4j:commandLink>
+
+
+        <a4j:commandLink event="click"
+                         oncomplete="jq162('#testRoleDeleteModalPanel').modal('show');"
+                         title="#{messages['gazelle.common.button.Delete']}"
+                         execute="@this" render="deleteTestRoleDiv"
+                         actionListener="#{roleInTestManager.setSelectedTestRoles(currentTestRoles)}">
+            <span class="gzl-icon-trash-o"/>
+        </a4j:commandLink>
+
+
+    </g:column>
+</rich:dataTable>

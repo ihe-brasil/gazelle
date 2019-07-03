@@ -1,0 +1,221 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tm.TestsList']}"/>
+    <ui:define name="body">
+        <script type="text/javascript">
+            var resultColumnNumber = 6;
+
+
+            function newOnloadFunction() {
+                colorRowsOfTable("viewmetafor:testListTable");
+            }
+
+            function colorRowsOfTable(idTable) {
+
+                var rows = document.getElementById(idTable).getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+                if (rows != null) {
+                    var numberOfRows = rows.length;
+
+                    var stringStatus = "";
+                    for (var i = 0; i &lt; numberOfRows; i++) {
+                        var row = rows[i];
+                        var subrow = row.getElementsByTagName('tr');
+                        if (subrow.length != 0) {
+                            colorRow(row);
+                        }
+                    }
+                }
+
+
+            }
+
+            function colorRow(idRow) {
+                var currentRow = idRow;
+
+                var tdToUse = currentRow.cells[resultColumnNumber - 1];
+
+                if (tdToUse != null) {
+                    var selectToUse = tdToUse.firstChild;
+                    if (selectToUse != null) {
+                        if (selectToUse.value == 1) // ready
+                            currentRow.style.background = "#CCFFCC";
+                        else if (selectToUse.value == 2)     // deprecated
+                            currentRow.style.background = "#FF1200";
+                        else if (selectToUse.value == 3)     // to be completed
+                            currentRow.style.background = "#FFCCCC";
+                        else if (selectToUse.value == 4)    // storage/subtitute
+                            currentRow.style.background = "#FFCC33";
+                        else if (selectToUse.value &gt; 4 &amp;&amp; selectToUse.value &lt; 8) // other cases but not null
+                            currentRow.style.background = "#E0E0E0";
+                        else
+                            currentRow.style.background = "#FFFFFF";
+                    }
+                }
+            }
+
+
+        </script>
+        <h:form id="viewmetafor">
+            <s:token allowMultiplePosts="true"/>
+            #{metaTestAdministrationManager.initSelectedMetaTest()}
+            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                <ui:define name="panel_title">#{messages['gazelle.tm.MetaTest']} :
+                    #{metaTestAdministrationManager.selectedMetaTest.keyword}
+                </ui:define>
+                <s:decorate style="font-size: 11px;" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.testmanagement.object.keyword']}</ui:define>
+                    <h:outputText value="#{metaTestAdministrationManager.selectedMetaTest.keyword}"/>
+                </s:decorate>
+                <s:decorate style="font-size: 11px;" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.table.Description']}</ui:define>
+                    <h:outputText value="#{metaTestAdministrationManager.selectedMetaTest.description}"/>
+                </s:decorate>
+                <s:decorate style="font-size: 11px;" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.common.LastModifier']}</ui:define>
+                    <h:outputText
+                            value="#{metaTestAdministrationManager.selectedMetaTest.lastModifierId}"/>
+                </s:decorate>
+                <s:decorate style="font-size: 11px;" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.common.LastChanged']}</ui:define>
+                    <g:date tooltip="true"
+                            value="#{metaTestAdministrationManager.selectedMetaTest.lastChanged}"/>
+                </s:decorate>
+                <br/>
+                <rich:dataTable id="testListTable" var="selectedTestRoles"
+                                value="#{metaTestAdministrationManager.selectedMetaTest.testRolesList}"
+
+                                onRowMouseOut="newOnloadFunction();"
+                                first="0" columnClasses="center">
+                    <g:column>
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.tm.RoleKeyword']}"/>
+                        </ui:define>
+                        <h:outputText id="metaTestListColumnsRoleKeywordOutputText"
+                                      value="#{selectedTestRoles.roleInTest.keyword}"/>
+                        <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                            <ui:param name="id" value="p#{selectedTestRoles.id}"/>
+                            <ui:param name="placement" value="bottom"/>
+                            <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                            <ui:param name="trigger" value="focus"/>
+                            <ui:define name="content">
+                                <s:div>
+                                    <h:outputText value="#{messages['gazelle.tm.test.NoParticipantsForThisRole']}"
+                                                  rendered="#{selectedTestRoles.roleInTest.testParticipantsList.size()==0 }"/>
+                                </s:div>
+                                <div style="max-height: 300px; overflow: auto;">
+                                    <rich:dataTable id="roleInTestTable" cellpadding="0" cellspacing="0" width="700"
+                                                    border="0" var="currentTestParticipant"
+                                                    value="#{selectedTestRoles.roleInTest.testParticipantsList}"
+                                                    rendered="#{selectedTestRoles.roleInTest.testParticipantsList.size()!=0 }"
+                                                    first="0">
+                                        <f:facet name="header">
+                                            <rich:columnGroup>
+                                                <g:column>
+                                                    <h:outputText
+                                                            value="#{messages['gazelle.testmanagement.system.label.IP']}"/>
+                                                </g:column>
+                                                <g:column>
+                                                    <h:outputText
+                                                            value="#{messages['gazelle.testmanagement.system.label.Actor']}"/>
+                                                </g:column>
+                                                <g:column>
+                                                    <h:outputText
+                                                            value="#{messages['gazelle.tf.LabelOption']}"/>
+                                                </g:column>
+                                                <g:column>
+                                                    <h:outputText
+                                                            value="#{messages['gazelle.tm.IsTested']} ?"/>
+                                                </g:column>
+                                            </rich:columnGroup>
+                                        </f:facet>
+                                        <g:column>
+                                            <h:outputText
+                                                    value="#{currentTestParticipant.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.toString()}">
+                                            </h:outputText>
+                                        </g:column>
+                                        <g:column>
+                                            <h:outputText
+                                                    value="#{currentTestParticipant.actorIntegrationProfileOption.actorIntegrationProfile.actor.toString()}"/>
+                                        </g:column>
+                                        <g:column>
+                                            <h:outputText
+                                                    value="#{currentTestParticipant.actorIntegrationProfileOption.integrationProfileOption.keyword}"/>
+                                        </g:column>
+                                        <g:column>
+                                            <h:outputText value="#{currentTestParticipant.tested}"/>
+                                        </g:column>
+                                    </rich:dataTable>
+                                </div>
+
+                            </ui:define>
+                        </ui:decorate>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">
+                            <h:outputText value="#" title="#{messages['gazelle.tm.NumberOfTestInstancesToRun']}"/>
+                        </ui:define>
+                        <h:outputText id="metaTestListColumnsNOTTROutputText"
+                                      value="#{selectedTestRoles.numberOfTestsToRealize}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.tm.patient.testKeyword']}"/>
+                        </ui:define>
+                        <h:outputText id="metaTestListColumnsTestKeywordOutputText"
+                                      value="#{selectedTestRoles.test.keyword}" title="#{selectedTestRoles.test.name}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.tf.table.Description']}"/>
+                        </ui:define>
+                        <h:outputText id="metaTestListColumnsTestDescriptionOutputText"
+                                      value="#{selectedTestRoles.test.shortDescription}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.systems.system.SystemVersion']}</ui:define>
+                        <h:outputText id="testsListColumnsTestVersionOutputText"
+                                      value="#{selectedTestRoles.test.version}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.tm.tests.testStatus']}</ui:define>
+                        <h:inputHidden id="testsListColumnsTestStatusInputHidden"
+                                       value="#{selectedTestRoles.test.testStatus.id}"
+                                       rendered="#{selectedTestRoles.test.testStatus!=null}"/>
+                        <h:outputText id="testsListColumnsTestStatusOutputText"
+                                      value="#{selectedTestRoles.test.testStatus.labelToDisplay}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.tm.monitors.TestType']}</ui:define>
+                        <h:outputText id="testsListColumnsTestTypeOutputText"
+                                      value="#{selectedTestRoles.test.testType.labelToDisplay}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.tm.monitors.PeerType']}</ui:define>
+                        <h:outputText id="testsListColumnsTestPeerTypeOutputText"
+                                      value="#{messages[selectedTestRoles.test.testPeerType.labelToDisplay]}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.common.LastModifier']}</ui:define>
+                        <h:outputText value="#{selectedTestRoles.test.lastModifierId}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.common.LastChanged']}</ui:define>
+                        <g:date tooltip="true" value="#{selectedTestRoles.test.lastChanged}"/>
+                    </g:column>
+                </rich:dataTable>
+                <script type="text/javascript">
+                    newOnloadFunction();
+                </script>
+                <br/><br/>
+                <h:commandButton value="#{messages['gazelle.tm.EditMetaTest']}"
+                                 action="#{metaTestAdministrationManager.editMetaTestAndGoToMetaTestList(metaTestAdministrationManager.selectedMetaTest)}"
+                                 rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"
+                                 styleClass="gzl-btn-blue"/>
+            </ui:decorate>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

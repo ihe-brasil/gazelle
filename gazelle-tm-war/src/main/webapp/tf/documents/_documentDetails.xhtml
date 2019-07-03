@@ -1,0 +1,42 @@
+<s:div xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+       xmlns:s="http://jboss.org/schema/seam/taglib"
+       xmlns="http://www.w3.org/1999/xhtml">
+    <s:decorate id="documentName" template="/layout/display/_display.xhtml">
+        <ui:define name="label">#{messages['net.ihe.gazelle.tm.Name']}</ui:define>
+        <h:outputText id="viewName" value="#{documentToDisplay.name}">
+        </h:outputText>
+        <ui:include src="/tf/documents/_documentPdfLink.xhtml">
+            <ui:param name="document" value="#{documentToDisplay}"/>
+            <ui:param name="displayedName" value=" #{messages['net.ihe.gazelle.tm.ViewPdf']}"/>
+        </ui:include>
+    </s:decorate>
+    <s:decorate id="title" template="/layout/display/_display.xhtml">
+        <ui:define name="label">#{messages['net.ihe.gazelle.tm.Title']}</ui:define>
+        <h:outputText id="viewType" value="#{documentToDisplay.title}"/>
+    </s:decorate>
+    <s:decorate id="lifecyclestatus" template="/layout/display/_display.xhtml">
+        <ui:define name="label">#{messages['net.ihe.gazelle.tm.LifeCycleStatus']}</ui:define>
+        <h:outputText id="viewLifecycleStatus" value="#{documentToDisplay.lifecyclestatus.friendlyName}"/>
+    </s:decorate>
+    <s:decorate id="type" template="/layout/display/_display.xhtml">
+        <ui:define name="label">#{messages['net.ihe.gazelle.tm.Type']}</ui:define>
+        <h:outputText id="viewType" value="#{documentToDisplay.type.friendlyName}"/>
+    </s:decorate>
+    <s:decorate id="domain" template="/layout/display/_display.xhtml">
+        <ui:define name="label">#{messages['gazelle.productregistry.system.label.Domain']}</ui:define>
+        <g:link value="#{documentToDisplay.domain}" detailed="false" target="_blank"/>
+    </s:decorate>
+    <s:decorate id="revision" template="/layout/display/_display.xhtml">
+        <ui:define name="label">#{messages['net.ihe.gazelle.tm.Revision']}</ui:define>
+        <h:outputText id="viewRevision" value="#{documentToDisplay.revision}"/>
+    </s:decorate>
+    <s:decorate id="volume" template="/layout/display/_display.xhtml">
+        <ui:define name="label">#{messages['net.ihe.gazelle.tm.Volume']}</ui:define>
+        <h:outputText id="viewVolume" value="#{documentToDisplay.volume}"/>
+    </s:decorate>
+    <s:decorate id="dateofpublication" template="/layout/display/_display.xhtml">
+        <ui:define name="label">#{messages['net.ihe.gazelle.tm.DateOfPublication']}</ui:define>
+        <g:date tooltip="true" value="#{documentToDisplay.dateOfpublication}"/>
+    </s:decorate>
+</s:div>

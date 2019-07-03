@@ -1,0 +1,566 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tm.roleInTest.ListRoleInTest']}"/>
+    <ui:define name="body">
+        #{roleInTestManager.initTestParticipant() }
+        <h:form id="listRoleForm" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <s:div id="AddAParticipantPanelDiv">
+                <h:panelGroup rendered="#{roleInTestManager.displayAddParticipantPanel}">
+                    <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                        <ui:param name="panel_id" value="AddAParticipantPanel"/>
+                        <ui:define name="panel_title">
+                            <h:outputText id="title"
+                                          value="#{messages['gazelle.tm.roleInTest.AddATestParticipantFor']} #{roleInTestManager.selectedRoleInTest.keyword}"/>
+                        </ui:define>
+                        <a4j:region id="CriteriaRegion">
+                            <s:decorate id="CriteriaDecoration" template="/layout/form/_edit.xhtml">
+                                <ui:define name="label">#{messages['gazelle.tm.roleInTest.SelectionCriterion']}
+                                </ui:define>
+                                <h:selectOneMenu styleClass="form-control gzl-form-control" id="CriteriaListBox"
+                                                 value="#{roleInTestManager.selectedCriterion}">
+                                    <s:selectItems value="#{roleInTestManager.getCriteriaSelectionList()}"
+                                                   var="selectedCriteria" hideNoSelectionLabel="true"
+                                                   label="#{selectedCriteria}"/>
+                                    <a4j:ajax event="change" render="AddAParticipantPanel" execute="@this"/>
+                                </h:selectOneMenu>
+                            </s:decorate>
+                        </a4j:region>
+                        <s:div id="DomainAIPOCriteriaDiv"
+                               rendered="#{roleInTestManager.selectedCriterion.equals(roleInTestManager.SEARCH_BY_DOMAIN_AIPO)}">
+                            <br/><br/>
+                            <table border="0">
+                                <thead>
+                                <tr>
+                                    <th>
+                                        <h:outputText
+                                                value="#{messages['gazelle.testmanagement.system.label.Domain']}"/>
+                                    </th>
+                                    <th style="padding-left: 10px;">
+                                        <h:outputText id="headerIP"
+                                                      value="#{messages['gazelle.tests.test.integrationProfile']}"
+                                                      rendered="#{not empty roleInTestManager.selectedDomain}"/>
+                                    </th>
+                                    <th style="padding-left: 10px;">
+                                        <h:outputText id="headerActor"
+                                                      value="#{messages['gazelle.configuration.system.actorKeyword']}"
+                                                      rendered="#{   not empty roleInTestManager.selectedIntegrationProfile  }"/>
+                                    </th>
+                                    <th style="padding-left: 10px;">
+                                        <h:outputText id="headerOption" value="#{messages['gazelle.tests.test.option']}"
+                                                      rendered="#{ not empty roleInTestManager.selectedActor }"/>
+                                    </th>
+                                    <th style="padding-left: 10px;">
+                                        <h:outputText value="#{messages['gazelle.tm.roleInTest.IsTested1']}"/>
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        <s:decorate id="domainDecoration">
+                                            <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                             id="DomainListBox"
+                                                             value="#{roleInTestManager.selectedDomain}">
+                                                <s:selectItems value="#{roleInTestManager.listOfDomain}"
+                                                               var="domainFromList"
+                                                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                               label="#{domainFromList.keyword}"/>
+                                                <a4j:ajax event="change" render="DomainAIPOCriteriaDiv" execute="@this"
+                                                          listener="#{roleInTestManager.reinit(roleInTestManager.selectedDomain)}"/>
+                                            </h:selectOneMenu>
+                                        </s:decorate>
+                                    </td>
+                                    <td style="padding-left: 10px;">
+                                        <s:decorate id="ipDecoration">
+                                            <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                             id="IntegrationProfileListBox"
+                                                             value="#{roleInTestManager.selectedIntegrationProfile }"
+                                                             rendered="#{not empty roleInTestManager.selectedDomain}">
+                                                <s:selectItems
+                                                        value="#{roleInTestManager.possibleIntegrationProfiles}"
+                                                        var="integrationProfileFromList"
+                                                        noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                        label="#{integrationProfileFromList.keyword}" execute="@this"
+                                                        render="actorDecoration"/>
+                                                <a4j:ajax event="change" render="DomainAIPOCriteriaDiv" execute="@this"
+                                                          listener="#{roleInTestManager.reinit(roleInTestManager.selectedTestParticipants.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile )}"/>
+                                            </h:selectOneMenu>
+                                        </s:decorate>
+                                    </td>
+                                    <td style="padding-left: 10px;">
+                                        <s:decorate id="actorDecoration">
+                                            <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                             id="ActorListBox"
+                                                             value="#{roleInTestManager.selectedActor }"
+                                                             rendered="#{   not empty roleInTestManager.selectedIntegrationProfile  }">
+                                                <s:selectItems value="#{roleInTestManager.possibleActors}"
+                                                               var="actorFromList"
+                                                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                               label="#{actorFromList.keyword}"/>
+                                                <a4j:ajax event="change" render="DomainAIPOCriteriaDiv" execute="@this"
+                                                          listener="#{roleInTestManager.reinit(roleInTestManager.selectedTestParticipants.actorIntegrationProfileOption.actorIntegrationProfile.actor)}"/>
+                                            </h:selectOneMenu>
+                                        </s:decorate>
+                                    </td>
+                                    <td style="padding-left: 10px;">
+                                        <s:decorate id="optionDecoration">
+                                            <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                             id="OptionListBox"
+                                                             value="#{roleInTestManager.selectedIntegrationProfileOption }"
+                                                             rendered="#{ not empty roleInTestManager.selectedActor }">
+                                                <s:selectItems value="#{roleInTestManager.possibleOptions}"
+                                                               var="optionFromList"
+                                                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                               label="#{optionFromList.keyword}"/>
+                                                <a4j:ajax event="change" render="DomainAIPOCriteriaDiv"
+                                                          execute="@this"/>
+                                            </h:selectOneMenu>
+                                        </s:decorate>
+                                    </td>
+                                    <td style="padding-left: 10px;">
+                                        <s:decorate id="isTestedDecoration">
+                                            <h:selectBooleanCheckbox styleClass="form-control-static" id="isTestBool"
+                                                                     value="#{roleInTestManager.selectedTestParticipants.tested}">
+                                                <a4j:ajax event="change" execute="@this"/>
+                                            </h:selectBooleanCheckbox>
+                                        </s:decorate>
+                                    </td>
+                                    <td style="padding-left: 10px;">
+                                        <s:decorate id="addButtonDecoration">
+                                            <a4j:commandButton id="addButton" styleClass="gzl-btn-green"
+                                                               actionListener="#{roleInTestManager.addParticipantToRoleInTest()}"
+                                                               rendered="#{ not empty roleInTestManager.selectedIntegrationProfileOption }"
+                                                               value="#{messages['gazelle.tm.patient.addAuthority']}"
+                                                               execute="@this"
+                                                               render="roleInTestTable,AddAParticipantPanelDiv"/>
+                                        </s:decorate>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <s:div id="divAddButton">
+                                <div align="left"></div>
+                            </s:div>
+                        </s:div>
+                        <s:div id="TransactionCriteriaDiv"
+                               rendered="#{roleInTestManager.selectedCriterion.equals(roleInTestManager.SEARCH_BY_TRANSACTION)}">
+                            <a4j:region id="transactionRegion">
+                                <s:decorate id="transactionDecoration" template="/layout/form/_edit.xhtml">
+                                    <ui:define name="label">#{messages['gazelle.tf.table.Transaction']}</ui:define>
+                                    <a4j:commandLink id="onChangePossibleTransaction" render="AddAParticipantPanel"
+                                                     execute="@this"/>
+                                    <h:selectOneMenu styleClass="form-control gzl-form-control" id="transactionListBox"
+                                                     value="#{roleInTestManager.selectedTransaction}">
+                                        <s:selectItems value="#{gazelleDAO.getAllTransactions()}"
+                                                       var="transactionFromList"
+                                                       noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                       label="#{transactionFromList.keyword}"/>
+                                    </h:selectOneMenu>
+                                </s:decorate>
+                            </a4j:region>
+                            <a4j:region id="InitiatorResponderRegion">
+                                <s:decorate id="InitiatorResponderDecoration" template="/layout/form/_edit.xhtml">
+                                    <ui:define name="label">#{messages['gazelle.tm.roleInTest.ActorRole']}</ui:define>
+                                    <a4j:commandLink id="onChangePossibleInitiatorResponder"
+                                                     execute="@this"/>
+                                    <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                     id="InitiatorResponderListBox"
+                                                     value="#{roleInTestManager.selectedInitiatorResponderCriterion}">
+                                        <s:selectItems value="#{roleInTestManager.getInitiatorResponderList()}"
+                                                       var="actorRole" hideNoSelectionLabel="true"
+                                                       label="#{actorRole}"/>
+                                    </h:selectOneMenu>
+                                </s:decorate>
+                            </a4j:region>
+                            <div id="addButtonForTransactionCriterionDiv" align="left">
+                                <a4j:commandButton id="addButtonForTransactionCriterion" styleClass="gzl-btn-green"
+                                                   actionListener="#{roleInTestManager.addSelectedAIPOToRoleInTest()}"
+                                                   rendered="#{roleInTestManager.selectedTransaction!=null}"
+                                                   value="#{messages['gazelle.tm.patient.addAuthority']}"
+                                                   execute="@this"
+                                                   render="RoleInTestDiv"/>
+                            </div>
+                        </s:div>
+                        <a4j:commandButton id="closeAddParticipantPanel" styleClass="gzl-btn"
+                                           actionListener="#{roleInTestManager.closeAddAParticipantPanel()}"
+                                           value="#{messages['gazelle.common.button.mp.close']}" execute="@this"
+                                           render="RoleInTestDiv,AddAParticipantPanelDiv"/>
+                    </ui:decorate>
+                </h:panelGroup>
+            </s:div>
+            <br/>
+            <s:div id="RoleInTestDiv">
+                <h:panelGroup rendered="#{roleInTestManager.displayRoleInTestList}">
+                    <div style="text-align: right;">
+                        <a4j:commandButton id="creatnewrol" styleClass="gzl-btn-green"
+                                           actionListener="#{roleInTestManager.openAddRoleInTestPanel()}"
+                                           value="#{messages['gazelle.tm.roleInTest.CreateANewRole']}"
+                                           rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"
+                                           render="RoleInTestDiv,AddARoleInTestDiv" execute="@this"/>
+                    </div>
+                    <br/><!--  AIPO selection -->
+                    <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                        <ui:define name="filter_buttons">
+                            <a4j:commandLink actionListener="#{roleInTestManager.clearFilter()}"
+                                             title="#{messages['gazelle.users.reset']}" type="submit"
+                                             execute="@this" render="listRoleForm">
+                                <span class="fa fa-times-circle"/>
+                            </a4j:commandLink>
+                        </ui:define>
+
+                        <!--  AIPO selection -->
+                        <ui:include src="/testing/research/filterAIPOForSystemImplementation.xhtml">
+                            <ui:param name="filter" value="#{roleInTestManager.foundRoleInTests.filter}"/>
+                            <ui:param name="filterForm" value="RoleInTestDiv"/>
+                        </ui:include>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <ui:decorate template="/layout/form/_form_field_horizontal_4-8.xhtml">
+                                    <ui:param name="id" value="inputTextFind"/>
+
+                                    <ui:define name="label">
+                                        <h:outputText value="#{messages['net.ihe.gazelle.tm.Contains']}"/>
+                                    </ui:define>
+                                    <span class="gzl-never-wrap">
+                                        <h:inputText styleClass="form-control" id="inputTextFind"
+                                                     style="width: 90%;display: initial;"
+                                                     value="#{roleInTestManager.findRoleInTestField}"/>
+                                        <rich:hotKey key="return"
+                                                     onkeydown="#{rich:element('sumbitFindTextImage')}.click()"
+                                                     selector="#inputTextFind"/>
+                                        <a4j:commandLink id="sumbitFindTextImage"
+                                                         actionListener="#{roleInTestManager.findRoleInTest()}"
+                                                         render="RoleInTestDiv,AddAParticipantPanelDiv"
+                                                         title="#{messages['gazelle.common.button.Search']}">
+                                            <span class="gzl-icon-search"/>
+                                        </a4j:commandLink>
+                                    </span>
+                                    <h:outputLabel>
+                                        <h:selectBooleanCheckbox id="isWideSearch"
+                                                                 value="#{roleInTestManager.isWideSearch}">
+                                            <a4j:ajax event="change" execute="@this"/>
+                                        </h:selectBooleanCheckbox>
+                                        #{messages['gazelle.tm.roleInTest.SearchAllFieldsInRoles']}
+                                    </h:outputLabel>
+                                </ui:decorate>
+                            </div>
+                            <div class="col-lg-6">
+                                <ui:decorate template="/layout/form/_form_field_horizontal_4-8.xhtml">
+                                    <ui:param name="id" value="isPlayedByAToolSearch"/>
+
+                                    <h:outputLabel>
+                                        <h:selectBooleanCheckbox id="isPlayedByAToolSearch"
+                                                                 value="#{roleInTestManager.isPlayedByAToolSearch}">
+                                            <a4j:ajax event="change" render="listRoleForm" execute="@this"/>
+                                        </h:selectBooleanCheckbox>
+                                        #{messages['net.ihe.gazelle.tm.ListOnlyRolesPlayedByATool']}
+                                    </h:outputLabel>
+                                </ui:decorate>
+                            </div>
+                        </div>
+                    </ui:decorate>
+                    <rich:dataTable id="roleInTestTable" render="ds"
+                                    rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                                    var="currentRoleInTest" value="#{roleInTestManager.foundRoleInTests}">
+
+                        <g:column rowspan="2">
+                            <f:facet name="header">#{messages['gazelle.tm.roleInTest.RoleInTestKeyword']}
+                            </f:facet>
+                            <h:outputText value="#{currentRoleInTest.keyword}"
+                                          style="font-size:small;font-weight:bold;"/>
+                            <a4j:commandLink id="renroleint"
+                                             actionListener="#{roleInTestManager.openAddRoleInTestPanel(currentRoleInTest)}"
+                                             rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"
+                                             render="RoleInTestDiv,AddARoleInTestDiv"
+                                             execute="@this">
+                                <span class="gzl-icon-pencil"/>
+                            </a4j:commandLink>
+                            <a4j:commandButton id="showtestsus" styleClass="gzl-btn"
+                                               actionListener="#{roleInTestManager.setSelectedRoleInTest(currentRoleInTest)}"
+                                               oncomplete="jq162('#TestListModalPanel').modal('show');"
+                                               value="#{messages['gazelle.tm.ShowUsage']}"
+                                               rendered="#{currentRoleInTest.testRoles!=null}"
+                                               render=":TestListModalPanelForm, TestListModalPanelDiv"
+                                               execute="@this"/>
+                            <a4j:commandLink id="deleteroleint"
+                                             actionListener="#{roleInTestManager.setSelectedRoleInTest(currentRoleInTest)}"
+                                             oncomplete="jq162('#deleteRoleInTestModalPanel').modal('show');"
+                                             rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"
+                                             render=" :deleteRoleInTestModalPanelForm,deleteRoleInTestModalPanel"
+                                             execute="@this">
+                                <span class="gzl-icon-trash-o"/>
+                            </a4j:commandLink>
+                            <s:div>
+                                <h:outputText
+                                        value="#{messages['gazelle.testing.roleintest.IsRolePlayedByATool']}"/>
+                                <h:selectBooleanCheckbox id="isToolBoolean"
+                                                         value="#{currentRoleInTest.isRolePlayedByATool}"
+                                                         rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}">
+                                    <a4j:ajax event="change" render="roleInTestTable" execute="@this"
+                                              listener="#{roleInTestManager.updateRoleInTest(currentRoleInTest)}"/>
+                                </h:selectBooleanCheckbox>
+                                <h:outputText value=" #{messages['gazelle.common.Yes']}"
+                                              rendered="#{currentRoleInTest.isRolePlayedByATool and !s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"/>
+                                <h:outputText value=" #{messages['gazelle.common.No']}"
+                                              rendered="#{!currentRoleInTest.isRolePlayedByATool and !s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"/>
+                            </s:div>
+                            <s:div rendered="#{currentRoleInTest.lastModifierId!=null}"
+                                   style="font-size:x-small;font-style:italic;">
+                                #{messages['gazelle.tm.roleInTest.ModifiedThe']}
+                                <g:date tooltip="true" value="#{currentRoleInTest.lastChanged}"/>
+                                #{messages['gazelle.tm.roleInTest.by']}
+                                #{currentRoleInTest.lastModifierId}
+                            </s:div>
+                        </g:column>
+                        <g:column>
+                            <f:facet name="header">#{messages['net.ihe.gazelle.tm.Actions']}</f:facet>
+
+                            <a4j:commandButton id="addtestpar" styleClass="gzl-btn-green"
+                                               actionListener="#{roleInTestManager.openAddATestParticipantPanel(currentRoleInTest)}"
+                                               value="#{messages['gazelle.tm.roleInTest.AddATestParticipant']}"
+                                               bypassUpdates="true"
+                                               rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"
+                                               render="AddAParticipantPanelDiv"/>
+                            <a4j:commandButton id="delallparti" styleClass="gzl-btn-red"
+                                               actionListener="#{roleInTestManager.setSelectedRoleInTest(currentRoleInTest)}"
+                                               value="#{messages['gazelle.users.connectaton.participants.button.DeleteAll']}"
+                                               rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"
+                                               oncomplete="jq162('#deleteAllTestParticipantsModalPanel').modal('show');"
+                                               render=" :deleteAllTestParticipantsModalPanelForm,deleteAllTestParticipantsModalPanel"
+                                               execute="@this"/>
+                        </g:column>
+                        <g:column breakRowBefore="true">
+
+                            <div style="font-weight: bold;">#{messages['gazelle.tm.monitors.TestParticipants']}
+                            </div>
+                            <h:panelGroup rendered="#{currentRoleInTest.testParticipantsList.size gt 0}">
+                                <table class="table table-striped table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>#{messages['gazelle.tf.IntegrationProfile']}</th>
+                                        <th>#{messages['gazelle.tf.Actor']}</th>
+                                        <th>#{messages['gazelle.tests.test.option']}</th>
+                                        <th>#{messages['gazelle.tm.roleInTest.Tested']}
+                                            <h:selectBooleanCheckbox styleClass="form-control-static"
+                                                                     id="isTestBool"
+                                                                     value="#{currentRoleInTest.isTestedForAllParticipants}"
+                                                                     rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}">
+                                                <a4j:ajax event="change" execute="@this"
+                                                          oncomplete="location.reload();"
+                                                          render="roleInTestTable,messageDecoration"
+                                                          listener="#{roleInTestManager.updateAllTestParticipants(currentRoleInTest)}"/>
+                                            </h:selectBooleanCheckbox>
+                                            <h:outputText value=" #{messages['gazelle.common.Yes']}"
+                                                          rendered="#{currentRoleInTest.isTestedForAllParticipants and !s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"/>
+                                            <h:outputText value=" #{messages['gazelle.common.No']}"
+                                                          rendered="#{!currentRoleInTest.isTestedForAllParticipants and !s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"/>
+                                            <h:outputText value="#{messages['gazelle.tm.roleInTest.all']}"/>
+                                        </th>
+                                        <th>#{messages['gazelle.common.button.Remove']}</th>
+                                    </tr>
+                                    </thead>
+                                    <tfoot>
+                                    <tr>
+                                        <td colspan="5">
+                                            <h:outputText
+                                                    value="#{currentRoleInTest.testParticipantsList.size} #{messages['gazelle.tm.monitors.TestParticipants']}"
+                                                    style="font-size:x-small;font-style:italic;"/>
+                                        </td>
+                                    </tr>
+                                    </tfoot>
+
+                                    <a4j:repeat var="testParticipant"
+                                                value="#{currentRoleInTest.testParticipantsList}">
+                                        <tr>
+                                            <td>
+                                                <h:outputText
+                                                        value="#{testParticipant.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.toString()}">
+                                                </h:outputText>
+                                            </td>
+                                            <td>
+                                                <h:outputText
+                                                        value="#{testParticipant.actorIntegrationProfileOption.actorIntegrationProfile.actor.toString()}"/>
+                                            </td>
+                                            <td>
+                                                <h:outputText
+                                                        value="#{testParticipant.actorIntegrationProfileOption.integrationProfileOption.name}"/>
+                                            </td>
+                                            <td>
+                                                <h:selectBooleanCheckbox styleClass="form-control-static"
+                                                                         id="isTestBool"
+                                                                         value="#{testParticipant.tested}"
+                                                                         rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}">
+                                                    <a4j:ajax event="change"
+                                                              render="roleInTestTable,messageDecoration"
+                                                              oncomplete="location.reload();"
+                                                              execute="@this"
+                                                              listener="#{roleInTestManager.updateTestParticipant(currentRoleInTest, testParticipant)}"/>
+                                                </h:selectBooleanCheckbox>
+                                                <h:outputText value=" #{messages['gazelle.common.Yes']}"
+                                                              rendered="#{testParticipant.tested and !s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"/>
+                                                <h:outputText value=" #{messages['gazelle.common.No']}"
+                                                              rendered="#{!testParticipant.tested and !s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"/>
+                                            </td>
+                                            <td>
+                                                <a4j:commandLink id="removeTP"
+                                                                 rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"
+                                                                 actionListener="#{roleInTestManager.setRoleInTestAndSelectedTestParticipant(currentRoleInTest,testParticipant)}"
+                                                                 oncomplete="jq162('#deleteTestParticipantForRoleInTestModalPanel').modal('show');"
+                                                                 render=" :deleteTestParticipantForRoleInTestModalPanelForm,deleteTestParticipantForRoleInTestModalPanel"
+                                                                 execute="@this">
+                                                    <span class="gzl-icon-trash-o"/>
+                                                </a4j:commandLink>
+
+                                            </td>
+                                        </tr>
+                                    </a4j:repeat>
+
+                                </table>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{currentRoleInTest.testParticipantsList.size == 0}">
+                                <h:outputText value="#{messages['gazelle.tm.test.NoParticipantsForThisRole']}"/>
+                            </h:panelGroup>
+                        </g:column>
+
+                        <f:facet name="footer">
+                            <ui:include src="/util/datatableFooter.xhtml">
+                                <ui:param name="dataScrollerId" value="ds"/>
+                                <ui:param name="dataTableId" value="roleInTestTable"/>
+                            </ui:include>
+                        </f:facet>
+                    </rich:dataTable>
+                </h:panelGroup>
+            </s:div>
+            <s:div id="AddARoleInTestDiv">
+                <h:panelGroup rendered="#{roleInTestManager.displayAddRoleInTest}">
+                    <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                        <ui:param name="panel_id" value="AddARoleInTestPanel"/>
+                        <ui:define name="panel_title">
+                            <h:outputText value="#{messages['gazelle.tm.roleInTest.CreateANewRole']}"/>
+                        </ui:define>
+                        <br/>
+                        <a4j:region id="keywordRegion">
+                            <s:decorate id="keywordDecoration" template="/layout/form/_edit.xhtml">
+                                <ui:param name="id" value="keyword"/>
+                                <ui:define name="label">#{messages['gazelle.testmanagement.object.keyword']}</ui:define>
+                                <h:inputText styleClass=" form-control" id="keyword" maxlength="64" size="64"
+                                             value="#{roleInTestManager.selectedRoleInTest.keyword}"
+                                             required="true">
+                                    <a4j:ajax event="blur" render="keywordDecoration"
+                                              listener="#{roleInTestManager.verifyRoleInTestKeyword()}"/>
+                                </h:inputText>
+                            </s:decorate>
+                        </a4j:region>
+                        <div align="right">
+                            <a4j:commandButton value="#{messages['gazelle.tm.roleInTest.AddThisRole']}" id="addthisrol"
+                                               actionListener="#{roleInTestManager.addOrUpdateRole()}"
+                                               styleClass="gzl-btn-green" type="submit"
+                                               render="listRoleForm"/>
+                        </div>
+                        <br/>
+                        <a4j:commandButton id="closeAddRoleInTestPanelBottom" styleClass="gzl-btn"
+                                           actionListener="#{roleInTestManager.closeAndCancelAddARoleInTestPanel()}"
+                                           value="#{messages['gazelle.tm.cancel']}" bypassUpdates="true"
+                                           immediate="true"
+                                           bypassUpdate="true" render="listRoleForm"/>
+                    </ui:decorate>
+                </h:panelGroup>
+            </s:div>
+        </h:form>
+        <h:form id="deleteRoleInTestModalPanelForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="deleteRoleInTestModalPanel"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.roleInTest.RoleInTestDeletion']}</ui:define>
+                <h:panelGroup rendered="#{!roleInTestManager.isRoleInTestContainsTestRoles()}">
+                    <p>
+                        <h:outputText
+                                value="#{messages['gazelle.common.button.Delete']} #{roleInTestManager.selectedRoleInTest.keyword} ?"
+                                rendered="#{ roleInTestManager.selectedRoleInTest !=null}"/>
+                    </p>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{roleInTestManager.isRoleInTestContainsTestRoles()}">
+                    <p>
+                        <h:outputText
+                                value="#{messages['net.ihe.gazelle.tm.YouAreNotAllowedToDeleteThisRoleInTestBecauseItI']}"
+                                rendered="#{ roleInTestManager.selectedRoleInTest !=null}"/>
+                        <rich:list value="#{roleInTestManager.getTestsUsingSelectedRoleInTest()}" var="test"
+                                   type="unordered">
+                            <h:outputLink value="#{testDefinitionManager.getTestPermalink(test)}" target="_blank">
+                                <h:outputText value="#{test.keyword}"/>
+                            </h:outputLink>
+                        </rich:list>
+                    </p>
+                </h:panelGroup>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="YesDeleteRoleInTest" styleClass="gzl-btn-red"
+                                       actionListener="#{roleInTestManager.deleteSelectedRoleInTest()}"
+                                       value="#{messages['gazelle.common.Yes']}"
+                                       onclick="jq162('#deleteRoleInTestModalPanel').modal('hide');"
+                                       rendered="#{!roleInTestManager.isRoleInTestContainsTestRoles()}"
+                                       render="listRoleForm" execute="@this"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <h:form id="deleteTestParticipantForRoleInTestModalPanelForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="deleteTestParticipantForRoleInTestModalPanel"/>
+                <ui:define name="popup_title">
+                    #{messages['gazelle.tm.roleInTest.TestParticipantForRoleInTestDeletion']}
+                </ui:define>
+                <p>
+                    <h:outputText
+                            value="#{messages['gazelle.common.button.Remove']} #{roleInTestManager.selectedTestParticipants.actorIntegrationProfileOption.actorIntegrationProfile.toString()} #{messages['gazelle.tm.For']} #{roleInTestManager.selectedRoleInTest.keyword} ?"
+                            rendered="#{roleInTestManager.selectedTestParticipants != null and roleInTestManager.selectedTestParticipants.actorIntegrationProfileOption.actorIntegrationProfile !=null and roleInTestManager.selectedRoleInTest!=null}"/>
+                </p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="YesDeleteTP" styleClass="gzl-btn-red"
+                                       actionListener="#{roleInTestManager.deleteSelectedTestParticipant()}"
+                                       value="#{messages['gazelle.common.Yes']}"
+                                       onclick="jq162('#deleteTestParticipantForRoleInTestModalPanel').modal('hide');"
+                                       render="roleInTestTable" execute="@this"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <h:form id="deleteAllTestParticipantsModalPanelForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="deleteAllTestParticipantsModalPanel"/>
+                <ui:define name="popup_title">
+                    #{messages['gazelle.tm.roleInTest.TestParticipantForRoleInTestDeletion']}
+                </ui:define>
+                <p>
+                    <h:outputText
+                            value="#{messages['gazelle.tm.RemoveAllTestParticipantsFor']} #{roleInTestManager.selectedRoleInTest.keyword} ?"
+                            rendered="#{roleInTestManager.selectedRoleInTest!=null}"/>
+                </p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="YesDeleteAllTP" styleClass="gzl-btn-red"
+                                       actionListener="#{roleInTestManager.deleteAllTestParticipants()}"
+                                       value="#{messages['gazelle.common.Yes']}"
+                                       oncomplete="jq162('#deleteAllTestParticipantsModalPanel').modal('hide');"
+                                       render="roleInTestTable" execute="@this"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <s:div id="TestListModalPanelDiv">
+            <ui:include src="showTestListModalPanel.xhtml">
+                <ui:param name="roleInTestVar" value="#{roleInTestManager.selectedRoleInTest}"/>
+            </ui:include>
+        </s:div>
+    </ui:define>
+</ui:composition>

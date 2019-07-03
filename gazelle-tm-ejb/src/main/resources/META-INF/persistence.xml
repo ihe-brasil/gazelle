@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<persistence xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns="http://java.sun.com/xml/ns/persistence"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+             version="2.0">
+
+    <persistence-unit name="${seamName}-PersistenceUnit">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <jta-data-source>java:jboss/datasources/${seamName}DS</jta-data-source>
+        <mapping-file>jpql.xml</mapping-file>
+        <jar-file>gazelle-model-common.jar</jar-file>
+        <jar-file>gazelle-model-tf.jar</jar-file>
+        <jar-file>gazelle-model-users.jar</jar-file>
+        <jar-file>gazelle-model-tm.jar</jar-file>
+
+        <properties>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+            <property name="hibernate.hbm2ddl.auto" value="${hibernate.hbm2ddl.auto}"/>
+            <property name="hibernate.show_sql" value="${hibernate.show_sql}"/>
+            <property name="hibernate.format_sql" value="true"/>
+
+            <property name="jboss.entity.manager.factory.jndi.name"
+                      value="java:jboss/root/${seamName}-EntityManagerFactory"/>
+            <!-- CAUTION: must be set to a number greater than 0 in production environment.
+                For development batching is turned off. -->
+            <property name="hibernate.jdbc.batch_size" value="20"/>
+            <property name="hibernate.cache.use_query_cache" value="true"/>
+            <property name="hibernate.cache.use_second_level_cache"
+                      value="false"/>
+            <!-- c3p0 configuration -->
+            <property name="hibernate.connection.url" value="${jdbc.connection.url}"/>
+            <property name="hibernate.connection.driver_class" value="org.postgresql.Driver"/>
+            <property name="hibernate.connection.username" value="${jdbc.user}"/>
+            <property name="hibernate.connection.password" value="${jdbc.password}"/>
+            <property name="hibernate.connection.provider_class"
+                      value="org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider"/>
+            <property name="hibernate.c3p0.min_size" value="${min.pool.size}"/>
+            <property name="hibernate.c3p0.max_size" value="${max.pool.size}"/>
+            <property name="hibernate.c3p0.acquire_increment" value="1"/>
+            <property name="hibernate.c3p0.max_statements" value="50"/>
+            <property name="hibernate.c3p0.timeout" value="30"/>
+            <property name="hibernate.c3p0.idle_test_period" value="40"/>
+            <property name="hibernate.id.new_generator_mappings" value="false"/>
+            <property name="hibernate.c3p0.unreturnedConnectionTimeout" value="400"/>
+            <property name="hibernate.c3p0.debugUnreturnedConnectionStackTraces" value="true"/>
+
+            <property name="hibernate.listeners.envers.autoRegister"
+                      value="true"/>
+
+
+            <property name="hibernate.cache.region.factory_class"
+                      value="org.jboss.as.jpa.hibernate4.infinispan.InfinispanRegionFactory"/>
+        </properties>
+    </persistence-unit>
+</persistence>

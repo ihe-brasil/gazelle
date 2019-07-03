@@ -1,0 +1,448 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns:c="http://java.sun.com/jstl/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tests.testInstance.mainConnectathonPage']}"/>
+    <ui:define name="body">
+
+        #{connectathonResult.setMainCatPage(true)}
+
+        <c:set var="isSystemSelected" scope="view" value="#{connectathonResult.isSystemSelected()}"/>
+        <c:set var="selectedTestingSession" scope="view" value="#{gazelleDAO.getSelectedTestingSession()}"/>
+
+        <h:form id="globalform" styleClass="form-horizontal">
+            <h:inputHidden id="filterUrlParameters" name="filterUrlParameters"
+                           value="#{connectathonResult.filter.urlParameters}"/>
+            <script>
+                updateUrl("globalform:filterUrlParameters");
+                $("#globalform\\:filterUrlParameters").bind('change',
+                        function () {
+                            updateUrl("globalform:filterUrlParameters");
+                        });
+            </script>
+            <div class="row">
+                <div class="col-lg-8">
+                    <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <ui:include src="/filter/filter.xhtml">
+                                    <ui:param name="filter" value="#{connectathonResult.filter}"/>
+                                    <ui:param name="filterWidth" value="240"/>
+                                    <ui:param name="filterId" value="testSession"/>
+                                    <ui:param name="filterName"
+                                              value="#{messages['gazelle.systems.TestingSession']}"/>
+                                    <ui:param name="filterForm" value="globalform,catTests"/>
+                                </ui:include>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <s:div styleClass="form-group"
+                                       rendered="#{not empty connectathonResult.selectedTestingSession}">
+                                    <label class="col-sm-4 control-label">
+                                        <h:outputText value="#{messages['net.ihe.gazelle.tm.LastUpdate']} : "/>
+                                    </label>
+
+                                    <div class="col-sm-5">
+                                        <g:date tooltip="true"
+                                                value="#{connectathonResult.selectedTestingSession.resultsCompute}"/>
+                                    </div>
+                                </s:div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <!--  institution selection -->
+                                <ui:include src="/filter/filter.xhtml">
+                                    <ui:param name="filter" value="#{connectathonResult.filter}"/>
+                                    <ui:param name="filterWidth" value="240"/>
+                                    <ui:param name="filterId" value="institution"/>
+                                    <ui:param name="filterName" value="#{messages['gazelle.users.Institution']}"/>
+                                    <ui:param name="filterForm" value="globalform,catTests"/>
+                                </ui:include>
+                            </div>
+                            <div class="col-lg-6">
+                                <ui:include src="/filter/filter.xhtml">
+                                    <ui:param name="filter" value="#{connectathonResult.filter}"/>
+                                    <ui:param name="filterWidth" value="240"/>
+                                    <ui:param name="filterId" value="system"/>
+                                    <ui:param name="filterName"
+                                              value="#{messages['gazelle.configuration.system.system']}"/>
+                                    <ui:param name="filterForm" value="globalform,catTests"/>
+                                </ui:include>
+                            </div>
+                        </div>
+
+                        <ui:include src="/testing/research/filterAIPO.xhtml">
+                            <ui:param name="filter" value="#{connectathonResult.filter}"/>
+                            <ui:param name="filterForm" value="globalform,catTests"/>
+                        </ui:include>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <ui:include src="/filter/filter.xhtml">
+                                    <ui:param name="filter" value="#{connectathonResult.filter}"/>
+                                    <ui:param name="filterWidth" value="240"/>
+                                    <ui:param name="filterId" value="statusResult"/>
+                                    <ui:param name="filterName"
+                                              value="#{messages['gazelle.tm.testing.results.resultStatus']}"/>
+                                    <ui:param name="filterForm" value="globalform,catTests"/>
+                                </ui:include>
+                            </div>
+                            <div class="col-lg-6">
+                                <ui:include src="/filter/filter.xhtml">
+                                    <ui:param name="filter" value="#{connectathonResult.filter}"/>
+                                    <ui:param name="filterWidth" value="120"/>
+                                    <ui:param name="filterId" value="testType"/>
+                                    <ui:param name="filterName"
+                                              value="#{messages['gazelle.tm.monitors.TestType']}"/>
+                                    <ui:param name="filterForm" value="globalform,catTests"/>
+                                </ui:include>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 form-control-static center">
+                                <h:selectOneRadio id="testPeerTypeSelection" layout="spread" forceId="true"
+                                                  styleClass="gzl-filter-checkboxes"
+                                                  value="#{connectathonResult.selectedTestPeerTypeId}">
+                                    <f:selectItems
+                                            value="#{connecthatonTestingManager.getPeerTypeListForSelectedSystemAsSelectItems()}"/>
+                                    <a4j:ajax event="change" execute="@this" render="globalform,catTests"/>
+                                </h:selectOneRadio>
+                            </div>
+                        </div>
+                        <ui:define name="filter_buttons">
+                            <a4j:commandLink actionListener="#{connectathonResult.cleanRefresh()}"
+                                             title="#{messages['gazelle.common.button.Refresh']}"
+                                             render="globalform,catTests">
+                                <span class="fa fa-refresh"/>
+                            </a4j:commandLink>
+
+                            <a4j:commandLink actionListener="#{connectathonResult.filter.clear()}"
+                                             title="#{messages['gazelle.users.reset']}" type="submit"
+                                             execute="@this" render="globalform,catTests">
+                                <span class="fa fa-times-circle"/>
+                            </a4j:commandLink>
+                        </ui:define>
+                    </ui:decorate>
+                </div>
+                <div class="col-lg-4">
+                    <ui:include src="presets.xhtml">
+                        <ui:param name="formId" value="globalform,catTests"/>
+                        <ui:param name="formId2" value="globalform,catTests"/>
+                        <ui:param name="min_height" value="180px"/>
+                    </ui:include>
+                </div>
+            </div>
+
+            <s:div rendered="#{selectedTestingSession.testingSessionClosedForUser()}"
+                   styleClass="gzl-alert gzl-alert-red">
+                <h:outputText
+                        value="#{messages['net.ihe.gazelle.tm.TheSessionIsClosedYouCanNotStartANewTestInstance']}"/>
+            </s:div>
+        </h:form>
+        <h:form id="catTests" styleClass="form-horizontal">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <s:div id="divOfSAIPOResults">
+                        <s:div rendered="#{selectedTestingSession.getDisableAutoResults()}">
+                            <h:outputText
+                                    value="#{messages['net.ihe.gazelle.tm.ResultsMayBeOutdatedPleaseCheckYourTestingSessio']}"/>
+                        </s:div>
+                        <rich:dataTable id="iheImplementationResultsTable" var="systemAIPOResultForTestingSession"
+                                        rowKeyVar="rowNumber" rowClasses="cat-aipo-row"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                                        value="#{connectathonResult.datamodel}"
+                                        rendered="#{connectathonResult.datamodel.getRowCount() != 0}" render="ds">
+                            <g:column rendered="#{not isSystemSelected}"
+                                      sortBy="#{'systemActorProfile.system.keyword'}">
+                                <ui:define name="header">
+                                    <h:outputText id="systemCompanyOutputText"
+                                                  value="#{messages['gazelle.tm.Sys']}"/>
+                                </ui:define>
+                                <g:link value="#{systemAIPOResultForTestingSession.systemActorProfile.system}"
+                                        target="_blank"/>
+                            </g:column>
+                            <g:column
+                                    sortBy="#{'systemActorProfile.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.keyword'}"
+                                    sortOrder="ascending">
+                                <ui:define name="header">
+                                    <h:outputText
+                                            value="#{messages['gazelle.tf.IntegrationProfileAcronym']}"/>
+                                </ui:define>
+                                <h:outputText
+                                        value="#{systemAIPOResultForTestingSession.systemActorProfile.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.keyword}"/>
+                            </g:column>
+                            <g:column
+                                    sortBy="#{'systemActorProfile.actorIntegrationProfileOption.actorIntegrationProfile.actor.keyword'}"
+                                    sortOrder="ascending">
+                                <ui:define name="header">
+                                    <h:outputText value="#{messages['gazelle.tf.Actor']}"/>
+                                </ui:define>
+                                <h:outputText
+                                        value="#{systemAIPOResultForTestingSession.systemActorProfile.actorIntegrationProfileOption.actorIntegrationProfile.actor.keyword}"/>
+                            </g:column>
+                            <g:column
+                                    sortBy="#{'systemActorProfile.actorIntegrationProfileOption.integrationProfileOption.keyword'}"
+                                    sortOrder="ascending">
+                                <ui:define name="header">
+                                    <h:outputText
+                                            value="#{messages['gazelle.tf.IntegrationProfileOptionAcronym']}"/>
+                                </ui:define>
+                                <h:outputText
+                                        value="#{systemAIPOResultForTestingSession.systemActorProfile.actorIntegrationProfileOption.integrationProfileOption.keyword}"/>
+                            </g:column>
+                            <g:column>
+                                <ui:define name="header">
+                                    <h:outputText id="testingTypeOutputText"
+                                                  value="#{messages['gazelle.systems.session.Type']}"/>
+                                </ui:define>
+                                <h:outputText
+                                        value="#{systemAIPOResultForTestingSession.systemActorProfile.testingType.keyword}"/>
+
+                            </g:column>
+                            <g:column sortBy="#{'testRolesCountR'}">
+                                <ui:define name="header">
+                                    <span title="#{messages['gazelle.tm.RequiredOptional']}">
+                                        <h:outputText
+                                                value="#{messages['gazelle.tm.RO']}" id="roTextId"/>
+                                    </span>
+                                </ui:define>
+                                <h:outputText
+                                        value="#{systemAIPOResultForTestingSession.testRolesCountR}"/>
+                                <h:outputText value="/"/>
+                                <h:outputText
+                                        value="#{systemAIPOResultForTestingSession.testRolesCountO}"/>
+                            </g:column>
+                            <g:column>
+                                <ui:define name="header">
+                                    <h:outputText value="#{messages['net.ihe.gazelle.tm.Partners']}"/>
+                                </ui:define>
+                            </g:column>
+                            <g:column sortBy="#{'indicatorVerified'}">
+                                <ui:define name="header">
+                                    <span title="#{messages['gazelle.tm.testing.status.verified']}">
+                                        <h:outputText
+                                                value="#{messages['gazelle.tm.V']}" id="vTextId"/>
+                                    </span>
+                                </ui:define>
+                                <h:outputText value="#{systemAIPOResultForTestingSession.getIndicatorVerified()}"/>
+                            </g:column>
+                            <g:column sortBy="#{'indicatorWaiting'}">
+                                <ui:define name="header">
+                                    <span title="#{messages['gazelle.tm.WaitingForValidation']}">
+                                        <h:outputText
+                                                value="#{messages['gazelle.tm.W']}" id="wTextId"/>
+                                    </span>
+                                </ui:define>
+                                <h:outputText value="#{systemAIPOResultForTestingSession.getIndicatorWaiting()}"/>
+                            </g:column>
+                            <g:column sortBy="#{'indicatorProgress'}">
+                                <ui:define name="header">
+                                    <span title="#{messages['gazelle.tm.Progress']}">
+                                        <h:outputText
+                                                value="#{messages['gazelle.tm.P']}" id="pTextId"/>
+                                    </span>
+                                </ui:define>
+                                <h:outputText value="#{systemAIPOResultForTestingSession.getIndicatorProgress()}"/>
+                            </g:column>
+                            <g:column sortBy="#{'indicatorFailed'}">
+                                <ui:define name="header">
+                                    <span title="#{messages['gazelle.tm.test.Failed']}">
+                                        <h:outputText
+                                                value="#{messages['gazelle.tm.F']}" id="fTextId"/>
+                                    </span>
+                                </ui:define>
+                                <h:outputText value="#{systemAIPOResultForTestingSession.getIndicatorFailed()}"/>
+                            </g:column>
+                            <g:column sortBy="#{'status.keyword'}">
+                                <ui:define name="header">
+                                    <span title="#{messages['net.ihe.gazelle.tm.PrivateComment']}">
+                                        <h:outputText
+                                                id="resultStatusOutputText"
+                                                value="#{messages['net.ihe.gazelle.tm.VendorComments']}"/>
+                                    </span>
+                                </ui:define>
+                                <s:span id="statusSpan">
+                                    <s:span styleClass="gzl-icon-verified"
+                                            rendered="#{systemAIPOResultForTestingSession.status.keyword.equals('passed')}"/>
+                                    <s:span styleClass="gzl-icon-times"
+                                            rendered="#{systemAIPOResultForTestingSession.status.keyword.equals('failed')}"/>
+                                    <s:span styleClass="gzl-icon-exclamation-triangle"
+                                            rendered="#{systemAIPOResultForTestingSession.status.keyword.equals('atrisk')}"/>
+
+                                    <s:span styleClass="gzl-icon-stack"
+                                            rendered="#{systemAIPOResultForTestingSession.status.keyword.equals('nopeer')}">
+                                        <span class="gzl-icon-user gzl-icon-stack-1x"/>
+                                        <span class="gzl-icon-ban gzl-icon-stack-1x gzl-color-light-red gzl-icon-stack-bottom-right"/>
+                                    </s:span>
+                                    <s:span styleClass="gzl-icon-forward"
+                                            rendered="#{systemAIPOResultForTestingSession.status.keyword.equals('nograding')}"/>
+
+
+                                    <h:selectOneMenu styleClass="form-control gzl-inline-table" id="StatusListBox"
+                                                     value="#{systemAIPOResultForTestingSession.status}"
+                                                     style="font-weight:bold;"
+                                                     rendered="#{s:hasPermission('ConnectathonResultManager', 'manageSystemAIPOResultsForAdmin')}">
+                                        <s:selectItems value="#{connectathonResult.listStatusResults}"
+                                                       var="statusFromList"
+                                                       noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                       label="#{messages[statusFromList.labelToDisplay]}"/>
+                                        <a4j:ajax event="change" execute="@this" render="statusSpan"
+                                                  listener="#{connectathonResult.mergeResult(systemAIPOResultForTestingSession)}"/>
+                                    </h:selectOneMenu>
+                                    <h:outputText
+                                            value="#{messages[systemAIPOResultForTestingSession.status.labelToDisplay]}"
+                                            rendered="#{!s:hasPermission('ConnectathonResultManager', 'manageSystemAIPOResultsForAdmin') and systemAIPOResultForTestingSession.status !=null}"/>
+
+                                </s:span>
+                            </g:column>
+                            <rich:collapsibleSubTable var="entry" value="#{connectathonResult.getEmptyList()}">
+                                <g:column rendered="#{not isSystemSelected}"/>
+                                <g:column colspan="2">
+                                    <ui:define name="header">
+                                        <h:outputText value="#{messages['gazelle.tm.monitors.test']}"/>
+
+                                    </ui:define>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">
+                                        <h:outputText value="#{messages['net.ihe.gazelle.tm.MetaTest']}"/>
+                                    </ui:define>
+                                </g:column>
+                                <g:column colspan="8">
+                                    <ui:define name="header">
+
+                                    </ui:define>
+                                </g:column>
+                            </rich:collapsibleSubTable>
+                            <rich:collapsibleSubTable var="entry"
+                                                      value="#{connectathonResult.getDetails(systemAIPOResultForTestingSession)}"
+                                                      rowClasses="cat-row-classic">
+                                <rich:column rendered="#{not isSystemSelected}">
+
+                                </rich:column>
+                                <rich:column colspan="3" rendered="#{!entry.isMetaTest()}">
+                                    <s:span rendered="#{!entry.isMetaTest()}">
+                                        <h:outputLink target="_blank" value="#{entry.getLink()}"
+                                                      rendered="#{not empty entry.getLink()}">
+                                            <h:outputText value="#{entry.getTitle()}"/>
+                                        </h:outputLink>
+                                        <h:outputText value="#{entry.getTitle()}"
+                                                      rendered="#{empty entry.getLink()}"/>
+                                    </s:span>
+                                </rich:column>
+                                <rich:column colspan="2" rendered="#{entry.isMetaTest()}" styleClass="cat-row-meta">
+                                    <span>
+                                        <h:outputLink target="_blank" value="#{entry.getLink2()}"
+                                                      rendered="#{not empty entry.getLink2()}">
+                                            <h:outputText value="#{entry.getTitle2()}"/>
+                                        </h:outputLink>
+                                        <h:outputText value="#{entry.getTitle2()}"
+                                                      rendered="#{empty entry.getLink2()}"/>
+                                    </span>
+                                </rich:column>
+                                <rich:column rendered="#{entry.isMetaTest()}" styleClass="cat-row-meta">
+                                    <span>
+                                        <h:outputLink target="_blank" value="#{entry.getLink()}"
+                                                      rendered="#{not empty entry.getLink()}">
+                                            <h:outputText value="#{entry.getTitle()}"/>
+                                        </h:outputLink>
+                                        <h:outputText value="#{entry.getTitle()}"
+                                                      rendered="#{empty entry.getLink()}"/>
+                                    </span>
+                                </rich:column>
+                                <rich:column>
+                                    <s:div rendered="#{!selectedTestingSession.testingSessionClosedForUser()}">
+                                        <s:div rendered="#{!entry.isMetaTest() || (not empty entry.getLink2())}">
+                                            <span title="#{messages['gazelle.tm.testing.addTestInstance']}"
+                                                  style="border-bottom: none;">
+                                            <a4j:commandLink
+                                                    action="#{connectathonResult.startTestInstance(entry)}"
+                                                    onRowMouseOver="this.style.cursor='pointer'"
+                                                    immediate="true">
+                                                <span class="gzl-icon-plus"/>
+                                            </a4j:commandLink>
+                                        </span>
+                                        </s:div>
+                                    </s:div>
+                                </rich:column>
+                                <rich:column styleClass="#{connectathonResult.getStyleClass(entry)}">
+                                    <h:outputText value="#{entry.getOpt()} / #{entry.getCount()}"
+                                                  rendered="#{!entry.isMetaTest() or empty entry.getLink2()}"/>
+                                </rich:column>
+                                <rich:column>
+                                    <ui:include src="/testing/partnersList.xhtml">
+                                        <ui:param name="partners" value="#{entry.partners}"/>
+                                    </ui:include>
+                                </rich:column>
+                                <rich:column styleClass="#{connectathonResult.getStyleClass(entry)}">
+                                    <a4j:repeat value="#{entry.getInstancesVerified()}" var="ti">
+                                        <g:link value="#{ti}" detailed="false" tooltip="true"/>
+                                        <s:span styleClass="gzl-icon-exclamation-triangle" title="#{messages['net.ihe.gazelle.tm.ThisTestInstanceHasBeenAllowedThoughPartnersAreF']}"
+                                                rendered="#{ti.containsSameSystemsOrFromSameCompany}"/>
+                                        <br/></a4j:repeat>
+                                </rich:column>
+                                <rich:column>
+                                    <a4j:repeat value="#{entry.getInstancesWaiting()}" var="ti">
+                                        <s:span rendered="#{ti.lastStatus == 'CRITICAL'}"><b>
+                                            <g:link value="#{ti}" detailed="false" tooltip="true"
+                                            />
+                                        </b></s:span>
+                                        <g:link rendered="#{ti.lastStatus != 'CRITICAL'}" value="#{ti}" detailed="false"
+                                                tooltip="true"/>
+                                        <s:span styleClass="gzl-icon-exclamation-triangle" title="#{messages['net.ihe.gazelle.tm.ThisTestInstanceHasBeenAllowedThoughPartnersAreF']}"
+                                                rendered="#{ti.containsSameSystemsOrFromSameCompany}"/>
+                                        <br/></a4j:repeat>
+                                </rich:column>
+                                <rich:column>
+                                    <a4j:repeat value="#{entry.getInstancesProgress()}" var="ti">
+                                        <g:link value="#{ti}" detailed="false" tooltip="true"/>
+                                        <s:span styleClass="gzl-icon-exclamation-triangle" title="#{messages['net.ihe.gazelle.tm.ThisTestInstanceHasBeenAllowedThoughPartnersAreF']}"
+                                                rendered="#{ti.containsSameSystemsOrFromSameCompany}"/>
+                                        <br/></a4j:repeat>
+                                </rich:column>
+                                <rich:column>
+                                    <a4j:repeat value="#{entry.getInstancesFailed()}" var="ti">
+                                        <g:link value="#{ti}" detailed="false" tooltip="true"/>
+                                        <s:span styleClass="gzl-icon-exclamation-triangle" title="#{messages['net.ihe.gazelle.tm.ThisTestInstanceHasBeenAllowedThoughPartnersAreF']}"
+                                                rendered="#{ti.containsSameSystemsOrFromSameCompany}"/>
+                                        <br/></a4j:repeat>
+                                </rich:column>
+                                <rich:column>
+                                    <s:div rendered="#{!selectedTestingSession.testingSessionClosedForUser() and entry.allowComment}">
+                                        <rich:inplaceInput value="#{entry.comment}" minInputWidth="80px"
+                                                           showControls="true"
+                                                           defaultLabel="Click to write a comment">
+                                            <a4j:ajax event="change"
+                                                      listener="#{entry.setComment(entry.comment)}"/>
+                                        </rich:inplaceInput>
+                                    </s:div>
+                                </rich:column>
+                            </rich:collapsibleSubTable>
+                            <rich:collapsibleSubTable var="entry" value="#{connectathonResult.getEmptyList()}">
+                                <g:column rendered="#{not isSystemSelected}"
+                                          footerClass="thickBottom"/>
+                                <g:column colspan="3">
+                                    <ui:define name="header">
+                                        <h:outputText
+                                                value="#{connectathonResult.printTestCount(systemAIPOResultForTestingSession)}"/>
+                                    </ui:define>
+                                </g:column>
+                                <g:column colspan="8">
+                                </g:column>
+                            </rich:collapsibleSubTable>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId" value="iheImplementationResultsTable"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </s:div>
+                </div>
+            </div>
+        </h:form>
+        <ui:include src="/testing/partnersModalPanel.xhtml"/>
+    </ui:define>
+</ui:composition>

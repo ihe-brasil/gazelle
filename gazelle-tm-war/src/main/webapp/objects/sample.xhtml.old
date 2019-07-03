@@ -1,0 +1,522 @@
+<!--
+ * Copyright 2009 IHE International (http://www.ihe.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ -->
+<!-- 	File : sample
+		@author		Abderrazek Boufahja/ INRIA Rennes - IHE development Project
+ 		@see	> 	aboufahj@irisa.fr	-  http://www.ihe-europe.org
+ -->
+
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:s="http://jboss.com/products/seam/taglib"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:rich="http://richfaces.ajax4jsf.org/rich"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:g="http://www.ihe.net/gazelle" template="/layout/template.xhtml">
+
+	<ui:param name="pageNameTitle"
+		value="#{messages['gazelle.testmanagement.object.SampleDescription']}" />
+
+	<ui:define name="header">
+		<a4j:loadStyle src="/stylesheet/resultStyle.css" />
+	</ui:define>
+
+	<ui:define name="body">
+
+		<a4j:form id="form">
+			<s:token allowMultiplePosts="true" />
+			<a4j:queue requestDelay="300" ignoreDupResponses="true" />
+			<s:decorate id="messageDecoration">
+				<h:messages globalOnly="true" styleClass="message" />
+			</s:decorate>
+			<rich:panel id="sampleGlobalPanel">
+				<f:facet name="header" id="headerOfPanel">#{messages['gazelle.testmanagement.object.DescriptionOfASample']}</f:facet>
+				<s:div id="descpanel"
+					rendered="#{sampleDisplayManager.selectedObjectInstance != null}">
+					<s:div
+						rendered="#{!sampleDisplayManager.selectedObjectInstanceExistsOnDisc}">
+						<h:outputText
+							value="#{messages['net.ihe.gazelle.tm.TheActualSampleHasMissingFilesOnTheServerThankYo']}"
+							style="font-weight:bold;color:red;" />
+					</s:div>
+					<h:outputText
+						value="#{messages['gazelle.testmanagement.object.SampleName']} : "
+						style="font-weight:bold;color:#000099;" />
+					<h:outputText
+						value="#{sampleDisplayManager.selectedObjectInstance.name}"
+						style="font-weight:bold;color:#0077aa;" />
+					<br />
+					<h:outputText value="#{messages['gazelle.tf.table.Id']} : "
+						style="font-weight:bold;color:#000099;" />
+					<h:outputText
+						value="#{sampleDisplayManager.selectedObjectInstance.id}" />
+					<br />
+					<h:outputText
+						value="#{messages['gazelle.testmanagement.object.SampleType']} : "
+						style="font-weight:bold;color:#000099;" />
+					<h:outputText
+						value="#{sampleDisplayManager.selectedObjectInstance.object.keyword}" />
+					<br />
+					<h:outputText
+						value="#{messages['gazelle.testmanagement.object.SystemInSessionCreator']} : "
+						style="font-weight:bold;color:#000099;" />
+					<h:outputText
+						value="#{sampleDisplayManager.selectedObjectInstance.system.system.keyword}" />
+					<br />
+					<h:outputText
+						value="#{messages['gazelle.users.user.UserInstitution']} : "
+						style="font-weight:bold;color:#000099;" />
+					<h:outputText
+						value="#{sampleDisplayManager.getInstitution(sampleDisplayManager.selectedObjectInstance)}" />
+					<br />
+					<h:outputText
+						value="#{messages['gazelle.testmanagement.object.CreationDate']} : "
+						style="font-weight:bold;color:#000099;" />
+					<g:date tooltip="true"
+						value="#{sampleDisplayManager.selectedObjectInstance.lastChanged}" />
+					<br />
+
+					<h:outputText value="#{messages['gazelle.tf.Usage']} : "
+						style="font-weight:bold;color:#000099;" />
+					<h:outputText
+						value="#{sampleDisplayManager.selectedObjectInstance.objectUsageType.keyword}" />
+					<br />
+
+					<h:outputText
+						value="#{messages['gazelle.tm.testing.instance.description']} : "
+						style="font-weight:bold;color:#000099;" />
+					<br />
+					<g:safehtml
+						value="#{sampleDisplayManager.selectedObjectInstance.description}" />
+					<br />
+					<br />
+					<h:outputText
+						value="# #{messages['gazelle.testmanagement.object.ListOfFile']}"
+						style="font-weight:bold;color:#000099;" />
+					<br />
+					<br />
+
+					<rich:dataList id="listOfNonSnapshot"
+						var="currentObjectInstanceFile"
+						rendered="#{sampleDisplayManager.selectedObjectInstanceExistsOnDisc}"
+						value="#{sampleDisplayManager.getListObjectInstanceFileWhichAreNotSnapshot(sampleDisplayManager.selectedObjectInstance)}">
+						<h:outputText
+							value="#{currentObjectInstanceFile.file.type.keyword} : " />
+						<h:commandLink id="downloadCommandLink"
+							value="#{currentObjectInstanceFile.url}"
+							action="#{sampleDisplayManager.displayFileOnScreen(currentObjectInstanceFile,false)}"
+							target="_blank">
+							<a4j:support event="onclick" immediate="true" ajaxSingle="true" />
+						</h:commandLink>
+						<rich:spacer width="5" />
+						<h:commandLink id="NonDicomFileCommandLink"
+							action="#{sampleDisplayManager.displayFileOnScreen(currentObjectInstanceFile,true)}"
+							target="_blank">
+							<a4j:support event="onclick" immediate="true" ajaxSingle="true" />
+							<h:graphicImage id="downloadNonDicomFile"
+								value="/img/icon-color-download.gif" width="15" height="15"
+								style="cursor:pointer;border:0;"
+								title="#{messages['gazelle.testmanagement.object.Download']}" />
+						</h:commandLink>
+
+						<h:outputText value="button for validation here"/>
+					</rich:dataList>
+
+					<a4j:repeat id="listOfSnapshotForCreator"
+						var="currentObjectInstanceFile"
+						rendered="#{sampleDisplayManager.selectedObjectInstanceExistsOnDisc}"
+						value="#{sampleDisplayManager.getListObjectInstanceFileWhichAreSnapshot(sampleDisplayManager.selectedObjectInstance)}">
+						<h:commandLink id="viewSnapshotOnOtherTab"
+							action="#{sampleDisplayManager.displayFileOnScreen(currentObjectInstanceFile,false)}"
+							target="_blank">
+							<a4j:support event="onclick" immediate="true" ajaxSingle="true" />
+							<s:graphicImage id="OpensnapshotOnNewTab"
+								value="#{sampleDisplayManager.getSnapshotThumbnailFile(currentObjectInstanceFile)}"
+								style="border:0px;cursor:pointer;"
+								title="#{currentObjectInstanceFile.url}"
+								rendered="#{sampleDisplayManager.getSnapshotThumbnailFile(currentObjectInstanceFile) != null}">
+							</s:graphicImage>
+						</h:commandLink>
+						<br />
+						<rich:spacer height="3" style="border:0;" />
+						<br />
+					</a4j:repeat>
+
+					<rich:dataList var="currentObjectInstanceFile"
+						rendered="#{!sampleDisplayManager.selectedObjectInstanceExistsOnDisc}"
+						value="#{sampleDisplayManager.getListInstanceFileFromObjectInstance(sampleDisplayManager.selectedObjectInstance)}">
+						<h:outputText
+							value="#{currentObjectInstanceFile.file.type.keyword} : " />
+						<h:outputText value="#{currentObjectInstanceFile.url}" />
+					</rich:dataList>
+					<br />
+
+					<h:outputText
+						value="# #{messages['gazelle.testmanagement.object.ListOfAttriute']}"
+						style="font-weight:bold;color:#000099;" />
+					<br />
+					<rich:dataList id="listOfAttribute" var="currentInstanceAttribute"
+						value="#{sampleDisplayManager.getListInstanceAttributeFromObjectInstance(sampleDisplayManager.selectedObjectInstance)}">
+						<h:outputText
+							value="#{currentInstanceAttribute.attribute.keyword}" />
+					</rich:dataList>
+					<br />
+
+					<!-- tree of objects added by readers -->
+					<br />
+					<h:outputText
+						value="#{messages['gazelle.testmanagement.object.ListFilesUploadedReaders']} :"
+						style="font-weight:bold;color:#000099;" />
+					<rich:tree id="TreeOfSampleOfReader"
+						value="#{sampleDisplayManager.getTreeNodeOfReaderInstanceFile(sampleDisplayManager.selectedObjectInstance)}"
+						switchType="client" var="node" nodeFace="#{node.class.simpleName}"
+						style="vertical-align:top">
+						<rich:treeNode type="SystemInSession"
+							iconLeaf="/img/icons64/systems.gif"
+							icon="/img/icons64/systems.gif" width="15" height="15">
+							<h:outputText value="#{node.system.keyword}" />
+						</rich:treeNode>
+						<rich:treeNode type="ObjectInstanceFile" iconLeaf="/img/disc.gif"
+							icon="/img/disc.gif" width="15" height="15">
+							<h:commandLink id="downloadCommandLinkOnR"
+								value="#{node.file.type.keyword} : #{node.url}"
+								action="#{sampleDisplayManager.displayFileOnScreen(node,false)}"
+								target="_blank">
+								<a4j:support event="onclick" immediate="true" ajaxSingle="true" />
+							</h:commandLink>
+							<rich:spacer width="5" />
+							<h:commandLink id="NonDicomFileCommandLinkOnR"
+								action="#{sampleDisplayManager.displayFileOnScreen(node,true)}"
+								target="_blank">
+								<a4j:support event="onclick" immediate="true" ajaxSingle="true" />
+								<h:graphicImage id="downloadNonDicomFileOnR"
+									value="/img/icon-color-download.gif" width="15" height="15"
+									style="cursor:pointer;border:0;"
+									title="#{messages['gazelle.testmanagement.object.Download']}" />
+							</h:commandLink>
+
+							<h:outputText value="button for validation here"/>
+						</rich:treeNode>
+					</rich:tree>
+					<br />
+					<!-- Comment of readers -->
+					<br />
+					<h:outputText
+						value="#{messages['gazelle.testmanagement.object.CommentOfReaders']}"
+						style="font-weight:bold;color:#000099;" />
+					<rich:spacer width="5" />
+					<a4j:commandLink id="AddCommmentByCreator"
+						oncomplete="#{rich:component('CommentSampleModal')}.show();"
+						rendered="#{sampleDisplayManager.currentUserCanAddCommentSample()}"
+						immediate="true" ajaxSingle="true">
+						<h:graphicImage id="AddCommentByCImg" value="/img/add.gif"
+							width="15" height="15" style="cursor:pointer;border:0;"
+							title="#{messages['gazelle.testmanagement.object.CommentSample']}" />
+					</a4j:commandLink>
+					<br />
+					<s:div id="helloword">
+						<s:div style="width:100%;" id="helloword1"
+							rendered="#{sampleDisplayManager.getReadersDescriptionsOnCreate().size() > 0}">
+							<rich:dataTable id="AnnotationForReaderOnCreate"
+								var="currentAnnotation"
+								value="#{sampleDisplayManager.getReadersDescriptionsOnCreate()}"
+								rowKeyVar="rowNumber" reRender="ds"
+								onRowMouseOver="this.style.backgroundColor='#94C2E6'"
+								onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
+								rows="#{dataScrollerMemory.numberOfResultsPerPage}" width="600">
+
+								<rich:column id="AnnotationDateOnCreate" width="25%"
+									sortBy="#{currentAnnotation.lastChanged.time}"
+									sortOrder="DESCENDING">
+									<f:facet name="header">#{messages['gazelle.testmanagement.object.CreationDate']}</f:facet>
+									<g:date tooltip="true" value="#{currentAnnotation.lastChanged}" />
+								</rich:column>
+
+								<rich:column id="AnnotationModifierOnCreate"
+									filterBy="#{currentAnnotation.lastModifierId}"
+									filterEvent="onkeyup"
+									sortBy="#{currentAnnotation.lastModifierId}"
+									sortOrder="ASCENDING" width="25%">
+									<f:facet name="header">#{messages['gazelle.tm.search.user']}</f:facet>
+									<h:outputText value="#{currentAnnotation.lastModifierId}" />
+								</rich:column>
+
+								<rich:column id="AnnotationValueOnCreate" style="width:40%;"
+									sortBy="#{currentAnnotation.value}" sortOrder="ASCENDING">
+									<f:facet name="header">#{messages['gazelle.testmanagement.object.Note']}</f:facet>
+									<h:outputText value="#{currentAnnotation.value}" />
+								</rich:column>
+
+								<rich:column id="ActionOnRead" style="width:10%;">
+									<f:facet name="header">#{messages['gazelle.testmanagement.object.Action']}</f:facet>
+									<center>
+										<h:graphicImage id="deleteAnnotationIdRead"
+											value="/img/icons64/deleteRedJR.gif" width="15" height="15"
+											style="cursor:pointer"
+											rendered="#{sampleDisplayManager.viewDeleteImg(currentAnnotation)}">
+											<a4j:support id="DeleteCommentOfUserRead" event="onclick"
+												actionListener="#{sampleDisplayManager.setSelectedAnnotation(currentAnnotation)}"
+												oncomplete="#{rich:component('DeleteAnnotationPanel')}.show();"
+												immediate="true" ajaxSingle="true" />
+										</h:graphicImage>
+
+										<rich:toolTip for="deleteAnnotationIdRead">
+											<span style="white-space: nowrap;">
+												#{messages['gazelle.testmanagement.object.DeleteAnnotation']}
+											</span>
+										</rich:toolTip>
+
+										<h:graphicImage id="editobjann2" value="/img/icons64/edit.gif"
+											width="15" height="15" title="#{messages['gazelle.tm.Edit']}"
+											style="cursor:pointer"
+											rendered="#{sampleDisplayManager.viewDeleteImg(currentAnnotation)}">
+											<a4j:support event="onclick" ajaxSingle="true"
+												reRender="EditSelectedAnnotation"
+												actionListener="#{sampleDisplayManager.setSelectedAnnotation(currentAnnotation) }"
+												oncomplete="#{rich:component('EditSelectedAnnotation')}.show();" />
+										</h:graphicImage>
+									</center>
+								</rich:column>
+
+								<f:facet name="footer">
+									<ui:include src="/util/datatableFooter.xhtml">
+										<ui:param name="dataScrollerId" value="ds" />
+										<ui:param name="dataTableId"
+											value="AnnotationForReaderOnCreate" />
+									</ui:include>
+								</f:facet>
+							</rich:dataTable>
+							<br />
+						</s:div>
+						<s:div
+							rendered="#{sampleDisplayManager.getReadersDescriptionsOnCreate().size() == 0}">
+							<h:outputText id="emptyAnnotationOnCreate"
+								value="#{messages['gazelle.tm.ThereAreNoCommentsFromUsersOfThisSample']}." />
+						</s:div>
+					</s:div>
+					<br />
+
+					<h:outputText
+						value="#{messages['gazelle.testmanagement.object.SampleReady']}"
+						rendered="#{sampleDisplayManager.selectedObjectInstance.completed}" />
+					<h:outputText
+						value="#{messages['gazelle.testmanagement.object.SampleNotReady']}"
+						rendered="#{!sampleDisplayManager.selectedObjectInstance.completed}"
+						style="color:#aa0000;" />
+					<br />
+
+					<s:decorate id="ValidationDecoration" template="/layout/form/edit.xhtml"
+						rendered="#{s:hasRole('admin_role')|| s:hasRole('monitor_role')}">
+						<ui:define name="label">#{messages['gazelle.testmanagement.object.Validation']}</ui:define>
+						<h:selectOneMenu styleClass="form-control gzl-form-control" id="ValidationBox"
+							value="#{sampleDisplayManager.selectedObjectInstance.validation}"
+							style="font-weight:bold;text-align:center;">
+							<s:selectItems id="ListValidationOptions"
+								value="#{sampleDisplayManager.possibleValidationOptions}"
+								var="validationOption"
+								noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+								label="#{validationOption.value}" />
+							<a4j:support event="onchange"
+								actionListener="#{sampleDisplayManager.mergeTheNewValidationOfSample(sampleDisplayManager.selectedObjectInstance)}"
+								reRender="messageDecoration,helloword" ajaxSingle="true" />
+						</h:selectOneMenu>
+					</s:decorate>
+
+				</s:div>
+				<s:div id="descpanelNull"
+					rendered="#{sampleDisplayManager.selectedObjectInstance == null}">
+					<h:outputText
+						value="#{messages['gazelle.testmanagement.object.ProblemIdNotGoodFormat']}"
+						style="color:#DD0000;" />
+				</s:div>
+
+				<s:div id="editbutdiv"
+					rendered="#{sampleDisplayManager.currentUserCanEditSample()}">
+					<a4j:commandButton styleClass="btn btn-default"
+						id="EditObjectInstanceButton"
+						value="#{messages['gazelle.testmanagement.object.EditSample']}"
+						actionListener="#{objectInstanceManager.initializeObjectInstanceAndReturnToSample(sampleDisplayManager.selectedObjectInstance)}"
+						action="/objects/EditSample.xhtml"
+						reRender="TreeOfSample,objectInstanceCreatorPage"
+						rendered="#{sampleDisplayManager.canEditSampleByCreator()}"
+						immediate="true" ajaxSingle="true" />
+				</s:div>
+
+			</rich:panel>
+
+		</a4j:form>
+
+		<!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+		<!-- Edit selected annotation -->
+		<!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+		<rich:modalPanel id="EditSelectedAnnotation"
+			onbeforeshow="ActiveModal.setActiveModalPanel('EditSelectedAnnotation')"
+			width="400" height="160" onshow="autofocus('CommeannFC')">
+
+			<f:facet name="header">
+				<h:outputText
+					value="#{messages['gazelle.testmanagement.object.EditAnnotation']}" />
+			</f:facet>
+			<f:facet name="controls">
+				<h:graphicImage id="CommeeegeFC"
+					alt="#{messages['gazelle.common.button.mp.close']}"
+					value="/img/modal/close.gif" style="cursor:pointer" height="14"
+					width="14"
+					onclick="Richfaces.hideModalPanel('EditSelectedAnnotation')" />
+			</f:facet>
+
+			<s:decorate id="CommeannFC">
+
+				<a4j:form id="CommsdfrmFC">
+					<s:token allowMultiplePosts="true" />
+					<rich:panel id="CommentSampleModalPanelFC">
+						<s:div id="CommentValDecorationFC" template="/layout/form/edit.xhtml"
+							rendered="#{sampleDisplayManager.selectedAnnotation != null}">
+							<h:outputText
+								value="#{messages['gazelle.testmanagement.object.Comment']} : "
+								style="font-weight:bold;" />
+							<br />
+							<center>
+								<h:inputTextarea id="CommentEditorIdFC"
+									value="#{sampleDisplayManager.selectedAnnotation.value}" rows="3"
+									cols="35">
+								</h:inputTextarea>
+							</center>
+						</s:div>
+
+						<div id="saceCommentDivFC" align="right">
+
+							<a4j:commandButton id="saveCommentbuttonFC"
+								value="#{messages['gazelle.common.button.Save']}"
+								styleClass="btn btn-default"
+								reRender="helloword,messageDecoration"
+								actionListener="#{sampleDisplayManager.saveModificationsForSelectedAnnotation()}"
+								onclick="Richfaces.hideModalPanel('EditSelectedAnnotation');" />
+
+							<a4j:commandButton
+								value="#{messages['gazelle.common.button.Cancel']}"
+								onclick="Richfaces.hideModalPanel('EditSelectedAnnotation')"
+								styleClass="btn btn-default" ajaxSingle="true" />
+						</div>
+
+					</rich:panel>
+				</a4j:form>
+			</s:decorate>
+		</rich:modalPanel>
+
+		<!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+		<!-- Delete selected Annotation-->
+		<!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+		<rich:modalPanel id="DeleteAnnotationPanel"
+			onbeforeshow="ActiveModal.setActiveModalPanel('DeleteAnnotationPanel')"
+			width="300" height="90">
+
+			<f:facet name="header">
+				<h:outputText
+					value="#{messages['gazelle.testmanagement.object.DeleteAnnotation']}" />
+			</f:facet>
+			<f:facet name="controls">
+				<h:graphicImage id="DeleteAnnotationGraphicImage"
+					alt="#{messages['gazelle.common.button.mp.close']}"
+					value="/img/modal/close.gif" style="cursor:pointer" height="14"
+					width="14"
+					onclick="Richfaces.hideModalPanel('DeleteAnnotationPanel')" />
+			</f:facet>
+
+			<s:decorate id="confirmationDeleteAnno">
+
+				<a4j:form id="deleteAnnForm">
+					<s:token allowMultiplePosts="true" />
+					<s:token allowMultiplePosts="true" />
+					<rich:panel id="DeleteAnnRPanel">
+						<center>
+
+							<div id="deleteAnnDiv" align="right">
+								<a4j:commandButton id="deleteAnnbutton"
+									value="#{messages['gazelle.testmanagement.object.DeleteThisAnnotation']}"
+									styleClass="btn btn-default"
+									reRender="helloword,messageDecoration"
+									actionListener="#{sampleDisplayManager.deleteSelectedAnnotation()}"
+									onclick="Richfaces.hideModalPanel('DeleteAnnotationPanel');" />
+
+								<a4j:commandButton
+									value="#{messages['gazelle.common.button.Cancel']}"
+									onclick="Richfaces.hideModalPanel('DeleteAnnotationPanel')"
+									styleClass="btn btn-default" ajaxSingle="true" />
+							</div>
+						</center>
+					</rich:panel>
+				</a4j:form>
+			</s:decorate>
+		</rich:modalPanel>
+
+		<!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+		<!-- Comment Sample Modal-->
+		<!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+		<rich:modalPanel id="CommentSampleModal"
+			onbeforeshow="ActiveModal.setActiveModalPanel('CommentSampleModal')"
+			onshow="autofocus('CommentSampleModalDecoration')" width="400"
+			height="160">
+			<f:facet name="header">
+				<h:outputText
+					value="#{messages['gazelle.testmanagement.object.CommentCurrentSample']}" />
+			</f:facet>
+			<f:facet name="controls">
+				<h:graphicImage id="CommentSampleGraphicImage"
+					alt="#{messages['gazelle.common.button.mp.close']}"
+					value="/img/modal/close.gif" style="cursor:pointer" height="14"
+					width="14" onclick="Richfaces.hideModalPanel('CommentSampleModal')" />
+			</f:facet>
+
+			<s:decorate id="CommentSampleModalDecoration">
+
+				<a4j:form id="CommentSampleForm">
+					<s:token allowMultiplePosts="true" />
+					<rich:panel id="CommentSampleModalPanel">
+						<center>
+							<a4j:region id="CommentValueReg">
+								<s:decorate id="CommentValDecoration"
+									template="/layout/form/edit.xhtml">
+									<ui:define name="label">#{messages['gazelle.testmanagement.object.Comment']}</ui:define>
+									<h:inputTextarea id="CommentEditorId"
+										value="#{sampleDisplayManager.commentOfCurrentSIS}" rows="3"
+										cols="35" />
+								</s:decorate>
+							</a4j:region>
+
+							<div id="saceCommentDiv" align="right">
+								<a4j:commandButton id="saveCommentbutton"
+									value="#{messages['gazelle.common.button.Save']}"
+									styleClass="btn btn-default"
+									reRender="helloword,messageDecoration"
+									actionListener="#{sampleDisplayManager.saveCommentOfObjectInstance()}"
+									onclick="Richfaces.hideModalPanel('CommentSampleModal');" />
+
+								<a4j:commandButton
+									value="#{messages['gazelle.common.button.Cancel']}"
+									onclick="Richfaces.hideModalPanel('CommentSampleModal')"
+									styleClass="btn btn-default" ajaxSingle="true" />
+							</div>
+						</center>
+					</rich:panel>
+				</a4j:form>
+			</s:decorate>
+		</rich:modalPanel>
+
+	</ui:define>
+</ui:composition>

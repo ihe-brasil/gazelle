@@ -1,0 +1,311 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <s:div id="editMetaTestDiv" rendered="#{metaTestAdministrationManager.showMetaTestPanel}">
+        <ui:decorate template="/layout/panels/_panel_id.xhtml">
+            <ui:param name="panel_id" value="editMetaTestPanel"/>
+            <ui:define name="panel_title">
+                <h:outputText rendered="#{metaTestAdministrationManager.selectedMetaTest.id == null }">
+                    #{messages['gazelle.tm.AddNewMetaTest']}
+                </h:outputText>
+                <h:outputText rendered="#{metaTestAdministrationManager.selectedMetaTest.id != null }">
+                    #{messages['gazelle.tm.UpdateMetaTest']}
+                    #{metaTestAdministrationManager.selectedMetaTest.keyword}
+                </h:outputText>
+            </ui:define>
+            <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                <ui:param name="panel_id" value="metaTestSummaryPanel"/>
+                <ui:define name="panel_title">#{messages['gazelle.tm.MetaTestSummary']}</ui:define>
+                <div class="form-horizontal">
+                    <s:decorate id="MetaTestKeywordDecoration"
+                                template="/layout/form/_form_field_horizontal_inline.xhtml">
+                        <ui:param name="id" value="keyword"/>
+                        <ui:define name="label">#{messages['gazelle.testmanagement.object.keyword']}</ui:define>
+                        <h:inputText styleClass=" form-control" id="keyword" maxlength="32" size="32"
+                                     value="#{metaTestAdministrationManager.metaTestKeyword}" required="true">
+                            <a4j:ajax event="blur" render="MetaTestKeywordDecoration" execute="@this"
+                                      listener="#{metaTestAdministrationManager.validateMetaTestKeyword()}"/>
+                        </h:inputText>
+                    </s:decorate>
+                    <s:decorate id="shortDescriptionDecoration"
+                                template="/layout/form/_form_field_horizontal_inline.xhtml">
+                        <ui:param name="id" value="shortDescriptionInputTextArea"/>
+                        <ui:define name="label">#{messages['gazelle.tf.table.Description']}
+                        </ui:define>
+                        <h:inputTextarea styleClass=" form-control" id="shortDescriptionInputTextArea" rows="3"
+                                         cols="50"
+                                         value="#{metaTestAdministrationManager.metaTestDescription}"
+                                         required="true">
+                            <a4j:ajax event="blur" render="shortDescriptionDecoration" execute="@this"/>
+                        </h:inputTextarea>
+                    </s:decorate>
+                </div>
+                <div align="right">
+                    <a4j:commandButton id="addmetatess"
+                                       rendered="#{metaTestAdministrationManager.selectedMetaTest.id == null}"
+                                       value="#{messages['gazelle.tm.AddMetaTest']}"
+                                       action="#{metaTestAdministrationManager.persistSelectedMetaTest()}"
+                                       styleClass="gzl-btn-green" render="editMetaTestDiv"/>
+                    <a4j:commandButton id="updatmeta"
+                                       rendered="#{metaTestAdministrationManager.selectedMetaTest.id != null}"
+                                       value="#{messages['gazelle.tm.UpdateMetaTest']}"
+                                       action="#{metaTestAdministrationManager.persistSelectedMetaTest()}"
+                                       styleClass="gzl-btn-orange" render="editMetaTestDiv"/>
+                </div>
+            </ui:decorate>
+
+            <br/>
+            <s:div id="testListDiv" rendered="#{metaTestAdministrationManager.selectedMetaTest.id != null }">
+                <rich:dataTable id="testListTable" var="selectedTestRoles" rowKeyVar="rowNumber"
+                                value="#{metaTestAdministrationManager.selectedMetaTest.testRolesList}"
+
+                                onRowMouseOut="colorListTestRolesTable();"
+                                first="0" columnClasses="center">
+                    <g:column>
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.tm.RoleKeyword']}"/>
+                        </ui:define>
+                        <h:outputText id="metaTestListColumnsRoleKeywordOutputText"
+                                      value="#{selectedTestRoles.roleInTest.keyword}"/>
+                        <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                            <ui:param name="id" value="r#{selectedTestRoles.id}"/>
+                            <ui:param name="placement" value="bottom"/>
+                            <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                            <ui:param name="trigger" value="focus"/>
+                            <ui:define name="content">
+                                <s:div>
+                                    <h:outputText value="#{messages['gazelle.tm.test.NoParticipantsForThisRole']}"
+                                                  rendered="#{selectedTestRoles.roleInTest.testParticipantsList.size()==0 }"/>
+                                </s:div>
+                                <div style="max-height: 300px; overflow: auto;">
+                                    <rich:dataTable id="roleInTestTable" cellpadding="0" cellspacing="0" width="700"
+                                                    border="0" var="currentTestParticipant"
+                                                    value="#{selectedTestRoles.roleInTest.testParticipantsList}"
+                                                    rendered="#{selectedTestRoles.roleInTest.testParticipantsList.size()!=0 }"
+                                                    first="0">
+                                        <f:facet name="header">
+                                            <rich:columnGroup>
+                                                <g:column>
+                                                    <h:outputText
+                                                            value="#{messages['gazelle.testmanagement.system.label.IP']}"/>
+                                                </g:column>
+                                                <g:column>
+                                                    <h:outputText
+                                                            value="#{messages['gazelle.testmanagement.system.label.Actor']}"/>
+                                                </g:column>
+                                                <g:column>
+                                                    <h:outputText
+                                                            value="#{messages['gazelle.tf.LabelOption']}"/>
+                                                </g:column>
+                                                <g:column>
+                                                    <h:outputText
+                                                            value="#{messages['gazelle.tm.IsTested']} ?"/>
+                                                </g:column>
+                                            </rich:columnGroup>
+                                        </f:facet>
+                                        <g:column>
+                                            <h:outputText
+                                                    value="#{currentTestParticipant.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.toString()}">
+                                            </h:outputText>
+                                        </g:column>
+                                        <g:column>
+                                            <h:outputText
+                                                    value="#{currentTestParticipant.actorIntegrationProfileOption.actorIntegrationProfile.actor.toString()}"/>
+                                        </g:column>
+                                        <g:column>
+                                            <h:outputText
+                                                    value="#{currentTestParticipant.actorIntegrationProfileOption.integrationProfileOption.keyword}"/>
+                                        </g:column>
+                                        <g:column>
+                                            <h:outputText value="#{currentTestParticipant.tested}"/>
+                                        </g:column>
+                                    </rich:dataTable>
+                                </div>
+                            </ui:define>
+                        </ui:decorate>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">
+                            <h:outputText value="#" title="#{messages['gazelle.tm.NumberOfTestInstancesToRun']}"/>
+                        </ui:define>
+                        <h:outputText id="metaTestListColumnsNOTTROutputText"
+                                      value="#{selectedTestRoles.numberOfTestsToRealize}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.tm.patient.testKeyword']}"/>
+                        </ui:define>
+                        <h:outputText id="metaTestListColumnsTestKeywordOutputText"
+                                      value="#{selectedTestRoles.test.keyword}"
+                                      title="#{selectedTestRoles.test.name}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.tf.table.Description']}"/>
+                        </ui:define>
+                        <h:outputText id="metaTestListColumnsTestDescriptionOutputText"
+                                      value="#{selectedTestRoles.test.shortDescription}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.tm.tests.testStatus']}</ui:define>
+                        <h:inputHidden id="testsListColumnsTestStatusInputHidden"
+                                       value="#{selectedTestRoles.test.testStatus.id}"
+                                       rendered="#{selectedTestRoles.test.testStatus!=null}"/>
+                        <h:outputText id="testsListColumnsTestStatusOutputText"
+                                      value="#{selectedTestRoles.test.testStatus.labelToDisplay}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.tm.monitors.TestType']}</ui:define>
+                        <h:outputText id="testsListColumnsTestTypeOutputText"
+                                      value="#{selectedTestRoles.test.testType.labelToDisplay}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.tm.monitors.PeerType']}</ui:define>
+                        <h:outputText id="testsListColumnsTestPeerTypeOutputText"
+                                      value="#{messages[selectedTestRoles.test.testPeerType.labelToDisplay]}"/>
+                    </g:column>
+                    <g:column
+                            rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.common.button.Remove']}"/>
+                        </ui:define>
+                        <a4j:commandLink id="metaTestListColumnsDeleteActionSupport"
+                                         title="#{messages['gazelle.common.button.Delete']}"
+                                         actionListener="#{metaTestAdministrationManager.setSelectedTestRole(selectedTestRoles)}"
+                                         oncomplete="jq162('#DeleteTestRoleFromMetaTest').modal('show');"
+                                         render="DeleteConfirmationDiv"
+                                         rendered="#{metaTestAdministrationManager.showMetaTestPanel}"
+                                         execute="@this">
+                            <span class="gzl-icon-trash-o"/>
+                        </a4j:commandLink>
+                    </g:column>
+                </rich:dataTable>
+                <div align="right">
+                    <a4j:commandButton value="#{messages['gazelle.tm.EditTestAssignment']}" id="edittesass"
+                                       rendered="#{!metaTestAdministrationManager.showEditTestAssignmentPanel}"
+                                       action="#{metaTestAdministrationManager.editTestAssignment()}"
+                                       styleClass="gzl-btn-blue" render="testListDiv"/>
+                </div>
+                <br/>
+
+                <h:panelGroup rendered="#{metaTestAdministrationManager.showEditTestAssignmentPanel}">
+
+                    <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                        <ui:param name="panel_id" value="testSelectionPanel"/>
+                        <ui:define name="panel_title">
+                            <h:outputText value="#{messages['gazelle.tm.EditTestAssignement']}"/>
+                        </ui:define>
+                        <s:decorate id="panelListPossibleSearchCriterion"
+                                    template="/layout/form/_form_field_horizontal_inline.xhtml">
+                            <ui:param name="id" value="PossibleSearchCriterionListBox"/>
+                            <ui:define name="label">#{messages['gazelle.tm.monitors.PossibleSearchCriteria']}
+                            </ui:define>
+                            <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                             id="PossibleSearchCriterionListBox"
+                                             value="#{metaTestAdministrationManager.selectedCriterion}">
+                                <s:selectItems
+                                        value="#{monitorInSessionAdministrationManager.getPossibleSearchCriterionList()}"
+                                        var="selectedCriterion"
+                                        noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                        label="#{messages[selectedCriterion]}"/>
+                                <a4j:ajax event="change" render="editMetaTestPanel" execute="@this"
+                                          listener="#{metaTestAdministrationManager.findTestsForSelectedCriteria()}"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                        <s:decorate id="decorationListDomain"
+                                    template="/layout/form/_form_field_horizontal_inline.xhtml"
+                                    rendered="#{metaTestAdministrationManager.selectedCriterion.equals(monitorInSessionAdministrationManager.getSEARCH_BY_DOMAIN_LABEL_TO_DISPLAY())}">
+                            <ui:define name="label">#{messages['gazelle.tf.Domain']}</ui:define>
+                            <ui:param name="id" value="DomainListBox"/>
+                            <h:selectOneMenu styleClass="form-control gzl-form-control" id="DomainListBox"
+                                             value="#{metaTestAdministrationManager.selectedDomain}">
+                                <s:selectItems value="#{gazelleDAO.getPossibleDomains()}" var="domainFromList"
+                                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                               label="#{domainFromList.keyword} - #{domainFromList.name}"/>
+                                <a4j:ajax event="change" render="testSelectionPanel" execute="@this"
+                                          listener="#{metaTestAdministrationManager.findTestsForSelectedCriteria()}"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                        <s:decorate id="deconrationListIP" template="/layout/form/_form_field_horizontal_inline.xhtml"
+                                    rendered="#{metaTestAdministrationManager.selectedCriterion.equals(monitorInSessionAdministrationManager.getSEARCH_BY_PROFILE_LABEL_TO_DISPLAY())}">
+                            <ui:define name="label">#{messages['gazelle.tf.IntegrationProfile']}</ui:define>
+                            <ui:param name="id" value="integrationProfileListBox"/>
+                            <h:selectOneMenu styleClass="form-control gzl-form-control" id="integrationProfileListBox"
+                                             value="#{metaTestAdministrationManager.selectedIntegrationProfile}">
+                                <s:selectItems value="#{gazelleDAO.getAllIntegrationProfile()}"
+                                               var="integrationProfileFromList"
+                                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                               label="#{integrationProfileFromList.keyword}:#{integrationProfileFromList.name}"/>
+                                <a4j:ajax event="change" render="testSelectionPanel"
+                                          listener="#{metaTestAdministrationManager.findTestsForSelectedCriteria()}"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                        <s:decorate id="deconrationListActor"
+                                    template="/layout/form/_form_field_horizontal_inline.xhtml"
+                                    rendered="#{metaTestAdministrationManager.selectedCriterion.equals(monitorInSessionAdministrationManager.getSEARCH_BY_ACTOR_LABEL_TO_DISPLAY())}">
+                            <ui:define name="label">#{messages['gazelle.tf.Actor']}</ui:define>
+                            <ui:param name="id" value="actorListBox"/>
+                            <h:selectOneMenu styleClass="form-control gzl-form-control" id="actorListBox"
+                                             value="#{metaTestAdministrationManager.selectedActor}">
+                                <s:selectItems value="#{gazelleDAO.listAllActors()}" var="actorFromList"
+                                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                               label="#{actorFromList.keyword}:#{actorFromList.name}"/>
+                                <a4j:ajax event="change" render="testSelectionPanel"
+                                          listener="#{metaTestAdministrationManager.findTestsForSelectedCriteria()}"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                        <a4j:region id="addTestRegion">
+                            <s:decorate id="addTestDecoration" template="/layout/form/_edit.xhtml">
+                                <ui:define name="label">#{messages['gazelle.tests.tests']} - (#{messages['net.ihe.gazelle.tm.RoleKeyword']})</ui:define>
+                                <ui:param name="id" value="seltest"/>
+                                <rich:pickList minListHeight="100px" maxListHeight="240px"
+                                               id="seltest" value="#{metaTestAdministrationManager.selectedTestRoles}">
+                                    <s:selectItems value="#{metaTestAdministrationManager.availableTestRoles}"
+                                                   var="selectedTestRoles"
+                                                   label="#{selectedTestRoles.test.keyword} - (#{selectedTestRoles.roleInTest.keyword})"/>
+                                    <s:convertEntity/>
+                                </rich:pickList>
+                            </s:decorate>
+                        </a4j:region>
+                        <div align="left">
+                            <a4j:commandButton value="#{messages['gazelle.tm.AddToMetaTestTestList']}" id="addtometlist"
+                                               action="#{metaTestAdministrationManager.addSelectedTestRolesToMetaTest2()}"
+                                               styleClass="gzl-btn-green" render="testListDiv"
+                                               disabled="#{metaTestAdministrationManager.availableTestRoles.size() == 0}"/>
+                        </div>
+                    </ui:decorate>
+                </h:panelGroup>
+            </s:div>
+            <div align="left">
+                <a4j:commandButton value="#{messages['gazelle.tm.BackToMetaTestList']}" id="backometa"
+                                   immediate="true"
+                                   action="#{metaTestAdministrationManager.setShowMetaTestPanel(false)}"
+                                   styleClass="gzl-btn" render="_f"/>
+            </div>
+        </ui:decorate>
+
+    </s:div>
+    <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+        <ui:param name="popup_id" value="DeleteTestRoleFromMetaTest"/>
+        <ui:define name="popup_title">#{messages['gazelle.users.institution.confirmation.delete.label']}</ui:define>
+        <s:div id="DeleteConfirmationDiv">
+            <p>
+                <h:outputText value="#{messages['gazelle.tm.DeleteSelectedTestRoleFromThisMetaTest']}?"/>
+            </p>
+        </s:div>
+        <ui:define name="popup_footer">
+            <button type="button" class="gzl-btn" data-dismiss="modal">
+                #{messages['gazelle.tm.Cancel']}
+            </button>
+            <a4j:commandButton id="deleteOTbutton" value="#{messages['gazelle.common.Yes']}"
+                               styleClass="gzl-btn-red"
+                               actionListener="#{metaTestAdministrationManager.removeSelectedTestRoleFromSelectedMetaTest()}"
+                               onclick="jq162('#DeleteTestRoleFromMetaTest').modal('hide');"
+                               execute="@this"
+                               render="testListDiv,messageDecoration"/>
+
+        </ui:define>
+    </ui:decorate>
+</ui:composition>

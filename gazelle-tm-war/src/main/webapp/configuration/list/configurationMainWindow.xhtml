@@ -1,0 +1,123 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.configuration.Configurations']}"/>
+    <ui:define name="body">
+        <h:panelGroup rendered="#{gazelleDAO.getSelectedTestingSession().testingSessionClosedForUser()}"
+                      style="text-align:left">
+            <h:outputText
+                    value="#{messages['net.ihe.gazelle.tm.ThisTestingSessionIsClosedEditionIsImpossible']}"/>
+        </h:panelGroup>
+
+
+        #{systemConfigurationManager.retrieveSelectedSystemVariable() }
+
+
+        <s:div id="noSystemGroup" rendered="#{gazelleDAO.getSystemsInSessionForLoggedCompanyForSession().size()==0}">
+            <h:outputText
+                    value="#{messages['net.ihe.gazelle.tm.NoSystemFromYourOrganizationHasBeenRegisteredFor']}"/>
+        </s:div>
+
+
+        <s:div id="panelGroup" rendered="#{gazelleDAO.getSystemsInSessionForLoggedCompanyForSession().size()&gt;0}">
+            <h:form rendered="#{identity.loggedIn}">
+                <s:decorate template="/layout/form/_edit.xhtml" id="systemDecorate"
+                            rendered="#{!s:hasRole('admin_role') }">
+                    <ui:param name="id" value="SystemListBox"/>
+                    <ui:define name="label">#{messages['gazelle.configuration.SelectSystem']}</ui:define>
+                    #{systemConfigurationManager.initOneMenu() }
+                    <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text" id="SystemListBox"
+                                     value="#{systemConfigurationManager.selectedSystemInSession}">
+                        <s:selectItems value="#{gazelleDAO.getNotDrppedSystemsInSessionForLoggedCompanyForSession()}"
+                                       var="sIsFromList" noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                       label="#{sIsFromList.system.name}/#{sIsFromList.system.keyword}"/>
+                        <a4j:ajax event="change"
+                                  render="divsOfTogglePannel, :buttons, :networkConfigurationsForm, :filter, :formConfigurationsTable"
+                                  execute="@this"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+            </h:form>
+            <s:div id="divsOfTogglePannel">
+                <h:form id="networkConfigurationsForm"
+                        rendered="#{identity.loggedIn and not empty systemConfigurationManager.selectedSystemInSession}">
+                    <s:token allowMultiplePosts="true"/>
+                    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                        <ui:define name="panel_title">
+                            <h:outputText value="#{messages['gazelle.configuration.networkConfiguration']} #{messages['gazelle.tm.For']} #{userManager.getInstitution().getKeyword()} - #{userManager.getInstitution().getName()}"/>
+                        </ui:define>
+                        <ui:include
+                                src="/configuration/NETWORK/list/listExistingNetworkConfiguration.xhtml"/>
+                    </ui:decorate>
+                </h:form>
+                <s:div id="systemConfigurationDiv">
+                    <s:div rendered="#{not empty systemConfigurationManager.selectedSystemInSession}">
+                        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                            <ui:define name="panel_title">
+                                <h:outputText value="#{messages['gazelle.configuration.systemConfiguration']}"/>
+                            </ui:define>
+
+                            <h:form id="buttons" rendered="#{identity.loggedIn}">
+                                <s:token allowMultiplePosts="true"/>
+                                <div align="right">
+                                    <a4j:region>
+                                        <a4j:commandButton id="buttonAddNewConfiguration" styleClass="gzl-btn-green"
+                                                           value="#{messages['gazelle.configuration.system.AddConfiguration']}"
+                                                           rendered="#{!gazelleDAO.getSelectedTestingSession().testingSessionClosedForUser()}"
+                                                           action="#{configurationsOverview.addConfig()}"
+                                                           render="systemConfigurationsPanel">
+                                        </a4j:commandButton>
+                                        <a4j:commandButton styleClass="gzl-btn-green"
+                                                           value="#{messages['gazelle.configuration.button.GenerateConfiguration']}"
+                                                           immediate="true"
+                                                           rendered="#{systemConfigurationManager.canGenerateConfigs()}"
+                                                           oncomplete="jq162('#ConfirmGenerateConfiguration3').modal('show');"
+                                                           execute="@this"
+                                                           render="systemConfigurationsPanel , :GenerateConfigurationForSelectedSystemForm, :filter, :formConfigurationsTable">
+                                        </a4j:commandButton>
+                                        <a4j:commandButton styleClass="gzl-btn"
+                                                           value="#{messages['gazelle.common.button.Refresh']}"
+                                                           rendered="#{systemConfigurationManager.canGenerateConfigs()}"
+                                                           render="panelGroup">
+                                        </a4j:commandButton>
+                                    </a4j:region>
+                                </div>
+                            </h:form>
+                            <ui:include src="/configuration/listConfigurationsForASystemInSession.xhtml">
+                                <ui:param name="systemInSessionToUse"
+                                          value="#{systemConfigurationManager.selectedSystemInSession}"/>
+                                <ui:param name="showActions"
+                                          value="#{!gazelleDAO.getSelectedTestingSession().testingSessionClosedForUser()}"/>
+                                <ui:param name="isUpdateUrl" value="true"/>
+                            </ui:include>
+                        </ui:decorate>
+                    </s:div>
+                </s:div>
+            </s:div>
+        </s:div>
+
+
+        <h:form id="GenerateConfigurationForSelectedSystemForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="ConfirmGenerateConfiguration3"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.GenerateConfigurationForSelectedSystem']}
+                </ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.GenerationOfConfigurationsWillBeExecutedInBackgr']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton styleClass="gzl-btn-green"
+                                       value="#{messages['gazelle.common.button.Confirm']}"
+                                       actionListener="#{systemConfigurationManager.generateConfigurations(systemConfigurationManager.selectedSystemInSession)}"
+                                       immediate="true"
+                                       onclick="jq162('#ConfirmGenerateConfiguration3').modal('hide');"
+                                       render="panelGroup" execute="@this"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+
+    </ui:define>
+</ui:composition>

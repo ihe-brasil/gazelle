@@ -1,0 +1,66 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml">
+    <h:form id="TestListModalPanelForm">
+        <s:token allowMultiplePosts="true"/>
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="TestListModalPanel"/>
+            <ui:param name="styleClass2" value="modal-lg"/>
+            <ui:define name="popup_title">#{messages['gazelle.tm.TestListFor']}</ui:define>
+            <rich:dataTable id="viewTestListTable" cellspacing="0"
+                            rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                            width="700" border="0" var="currentTestRole" value="#{roleInTestVar.testRoles}"
+                            render="ds">
+                <f:facet name="header">#{messages['gazelle.tm.monitors.TestList']}</f:facet>
+                <g:column sortBy="#{'test.keyword'}" sortOrder="ascending">
+                    <ui:define name="header">#{messages['gazelle.testmanagement.object.keyword']}</ui:define>
+                    <h:outputText id="testsListColumnsTestKeywordOutputText" value="#{currentTestRole.test.keyword}"
+                    />
+                </g:column>
+                <g:column sortBy="#{'test.name'}" sortOrder="ascending">
+                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Name']}</ui:define>
+                    <h:outputText id="testsListColumnsTestNameOutputText" value="#{currentTestRole.test.name}"
+                    />
+                </g:column>
+                <g:column styleClass="#{styleClassColumn}">
+                    <ui:define name="header">
+                        <h:outputText id="testsListColumnsTestVersionHeaderOutputText"
+                                      value="#{messages['gazelle.common.application.about.version']}"/>
+                    </ui:define>
+                    <h:outputText id="testsListColumnsTestVersionOutputText" value="#{currentTestRole.test.version}"
+                    />
+                </g:column>
+                <g:column styleClass="#{styleClassColumn}">
+                    <ui:define name="header">
+                        <h:outputText id="testsListColumnsTestStatusHeaderOutputText"
+                                      value="#{messages['gazelle.tm.testing.instance.status']}"/>
+                    </ui:define>
+                    <h:outputText id="testsListColumnsTestStatusOutputText"
+                                  value="#{currentTestRole.test.testStatus.labelToDisplay}"
+                    />
+                </g:column>
+                <g:column styleClass="#{styleClassColumn}">
+                    <ui:define name="header">
+                        <h:outputText id="testsListColumnsTestTypeHeaderOutputText"
+                                      value="#{messages['gazelle.tm.monitors.TestType']}"/>
+                    </ui:define>
+                    <h:outputText id="testsListColumnsTestTestTypeOutputText"
+                                  value="#{currentTestRole.test.testType.labelToDisplay}"
+                    />
+                </g:column>
+                <f:facet name="footer">
+                    <ui:include src="/util/datatableFooter.xhtml">
+                        <ui:param name="dataScrollerId" value="ds"/>
+                        <ui:param name="dataTableId" value="viewTestListTable"/>
+                    </ui:include>
+                </f:facet>
+            </rich:dataTable>
+            <ui:define name="popup_footer">
+                <button type="button" class="gzl-btn" data-dismiss="modal">
+                    #{messages['gazelle.tm.Cancel']}
+                </button>
+            </ui:define>
+        </ui:decorate>
+    </h:form>
+</ui:composition>

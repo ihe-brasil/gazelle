@@ -1,0 +1,458 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle"
+              value="#{messages['net.ihe.gazelle.tm.EditTestRolesOf']} #{editTestDefinitionManager.getEditedTest().name}"/>
+    <ui:define name="body">
+        <h:form>
+            <a4j:commandButton styleClass="gzl-btn" immediate="true"
+                               value="#{messages['net.ihe.gazelle.tm.BackToTest']}"
+                               action="#{editTestDefinitionManager.backTo(editTestDefinitionManager.getEditedTest().id)}"
+                               execute="@this"/>
+        </h:form>
+
+        <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+            <ui:param name="panel_id" value="description"/>
+            <ui:define name="panel_title">#{messages['gazelle.tm.test.TestDescription']}
+                #{messages['net.ihe.gazelle.tm.In']}
+                #{testDefinitionManager.getSelectedTest().getContextualDescription().gazelleLanguage.keyword}
+            </ui:define>
+            <g:safehtml value="#{editTestDefinitionManager.getEditedTest().getContextualDescription().description}"/>
+        </ui:decorate>
+
+        <h:panelGroup
+                rendered="#{editTestDefinitionManager.getEditedTest().id != null and s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}">
+            <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                <ui:param name="panel_id" value="displayRoles"/>
+                <ui:define name="panel_title">#{messages['gazelle.tm.roleInTest.Roles']}</ui:define>
+                <h:form id="tableOfTestRoles">
+                    <rich:dataTable border="0" id="tableOfTestRolesWithAction" var="currentTestRoles"
+                                    rowClasses="ti-row1, ti-row2" value="#{editTestDefinitionManager.listOfTestRoles}">
+                        <g:column>
+                            <ui:define name="header">
+                                <h:outputText value="#{messages['gazelle.testmanagement.object.keyword']}"/>
+                            </ui:define>
+                            <h:outputText value="#{currentTestRoles.roleInTest.keyword}"/>
+                            <s:span styleClass="fa fa-laptop"
+                                    rendered="#{currentTestRoles.roleInTest.isRolePlayedByATool}"
+                                    title="#{messages['net.ihe.gazelle.tm.RolePlayedByATool']}"/>
+                            <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                <ui:param name="id" value="r#{currentTestRoles.id}"/>
+                                <ui:param name="placement" value="bottom"/>
+                                <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                                <ui:param name="trigger" value="click"/>
+                                <ui:define name="content">
+                                    <s:div>
+                                        <h:outputText
+                                                value="#{messages['gazelle.tm.test.NoParticipantsForThisRole']}"
+                                                rendered="#{currentTestRoles.roleInTest.testParticipantsList.size()==0 }"/>
+                                    </s:div>
+                                    <div style="max-height: 300px; overflow: auto;">
+                                        <rich:dataTable id="roleInTestTable" cellpadding="0" cellspacing="0"
+                                                        width="700"
+                                                        border="0" var="currentTestParticipant"
+                                                        value="#{currentTestRoles.roleInTest.testParticipantsList}"
+                                                        rendered="#{currentTestRoles.roleInTest.testParticipantsList.size()!=0 }"
+                                                        first="0">
+                                            <f:facet name="header">
+                                                <rich:columnGroup>
+                                                    <g:column>
+                                                        <h:outputText
+                                                                value="#{messages['gazelle.testmanagement.system.label.IP']}"/>
+                                                    </g:column>
+                                                    <g:column>
+                                                        <h:outputText
+                                                                value="#{messages['gazelle.configuration.system.actorKeyword']}"/>
+                                                    </g:column>
+                                                    <g:column>
+                                                        <h:outputText
+                                                                value="#{messages['gazelle.tests.test.option']}"/>
+                                                    </g:column>
+                                                    <g:column>
+                                                        <h:outputText
+                                                                value="#{messages['gazelle.tm.test.IsTested']}"/>
+                                                    </g:column>
+                                                </rich:columnGroup>
+                                            </f:facet>
+                                            <g:column>
+                                                <h:outputText
+                                                        value="#{currentTestParticipant.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.toString()}">
+                                                </h:outputText>
+                                            </g:column>
+                                            <g:column>
+                                                <h:outputText
+                                                        value="#{currentTestParticipant.actorIntegrationProfileOption.actorIntegrationProfile.actor.toString()}"/>
+                                            </g:column>
+                                            <g:column>
+                                                <h:outputText
+                                                        value="#{currentTestParticipant.actorIntegrationProfileOption.integrationProfileOption.keyword}"/>
+                                            </g:column>
+                                            <g:column>
+                                                <h:outputText value="#{currentTestParticipant.tested}"/>
+                                            </g:column>
+                                        </rich:dataTable>
+                                    </div>
+
+                                </ui:define>
+                            </ui:decorate>
+                        </g:column>
+                        <g:column>
+                            <ui:define name="header">
+                                <h:outputText value="# #{messages['gazelle.tm.roleInTest.toRealize']}"/>
+                            </ui:define>
+                            <h:outputText id="numToRealize" value="#{currentTestRoles.numberOfTestsToRealize}"/>
+                        </g:column>
+                        <g:column>
+                            <ui:define name="header">
+                                <h:outputText value="#{messages['gazelle.tm.CardMin']}"/>
+                            </ui:define>
+                            <h:outputText id="cardMin" value="#{currentTestRoles.cardMin}"/>
+                        </g:column>
+                        <g:column>
+                            <ui:define name="header">
+                                <h:outputText value="#{messages['gazelle.tm.CardMax']}"/>
+                            </ui:define>
+                            <h:outputText id="cardMax" value="#{currentTestRoles.cardMax}"/>
+                        </g:column>
+                        <g:column>
+                            <ui:define name="header">
+                                <h:outputText value="#{messages['gazelle.tf.table.Optionality']}"/>
+                            </ui:define>
+                            <h:outputText id="option" value="#{currentTestRoles.testOption.labelToDisplay}"/>
+                        </g:column>
+                        <g:column>
+                            <ui:define name="header">
+                                <h:outputText value="#{messages['gazelle.tm.testing.URL']}"/>
+                            </ui:define>
+                            <s:div rendered="#{ not empty currentTestRoles.url}">
+                                <a href="#{currentTestRoles.url}" target="_blank"
+                                   title="#{messages['gazelle.tm.GoTo']} : #{currentTestRoles.url}">
+                                    <span class="gzl-icon-globe"/>
+                                </a>
+                            </s:div>
+                        </g:column>
+                        <g:column>
+                            <ui:define name="header">
+                                <h:outputText value="#{messages['gazelle.tm.URLDoc']}"/>
+                            </ui:define>
+                            <s:div rendered="#{ not empty currentTestRoles.urlDocumentation}">
+                                <a href="#{currentTestRoles.urlDocumentation}" target="_blank"
+                                   title="#{messages['gazelle.tm.GoTo']} : #{currentTestRoles.urlDocumentation}">
+                                    <span class="gzl-icon-globe"/>
+                                </a>
+                            </s:div>
+                        </g:column>
+                        <g:column>
+                            <ui:define name="header">
+                                <h:outputText value="#{messages['gazelle.testmanagement.object.Action']}"/>
+                            </ui:define>
+
+                            <s:span styleClass="gzl-icon-down" rendered="#{not editTestDefinitionManager.canBeMovedDown(currentTestRoles)}" style="color:C6C6C6"/>
+                            <a4j:commandLink event="click" execute="@this"
+                                             render="tableOfTestRolesWithAction"
+                                             rendered="#{editTestDefinitionManager.canBeMovedDown(currentTestRoles)}"
+                                             title="Move Down"
+                                             actionListener="#{editTestDefinitionManager.moveRoleDown(currentTestRoles)}">
+                                <span class="gzl-icon-down"/>
+                            </a4j:commandLink>
+
+                            <s:span styleClass="gzl-icon-up" rendered="#{not editTestDefinitionManager.canBeMovedUp(currentTestRoles)}" style="color:C6C6C6"/>
+                            <a4j:commandLink event="click" execute="@this"
+                                             render="tableOfTestRolesWithAction"
+                                             rendered="#{editTestDefinitionManager.canBeMovedUp(currentTestRoles)}"
+                                             title="Move Up"
+                                             actionListener="#{editTestDefinitionManager.moveRoleUp(currentTestRoles)}">
+                                <span class="gzl-icon-up"/>
+                            </a4j:commandLink>
+
+                            <a4j:commandLink event="click" execute="@this"
+                                             render=" :addNewRowForm,addNewRow,spinnerScript"
+                                             title="#{messages['gazelle.common.button.Edit']}"
+                                             actionListener="#{editTestDefinitionManager.setSelectedTestRole(currentTestRoles)}">
+                                <span class="gzl-icon-pencil"/>
+                            </a4j:commandLink>
+
+                            <a4j:commandLink event="click"
+                                             title="#{messages['gazelle.common.button.Delete']}"
+                                             oncomplete="jq162('#testRoleDeleteModalPanel').modal('show');"
+                                             execute="@this"
+                                             render=" :testRoleDeleteModalPanelForm,testRoleDeleteModalPanel"
+                                             actionListener="#{editTestDefinitionManager.setSelectedTestRole(currentTestRoles)}">
+                                <span class="gzl-icon-trash-o"/>
+                            </a4j:commandLink>
+                        </g:column>
+                    </rich:dataTable>
+                    <br/>
+                    <a4j:commandButton value="#{messages['gazelle.tm.patient.addAuthority']}"
+                                       styleClass="gzl-btn-green"
+                                       actionListener="#{editTestDefinitionManager.addTestRoles()}"
+                                       rendered="#{editTestDefinitionManager.selectedTestRole == null}"
+                                       render=" :addNewRowForm,addNewRow,tableOfTestRoles"/>
+                </h:form>
+                <s:div id="addNewRow">
+                    <h:form id="addNewRowForm" styleClass="form-horizontal">
+                        <h:panelGroup rendered="#{editTestDefinitionManager.selectedTestRole != null}">
+
+                            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                                <ui:define name="panel_title">
+                                    <h:outputText id="modeCreate"
+                                                  value="#{messages['gazelle.tm.AddARoleForTest']} #{editTestDefinitionManager.getEditedTest().keyword}"
+                                                  rendered="#{editTestDefinitionManager.selectedTestRole.id == null}"/>
+                                    <h:outputText id="modeUpdate"
+                                                  value="#{messages['gazelle.tm.EditingRole']} #{editTestDefinitionManager.roleInTestKeywordTyped} #{messages['gazelle.tm.monitors.ForTest']} #{editTestDefinitionManager.getEditedTest().keyword}"
+                                                  rendered="#{editTestDefinitionManager.selectedTestRole.id != null}"/>
+                                </ui:define>
+                                <h:panelGroup
+                                        rendered="#{editTestDefinitionManager.selectedTestRole.roleInTest == null}">
+                                    <s:div id="roleInTestSelector">
+                                        <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+
+                                            <!--  AIPO selection -->
+                                            <ui:include src="/testing/research/filterAIPO.xhtml">
+                                                <ui:param name="filter"
+                                                          value="#{editTestDefinitionManager.foundRoleInTests.filter}"/>
+                                                <ui:param name="filterForm" value="roleInTestSelector"/>
+                                            </ui:include>
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="col-sm-4 control-label">
+                                                            <h:outputText id="searchTextName"
+                                                                          value="#{messages['net.ihe.gazelle.tm.ByKeywordOrName']}"/>
+                                                        </label>
+
+                                                        <div class="col-sm-5">
+                                                            <span class="gzl-never-wrap">
+                                                                <h:inputText styleClass=" form-control"
+                                                                             id="inputTextFind"
+                                                                             value="#{editTestDefinitionManager.roleInTestKeywordTyped}"/>
+                                                                <rich:hotKey key="return"
+                                                                             onkeydown="#{rich:element('sumbitFindTextImage')}.click()"
+                                                                             selector="#inputTextFind"/>
+                                                                <a4j:commandLink id="sumbitFindTextImage" event="click"
+                                                                                 render="roleInTestSelector"
+                                                                                 title="#{messages['gazelle.common.button.Search']}">
+                                                                    <span class="gzl-icon-search"/>
+                                                                </a4j:commandLink>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <ui:define name="filter_buttons">
+                                                <a4j:commandLink
+                                                        actionListener="#{editTestDefinitionManager.resetFilterRoleInTests()}"
+                                                        title="#{messages['gazelle.users.reset']}" type="submit"
+                                                        execute="@this" render="roleInTestSelector">
+                                                    <span class="fa fa-times-circle"/>
+                                                </a4j:commandLink>
+                                            </ui:define>
+                                        </ui:decorate>
+                                        <rich:dataTable id="roleInTestTableSelect" cellpadding="0" cellspacing="0"
+                                                        rows="6"
+                                                        border="0" var="currentRoleInTest"
+                                                        value="#{editTestDefinitionManager.foundRoleInTests}">
+                                            <f:facet name="header">
+                                                <rich:columnGroup>
+                                                    <g:column rowspan="2">
+                                                        <h:outputText
+                                                                value="#{messages['gazelle.tm.roleInTest.RoleInTestKeyword']}"/>
+                                                    </g:column>
+                                                    <g:column colspan="4">
+                                                        <h:outputText
+                                                                value="#{messages['gazelle.tm.monitors.TestParticipants']}"/>
+                                                    </g:column>
+                                                    <g:column breakRowBefore="true">
+                                                        <h:outputText
+                                                                value="#{messages['gazelle.testmanagement.system.label.IP']}"/>
+                                                    </g:column>
+                                                    <g:column>
+                                                        <h:outputText
+                                                                value="#{messages['gazelle.configuration.system.actorKeyword']}"/>
+                                                    </g:column>
+                                                    <g:column>
+                                                        <h:outputText value="#{messages['gazelle.tests.test.option']}"/>
+                                                    </g:column>
+                                                    <g:column>
+                                                        <h:outputText
+                                                                value="#{messages['gazelle.tm.roleInTest.IsTested']}"/>
+                                                    </g:column>
+                                                </rich:columnGroup>
+                                            </f:facet>
+                                            <g:column colspan="5">
+                                                <h:outputText value="#{currentRoleInTest.keyword}"
+                                                              style="font-size:small;font-weight:bold;"/>
+                                            </g:column>
+                                            <g:column breakRowBefore="true" colspan="5">
+                                                <s:div style="text-align:right">
+                                                    <a4j:commandButton id="selectbestrit"
+                                                                       actionListener="#{editTestDefinitionManager.selectRoleInTestAndUpdateKeyword(currentRoleInTest)}"
+                                                                       value="#{messages['gazelle.common.Select']}"
+                                                                       render=" :addNewRowForm,addNewRow,globalMessageDiv,spinnerScript"
+                                                                       execute="@this"
+                                                                       styleClass="gzl-btn-green"/>
+                                                </s:div>
+                                            </g:column>
+                                            <rich:collapsibleSubTable var="testParticipant"
+                                                                      value="#{currentRoleInTest.testParticipantsList}">
+                                                <g:column>
+
+                                                    <f:facet name="footer">
+                                                        <h:outputText
+                                                                value="#{currentRoleInTest.testParticipantsList.size} #{messages['gazelle.tm.monitors.TestParticipants']}"
+                                                                style="font-size:x-small;font-style:italic;"/>
+                                                    </f:facet>
+                                                </g:column>
+                                                <g:column>
+                                                    <h:outputText
+                                                            value="#{testParticipant.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.toString()}">
+                                                    </h:outputText>
+                                                </g:column>
+                                                <g:column>
+                                                    <h:outputText
+                                                            value="#{testParticipant.actorIntegrationProfileOption.actorIntegrationProfile.actor.toString()}"/>
+                                                </g:column>
+                                                <g:column>
+                                                    <h:outputText
+                                                            value="#{testParticipant.actorIntegrationProfileOption.integrationProfileOption.keyword}"/>
+                                                </g:column>
+                                                <g:column>
+                                                    <h:outputText value="#{testParticipant.tested}"/>
+                                                </g:column>
+                                            </rich:collapsibleSubTable>
+                                            <f:facet name="footer">
+                                                <rich:dataScroller maxPages="10" renderIfSinglePage="false"/>
+                                            </f:facet>
+                                        </rich:dataTable>
+                                    </s:div>
+                                </h:panelGroup>
+                                <h:panelGroup
+                                        rendered="#{editTestDefinitionManager.selectedTestRole.roleInTest != null}">
+                                    <h:outputScript library="jscript" name="disable_input_spinner_mouse_wheel.js"/>
+                                    <s:decorate template="/layout/form/_edit.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.testmanagement.object.keyword']}
+                                        </ui:define>
+                                        <h:outputText
+                                                value="#{editTestDefinitionManager.selectedTestRole.roleInTest.keyword}"/>
+                                    </s:decorate>
+                                    <s:decorate template="/layout/form/_edit.xhtml">
+                                        <ui:define name="label">##{messages['gazelle.tm.roleInTest.toRealize']}
+                                        </ui:define>
+                                        <rich:inputNumberSpinner id="roleInTestNumberToRealizeInputText"
+                                                                 value="#{editTestDefinitionManager.selectedTestRole.numberOfTestsToRealize}"
+                                                                 minValue="1"/>
+                                    </s:decorate>
+                                    <s:decorate template="/layout/form/_edit.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.tm.test.CardMin']}</ui:define>
+                                        <rich:inputNumberSpinner id="roleInTestCardMinInputText"
+                                                                 value="#{editTestDefinitionManager.selectedTestRole.cardMin}"
+                                                                 minValue="0"/>
+                                    </s:decorate>
+                                    <s:decorate template="/layout/form/_edit.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.tm.test.CardMax']}</ui:define>
+                                        <rich:inputNumberSpinner id="roleInTestCardMaxInputText"
+                                                                 value="#{editTestDefinitionManager.selectedTestRole.cardMax}"
+                                                                 minValue="0"/>
+                                    </s:decorate>
+                                    <s:decorate template="/layout/form/_edit.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.tf.table.Optionality']}</ui:define>
+                                        <h:selectOneMenu styleClass="form-control gzl-form-control" id="optionsList"
+                                                         value="#{editTestDefinitionManager.selectedTestRole.testOption}">
+                                            <s:selectItems value="#{gazelleDAO.listTestOptions()}" var="optionFromList"
+                                                           noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                           label="#{optionFromList.labelToDisplay}"/>
+                                        </h:selectOneMenu>
+                                    </s:decorate>
+                                    <s:decorate id="urlDecoration" template="/layout/form/_edit.xhtml">
+                                        <ui:param name="id" value="url"/>
+                                        <ui:define name="label">
+                                            <h:outputText value="#{messages['gazelle.tm.testing.URL']}"
+                                                          title="#{messages['gazelle.tm.ALinkToTheTestDescription']}"/>
+                                        </ui:define>
+                                        <h:inputText styleClass=" form-control" id="url" maxlength="250" size="60"
+                                                     value="#{editTestDefinitionManager.selectedTestRole.url}">
+                                            <a4j:ajax event="blur" execute="@this" render="urlDecoration"/>
+                                        </h:inputText>
+                                    </s:decorate>
+                                    <s:decorate id="urlDocumentationDecoration" template="/layout/form/_edit.xhtml">
+                                        <ui:param name="id" value="urlDocumentation"/>
+                                        <ui:define name="label">
+                                            <h:outputText value="#{messages['gazelle.tm.URLDocumentation']}"
+                                                          title="#{messages['gazelle.tm.ALinkToTheTestDocumentation']}"/>
+                                        </ui:define>
+                                        <h:inputText styleClass=" form-control" id="urlDocumentation" maxlength="250"
+                                                     size="60"
+                                                     value="#{editTestDefinitionManager.selectedTestRole.urlDocumentation}">
+                                            <a4j:ajax event="blur" execute="@this" render="urlDocumentationDecoration"/>
+                                        </h:inputText>
+                                    </s:decorate>
+                                    <br/>
+                                    <a4j:commandButton value="#{messages['gazelle.tm.roleInTest.CancelEditing']}"
+                                                       styleClass="gzl-btn"
+                                                       actionListener="#{editTestDefinitionManager.cancelEditingTestRoles()}"
+                                                       render="displayRoles, :tableOfTestRoles" execute="@this"/>
+                                    <a4j:commandButton value="#{messages['gazelle.tm.patient.addAuthority']}"
+                                                       styleClass="gzl-btn-green"
+                                                       actionListener="#{editTestDefinitionManager.updateTestRoles()}"
+                                                       rendered="#{editTestDefinitionManager.selectedTestRole.id == null}"
+                                                       render="displayRoles, :tableOfTestRoles,globalMessageDiv"/>
+                                    <a4j:commandButton value="#{messages['gazelle.testmanagement.object.Update']}"
+                                                       styleClass="gzl-btn-orange"
+                                                       actionListener="#{editTestDefinitionManager.updateTestRoles()}"
+                                                       rendered="#{editTestDefinitionManager.selectedTestRole.id != null}"
+                                                       render="displayRoles, :tableOfTestRoles,globalMessageDiv"/>
+                                </h:panelGroup>
+                            </ui:decorate>
+                        </h:panelGroup>
+                    </h:form>
+                </s:div>
+                <h:form id="testRoleDeleteModalPanelForm">
+                    <s:token allowMultiplePosts="true"/>
+                    <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                        <ui:param name="popup_id" value="testRoleDeleteModalPanel"/>
+                        <ui:define name="popup_title">#{messages['gazelle.tm.roleInTest.DeleteTestRole']}</ui:define>
+                        <p>#{messages['gazelle.tm.roleInTest.DeleteTestRole']}
+                            #{editTestDefinitionManager.selectedTestRole.roleInTest.keyword} ?</p>
+                        <h:panelGroup rendered="#{editTestDefinitionManager.isRoleLinkedToStep()}">
+                            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                                <ui:define name="panel_title"><span class="gzl-icon-exclamation-triangle"/>#{messages['net.ihe.gazelle.tm.Warning']}</ui:define>
+                                <span class="gzl-icon-exclamation-triangle"/>
+                                <h:outputText id="warningOutputText"
+                                              value="#{messages['net.ihe.gazelle.tm.BeCarefulThisRoleIsUsedIn']} #{editTestDefinitionManager.countStepsLinkedToRole()} #{messages['net.ihe.gazelle.tm.StepsAreYouSureYouWantToDeleteThisRoleAndAllAsso']}"/>
+                            </ui:decorate>
+                        </h:panelGroup>
+                        <ui:define name="popup_footer">
+                            <button type="button" class="gzl-btn" data-dismiss="modal">
+                                #{messages['gazelle.tm.Cancel']}
+                            </button>
+                            <a4j:commandButton id="yesDeleteTR" styleClass="gzl-btn-red"
+                                               actionListener="#{editTestDefinitionManager.deleteTestRole()}"
+                                               onclick="jq162('#testRoleDeleteModalPanel').modal('hide');"
+                                               value="#{messages['gazelle.common.Yes']}"
+                                               render="displayRoles, :tableOfTestRoles,globalMessageDiv"
+                                               execute="@this"/>
+                        </ui:define>
+                    </ui:decorate>
+                </h:form>
+            </ui:decorate>
+        </h:panelGroup>
+        <h:outputLink
+                value="#{applicationPreferenceManager.getApplicationUrl()}testing/testsDefinition/editTestSteps.seam"
+                styleClass="gzl-btn"
+                rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}">
+            <f:param name="id" value="#{editTestDefinitionManager.getEditedTest().id}"/>
+            <h:outputText value="#{messages['net.ihe.gazelle.tm.NextEditTestSteps']}"/>
+        </h:outputLink>
+        <!--@formatter:off-->
+        <s:span id="spinnerScript">
+            <script>
+                disable_input_spinner_mouse_wheel('#{rich:clientId('roleInTestNumberToRealizeInputText')}');
+                disable_input_spinner_mouse_wheel('#{rich:clientId('roleInTestCardMinInputText')}');
+                disable_input_spinner_mouse_wheel('#{rich:clientId('roleInTestCardMaxInputText')}');
+            </script>
+        </s:span>
+        <!--@formatter:on-->
+    </ui:define>
+</ui:composition>

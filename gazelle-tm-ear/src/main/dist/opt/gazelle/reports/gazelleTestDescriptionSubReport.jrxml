@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			  xmlns="http://jasperreports.sourceforge.net/jasperreports"
+			  xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+			  name="gazelleTestSubReport_subreport1" pageWidth="803" pageHeight="686" orientation="Landscape"
+			  columnWidth="803" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0"
+			  uuid="bec07d6d-cd04-41ef-a3b0-2aed0abfc0c7">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="test_keyword" class="java.lang.String">
+		<defaultValueExpression><![CDATA["ARI_RPT"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="applicationurl" class="java.lang.String">
+		<defaultValueExpression><![CDATA["https://gazelle.ihe.net/EU-CAT/"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+     tm_test."id" AS tm_test_id,
+     tm_test."keyword" AS tm_test_keyword,
+     tm_test."name" AS tm_test_name,
+     tm_test."short_description" AS tm_test_short_description,
+     tm_test."version" AS tm_test_version,
+     tm_test."test_peer_type_id" AS tm_test_test_peer_type_id,
+     tm_test."orchestrable" AS tm_test_orchestrable,
+     tm_test."validated" AS tm_test_validated,
+     tm_test."last_changed" AS tm_test_last_changed,
+     tm_test."last_modifier_id" AS tm_test_last_modifier_id,
+     tm_test."author" AS tm_test_author,
+     tm_test."last_validator_id" AS tm_test_last_validator_id,
+     tm_test_status."label_to_display" AS tm_test_status_label_to_display,
+     tm_test_type."label_to_display" AS tm_test_type_label_to_display,
+     tm_test_peer_type."keyword" AS tm_test_peer_type_label_to_display
+FROM
+     tm_test_status tm_test_status INNER JOIN tm_test tm_test ON tm_test_status."id" = tm_test."test_status_id"
+     INNER JOIN tm_test_type tm_test_type ON tm_test."test_type_id" = tm_test_type."id"
+     INNER JOIN tm_test_peer_type tm_test_peer_type ON tm_test."test_peer_type_id" = tm_test_peer_type."id"
+ where tm_test."keyword"=$P{test_keyword}]]>
+	</queryString>
+	<field name="tm_test_id" class="java.lang.Integer"/>
+	<field name="tm_test_keyword" class="java.lang.String"/>
+	<field name="tm_test_name" class="java.lang.String"/>
+	<field name="tm_test_short_description" class="java.lang.String"/>
+	<field name="tm_test_version" class="java.lang.String"/>
+	<field name="tm_test_test_peer_type_id" class="java.lang.Integer"/>
+	<field name="tm_test_orchestrable" class="java.lang.Boolean"/>
+	<field name="tm_test_validated" class="java.lang.Boolean"/>
+	<field name="tm_test_last_changed" class="java.sql.Timestamp"/>
+	<field name="tm_test_last_modifier_id" class="java.lang.String"/>
+	<field name="tm_test_author" class="java.lang.String"/>
+	<field name="tm_test_last_validator_id" class="java.lang.String"/>
+	<field name="tm_test_status_label_to_display" class="java.lang.String"/>
+	<field name="tm_test_type_label_to_display" class="java.lang.String"/>
+	<field name="tm_test_peer_type_label_to_display" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="168" splitType="Stretch">
+			<staticText>
+				<reportElement positionType="Float" mode="Opaque" x="0" y="0" width="803" height="19" isPrintInFirstWholeBand="true" backcolor="#9999FF" uuid="5b47c3cd-bcc0-49ae-8fef-c8facf263a4b"/>
+				<box leftPadding="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Test Summary]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="21" width="137" height="15" uuid="36d02723-cc2d-4ca5-b325-b1b4f8e26d4b"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Keyword :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="141" y="21" width="230" height="15" uuid="8740097c-111c-419c-857e-149cfb8c7bd5"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_test_keyword}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="35" width="137" height="15" uuid="ad639dc9-3231-47bd-9e80-511e22f4a7cd"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Name :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="141" y="35" width="230" height="15" uuid="f6c3c4ee-2783-44c3-8acc-ac3a12f405cf"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_test_name}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="49" width="137" height="15" uuid="a43bd556-2d49-4a74-9d72-44fd2e2c6e6b"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Version :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="141" y="49" width="230" height="15" uuid="2998e8df-a296-4c4e-9aa9-0ed93ee96580"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_test_version}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="399" y="49" width="105" height="15" uuid="36335564-fcac-4f29-86a1-50fd0787a215"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Status :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="507" y="49" width="230" height="15" uuid="26d855bb-1aea-4775-bbfb-80026a9ffdbc"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_test_status_label_to_display}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="399" y="21" width="105" height="15" uuid="9b704ca5-3728-406c-b5f0-687ecc2f8119"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Type :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="507" y="21" width="230" height="15" uuid="560d0e83-e9b3-48a1-bd65-f8515b29c42b"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_test_type_label_to_display}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="399" y="35" width="105" height="15" uuid="0effeba3-7a01-42c4-89dc-5c752fe0ec4b"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Peer Type :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="507" y="35" width="230" height="15" uuid="e59f298c-a04e-4e1e-aa11-1d828cde7dab"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_test_peer_type_label_to_display}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="99" width="137" height="15" uuid="d9f477f5-9f38-45f6-9bc7-78fa3cadb9f2"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Top" markup="none">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Test permanent link :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="115" width="137" height="15" uuid="c11c5794-daa8-4517-84fd-311deef6a5cc"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Top" markup="none">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Sequence Diagram link :]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" hyperlinkType="Reference" hyperlinkTarget="Blank">
+				<reportElement stretchType="RelativeToTallestObject" x="141" y="99" width="633" height="15" forecolor="#0D78EC" uuid="b00bc6d7-5e7d-4f06-895c-5307b8689b1d"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression>
+					<![CDATA[$P{applicationurl} + "test.seam?id=" + $F{tm_test_id}]]></textFieldExpression>
+				<anchorNameExpression><![CDATA["testpermanentlink"]]></anchorNameExpression>
+				<hyperlinkReferenceExpression>
+					<![CDATA[$P{applicationurl} + "test.seam?id=" + $F{tm_test_id}]]></hyperlinkReferenceExpression>
+				<hyperlinkParameter name="testid">
+					<hyperlinkParameterExpression><![CDATA[$F{tm_test_id}]]></hyperlinkParameterExpression>
+				</hyperlinkParameter>
+			</textField>
+			<textField isStretchWithOverflow="true" hyperlinkType="Reference" hyperlinkTarget="Blank">
+				<reportElement stretchType="RelativeToTallestObject" x="141" y="115" width="633" height="15" forecolor="#0D78EC" uuid="52a2937c-e6ab-4005-aaf0-ca14c8addf82"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression>
+					<![CDATA[$P{applicationurl} + "testSequenceDiagram.seam?id=" + $F{tm_test_id}]]></textFieldExpression>
+				<anchorNameExpression><![CDATA["diagram"]]></anchorNameExpression>
+				<hyperlinkReferenceExpression>
+					<![CDATA[$P{applicationurl} + "testSequenceDiagram.seam?id=" + $F{tm_test_id}]]></hyperlinkReferenceExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement stretchType="RelativeToTallestObject" x="141" y="131" width="633" height="33" uuid="d1862731-c331-457e-9521-2fbe4a9cb75e"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_test_short_description}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="131" width="137" height="15" uuid="2db8e86b-ea37-4a81-b9ed-856ea453995e"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Top" markup="none">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Short Description :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="63" width="137" height="15" uuid="e462f803-6208-46ef-b4de-0727084711bd"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Author :]]></text>
+			</staticText>
+			<textField isBlankWhenNull="false">
+				<reportElement x="507" y="63" width="230" height="15" uuid="8902ea12-3737-470e-8ae6-2d34b5539c24"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_test_last_validator_id}==null?"No verified":$F{tm_test_last_validator_id}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="399" y="63" width="105" height="15" uuid="db8a350f-f0a7-4f7b-893e-4d58a56b56ec"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Verified by :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="141" y="63" width="230" height="15" uuid="fa0dcfeb-c7bd-4762-91f6-7dbcd2895cf9"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_test_author}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement mode="Opaque" x="507" y="63" width="230" height="15" forecolor="#FF0000" backcolor="#FFFFFF" uuid="c4798576-a6ec-43d7-9aa3-b3d4b4811537">
+					<printWhenExpression><![CDATA[$F{tm_test_last_validator_id}==null]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Not verified"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="77" width="137" height="15" uuid="848e38bd-1272-4941-8be9-1cd92ab9d026"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date of last modification :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="141" y="77" width="596" height="15" uuid="2545c86a-606e-4f33-bf62-9c951442d841"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_test_last_changed} + " by " + $F{tm_test_last_modifier_id}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

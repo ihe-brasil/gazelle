@@ -1,0 +1,254 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle"
+              value="#{messages['gazelle.tests.test.listOfMesaTestsFor']} #{mesaTestManager.selectedSystemInSession.system.keyword}"/>
+    <ui:define name="body">
+        <h:form id="globform">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <s:decorate template="/layout/form/_form_field_horizontal_4-8.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.IntegrationProfiles']}
+                            </ui:define>
+                            <ui:param name="id" value="IPListBox"/>
+                            <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text" id="IPListBox"
+                                             value="#{mesaTestManager.selectedIntegrationProfile}">
+                                <s:selectItems
+                                        value="#{mesaTestManager.getPossibleIntegrationProfileForCurrentSystem()}"
+                                        var="ipFromList" noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                        label="#{ipFromList.keyword}-#{ipFromList.name}"/>
+                                <a4j:ajax event="change" execute="@this" render="actorsListDeco,globform"
+                                          listener="#{mesaTestManager.displayListOfTestsFiltered()}"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </div>
+                    <div class="col-lg-6">
+                        <s:decorate id="actorsListDeco" template="/layout/form/_form_field_horizontal_4-8.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.ActorsTab']}
+                            </ui:define>
+                            <ui:param name="id" value="actorsListBox"/>
+                            <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text"
+                                             id="actorsListBox"
+                                             value="#{mesaTestManager.selectedActor}">
+                                <s:selectItems value="#{mesaTestManager.getPossibleActorsForCurrentSystem()}"
+                                               var="actorFromList"
+                                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                               label="#{actorFromList.keyword}-#{actorFromList.name}"/>
+                                <a4j:ajax event="change" execute="@this" render="globform"
+                                          listener="#{mesaTestManager.displayListOfTestsFiltered()}"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <s:decorate template="/layout/form/_form_field_horizontal_4-8.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tests.test.option']}
+                            </ui:define>
+                            <ui:param name="id" value="testOptionListBox"/>
+                            <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text"
+                                             id="testOptionListBox"
+                                             value="#{mesaTestManager.selectedTestOption}">
+                                <s:selectItems value="#{mesaTestManager.getTestOptions()}" var="testOptionFromList"
+                                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                               label="#{testOptionFromList.keyword}-#{testOptionFromList.description}"/>
+                                <a4j:ajax event="change" execute="@this" render="globform"
+                                          listener="#{mesaTestManager.displayListOfTestsFiltered()}"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </div>
+                    <div class="col-lg-6">
+                        <s:decorate template="/layout/form/_form_field_horizontal_4-8.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tm.tests.testStatus']}
+                            </ui:define>
+                            <ui:param name="id" value="statusFromList"/>
+                            <h:selectOneMenu id="statusFromList"
+                                             styleClass="form-control gzl-form-control gzl-select-text"
+                                             value="#{mesaTestManager.filterByInstanceStatus}">
+                                <s:selectItems value="#{mesaTestManager.instanceStatuses}" var="statusFromList"
+                                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                               label="#{messages[statusFromList.labelToDisplay]}"/>
+                                <a4j:ajax event="change" execute="@this" render="globform"
+                                          listener="#{mesaTestManager.displayListOfTestsFiltered()}"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </div>
+                </div>
+                <ui:define name="filter_buttons">
+                    <a4j:commandLink title="#{messages['gazelle.common.button.Refresh']}"
+                                     actionListener="#{mesaTestManager.displayListOfTestsFiltered()}"
+                                     render="globform">
+                        <span class="fa fa-refresh"></span>
+                    </a4j:commandLink>
+                    <a4j:commandLink title="#{messages['gazelle.users.reset']}"
+                                     actionListener="#{mesaTestManager.displayListOfTestsUnfiltered()}"
+                                     render="globform">
+                        <span class="fa fa-times-circle"></span>
+                    </a4j:commandLink>
+                </ui:define>
+            </ui:decorate>
+            <a4j:commandButton action="#{mesaTestManager.preConnectathonTestingClickFromMenu()}"
+                               immediate="true"
+                               value="#{messages['gazelle.tests.test.backToSystemsList']}"
+                               styleClass="gzl-btn"/>
+            <s:div id="panelOfTest">
+                <rich:dataTable id="testTable" rows="#{dataScrollerMemory.numberOfResultsPerPage}" border="0"
+                                var="currentTestRole" value="#{mesaTestManager.listTestRoles}"
+                                render="ds">
+                    <f:facet name="header">
+                        <rich:columnGroup>
+                            <g:column>
+                                <h:outputText value="#{messages['gazelle.tests.test']}" id="testh"/>
+                            </g:column>
+                            <g:column>
+                                <h:outputText value="#{messages['gazelle.tests.test.integrationProfile']}"
+                                              id="headid"/>
+                            </g:column>
+                            <g:column>
+                                <h:outputText value="#{messages['gazelle.tests.test.actor']}" id="hactt"/>
+                            </g:column>
+                            <g:column>
+                                <h:outputText id="ipohead"
+                                              value="#{messages['gazelle.tests.test.integrationProfileOption']}"/>
+                            </g:column>
+                            <g:column>
+                                <h:outputText value="#{messages['gazelle.tests.test.option']}"
+                                              id="topkeyh"/>
+                            </g:column>
+                            <g:column>
+                                <h:outputText value="#{messages['gazelle.tm.testing.instance.status']}"
+                                              id="stathed"/>
+                            </g:column>
+                            <g:column>
+                                <h:outputText value="#{messages['gazelle.common.Action']}" id="acth"/>
+                            </g:column>
+                        </rich:columnGroup>
+                    </f:facet>
+                    <rich:collapsibleSubTable value="#{mesaTestManager.getAiposForTestRole(currentTestRole)}" var="aipo"
+                                              rowKeyVar="rowKey">
+                        <rich:column id="testkeycol"
+                                     rowspan="#{mesaTestManager.getAiposForTestRole(currentTestRole).size()}"
+                                     rendered="#{empty rowKey or rowKey eq 0}">
+
+                            <h:outputText value="#{currentTestRole.test.keyword} " id="keywtest"/>
+                            <h:outputLink id="linkToDoc" value="#{currentTestRole.urlDocumentation}"
+                                          rendered="#{not empty currentTestRole.urlDocumentation}"
+                                          title="#{messages['gazelle.tm.testing.URLDocumentation']}"
+                                          target="_blank">
+                                <span class="gzl-icon-globe"/>
+                            </h:outputLink>
+
+                            <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                <ui:param name="id" value="fk#{currentTestRole.id}"/>
+                                <ui:param name="placement" value="bottom"/>
+                                <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                                <ui:define name="content">
+                                    <s:decorate template="/layout/display/_display.xhtml" id="testdectt">
+                                        <ui:define name="label">#{messages['gazelle.tests.test']}</ui:define>
+                                        <h:outputText value="#{currentTestRole.test.name}" id="testntt"/>
+                                    </s:decorate>
+                                    <s:decorate template="/layout/display/_display.xhtml" id="testurltt"
+                                                rendered="#{!currentTestRole.url.isEmpty()}">
+                                        <ui:define name="label">#{messages['gazelle.tm.testing.URL']}</ui:define>
+                                        <a href="#{currentTestRole.url}" target="_blank">
+                                            <h:outputText value="#{currentTestRole.url}"/>
+                                        </a>
+                                    </s:decorate>
+                                </ui:define>
+                            </ui:decorate>
+                        </rich:column>
+                        <rich:column>
+                            <g:link value="#{aipo.actorIntegrationProfile.integrationProfile}" target="_blank"/>
+                        </rich:column>
+                        <rich:column>
+                            <g:link value="#{aipo.actorIntegrationProfile.actor}" target="_blank"/>
+                        </rich:column>
+                        <rich:column>
+                            <g:link value="#{aipo.integrationProfileOption}" target="_blank"/>
+                        </rich:column>
+                        <rich:column rowspan="#{mesaTestManager.getAiposForTestRole(currentTestRole).size()}"
+                                     rendered="#{empty rowKey or rowKey eq 0}">
+                            <h:outputText value="#{currentTestRole.testOption.keyword}" id="topkeyval"/>
+                        </rich:column>
+                        <rich:column rowspan="#{mesaTestManager.getAiposForTestRole(currentTestRole).size()}"
+                                     rendered="#{empty rowKey or rowKey eq 0}" id="statcolumn">
+                            <h:outputText id="statouptval"
+                                          value="#{messages[mesaTestManager.getSingleInstanceOfTestParticipants( currentTestRole ).testInstance.lastStatus.labelToDisplay]}"
+                                          rendered="#{ not empty mesaTestManager.getSingleInstanceOfTestParticipants( currentTestRole )  }"/>
+                        </rich:column>
+                        <rich:column rowspan="#{mesaTestManager.getAiposForTestRole(currentTestRole).size()}"
+                                     rendered="#{empty rowKey or rowKey eq 0}" id="actcolumnn">
+                            <a4j:commandLink id="returnlog1"
+                                             action="#{mesaTestManager.generateAMesaTestInstance(currentTestRole)}"
+                                             value="#{messages['gazelle.tm.testing.returnLogFile']}"
+                                             rendered="#{!mesaTestManager.instanceParticipantExists(currentTestRole) and mesaTestManager.allowedToAddLogs == true}"
+                                             execute="@this"/>
+                            <a4j:commandLink id="returnlog2"
+                                             actionListener="#{mesaTestManager.displaySingleInstanceOfTestParticipants( currentTestRole )}"
+                                             value="#{messages['gazelle.tm.testing.viewLogFile']}"
+                                             oncomplete="jq162('#ViewInstanceModalPanel').modal('show');"
+                                             rendered="#{mesaTestManager.instanceParticipantExists(currentTestRole) }"
+                                             execute="@this"
+                                             render="ViewInstanceModalPanel, :ViewInstanceModalPanelForm,messageDecoration"/>
+                            <br/>
+                        </rich:column>
+                    </rich:collapsibleSubTable>
+                    <f:facet name="footer">
+                        <ui:include src="/util/datatableFooter.xhtml">
+                            <ui:param name="dataScrollerId" value="ds"/>
+                            <ui:param name="dataTableId" value="testTable"/>
+                        </ui:include>
+                    </f:facet>
+                </rich:dataTable>
+                <h:commandLink value="#{messages['gazelle.common.export.ExportAsExcel']}"
+                               action="#{gazelleExcelExporterJboss7CollapsibleSubPanel.export('globform:testTable')}"/>
+
+                <div>
+                    <i>#{messages['gazelle.tm.testing.tests.where']}</i>
+                    <br/>
+                    <br/>
+                    <a4j:repeat value="#{mesaTestManager.getTestOptions()}" var="testOptionFromList">
+                        <b>
+                            <h:outputText value="#{testOptionFromList.keyword}:"/>
+                        </b>
+                        <h:outputText value="#{testOptionFromList.description}"/>
+
+                    </a4j:repeat>
+                    <br/>
+                </div>
+            </s:div>
+
+        </h:form>
+
+        <!-- modal panel to view log returned properties -->
+        <h:form id="ViewInstanceModalPanelForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="ViewInstanceModalPanel"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.LogReturnFor']}
+                    #{mesaTestManager.currentTestInstanceParticipants.testInstance.test.name}
+                </ui:define>
+                <s:div id="instancePanel" style="overflow:auto;width:530;height:250;"
+                       rendered="#{mesaTestManager.currentTestInstanceParticipants.testInstance!=null}">
+                    <ui:include src="viewTIPpanel.xhtml">
+                        <ui:param name="currentTestInstanceParticipants"
+                                  value="#{mesaTestManager.currentTestInstanceParticipants}"/>
+                    </ui:include>
+                </s:div>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton value="#{messages['gazelle.common.button.Edit']}"
+                                       styleClass="gzl-btn-blue"
+                                       id="editbutlog"
+                                       action="#{mesaTestManager.editMesaTestInstanceParticipant(mesaTestManager.currentTestInstanceParticipants)}"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

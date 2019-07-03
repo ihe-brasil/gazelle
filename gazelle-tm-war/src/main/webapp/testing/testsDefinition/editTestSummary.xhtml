@@ -1,0 +1,250 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tm.EditTest']}"/>
+    <!-- ======================= -->
+    <!-- Test summary section	 -->
+    <!-- ======================= -->
+    <ui:define name="body">
+        <h:form id="globalform" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <div class="row">
+                <div class="col-lg-6 col-lg-offset-3">
+                    <ui:decorate template="/layout/panels/_panel_title_footer.xhtml">
+                        <ui:define name="panel_title">#{messages['gazelle.tm.TestSummary']}</ui:define>
+
+                        <a4j:region id="testAuthorRegion"
+                                    rendered="#{editTestDefinitionManager.getEditedTest().id != null and editTestDefinitionManager.getEditedTest().author != null}">
+                            <s:decorate id="testAuthorDecoration" template="/layout/display/_display.xhtml"
+                                        rendered="#{!s:hasRole('admin_role')}">
+                                <ui:define name="label">
+                                    <h:outputText value="#{messages['net.ihe.gazelle.tm.AuthorOfTheTestIs']}"/>
+                                </ui:define>
+                                <h:outputText id="testAuthor"
+                                              value="#{editTestDefinitionManager.getEditedTest().author}"/>
+                            </s:decorate>
+                            <s:decorate id="testAuthorDecorationAdmin"
+                                        template="/layout/form/_form_field_horizontal_3-9.xhtml"
+                                        rendered="#{s:hasRole('admin_role')}">
+                                <ui:param name="id" value="testAuthor"/>
+                                <ui:define name="label">
+                                    <h:outputText value="#{messages['net.ihe.gazelle.tm.AuthorOfTheTestIs']}"/>
+                                </ui:define>
+                                <h:inputText styleClass=" form-control" id="testAuthor"
+                                             value="#{editTestDefinitionManager.getEditedTest().author}"/>
+                            </s:decorate>
+                        </a4j:region>
+                        <a4j:region id="keywordRegion">
+                            <s:decorate id="keywordDecoration"
+                                        template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                <ui:param name="id" value="keyword"/>
+                                <ui:define name="label">
+                                    <h:outputText value="#{messages['gazelle.testmanagement.object.keyword']}"
+                                                  title="#{messages['gazelle.tm.AUniqueKeywordThatIdentifiesTheTest']}"/>
+                                </ui:define>
+                                <h:inputText styleClass=" form-control" id="keyword" maxlength="32" size="32"
+                                             value="#{editTestDefinitionManager.getEditedTest().keyword}"
+                                             required="true">
+                                    <a4j:ajax event="blur" render="keywordDecoration"
+                                              listener="#{editTestDefinitionManager.validateTestKeyword()}"/>
+                                </h:inputText>
+                            </s:decorate>
+                        </a4j:region>
+                        <a4j:region id="nameRegion">
+                            <s:decorate id="nameDecoration" template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                <ui:param name="id" value="name"/>
+                                <ui:define name="label">
+                                    <h:outputText value="#{messages['gazelle.testmanagement.object.Name']}"/>
+                                </ui:define>
+                                <h:inputText styleClass=" form-control" id="name" size="80"
+                                             value="#{editTestDefinitionManager.getEditedTest().name}"
+                                             required="true">
+                                    <a4j:ajax event="blur" render="nameDecoration"
+                                              listener="#{editTestDefinitionManager.validateTestName()}"/>
+                                </h:inputText>
+                            </s:decorate>
+                        </a4j:region>
+                        <a4j:region id="shortDescriptionRegion">
+                            <s:decorate id="shortDescriptionDecoration"
+                                        template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                <ui:param name="id" value="shortDescriptionInputTextArea"/>
+                                <ui:define name="label">
+                                    <h:outputText value="#{messages['gazelle.tm.ShortDescription']}"
+                                                  title="#{messages['gazelle.tm.AShortDescriptionThatDescribesTheTest']}"/>
+                                </ui:define>
+                                <a4j:commandLink id="shortDescriptionSupport" render="shortDescriptionDecoration"/>
+                                <h:inputTextarea styleClass=" form-control" id="shortDescriptionInputTextArea"
+                                                 rows="3" cols="50"
+                                                 value="#{editTestDefinitionManager.getEditedTest().shortDescription}"
+                                                 required="true"/>
+                            </s:decorate>
+                        </a4j:region>
+                        <a4j:region id="testTypeRegion">
+                            <s:decorate id="testTypeDecoration"
+                                        template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                <ui:param name="id" value="testStatusListBoxIfStatusNull"/>
+                                <ui:define name="label">
+                                    <h:outputText value="#{messages['gazelle.systems.session.Type']}"
+                                                  title="#{messages['gazelle.tm.TheTypeOfTheTest']}"/>
+                                </ui:define>
+                                <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                 id="testStatusListBoxIfStatusNull"
+                                                 value="#{editTestDefinitionManager.getEditedTest().testType}"
+                                                 required="true">
+                                    <s:selectItems id="testTypeSelectItemsIfStatusNull"
+                                                   value="#{gazelleDAO.getTestTypeList()}" var="selectedType"
+                                                   noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                   hideNoSelectionLabel="#{editTestDefinitionManager.getEditedTest().testType != null}"
+                                                   label="#{messages[selectedType.labelToDisplay]}"/>
+                                    <a4j:ajax event="change" render="testTypeDecoration, testPeerTypeDecoration"/>
+                                </h:selectOneMenu>
+                            </s:decorate>
+                        </a4j:region>
+                        <a4j:region id="testStatusRegion">
+                            <s:decorate id="testStatusDecoration"
+                                        template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                <ui:param name="id" value="testStatusListBoxIfTestStatusNull"/>
+                                <ui:define name="label">
+                                    <h:outputText value="#{messages['gazelle.tm.tests.testStatus']}"
+                                                  title="#{messages['gazelle.tm.TheStatusOfTheTest']} "/>
+                                </ui:define>
+                                <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                 id="testStatusListBoxIfTestStatusNull"
+                                                 value="#{editTestDefinitionManager.getEditedTest().testStatus}">
+                                    <s:selectItems id="testStatusSelectItemsIfTestStatusNull"
+                                                   value="#{editTestDefinitionManager.possibleTestStatus}"
+                                                   var="selectedStatus" hideNoSelectionLabel="#{editTestDefinitionManager.getEditedTest().testStatus != null}"
+                                                   noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                   label="#{messages[selectedStatus.labelToDisplay]}"/>
+                                    <a4j:ajax event="change" render="testStatusRegion" execute="@region"/>
+                                </h:selectOneMenu>
+                            </s:decorate>
+                        </a4j:region>
+                        <a4j:region id="testPeerTypeRegion">
+                            <s:decorate id="testPeerTypeDecoration"
+                                        template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                <ui:param name="id" value="testPeerTypeListBoxIfTestStatusNull"/>
+                                <ui:define name="label">
+                                    <h:outputText value="#{messages['gazelle.tm.monitors.PeerType']}"
+                                                  title="#{messages['gazelle.tm.TheStatusOfTheTest']} "/>
+                                </ui:define>
+                                <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                 id="testPeerTypeListBoxIfTestStatusNull"
+                                                 value="#{editTestDefinitionManager.getEditedTest().testPeerType}"
+                                                 required="#{editTestDefinitionManager.getEditedTest().testType.labelToDisplay=='connectathon'}">
+                                    <s:selectItems id="testPeerTypeSelectItemsIfTestPeerTypeNull"
+                                                   value="#{editTestDefinitionManager.possibleTestPeerTypes}"
+                                                   var="selectedPeerType" hideNoSelectionLabel="#{editTestDefinitionManager.getEditedTest().testPeerType != null}"
+                                                   noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                   label="#{messages[selectedPeerType.labelToDisplay]}"/>
+                                    <a4j:ajax event="change" render="testPeerTypeDecoration" execute="@region"/>
+                                </h:selectOneMenu>
+                            </s:decorate>
+                        </a4j:region>
+                        <a4j:region id="orchestrableRegion">
+                            <s:decorate id="orchestrableDecoration"
+                                        template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                <ui:param name="id" value="orchestrableid"/>
+                                <ui:define name="label">
+                                    <h:outputText id="orchestrableText"
+                                                  value="#{messages['gazelle.tm.IsOrchestrable']}"/>
+                                </ui:define>
+                                <h:selectBooleanCheckbox id="orchestrableid" styleClass="form-control-static"
+                                                         value="#{editTestDefinitionManager.getEditedTest().orchestrable}">
+                                </h:selectBooleanCheckbox>
+                            </s:decorate>
+                        </a4j:region>
+                        <a4j:region id="validatedRegion" rendered="#{s:hasRole('admin_role')}">
+                            <s:decorate id="validatedDecoration"
+                                        template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                <ui:param name="id" value="validatedid"/>
+                                <ui:define name="label">
+                                    <h:outputText id="validatedText"
+                                                  value="#{messages['net.ihe.gazelle.tm.IsValidated']}"/>
+                                </ui:define>
+                                <h:selectBooleanCheckbox id="validatedid" styleClass="form-control-static"
+                                                         value="#{editTestDefinitionManager.getEditedTest().validated}">
+                                </h:selectBooleanCheckbox>
+                            </s:decorate>
+                        </a4j:region>
+                        <a4j:region id="validatedByUserRegion"
+                                    rendered="#{editTestDefinitionManager.getEditedTest().lastValidatorId != null}">
+                            <s:decorate id="validatedByUserDecoration"
+                                        template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                <ui:param name="id" value="validatedByUser"/>
+                                <ui:define name="label">
+                                    <h:outputText value="#{messages['net.ihe.gazelle.tm.TestIsValidatedBy']}"/>
+                                </ui:define>
+                                <h:outputText id="validatedByUser" styleClass="form-control-static"
+                                              value="#{editTestDefinitionManager.getEditedTest().lastValidatorId}"/>
+                            </s:decorate>
+                        </a4j:region>
+                        <a4j:region id="editTestPermalinkRegion"
+                                    rendered="#{editTestDefinitionManager.getEditedTest().id!=null}">
+                            <s:decorate id="editTestPermalinkDecoration"
+                                        template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                <ui:param name="id" value="editTestPermalink"/>
+                                <ui:define name="label">
+                                    <h:outputText value="#{messages['gazelle.tm.testing.test.testPermalink']}"/>
+                                </ui:define>
+                                <div class="form-control-static">
+                                    <h:outputLink id="editTestPermalink" target="_blank"
+                                                  value="#{editTestDefinitionManager.getTestPermalink(editTestDefinitionManager.getEditedTest().id)}">
+                                        <h:outputText
+                                                value="#{editTestDefinitionManager.getTestPermalink(editTestDefinitionManager.getEditedTest().id)}"/>
+                                    </h:outputLink>
+                                </div>
+                            </s:decorate>
+                        </a4j:region>
+                        <a4j:region id="versionRegion">
+                            <s:decorate id="versionDecoration"
+                                        template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                <ui:param name="id" value="version"/>
+                                <ui:define name="label">
+                                    <h:outputText value="#{messages['gazelle.systems.system.SystemVersion']}"/>
+                                </ui:define>
+                                <h:inputText styleClass=" form-control" id="version" maxlength="60" size="60"
+                                             value="#{editTestDefinitionManager.getEditedTest().version}">
+                                </h:inputText>
+                            </s:decorate>
+                        </a4j:region>
+                        <a4j:region id="editLastChangedRegion"
+                                    rendered="#{editTestDefinitionManager.getEditedTest().lastChanged!=null}">
+                            <s:decorate id="editTestLastChangedDecoration"
+                                        template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                <ui:param name="id" value="version"/>
+                                <ui:define name="dateId">
+                                    <h:outputText value="#{messages['gazelle.common.LastChanged']}"/>
+                                </ui:define>
+                                <div class="form-control-static">
+                                    <g:date tooltip="true" id="dateId"
+                                            value="#{editTestDefinitionManager.getEditedTest().lastChanged}"/>
+                                </div>
+                            </s:decorate>
+                        </a4j:region>
+
+                        <ui:define name="panel_footer">
+                            <a4j:commandButton styleClass="gzl-btn" immediate="true"
+                                               value="#{messages['gazelle.common.button.Cancel']}"
+                                               action="#{editTestDefinitionManager.backTo(editTestDefinitionManager.getEditedTest().id)}"
+                                               execute="@this"/>
+                            <a4j:commandButton id="testSummaryAddThisTestButton"
+                                               value="#{messages['gazelle.tm.AddThisTest']}"
+                                               action="#{editTestDefinitionManager.persistTest()}"
+                                               styleClass="gzl-btn-green"
+                                               rendered="#{editTestDefinitionManager.getEditedTest().id==null and s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"
+                                               render="globalform,messageDecoration"/>
+                            <a4j:commandButton id="updateThisTestButton"
+                                               value="#{messages['gazelle.tm.UpdateThisTest']}"
+                                               action="#{editTestDefinitionManager.persistTest()}"
+                                               styleClass="btn btn-warning"
+                                               rendered="#{editTestDefinitionManager.getEditedTest().id!=null and s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"
+                                               render="globalform,messageDecoration"/>
+                        </ui:define>
+                    </ui:decorate>
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,105 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.users.institution.DisplayInstitutionLabel2']}"/>
+    <ui:define name="body">
+        #{institutionManagerTM.retrieveOutjectedVariables() }
+
+        <h:form id="register">
+            <ui:include src="/users/institution/showInstitutionPanel.xhtml">
+                <ui:param name="institutionVariable"
+                          value="#{institutionManagerTM.selectedInstitution}"/>
+            </ui:include>
+
+            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                <ui:define name="panel_title">#{messages['gazelle.users.address.InstitutionMailingAddress']}
+                </ui:define>
+                <ui:include src="/users/address/showAddressPanel.xhtml">
+                    <ui:param name="panelLabel"
+                              value="#{messages['gazelle.users.address.InstitutionMailingAddress']}"/>
+                    <ui:param name="panelId" value="MailingAddress"/>
+                    <ui:param name="addressVariable"
+                              value="#{institutionManagerTM.selectedInstitution.mailingAddress}"/>
+                    <ui:param name="countryVariable"
+                              value="#{institutionManagerTM.selectedInstitution.mailingAddress.iso3166CountryCode}"/>
+                </ui:include>
+            </ui:decorate>
+            <div class="row">
+                <div class="col-lg-6">
+                    <h:panelGroup rendered="#{applicationManager.isTestManagement()}">
+                        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                            <ui:define name="panel_title">#{messages['gazelle.users.address.InstitutionBillingAddress']}
+                            </ui:define>
+                            <p>#{messages['gazelle.users.contact.financial.info1']}</p>
+
+                            <p>#{messages['gazelle.users.contact.financial.info2']}</p>
+
+                            <p>#{messages['gazelle.users.contact.financial.info3']}</p>
+
+
+                            <ui:decorate template="/layout/panels/_panel.xhtml">
+                                <ui:include src="/users/contact/showContactLightPanel.xhtml">
+                                    <ui:param name="panelLabel"
+                                              value="#{messages['gazelle.users.contact.FinancialContactInformation']}"/>
+                                    <ui:param name="panelId" value="FinancialContact"/>
+                                    <ui:param name="contactVariable"
+                                              value="#{institutionManagerTM.selectedContact}"/>
+                                    <ui:param name="isSelectionBoxInstitutionRendered"
+                                              value="#{messages['gazelle.common.no']}"/>
+                                </ui:include>
+                                <ui:include src="/users/address/showAddressPanel.xhtml">
+                                    <ui:param name="panelLabel"
+                                              value="#{messages['gazelle.users.address.InstitutionBillingAddress']}"/>
+                                    <ui:param name="panelId" value="BillingAddress"/>
+                                    <ui:param name="addressVariable"
+                                              value="#{institutionManagerTM.selectedContact.address}"/>
+                                    <ui:param name="countryVariable"
+                                              value="#{institutionManagerTM.selectedContact.address.iso3166CountryCode}"/>
+                                </ui:include>
+                                <s:decorate id="purchaseOrder" template="/layout/display/_display.xhtml"
+                                            rendered="#{ not empty institutionManagerTM.selectedInvoiceForInstitution}">
+                                    <ui:define name="label">#{messages['gazelle.users.institution.PurchaseOrder']}
+                                    </ui:define>
+                                    #{institutionManagerTM.selectedInvoiceForInstitution.purchaseOrder}
+                                </s:decorate>
+                                <s:decorate id="vatDecoration" template="/layout/display/_display.xhtml"
+                                            rendered="#{ not empty institutionManagerTM.selectedInvoiceForInstitution}">
+                                    <ui:define name="label">#{messages['gazelle.users.institution.vatNumber']}
+                                    </ui:define>
+                                    #{institutionManagerTM.selectedInvoiceForInstitution.vatCountry.iso}-#{institutionManagerTM.selectedInvoiceForInstitution.vatNumber}
+                                </s:decorate>
+                            </ui:decorate>
+                        </ui:decorate>
+                    </h:panelGroup>
+                </div>
+                <div class="col-lg-6">
+
+                        <ui:include src="/users/institution/billingPreviewPanel.xhtml">
+                            <ui:param name="panelId" value="BillingPreviewAddress"/>
+                            <ui:param name="contactVariable" value="#{currentContact}"/>
+                            <ui:param name="addressVariable"
+                                      value="#{institutionManagerTM.selectedContact.address}"/>
+                            <ui:param name="countryVariable"
+                                      value="#{institutionManagerTM.selectedContact.address.iso3166CountryCode}"/>
+                        </ui:include>
+
+                </div>
+            </div>
+            <div>
+                <a4j:commandButton value="#{messages['gazelle.common.button.Edit']}"
+                                   action="#{institutionManagerTM.updateInstitutionForTM(institutionManagerTM.selectedInstitution.id)}"
+                                   immediate="true" styleClass="gzl-btn-blue"
+                                   rendered="#{institutionManagerTM.isAllowedToUpdate(institutionManagerTM.selectedInstitution)}"/>
+                <a4j:commandButton id="cancel" styleClass="gzl-btn"
+                                   value="#{messages['gazelle.common.button.Cancel']}" action="/home.seam"
+                                   rendered="#{!s:hasRole('admin_role')}" immediate="true"/>
+                <a4j:commandButton id="cancelAdmin" styleClass="gzl-btn"
+                                   value="#{messages['gazelle.common.button.Cancel']}"
+                                   action="/administration/listInstitutions.xhtml"
+                                   rendered="#{s:hasRole('admin_role')}" immediate="true"/>
+            </div>
+        </h:form>
+
+    </ui:define>
+</ui:composition>

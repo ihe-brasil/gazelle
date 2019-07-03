@@ -1,0 +1,770 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.systems.session.LabelTitle']}"/>
+    <ui:define name="body">
+        <h:outputStylesheet library="stylesheet" name="spectrum.css"/>
+        <h:outputScript library="jscript" name="spectrum.js"/>
+        <h:outputScript library="jscript" name="disable_input_spinner_mouse_wheel.js"/>
+
+        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+            <ui:define name="panel_title">#{messages['gazelle.systems.session.LabelHeader']}</ui:define>
+            <h:form id="editTestingSession">
+                <s:token allowMultiplePosts="true"/>
+                <h:inputHidden name="id" value="#{testingSessionManager.selectedTestingSession.id}"/>
+                <h:inputHidden name="activeSession"
+                               value="#{testingSessionManager.selectedTestingSession.activeSession}"/>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <ui:decorate template="/layout/panels/_panel.xhtml">
+                            <div class="form-inline">
+                                <ui:decorate id="sessionYear" template="/layout/form/_edit.xhtml">
+                                    <ui:param name="id" value="year"/>
+                                    <ui:define name="label">#{messages['gazelle.systems.session.Year']}</ui:define>
+                                    <h:inputText styleClass=" form-control" id="year" size="30"
+                                                 placeholder="#{messages['gazelle.tm.ExampleOfValue']} : 2010"
+                                                 value="#{testingSessionManager.selectedTestingSession.year}"/>
+                                </ui:decorate>
+                                <ui:decorate id="sessionZone" template="/layout/form/_edit.xhtml">
+                                    <ui:param name="id" value="zone"/>
+                                    <ui:define name="label">#{messages['gazelle.systems.session.Zone']}</ui:define>
+                                    <h:inputText styleClass=" form-control" id="zone" size="30"
+                                                 placeholder="#{messages['gazelle.tm.application.ExampleOfValuesEuropeNaAustralia']}"
+                                                 value="#{testingSessionManager.selectedTestingSession.zone}"/>
+                                </ui:decorate>
+                                <ui:decorate id="sessionType" template="/layout/form/_edit.xhtml">
+                                    <ui:param name="id" value="type_"/>
+                                    <ui:define name="label">#{messages['gazelle.systems.session.Type']}</ui:define>
+                                    <h:inputText styleClass=" form-control" id="type_" size="30"
+                                                 placeholder="#{messages['gazelle.tm.application.ExampleOfValuesConnectathonShowcase']}"
+                                                 value="#{testingSessionManager.selectedTestingSession.type}"/>
+                                </ui:decorate>
+                            </div>
+                            <s:decorate id="descriptionDecoration" template="/layout/form/_edit.xhtml"
+                                        styleClass="form-inline">
+                                <ui:param name="id" value="description"/>
+                                <ui:define name="label">#{messages['gazelle.systems.session.Description']}</ui:define>
+                                <h:inputText styleClass=" form-control" id="description" size="60"
+                                             placeholder="#{messages['gazelle.tm.ExampleOfValuesEuropeanConnectathon2010BordeauxA']}"
+                                             value="#{testingSessionManager.selectedTestingSession.description}"/>
+                            </s:decorate>
+
+                            <a4j:region id="startDateRegion">
+                                <ui:decorate id="startDateDecoration"
+                                             template="/layout/form/_form_field_horizontal_inline.xhtml">
+                                    <ui:param name="id" value="calendarStartDate"/>
+                                    <ui:define name="label">#{messages['gazelle.systems.session.StartDate']}</ui:define>
+                                    <a4j:outputPanel id="calendarStartDate" layout="block">
+                                        <rich:calendar
+                                                value="#{testingSessionManager.selectedTestingSession.beginningSession}"
+                                                popup="true" showApplyButton="false"
+                                                datePattern="#{dateDisplay.calendarPatternDateTime}"
+                                                locale="#{dateDisplay.calendarLocale}"
+                                                timeZone="#{dateDisplay.calendarTimeZoneDateTime}">
+                                            <a4j:ajax event="change" render="calendarOffset1"/>
+                                        </rich:calendar>
+                                        <p class="help-block">
+                                            <h:outputText id="calendarOffset1"
+                                                          value="#{applicationPreferenceManager.getTimeZoneOffset(dateDisplay.calendarTimeZoneDateTime, testingSessionManager.selectedTestingSession.beginningSession)}"/>
+                                        </p>
+                                    </a4j:outputPanel>
+                                </ui:decorate>
+                            </a4j:region>
+                            <a4j:region id="endDateRegion">
+                                <ui:decorate id="endDateDecoration"
+                                             template="/layout/form/_form_field_horizontal_inline.xhtml">
+                                    <ui:param name="id" value="calendarEndDate"/>
+                                    <ui:define name="label">#{messages['gazelle.systems.session.EndDate']}</ui:define>
+                                    <a4j:outputPanel id="calendarEndDate" layout="block">
+                                        <rich:calendar
+                                                value="#{testingSessionManager.selectedTestingSession.endingSession}"
+                                                popup="true" showApplyButton="false" cellWidth="24px"
+                                                datePattern="#{dateDisplay.calendarPatternDateTime}"
+                                                locale="#{dateDisplay.calendarLocale}"
+                                                timeZone="#{dateDisplay.calendarTimeZoneDateTime}"
+                                                cellHeight="22px"
+                                                style="width:200px">
+                                            <a4j:ajax event="change" render="calendarOffset2"/>
+                                        </rich:calendar>
+                                        <p class="help-block">
+                                            <h:outputText id="calendarOffset2"
+                                                          value="#{applicationPreferenceManager.getTimeZoneOffset(dateDisplay.calendarTimeZoneDateTime, testingSessionManager.selectedTestingSession.endingSession)}"/>
+                                        </p>
+                                    </a4j:outputPanel>
+                                </ui:decorate>
+                            </a4j:region>
+                            <a4j:region id="registrationDeadlineDateRegion">
+                                <ui:decorate id="registrationDeadlineDateDecoration"
+                                             template="/layout/form/_form_field_horizontal_inline.xhtml">
+                                    <ui:param name="id" value="calendar"/>
+                                    <ui:define name="label">
+                                        #{messages['gazelle.systems.session.RegistrationDeadlineDate']}
+                                    </ui:define>
+                                    <a4j:outputPanel id="calendarRegistrationDeadlineDate" layout="block">
+                                        <rich:calendar id="calendar" required="true"
+                                                       value="#{testingSessionManager.selectedTestingSession.registrationDeadlineDate}"
+                                                       popup="true" showApplyButton="false" cellWidth="24px"
+                                                       datePattern="#{dateDisplay.calendarPatternDateTime}"
+                                                       locale="#{dateDisplay.calendarLocale}"
+                                                       timeZone="#{dateDisplay.calendarTimeZoneDateTime}"
+                                                       cellHeight="22px" style="width:200px">
+                                            <a4j:ajax event="change" render="calendarOffset3"/>
+                                        </rich:calendar>
+                                        <p class="help-block">
+                                            <h:outputText id="calendarOffset3"
+                                                          value="#{applicationPreferenceManager.getTimeZoneOffset(dateDisplay.calendarTimeZoneDateTime, testingSessionManager.selectedTestingSession.registrationDeadlineDate)}"/>
+                                        </p>
+                                    </a4j:outputPanel>
+                                </ui:decorate>
+                            </a4j:region>
+                            <s:decorate id="defaultDecoration" template="/layout/form/_checkbox.xhtml">
+                                <h:selectBooleanCheckbox disabled="true"
+                                                         value="#{testingSessionManager.selectedTestingSession.defaultTestingSession}"/>
+                                <a4j:commandLink id="markDefaultSupport"
+                                                 title="#{messages['net.ihe.gazelle.tm.MarkAsDefaultTestingSession']}"
+                                                 rendered="#{!testingSessionManager.selectedTestingSession.defaultTestingSession and testingSessionManager.selectedTestingSession.activeSession}"
+                                                 action="#{testingSessionManager.markAsDefaultTestingSession(testingSessionManager.selectedTestingSession)}"
+                                                 onRowMouseOver="this.style.cursor='pointer'" immediate="true"
+                                                 render="defaultDecoration">
+                                    <span class="gzl-icon-checked"/>
+
+                                </a4j:commandLink>
+                                #{messages['net.ihe.gazelle.tm.DefaultTestingSession']}
+                                <h:outputText styleClass="help-block"
+                                              value="#{messages['net.ihe.gazelle.tm.TheDefaultTestingSessionWillBeAssignedToNewUsers']}"/>
+
+                            </s:decorate>
+
+                            <s:decorate id="internetTestingSessionBoxDecoration"
+                                        template="/layout/form/_checkbox.xhtml">
+                                <h:selectBooleanCheckbox
+                                        value="#{testingSessionManager.selectedTestingSession.internetTesting}"/>
+                                #{messages['net.ihe.gazelle.tm.InternetTesting']}
+                                <h:outputText styleClass="help-block"
+                                              value="#{messages['net.ihe.gazelle.tm.CheckedIfThisTestingSessionIsUsingSystemsFromANo']}"/>
+                            </s:decorate>
+
+                            <s:decorate id="enablePreConnectathonTestingDecoration"
+                                        template="/layout/form/_checkbox.xhtml">
+                                <h:selectBooleanCheckbox
+                                        value="#{testingSessionManager.selectedTestingSession.enablePrecatTests}"/>
+                                #{messages['net.ihe.gazelle.tm.EnablePreConnectathonTesting']}
+                                <h:outputText styleClass="help-block"
+                                              value="#{messages['net.ihe.gazelle.tm.CheckedIfThisTestingSessionIsUsingPreConnectatho']}"/>
+                            </s:decorate>
+
+                            <s:decorate id="allowSameCompanyTesting"
+                                        template="/layout/form/_checkbox.xhtml">
+                                <h:selectBooleanCheckbox
+                                        value="#{testingSessionManager.selectedTestingSession.allowSameCompanyTesting}"/>
+                                <h:outputText value="#{messages['net.ihe.gazelle.tm.AllowSameCompanyTesting']}"/>
+                                <h:outputText styleClass="help-block"
+                                              value="#{messages['net.ihe.gazelle.tm.CheckedIfThisTestingSessionAllowsSameCompanyTest']}"/>
+                            </s:decorate>
+
+                            <s:decorate id="allowParticipantRegistrationDecoration"
+                                        template="/layout/form/_checkbox.xhtml">
+                                <h:selectBooleanCheckbox
+                                        value="#{testingSessionManager.selectedTestingSession.allowParticipantRegistration}"/>
+                                #{messages['net.ihe.gazelle.tm.AllowParticipantRegistration']}
+                                <h:outputText styleClass="help-block"
+                                              value="#{messages['net.ihe.gazelle.tm.CheckedIfThisTestingSessionAllowParticipantRegistration']}"/>
+                            </s:decorate>
+
+
+                            <s:decorate id="hiddenDecoration" template="/layout/form/_checkbox.xhtml">
+                                <h:selectBooleanCheckbox id="hiddenSessionSelectBooleanCheckbox"
+                                                         value="#{testingSessionManager.selectedTestingSession.hiddenSession}"/>
+                                #{messages['gazelle.systems.session.HiddenFromList']}
+                                <h:outputText styleClass="help-block"
+                                              value="#{messages['gazelle.systems.session.HiddenFromList2']}"/>
+                            </s:decorate>
+
+                            <s:decorate id="closedDecoration" template="/layout/form/_checkbox.xhtml">
+                                <h:selectBooleanCheckbox styleClass="form-control-static"
+                                                         value="#{testingSessionManager.selectedTestingSession.sessionClosed}"/>
+                                #{messages['net.ihe.gazelle.tm.SessionClosed']}
+                                <h:outputText styleClass="help-block"
+                                              value="#{messages['net.ihe.gazelle.tm.CloseTheSessionToVendorRemoveTheCapabilityToAddO']}"/>
+                            </s:decorate>
+
+
+                            <s:decorate id="autoUpdateDecoration" template="/layout/form/_checkbox.xhtml">
+                                <h:selectBooleanCheckbox styleClass="form-control-static"
+                                                         value="#{testingSessionManager.selectedTestingSession.disableAutoResults}"/>
+                                #{messages['net.ihe.gazelle.tm.DisableAutoUpdateResults']}
+                                <h:outputText styleClass="help-block"
+                                              value="#{messages['net.ihe.gazelle.tm.ExcludeThisTestingSessionWhenComputingResults']}"/>
+                            </s:decorate>
+
+                            <s:decorate id="orderDecoration" template="/layout/display/_display.xhtml">
+                                <ui:define name="label">#{messages['gazelle.systems.session.OrderInTheGui']}</ui:define>
+                                <h:panelGrid id="orderPG" columns="3">
+                                    <rich:inputNumberSpinner id="sessionOrderSpinner"
+                                                             value="#{testingSessionManager.selectedTestingSession.orderInGUI}"/>
+
+                                    <h:outputText value="#{messages['gazelle.systems.session.OrderInTheGui2']}"/>
+                                </h:panelGrid>
+                            </s:decorate>
+                            <s:decorate id="criticalStatusRegionIsEnabledDecoration"
+                                        rendered="#{testingSessionManager.selectedTestingSession.isCriticalStatusEnabled}"
+                                        template="/layout/display/_display.xhtml">
+                                <ui:define name="label">#{messages['gazelle.tm.CriticalStatusIsEnabled']}</ui:define>
+                                <a4j:commandButton id="disableCriticalStatus"
+                                                   value="#{messages['gazelle.tm.DisableCriticalStatus']}"
+                                                   styleClass="gzl-btn"
+                                                   actionListener="#{testingSessionManager.disableCriticalStatus()}"
+                                                   render="editTestingSession,spinnerScript" execute="@this"/>
+                            </s:decorate>
+                            <s:decorate id="criticalStatusRegionIsDisabledDecoration"
+                                        template="/layout/display/_display.xhtml"
+                                        rendered="#{!testingSessionManager.selectedTestingSession.isCriticalStatusEnabled and testingSessionManager.selectedTestingSession.id != null}">
+                                <ui:define name="label">#{messages['gazelle.tm.CriticalStatusIsDisabled']}</ui:define>
+                                <a4j:commandButton id="enableCriticalStatus"
+                                                   value="#{messages['gazelle.tm.EnableCriticalStatus']}"
+                                                   styleClass="gzl-btn"
+                                                   actionListener="#{testingSessionManager.enableCriticalStatus()}"
+                                                   execute="@this" render="editTestingSession,spinnerScript"/>
+                            </s:decorate>
+
+
+                            <div style="clear: both"><span class="required">*</span>
+                                #{messages['gazelle.tm.application.RequiredFields']}
+                            </div>
+                        </ui:decorate>
+                        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                            <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.CertificatesMenuURL']}
+                            </ui:define>
+                            <s:decorate id="certificatesDecoration" template="/layout/form/_edit.xhtml">
+                                <ui:define name="label">#{messages['net.ihe.gazelle.tm.DisplayCertificatesMenu']}
+                                </ui:define>
+                                <h:panelGrid id="hiddenPG" columns="3">
+                                    <h:selectBooleanCheckbox styleClass="form-control-static"
+                                                             value="#{testingSessionManager.selectedTestingSession.displayCertificatesMenu}"/>
+                                </h:panelGrid>
+                            </s:decorate>
+                            <a4j:region id="certificatesEdit">
+                                <s:decorate template="/layout/form/_edit.xhtml">
+                                    <ui:param name="id" value="certificatesMenuURL"/>
+                                    <ui:define name="label">#{messages['net.ihe.gazelle.tm.CertificatesMenuURL']}
+                                    </ui:define>
+                                    <h:inputText id="certificatesMenuURL" styleClass=" form-control" size="65" cols="80"
+                                                 rows="3"
+                                                 value="#{testingSessionManager.selectedTestingSession.certificatesUrl}"
+                                                 required="false">
+
+                                    </h:inputText>
+                                </s:decorate>
+                            </a4j:region>
+                        </ui:decorate>
+                        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                            <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.Customization']}</ui:define>
+                            <s:decorate id="mailingListUrlDecoration" template="/layout/form/_edit.xhtml">
+                                <ui:param name="id" value="mailingListUrlInputText"/>
+                                <ui:define name="label">#{messages['gazelle.systems.session.MailingListUrl']}
+                                </ui:define>
+                                <h:inputText styleClass=" form-control" id="mailingListUrlInputText" size="90"
+                                             value="#{testingSessionManager.selectedTestingSession.mailingListUrl}"/>
+                            </s:decorate>
+                            <s:decorate id="wikiUrlDecoration" template="/layout/form/_edit.xhtml">
+                                <ui:param name="id" value="wikiInputText"/>
+                                <ui:define name="label">#{messages['gazelle.systems.session.WikiUrl']}</ui:define>
+                                <h:inputText styleClass=" form-control" id="wikiInputText" size="90"
+                                             value="#{testingSessionManager.selectedTestingSession.wikiUrl}"/>
+                            </s:decorate>
+                            <s:decorate id="logoUrlDecoration" template="/layout/form/_edit.xhtml">
+                                <ui:param name="id" value="logoUrlInputText"/>
+                                <ui:define name="label">#{messages['gazelle.systems.session.LogoUrl']}</ui:define>
+                                <h:panelGrid id="logoPG" columns="3">
+                                    <h:inputText styleClass=" form-control" id="logoUrlInputText" size="90"
+                                                 value="#{testingSessionManager.selectedTestingSession.logoUrl}"/>
+
+                                    <h:outputText
+                                            value="#{messages['gazelle.tm.ExampleOfValuesimggazellegifORHttpwwwihenetAbout']}..."/>
+                                </h:panelGrid>
+                            </s:decorate>
+                            <s:decorate id="logoUrlLinkDecoration" template="/layout/form/_edit.xhtml">
+                                <ui:param name="id" value="logoLinkUrlInputText"/>
+                                <ui:define name="label">#{messages['gazelle.systems.session.LogoLinkUrl']}
+                                </ui:define>
+                                <h:panelGrid id="logoLinkPG" columns="3">
+                                    <h:inputText styleClass=" form-control" id="logoLinkUrlInputText" size="90"
+                                                 value="#{testingSessionManager.selectedTestingSession.logoLinkUrl}"/>
+
+                                    <h:outputText value="#{messages['gazelle.tm.ExampleOfValueHttpwwwihenet']}"/>
+                                </h:panelGrid>
+                            </s:decorate>
+                            <s:decorate id="colorPickerSection" template="/layout/form/_edit.xhtml">
+                                <ui:param name="id" value="colorpicker"/>
+                                <ui:define name="label">#{messages['net.ihe.gazelle.tm.Color']}</ui:define>
+                                <h:outputText value="#{messages['net.ihe.gazelle.tm.DefaultIs4A75B5']}"/>
+                                <h:inputText id='colorpicker' value="#{testingSessionManager.sessionColor}"/>
+                                <script>
+                                    $("#editTestingSession\\:colorPickerSection\\:colorpicker").spectrum({
+                                        preferredFormat: "hex",
+                                        color: "#{testingSessionManager.sessionColor}"
+                                    });
+                                </script>
+                            </s:decorate>
+                        </ui:decorate>
+                    </div>
+                    <div class="col-lg-6">
+                        <ui:decorate template="/layout/panels/_panel.xhtml">
+
+                            <s:decorate template="/layout/display/_display.xhtml">
+                                <ui:define name="label">#{messages['net.ihe.gazelle.tm.TestingSessionAdmin']}
+                                </ui:define>
+                                <rich:pickList listsHeight="100px" sourceListWidth="260px" targetListWidth="260px"
+                                               style="min-height: 100px;"
+                                               value="#{testingSessionManager.selectedTestingSession.testingSessionAdmin}">
+                                    <s:selectItems value="#{testingSessionManager.getPossibleTestSessionAdmin()}"
+                                                   var="selectedTestSessionAdmin"
+                                                   label="#{selectedTestSessionAdmin.firstname} #{selectedTestSessionAdmin.lastname}"/>
+                                    <s:convertEntity/>
+                                </rich:pickList>
+                            </s:decorate>
+
+                            <s:decorate template="/layout/display/_display.xhtml">
+                                <ui:define name="label">#{messages['net.ihe.gazelle.tm.TestTypes']}</ui:define>
+                                <rich:pickList listsHeight="240px" sourceListWidth="260px" targetListWidth="260px"
+                                               value="#{testingSessionManager.selectedTestingSession.testTypes}">
+                                    <s:selectItems value="#{testingSessionManager.getTestTypes()}"
+                                                   var="selectedTestType"
+                                                   label="#{selectedTestType.keyword}"/>
+                                    <s:convertEntity/>
+                                </rich:pickList>
+                            </s:decorate>
+
+                            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                                <ui:define name="panel_title">
+                                    #{messages['net.ihe.gazelle.tm.IntegrationProfilesAssociatedToThisTestingSessio']}
+                                </ui:define>
+                                <a4j:region id="addintegrationProfilesInTestingSessionRegion">
+                                    <s:div>
+                                        <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text"
+                                                         value="#{testingSessionManager.selectedDomain}">
+                                            <s:selectItems value="#{gazelleDAO.getPossibleDomains()}"
+                                                           var="domainFromList"
+                                                           noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                           label="#{domainFromList.keyword} - #{domainFromList.name}"/>
+                                        </h:selectOneMenu>
+                                        <a4j:commandButton
+                                                value="#{messages['net.ihe.gazelle.tm.AddAllIntegrationProfilesLinkedToThisDomain']}"
+                                                styleClass="gzl-btn"
+                                                actionListener="#{testingSessionManager.addAllIntegrationProfiles()}"
+                                                render="addintegrationProfilesInTestingInSessionDiv"/>
+                                        <a4j:commandButton
+                                                value="#{messages['net.ihe.gazelle.tm.RemoveAllIntegrationProfilesLinkedToThisDomain']}"
+                                                styleClass="gzl-btn"
+                                                actionListener="#{testingSessionManager.removeAllIntegrationProfilesFromDomain()}"
+                                                render="addintegrationProfilesInTestingInSessionDiv"/>
+                                        <a4j:commandButton
+                                                value="#{messages['net.ihe.gazelle.tm.RemoveAllIntegrationProfiles']}"
+                                                styleClass="gzl-btn-red"
+                                                oncomplete="jq162('#DeleteAllIntegrationProfilesModalPanel').modal('show');"
+                                                execute="@this"
+                                                render="DeleteAllIntegrationProfilesModalPanelDecoration"/>
+                                    </s:div>
+                                    <s:div id="addintegrationProfilesInTestingInSessionDiv">
+                                        <rich:pickList listHeight="300px" listWidth="260px"
+                                                       value="#{testingSessionManager.selectedTestingSession.integrationProfiles}">
+                                            <s:selectItems
+                                                    value="#{gazelleDAO.getAllIntegrationProfileForTestingSession()}"
+                                                    var="selectedIP"
+                                                    label="#{selectedIP.keyword} #{selectedIP.name}"/>
+                                            <s:convertEntity/>
+                                        </rich:pickList>
+                                    </s:div>
+                                </a4j:region>
+                            </ui:decorate>
+                            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                                <ui:define name="panel_title">
+                                    #{messages['gazelle.tm.application.preferences.FinancialSection']}
+                                </ui:define>
+                                <a4j:region id="isContractRequiredRegion">
+                                    <s:decorate id="isContractRequiredDecorate"
+                                                template="/layout/form/_form_checkbox_horizontal_3-9.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.tm.session.isContractRequired']}
+                                        </ui:define>
+                                        <h:selectBooleanCheckbox id="requiredContract"
+                                                                 value="#{testingSessionManager.selectedTestingSession.contractRequired}">
+                                            <a4j:ajax event="change" render="feesDiv"/>
+                                        </h:selectBooleanCheckbox>
+                                    </s:decorate>
+                                </a4j:region>
+                                <s:div id="feesDiv" styleClass="form-horizontal">
+                                    <h:panelGroup
+                                            rendered="#{testingSessionManager.selectedTestingSession.contractRequired == true}">
+                                        <a4j:region id="feesFirstSystemRegion">
+                                            <s:decorate id="feesFirstSystemDecoration"
+                                                        template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                                <ui:param name="id" value="feesFirstSystemInput"/>
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.tm.application.preferences.FeesFirstSystem']}
+                                                </ui:define>
+                                                <h:inputText styleClass=" form-control" id="feesFirstSystemInput"
+                                                             maxlength="128"
+                                                             size="25" cols="80" rows="3"
+                                                             value="#{testingSessionManager.selectedTestingSession.feeFirstSystem}"
+                                                             required="true">
+                                                </h:inputText>
+
+                                                (#{messages['gazelle.common.ie']}. '3000.00')
+                                            </s:decorate>
+                                        </a4j:region>
+
+                                        <a4j:region>
+                                            <s:decorate id="nbParticipantsIncludedInSystemFees"
+                                                        template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                                <ui:param name="id" value="participantsWithSys"/>
+                                                <ui:define name="label">
+                                                    #{messages['net.ihe.gazelle.tm.NbParticipantsIncludedInOneSystemFees']}
+                                                </ui:define>
+                                                <h:inputText styleClass=" form-control" maxlength="128" size="25"
+                                                             id="participantsWithSys"
+                                                             cols="80" rows="3" required="true"
+                                                             value="#{testingSessionManager.selectedTestingSession.nbParticipantsIncludedInSystemFees}">
+                                                </h:inputText>
+                                                (#{messages['gazelle.common.ie']}. '2')
+                                            </s:decorate>
+                                        </a4j:region>
+
+                                        <a4j:region id="feesAdditionalSystemRegion">
+                                            <s:decorate id="feesAdditionalSystemDecoration"
+                                                        template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                                <ui:param name="id" value="feesFirstSystemInput"/>
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.tm.application.preferences.FeesAdditionalSystem']}
+                                                </ui:define>
+                                                <h:inputText styleClass=" form-control" id="feesFirstSystemInput"
+                                                             maxlength="128"
+                                                             size="25" cols="80" rows="3"
+                                                             value="#{testingSessionManager.selectedTestingSession.feeAdditionalSystem}"
+                                                             required="true">
+                                                </h:inputText>
+
+                                                (#{messages['gazelle.common.ie']}. '3000.00')
+                                            </s:decorate>
+                                        </a4j:region>
+                                        <a4j:region>
+                                            <s:decorate template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                                <ui:param name="id" value="feesPerAdditionalParticipantsInput"/>
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.tm.FeesPerAdditionalParticipants']}
+                                                </ui:define>
+                                                <h:inputText id="feesPerAdditionalParticipantsInput"
+                                                             styleClass=" form-control" maxlength="128" size="25"
+                                                             cols="80"
+                                                             rows="3"
+                                                             value="#{testingSessionManager.selectedTestingSession.feeParticipant}"
+                                                             required="true">
+                                                </h:inputText>
+
+                                                (#{messages['gazelle.common.ie']}. '600.00')
+                                            </s:decorate>
+                                        </a4j:region>
+                                        <a4j:region id="currencyRegion">
+                                            <s:decorate id="currencyDecoration"
+                                                        template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                                <ui:param name="id" value="currencyListBox"/>
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.tm.application.preferences.Currency']}
+                                                </ui:define>
+                                                <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                                 id="currencyListBox"
+                                                                 required="true"
+                                                                 value="#{testingSessionManager.selectedTestingSession.currency}">
+                                                    <s:selectItems value="#{gazelleDAO.getCurrencyList()}"
+                                                                   var="selectedCurrency"
+                                                                   noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                                   label="#{selectedCurrency.keyword}"/>
+                                                </h:selectOneMenu>
+
+                                                (#{messages['gazelle.common.ie']}.
+                                                '#{messages['gazelle.tm.EURUSD']}'...)
+                                            </s:decorate>
+                                        </a4j:region>
+                                        <a4j:region id="vatRegion">
+                                            <s:decorate id="vatDecoration"
+                                                        template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                                <ui:param name="id" value="vatInput"/>
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.tm.application.preferences.VATPercent']}
+                                                </ui:define>
+                                                <h:inputText styleClass=" form-control" id="vatInput" maxlength="128"
+                                                             size="25"
+                                                             value="#{testingSessionManager.selectedTestingSession.vatPercent}"
+                                                             required="true">
+                                                </h:inputText>
+
+                                                (#{messages['gazelle.common.ie']}. '0.21' )
+                                            </s:decorate>
+                                        </a4j:region>
+                                        <a4j:region id="vatCountrRegion">
+                                            <s:decorate id="vatCDec"
+                                                        template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                                <ui:param name="id" value="vatCInput"/>
+                                                <ui:define name="label">#{messages['gazelle.tm.VATCountries']}
+                                                </ui:define>
+                                                <h:inputText styleClass=" form-control" id="vatCInput" maxlength="128"
+                                                             size="100"
+                                                             value="#{testingSessionManager.selectedTestingSession.iso3VATCountries}"
+                                                             required="true"/>
+
+                                                (#{messages['gazelle.common.ie']}. '#{messages['gazelle.tm.BELFRA']}' )
+                                            </s:decorate>
+                                        </a4j:region>
+                                        <a4j:region id="templatePathRegion">
+                                            <s:decorate id="templatePathDecoration"
+                                                        template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                                <ui:param name="id" value="templatePathInput"/>
+                                                <ui:define name="label">#{messages['gazelle.tm.session.contract.path']}
+                                                </ui:define>
+                                                <h:inputText styleClass=" form-control" id="templatePathInput"
+                                                             maxlength="128"
+                                                             size="100"
+                                                             value="#{testingSessionManager.selectedTestingSession.pathToContractTemplate}">
+                                                    <a4j:ajax event="keyup" render="templatePathOutputDiv"/>
+                                                </h:inputText>
+
+                                                <s:div id="templatePathOutputDiv">
+                                                    <h:outputText id="templatePathOutput"
+                                                                  rendered="#{not empty testingSessionManager.selectedTestingSession.pathToContractTemplate}"
+                                                                  value="(#{messages['gazelle.tm.session.contract.path.root']} #{applicationPreferenceManager.getGazelleReportsPath()}/#{testingSessionManager.selectedTestingSession.pathToContractTemplate}.#{messages['gazelle.tm.Jrxml']} )"/>
+                                                </s:div>
+                                            </s:decorate>
+                                        </a4j:region>
+                                        <a4j:region id="invoiceTemplatePathRegion">
+                                            <s:decorate id="invoiceTemplatePathDecoration"
+                                                        template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                                <ui:param name="id" value="invoiceTemplatePathInput"/>
+                                                <ui:define name="label">#{messages['gazelle.tm.session.invoice.path']}
+                                                </ui:define>
+                                                <h:inputText styleClass=" form-control" id="invoiceTemplatePathInput"
+                                                             maxlength="128"
+                                                             size="100"
+                                                             value="#{testingSessionManager.selectedTestingSession.pathToInvoiceTemplate}">
+                                                    <a4j:ajax event="keyup" render="invoiceTemplatePathOutputDiv"/>
+                                                </h:inputText>
+
+                                                <s:div id="invoiceTemplatePathOutputDiv">
+                                                    <h:outputText id="invoiceTemplatePathOutput"
+                                                                  rendered="#{not empty testingSessionManager.selectedTestingSession.pathToInvoiceTemplate}"
+                                                                  value="(#{messages['gazelle.tm.session.invoice.path.root']} #{applicationPreferenceManager.getGazelleReportsPath()}/#{testingSessionManager.selectedTestingSession.pathToInvoiceTemplate}.#{messages['gazelle.tm.Jrxml']} )"/>
+                                                </s:div>
+                                            </s:decorate>
+                                        </a4j:region>
+                                        <a4j:region id="invoiceNumberRegion">
+                                            <s:decorate id="invoiceNumberDecoration"
+                                                        template="/layout/display/_display_field_horizontal_3-9.xhtml">
+                                                <ui:define name="label">#{messages['gazelle.tm.session.invoice.number']}
+                                                </ui:define>
+                                                <h:outputText id="invoiceNumberInput" styleClass="form-control-static"
+                                                              value="#{testingSessionManager.selectedTestingSession.nextInvoiceNumber}"/>
+                                            </s:decorate>
+                                        </a4j:region>
+                                        <br/>
+
+                                        <div style="clear: both"><span class="required">*</span>
+                                            #{messages['gazelle.tm.application.RequiredFields']}
+                                        </div>
+                                    </h:panelGroup>
+                                </s:div>
+                            </ui:decorate>
+
+                        </ui:decorate>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                            <ui:define name="panel_title">#{messages['gazelle.users.contact.EditContactLabel1']}
+                            </ui:define>
+                            <a4j:region id="contactFirstNameRegionEdit">
+                                <s:decorate id="contactFirstNameDecorationEdit" template="/layout/form/_edit.xhtml">
+                                    <ui:param name="id" value="contactFirstNameEdit"/>
+                                    <ui:define name="label">#{messages['gazelle.contacts.Firstname']}</ui:define>
+                                    <h:inputText styleClass=" form-control" id="contactFirstNameEdit" size="30"
+                                                 value="#{testingSessionManager.selectedTestingSession.contactFirstname}"
+                                                 required="true">
+                                    </h:inputText>
+                                </s:decorate>
+                            </a4j:region>
+                            <a4j:region id="contactLastNameRegionEdit">
+                                <s:decorate id="contactLastNameDecorationEdit" template="/layout/form/_edit.xhtml">
+                                    <ui:param name="id" value="contactLastNameEdit"/>
+                                    <ui:define name="label">#{messages['gazelle.contacts.Lastname']}</ui:define>
+                                    <h:inputText styleClass=" form-control" id="contactLastNameEdit" size="30"
+                                                 value="#{testingSessionManager.selectedTestingSession.contactLastname}"
+                                                 required="true">
+                                    </h:inputText>
+                                </s:decorate>
+                            </a4j:region>
+                            <a4j:region id="contactEmailRegionEdit">
+                                <s:decorate id="contactEmailDecorationEdit" template="/layout/form/_edit.xhtml">
+                                    <ui:param name="id" value="contactEmailEdit"/>
+                                    <ui:define name="label">#{messages['gazelle.contacts.Email']}</ui:define>
+                                    <h:inputText styleClass=" form-control" id="contactEmailEdit" size="30"
+                                                 value="#{testingSessionManager.selectedTestingSession.contactEmail}"
+                                                 required="true">
+                                    </h:inputText>
+                                </s:decorate>
+                            </a4j:region>
+                            <div style="clear: both"><span class="required">*</span>
+                                #{messages['gazelle.tm.application.RequiredFields']}
+                            </div>
+                        </ui:decorate>
+                    </div>
+                    <div class="col-lg-6">
+                        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                            <ui:define name="panel_title">#{messages['gazelle.users.address.ContactAddress']}
+                            </ui:define>
+                            <a4j:commandButton styleClass="gzl-btn-green"
+                                               rendered="#{testingSessionManager.address==null}"
+                                               actionListener="#{testingSessionManager.createAddress()}"
+                                               value="#{messages['net.ihe.gazelle.tm.AddAnAddress']}" execute="@this"
+                                               render="editTestingSession,spinnerScript"/>
+                            <a4j:commandButton styleClass="gzl-btn-red"
+                                               rendered="#{testingSessionManager.address!=null}"
+                                               actionListener="#{testingSessionManager.deleteAddress()}"
+                                               value="#{messages['net.ihe.gazelle.tm.DeleteTheAddress']}"
+                                               execute="@this"
+                                               render="editTestingSession,spinnerScript"/>
+                            <s:div id="addressPanel" rendered="#{testingSessionManager.address!=null}" styleClass="form-horizontal">
+                                <ui:include src="/users/address/editAddressPanel.xhtml">
+                                    <ui:param name="panelId" value="n"/>
+                                    <ui:param name="addressVariable" value="#{testingSessionManager.address}"/>
+                                    <ui:param name="countryVariable"
+                                              value="#{testingSessionManager.address.iso3166CountryCode}"/>
+                                </ui:include>
+                            </s:div>
+                        </ui:decorate>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6"></div>
+                    <div class="col-lg-6"></div>
+                </div>
+
+
+                <h:panelGroup rendered="#{testingSessionManager.selectedTestingSession.id!=null}">
+                    <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                        <ui:param name="panel_id" value="TestingManagementPanel"/>
+                        <ui:param name="styleClass" value="panel-danger"/>
+                        <ui:define name="panel_title">#{messages['gazelle.tm.TestingManagement']}</ui:define>
+                        <div class="well">
+                            <strong class="text-danger">
+                                #{messages['net.ihe.gazelle.tm.ThisIsUsedToTestTheInstallationSetupItWillGenera']}
+                            </strong>
+                        </div>
+                        <s:decorate id="systemInSessionStatusDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tm.testing.status.status']}</ui:define>
+                            <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                             id="systemInSessionStatusListBox"
+                                             style="text-align:center;"
+                                             value="#{connecthatonTestingManager.selectedSystemInSessionStatus}">
+                                <s:selectItems value="#{gazelleDAO.getListSystemInSessionStatus()}"
+                                               var="selectedSystemInSessionStatus"
+                                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                               label="#{selectedSystemInSessionStatus.keyword}"/>
+                                <a4j:ajax event="change"
+                                          render="TestingManagementPanel" execute="@this"
+                                          listener="#{connecthatonTestingManager.updateSystemInSessionStatusByTestingSession(testingSessionManager.selectedTestingSession)}"/>
+                            </h:selectOneMenu>
+                            <h:outputText
+                                    value="#{messages['gazelle.tm.TheSelectedValueWillBeAppliedToAllSystemsInTheSe']}"/>
+                        </s:decorate>
+                        <a4j:region>
+                            <s:decorate id="generateTestInstanceDecoration" template="/layout/display/_display.xhtml">
+                                <ui:define name="label">#{messages['gazelle.tm.TestInstanceRandomGeneration']}
+                                </ui:define>
+                                <h:panelGrid columns="2">
+                                    <rich:pickList value="#{testingSessionManager.selectedInstitutions}">
+                                        <s:selectItems
+                                                value="#{testingSessionManager.getInstitutionsForSession(testingSessionManager.selectedTestingSession)}"
+                                                var="currentIns"
+                                                label="#{currentIns.keyword} - #{currentIns.name}"/>
+                                        <s:convertEntity></s:convertEntity>
+                                    </rich:pickList>
+                                    <a4j:commandButton id="generateTestInstanceButton"
+                                                       value="#{messages['gazelle.tm.GenerateTestingSessionForSelectedInstitutions']}"
+                                                       styleClass="gzl-btn"
+                                                       actionListener="#{testingSessionManager.generateRandomlyTestInstanceForSelectedInstitutions()}"
+                                                       render="TestingManagementPanel"/>
+                                </h:panelGrid>
+                            </s:decorate>
+                        </a4j:region>
+                        <s:decorate id="deleteAllTestInstanceDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tm.monitors.TestInstance']}</ui:define>
+                            <a4j:commandButton id="deleteAllTestInstanceButton"
+                                               value="#{messages['gazelle.tm.DeleteAllConnectathonTestInstance']}"
+                                               styleClass="gzl-btn-red"
+                                               oncomplete="jq162('#DeleteAllTestInstancesModalPanel').modal('show');"
+                                               execute="@this"
+                                               render="DeleteAllTestInstancesModalPanelDecoration"/>
+                        </s:decorate>
+                    </ui:decorate>
+                </h:panelGroup>
+
+
+                <div>
+                    <h:commandButton id="cancelSession" immediate="true" styleClass="gzl-btn"
+                                     value="#{messages['gazelle.common.button.Cancel']}"
+                                     action="/administration/listSessions.xhtml"/>
+                    <h:commandButton id="saveSession" styleClass="gzl-btn-green"
+                                     value="#{messages['gazelle.common.button.Save']}"
+                                     action="#{testingSessionManager.addTestingSession(testingSessionManager.selectedTestingSession)}"
+                                     render="newGazelleToolBar"/>
+                </div>
+
+                <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                    <ui:param name="popup_id" value="DeleteAllTestInstancesModalPanel"/>
+                    <ui:define name="popup_title">
+                        #{messages['gazelle.tm.application.preferences.gmm.confirmation.Confirmation']}
+                    </ui:define>
+                    <p>#{messages['gazelle.tm.AreYouSureToDeleteAllTestInstancesBelongingTo']} </p>
+
+                    <p>#{testingSessionManager.selectedTestingSession.description}</p>
+                    <ui:define name="popup_footer">
+                        <button type="button" class="gzl-btn" data-dismiss="modal">
+                            #{messages['gazelle.tm.Cancel']}
+                        </button>
+                        <a4j:commandButton id="deleteConfirmationPanelButton"
+                                           value="#{messages['gazelle.common.button.Confirm']}"
+                                           styleClass="gzl-btn-red" ignoreDupResponses="true"
+                                           actionListener="#{connecthatonTestingManager.deleteAllConnectathonTestInstanceByTestingSession(testingSessionManager.selectedTestingSession)}"
+                                           oncomplete="jq162('#DeleteAllTestInstancesModalPanel').modal('hide');"
+                                           render="TestingManagementPanel"/>
+                    </ui:define>
+                </ui:decorate>
+
+                <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                    <ui:param name="popup_id" value="DeleteAllIntegrationProfilesModalPanel"/>
+                    <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.RemoveAllIntegrationProfiles']}
+                    </ui:define>
+                    <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToRemoveAllTheProfileForThatSes']}</p>
+                    <ui:define name="popup_footer">
+                        <button type="button" class="gzl-btn" data-dismiss="modal">
+                            #{messages['gazelle.tm.Cancel']}
+                        </button>
+                        <a4j:commandButton id="DeleteAllIntegrationProfilesConfirmationPanelButton"
+                                           value="#{messages['gazelle.common.button.Confirm']}"
+                                           styleClass="gzl-btn-red" ignoreDupResponses="true"
+                                           actionListener="#{testingSessionManager.removeAllIntegrationProfiles()}"
+                                           oncomplete="jq162('#DeleteAllIntegrationProfilesModalPanel').modal('hide');"
+                                           render="addintegrationProfilesInTestingInSessionDiv"/>
+                    </ui:define>
+                </ui:decorate>
+            </h:form>
+        </ui:decorate>
+        <!--@formatter:off-->
+        <s:span id="spinnerScript">
+            <script>
+                disable_input_spinner_mouse_wheel('#{rich:clientId('sessionOrderSpinner')}');
+            </script>
+        </s:span>
+        <!--@formatter:on-->
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,35 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+    <!-- Comment Sample Modal-->
+    <!-- ui:param name="managedbean" value="a bean name (extends AbstractSampleManager)"-->
+    <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+    <h:form id="CommentSampleForm">
+        <s:token allowMultiplePosts="true"/>
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="CommentSampleModal"/>
+            <ui:define name="popup_title">#{messages['gazelle.testmanagement.object.CommentCurrentSample']}</ui:define>
+            <a4j:region id="CommentValueReg">
+                <s:decorate id="CommentValDecoration" template="/layout/form/_edit.xhtml">
+                    <ui:param name="id" value="CommentEditorId"/>
+                    <ui:define name="label">#{messages['gazelle.testmanagement.object.Comment']}</ui:define>
+                    <h:inputTextarea styleClass=" form-control" id="CommentEditorId"
+                                     value="#{managedBean.commentOfCurrentSIS}"
+                                     rows="3" cols="35"/>
+                </s:decorate>
+            </a4j:region>
+            <ui:define name="popup_footer">
+                <button type="button" class="gzl-btn" data-dismiss="modal">
+                    #{messages['gazelle.tm.Cancel']}
+                </button>
+                <a4j:commandButton id="saveCommentbutton" value="#{messages['gazelle.common.button.Save']}"
+                                   styleClass="gzl-btn-green"
+                                   actionListener="#{managedBean.saveCommentOfObjectInstance()}"
+                                   onclick="jq162('#CommentSampleModal').modal('hide');"
+                                   render="commentsPanel, annotationForReaderOnCreateForm, helloword, messageDecoration"/>
+            </ui:define>
+        </ui:decorate>
+    </h:form>
+</ui:composition>

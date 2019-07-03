@@ -1,0 +1,270 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tm.TestsList']}"/>
+    <ui:define name="body">
+        <h:outputScript library="jscript" name="tests_list.js"/>
+
+        #{testsDefinitionsAdministrationManager.setMainTestPage(true)}
+        <c:set var="foundTests" scope="view" value="#{testsDefinitionsAdministrationManager.foundTests}"/>
+
+        <h:form id="f" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+
+            <h:inputHidden id="filterUrlParameters" name="filterUrlParameters"
+                           value="#{foundTests.filter.urlParameters}"/>
+            <script>
+                updateUrl("f:filterUrlParameters");
+                $("#f\\:filterUrlParameters").bind('change', function () {
+                    updateUrl("f:filterUrlParameters");
+                });
+            </script>
+            <div class="row">
+                <div class="col-lg-8">
+                    <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                        <ui:include src="/testing/research/filterAIPO.xhtml">
+                            <ui:param name="filter"
+                                      value="#{foundTests.filter}"/>
+                            <ui:param name="filterForm" value="f"/>
+                        </ui:include>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <ui:include src="/filter/filter.xhtml">
+                                    <ui:param name="filter"
+                                              value="#{foundTests.filter}"/>
+                                    <ui:param name="filterId" value="testType"/>
+                                    <ui:param name="filterName"
+                                              value="#{messages['gazelle.tm.monitors.TestType']}"/>
+                                    <ui:param name="filterForm" value="f"/>
+                                </ui:include>
+                            </div>
+                            <div class="col-lg-6">
+                                <ui:include src="/filter/filter.xhtml">
+                                    <ui:param name="filter"
+                                              value="#{foundTests.filter}"/>
+                                    <ui:param name="filterId" value="testStatus"/>
+                                    <ui:param name="filterName" value="#{messages['gazelle.tm.TestStatus']}"/>
+                                    <ui:param name="filterForm" value="f"/>
+                                </ui:include>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <ui:include src="/filter/filter.xhtml">
+                                    <ui:param name="filter"
+                                              value="#{foundTests.filter}"/>
+                                    <ui:param name="filterId" value="testPeerType"/>
+                                    <ui:param name="filterName" value="#{messages['gazelle.tm.TestPeerType']}"/>
+                                    <ui:param name="filterForm" value="f"/>
+                                </ui:include>
+                            </div>
+                            <div class="col-lg-6">
+                                <ui:include src="/filter/filter.xhtml">
+                                    <ui:param name="filter"
+                                              value="#{foundTests.filter}"/>
+                                    <ui:param name="filterId" value="testVersion"/>
+                                    <ui:param name="filterName" value="#{messages['gazelle.tm.TestVersion']}"/>
+                                    <ui:param name="filterForm" value="f"/>
+                                </ui:include>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <ui:include src="/filter/filter.xhtml">
+                                    <ui:param name="filter"
+                                              value="#{foundTests.filter}"/>
+                                    <ui:param name="filterId" value="lastModifier"/>
+                                    <ui:param name="filterName"
+                                              value="#{messages['gazelle.tm.TestLastModifier']}"/>
+                                    <ui:param name="filterForm" value="f"/>
+                                </ui:include>
+                            </div>
+                            <div class="col-lg-6">
+                                <ui:include src="/filter/filter.xhtml">
+                                    <ui:param name="filter"
+                                              value="#{foundTests.filter}"/>
+                                    <ui:param name="filterId" value="testValidated"/>
+                                    <ui:param name="filterName"
+                                              value="#{messages['net.ihe.gazelle.tm.IsValidated_2']}"/>
+                                    <ui:param name="filterForm" value="f"/>
+                                </ui:include>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <ui:include src="/filter/filter.xhtml">
+                                    <ui:param name="filter"
+                                              value="#{foundTests.filter}"/>
+                                    <ui:param name="filterId" value="testAuthor"/>
+                                    <ui:param name="filterName" value="#{messages['gazelle.tm.Author']}"/>
+                                    <ui:param name="filterForm" value="f"/>
+                                </ui:include>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">
+                                        <h:outputText id="searchTextName"
+                                                      value="#{messages['net.ihe.gazelle.tm.ByKeywordOrName']}"/>
+                                    </label>
+
+                                    <div class="col-sm-5">
+                                        <h:panelGrid columns="3" border="0" cellpadding="0" cellspacing="0">
+                                            <h:inputText styleClass=" form-control" id="inputTextFind"
+                                                         value="#{testsDefinitionsAdministrationManager.searchKeyword}"/>
+                                            <rich:hotKey key="return"
+                                                         onkeydown="#{rich:element('sumbitFindTextImage')}.click()"
+                                                         selector="#inputTextFind"/>
+
+                                            <a4j:commandLink id="sumbitFindTextImage" event="click"
+                                                             render="f,inputTextFind"
+                                                             title="#{messages['gazelle.common.button.Search']}">
+                                                <span class="gzl-icon-search"/>
+                                            </a4j:commandLink>
+
+                                        </h:panelGrid>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <ui:define name="filter_buttons">
+                            <a4j:commandLink actionListener="#{testsDefinitionsAdministrationManager.resetFilter()}"
+                                             title="#{messages['gazelle.users.reset']}" type="submit"
+                                             oncomplete="colorRowsOfTable();" execute="@this" render="f">
+                                <span class="fa fa-times-circle"/>
+                            </a4j:commandLink>
+                        </ui:define>
+                    </ui:decorate>
+                </div>
+                <div class="col-lg-4">
+                    <ui:include src="../test/presets.xhtml">
+                        <ui:param name="formId" value="f"/>
+                        <ui:param name="formId2" value="f"/>
+                        <ui:param name="connectathonResult"
+                                  value="#{testsDefinitionsAdministrationManager}"/>
+                        <ui:param name="min_height" value="197px"/>
+                    </ui:include>
+                </div>
+            </div>
+
+
+            <h:outputLink styleClass="gzl-btn-green"
+                          value="#{applicationPreferenceManager.getApplicationUrl()}testing/testsDefinition/editTestSummary.seam"
+                          rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}">
+                <f:param name="new" value="1"/>
+                <h:outputText value="#{messages['gazelle.tm.AddANewTest']}"/>
+            </h:outputLink>
+
+            <rich:dataTable id="t" var="currentTest" rowKeyVar="rowNumber"
+                            value="#{foundTests}"
+                            first="0" columnClasses="center" rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                            render="ds">
+                <ui:include src="testsListColumns.xhtml">
+                    <ui:param name="currentTest" value="#{currentTest}"/>
+                    <ui:param name="filteredTests"
+                              value="#{foundTests}"/>
+                </ui:include>
+                <f:facet name="footer">
+                    <ui:include src="/util/datatableFooter.xhtml">
+                        <ui:param name="dataScrollerId" value="ds"/>
+                        <ui:param name="dataTableId" value="t"/>
+                    </ui:include>
+                </f:facet>
+            </rich:dataTable>
+            <h:commandLink value="#{messages['gazelle.common.export.ExportAsExcel']}"
+                           action="#{gazelleExcelExporterJboss7.export('f:t')}"/>
+
+        </h:form>
+
+        <h:panelGroup
+                rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}">
+            <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                <ui:param name="panel_id" value="UploadTestsPanel"/>
+                <ui:define name="panel_title">
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.ImportTests']}"/>
+                </ui:define>
+                <h:form id="globalFrom" enctype="multipart/form-data">
+                    <s:div id="u">
+                        <ui:include src="/fineupload.xhtml">
+                            <ui:param name="id" value="testsToUpload"/>
+                            <ui:param name="idToRerender" value="f"/>
+                            <ui:param name="beanName" value="testIOManager"/>
+                            <ui:param name="multiple" value="false"/>
+                            <ui:param name="extensions" value="xml"/>
+                        </ui:include>
+                    </s:div>
+                </h:form>
+            </ui:decorate>
+        </h:panelGroup>
+
+        <h:form id="deletetestForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteConfirmationModalPanel"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.DeleteTest']}</ui:define>
+                <p>#{messages['gazelle.tm.DeleteTest']}: #{testsDefinitionsAdministrationManager.selectedTest.keyword}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="deleteConfirmationPanelButton"
+                                       value="#{messages['gazelle.common.button.Delete']}"
+                                       styleClass="gzl-btn-red" ignoreDupResponses="true"
+                                       actionListener="#{testsDefinitionsAdministrationManager.deleteSelectedTest()}"
+                                       onclick="jq162('#DeleteConfirmationModalPanel').modal('hide');"
+                                       oncomplete="colorRowsOfTable()"
+                                       render="f"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <h:form id="confcopForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="CopyConfirmationModalPanel"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.CopyTest']} </ui:define>
+                <p>#{messages['gazelle.tm.CopyTest']}: #{testDefinitionManager.selectedTest.keyword}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="deleteConfirmationPanelButton"
+                                       value="#{messages['gazelle.common.button.Confirm']}"
+                                       styleClass="gzl-btn-red" ignoreDupResponses="true"
+                                       actionListener="#{testDefinitionManager.copySelectedTest()}"
+                                       onclick="jq162('#CopyConfirmationModalPanel').modal('hide');"
+                                       oncomplete="colorRowsOfTable()"
+                                       render="f"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <h:form id="printAllTestsForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="printAllTestsId"/>
+                <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.PrintAllTests']}</ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.DueToAnExcessLargeNumberOfTestTheListWasSplitedE']}</p>
+                <s:div id="printAllTestsDiv">
+                <a4j:repeat value="#{testsDefinitionsAdministrationManager.listOfTestLists}" var="item"
+                            rowKeyVar="i">
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.Part']} #{i+1} : "/>
+                    <h:commandLink
+                            action="#{testsDefinitionsAdministrationManager.downloadSelectedTestsAsPdf(item,(i+1))}"
+                            title="#{messages['net.ihe.gazelle.tm.ExportFilteredTestAsPdf']}"
+                            render="printAllTestsDiv">
+                        <span class="gzl-icon-pdf"/>
+                    </h:commandLink>
+                </a4j:repeat>
+                </s:div>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

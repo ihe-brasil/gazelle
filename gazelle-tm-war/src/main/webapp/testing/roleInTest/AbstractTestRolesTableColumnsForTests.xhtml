@@ -1,0 +1,116 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml">
+    <g:column>
+        <ui:define name="header">
+            #{messages['gazelle.testmanagement.object.keyword']}
+        </ui:define>
+        <a4j:commandLink id="ritKeyword"
+                         action="#{roleInTestManager.setFindRoleInTestFieldToNullAndsetRoleInTestKeywordSearch(currentTestRoles.roleInTest)}"
+                         value="#{currentTestRoles.roleInTest.keyword}" immediate="true"
+                         rendered="#{(s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}"/>
+        <h:outputText value="#{currentTestRoles.roleInTest.keyword}"
+                      rendered="#{!((s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel())}"/>
+        <s:span styleClass="fa fa-laptop" rendered="#{currentTestRoles.roleInTest.isRolePlayedByATool}"
+                title="#{messages['net.ihe.gazelle.tm.RolePlayedByATool']}"/>
+        <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+            <ui:param name="id" value="k#{currentTestRoles.id}"/>
+            <ui:param name="placement" value="bottom"/>
+            <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+            <ui:param name="trigger" value="click"/>
+            <ui:define name="content">
+                <s:div>
+                    <h:outputText value="#{messages['gazelle.tm.test.NoParticipantsForThisRole']}"
+                                  rendered="#{currentTestRoles.roleInTest.testParticipantsList.size()==0 }"/>
+                </s:div>
+                <div style="max-height: 300px; overflow: auto;">
+                    <rich:dataTable id="roleInTestTable" cellpadding="0" cellspacing="0" width="700" border="0"
+                                    var="currentTestParticipant"
+                                    value="#{roleInTestManager.getTestParticipantsForTestRole(currentTestRoles)}"
+                                    rendered="#{roleInTestManager.testParticipantsForTestRole.size()!=0 }"
+                                    first="0">
+                        <f:facet name="header">
+                            <rich:columnGroup>
+                                <g:column>
+                                    <h:outputText value="#{messages['gazelle.testmanagement.system.label.IP']}"/>
+                                </g:column>
+                                <g:column>
+                                    <h:outputText value="#{messages['gazelle.configuration.system.actorKeyword']}"/>
+                                </g:column>
+                                <g:column>
+                                    <h:outputText value="#{messages['gazelle.tests.test.option']}"/>
+                                </g:column>
+                                <g:column>
+                                    <h:outputText value="#{messages['gazelle.tm.test.IsTested']}"/>
+                                </g:column>
+                            </rich:columnGroup>
+                        </f:facet>
+                        <g:column>
+                            <h:outputText
+                                    value="#{currentTestParticipant.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.toString()}">
+                            </h:outputText>
+                        </g:column>
+                        <g:column>
+                            <h:outputText
+                                    value="#{currentTestParticipant.actorIntegrationProfileOption.actorIntegrationProfile.actor.toString()}"/>
+                        </g:column>
+                        <g:column>
+                            <h:outputText
+                                    value="#{currentTestParticipant.actorIntegrationProfileOption.integrationProfileOption.keyword}"/>
+                        </g:column>
+                        <g:column>
+                            <h:outputText value="#{currentTestParticipant.tested}"/>
+                        </g:column>
+                    </rich:dataTable>
+                </div>
+            </ui:define>
+        </ui:decorate>
+    </g:column>
+    <g:column>
+        <ui:define name="header">
+            # #{messages['gazelle.tm.roleInTest.toRealize']}
+        </ui:define>
+        <h:outputText id="numToRealize" value="#{currentTestRoles.numberOfTestsToRealize}"/>
+    </g:column>
+    <g:column>
+        <ui:define name="header">
+            #{messages['gazelle.tm.CardMin']}
+        </ui:define>
+        <h:outputText id="cardMin" value="#{currentTestRoles.cardMin}"/>
+    </g:column>
+    <g:column>
+        <ui:define name="header">
+            #{messages['gazelle.tm.CardMax']}
+        </ui:define>
+        <h:outputText id="cardMax" value="#{currentTestRoles.cardMax}"/>
+    </g:column>
+    <g:column>
+        <ui:define name="header">
+            #{messages['gazelle.tf.table.Optionality']}
+        </ui:define>
+        <h:outputText id="option" value="#{currentTestRoles.testOption.labelToDisplay}"/>
+    </g:column>
+    <g:column>
+        <ui:define name="header">
+            #{messages['gazelle.tm.testing.URL']}
+        </ui:define>
+        <s:div rendered="#{ not empty currentTestRoles.url}">
+            <a href="#{currentTestRoles.url}" target="_blank"
+               title="#{messages['gazelle.tm.GoTo']} : #{currentTestRoles.url}">
+                <span class="gzl-icon-globe"/>
+            </a>
+        </s:div>
+    </g:column>
+    <g:column>
+        <ui:define name="header">
+            #{messages['gazelle.tm.URLDoc']}
+        </ui:define>
+        <s:div rendered="#{ not empty currentTestRoles.urlDocumentation}">
+            <a href="#{currentTestRoles.urlDocumentation}" target="_blank"
+               title="#{messages['gazelle.tm.GoTo']}: #{currentTestRoles.urlDocumentation}">
+                <span class="gzl-icon-globe"/>
+            </a>
+        </s:div>
+    </g:column>
+</ui:composition>

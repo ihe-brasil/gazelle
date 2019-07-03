@@ -1,0 +1,127 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+        <ui:param name="panel_id" value="#{varTableId}Panel"/>
+        <ui:define name="panel_title">#{dataTableHeader}</ui:define>
+        <h:panelGrid columns="2" columnClasses="gridContent">
+            <s:div>
+                <h:outputText value="#{varList.size()} #{subHeader}"
+                              rendered="#{varList.size() &gt; 0}"/>
+            </s:div>
+        </h:panelGrid>
+        <rich:dataTable cellspacing="0" width="700" border="0" rowClasses="#{varColor}"
+                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" id="#{varTableId}"
+                        var="selectedTestInstance" value="#{varList}">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <g:column rowspan="2">
+                        <h:outputText value="#{messages['gazelle.tf.table.Id']}"/>
+                    </g:column>
+                    <g:column rowspan="2">
+                        <h:outputText value="#{messages['gazelle.tm.test.execution.Status']}"/>
+                    </g:column>
+                    <g:column rowspan="2">
+                        <h:outputText value="#{messages['gazelle.tm.monitors.TestType']}"/>
+                    </g:column>
+                    <g:column rowspan="2">
+                        <h:outputText value="#{messages['gazelle.tm.monitors.TestName']}"/>
+                    </g:column>
+                    <g:column rowspan="2">
+                        <h:outputText value="#{messages['gazelle.tm.test.LastUpdate']}"/>
+                    </g:column>
+                    <g:column colspan="5">
+                        <h:outputText value="#{messages['gazelle.tm.monitors.TestParticipants']}"/>
+                    </g:column>
+                    <g:column breakRowBefore="true">
+                        <h:outputText value="#{messages['gazelle.tm.monitors.SystemKeyword']}"/>
+                    </g:column>
+                    <g:column>
+                        <h:outputText value="#{messages['gazelle.systems.systemInSession.table']}"/>
+                    </g:column>
+                    <g:column>
+                        <h:outputText value="#{messages['gazelle.testmanagement.system.label.IP']}"/>
+                    </g:column>
+                    <g:column>
+                        <h:outputText value="#{messages['gazelle.testmanagement.system.label.Actor']}"/>
+                    </g:column>
+                    <g:column>
+                        <h:outputText value="#{messages['gazelle.tf.LabelOption']}"/>
+                    </g:column>
+                </rich:columnGroup>
+            </f:facet>
+            <g:column sortBy="#{'id'}"
+                      sortOrder="#{datatablestateholder.sortorders['id']}">
+                <ui:define name="header">#{messages['gazelle.tm.tests.sort']}</ui:define>
+                <g:link target="_blank" value="#{selectedTestInstance}"/>
+            </g:column>
+            <g:column>
+                <h:outputText
+                        value="#{messages[selectedTestInstance.executionStatus.labelKeyForDisplay]}"/>
+            </g:column>
+            <g:column>
+                <h:outputText value="#{messages[selectedTestInstance.test.testPeerType.labelToDisplay]}"/>
+            </g:column>
+            <g:column>
+                <g:link target="_blank" value="#{selectedTestInstance.test}"/>
+            </g:column>
+            <g:column sortBy="#{'lastChanged'}"
+                      sortOrder="#{datatablestateholder.sortorders['lastchanged']}">
+                <ui:define name="header">#{messages['gazelle.tm.tests.sort']}</ui:define>
+                <g:date tooltip="true" value="#{selectedTestInstance.lastChanged}"/>
+            </g:column>
+            <g:column>
+            </g:column>
+            <g:column>
+            </g:column>
+            <g:column>
+            </g:column>
+            <g:column>
+            </g:column>
+            <g:column>
+            </g:column>
+            <rich:collapsibleSubTable id="subTable"
+
+                                      var="selectedTestInstanceParticipants"
+                                      value="#{gazelleDAO.getTestInstanceParticipantsListForATest(selectedTestInstance)}">
+                <g:column colspan="5">
+
+                    <f:facet name="footer">
+                        <h:outputText
+                                value="#{gazelleDAO.getTestInstanceParticipantsListForATest(selectedTestInstance).size} #{messages['gazelle.tm.monitors.TestParticipants']}"
+                                style="font-size:x-small;font-style:italic;"/>
+                    </f:facet>
+                </g:column>
+                <g:column>
+                    <g:link target="_blank"
+                            value="#{selectedTestInstanceParticipants.systemInSessionUser.systemInSession}"/>
+                </g:column>
+                <g:column>
+                    <h:outputText
+                            value="#{selectedTestInstanceParticipants.systemInSessionUser.systemInSession.tableSession.tableKeyword}"/>
+                </g:column>
+                <g:column>
+                    <h:outputText
+                            value="#{selectedTestInstanceParticipants.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.keyword}"/>
+                </g:column>
+                <g:column>
+                    <h:outputText
+                            value="#{selectedTestInstanceParticipants.actorIntegrationProfileOption.actorIntegrationProfile.actor.keyword}"/>
+                </g:column>
+                <g:column>
+                    <h:outputText
+                            value="#{selectedTestInstanceParticipants.actorIntegrationProfileOption.integrationProfileOption.keyword}"/>
+                </g:column>
+            </rich:collapsibleSubTable>
+            <f:facet name="footer">
+                <ui:include src="/util/datatableFooter.xhtml">
+                    <ui:param name="dataTableId" value="#{varTableId}"/>
+                </ui:include>
+            </f:facet>
+        </rich:dataTable>
+    </ui:decorate>
+
+</ui:composition>

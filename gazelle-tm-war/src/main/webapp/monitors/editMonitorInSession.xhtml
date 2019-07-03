@@ -1,0 +1,158 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <s:div id="testManagementDiv">
+        <s:div id="testListDiv">
+            <h:outputText
+                    value="#{monitorInSessionAdministrationManager.selectedMonitorInSession.testList.size()} #{messages['gazelle.tm.TestsFound']}."
+                    rendered="#{not empty monitorInSessionAdministrationManager.selectedMonitorInSession.testList}"/>
+            <rich:dataTable id="testListTable" cellspacing="0" rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                            width="700" border="0" var="selectedTest"
+                            value="#{monitorInSessionAdministrationManager.selectedMonitorInSession.getAllTestList()}"
+                            render="ds">
+                <f:facet name="header">#{messages['gazelle.tm.monitors.TestList']}</f:facet>
+                <g:column sortBy="#{'keyword'}" sortOrder="ascending">
+                    <ui:define name="header">#{messages['gazelle.testmanagement.object.keyword']}</ui:define>
+                    <g:link target="_blank" value="#{selectedTest}"/>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">#{messages['gazelle.testmanagement.configuration.ParameterDescription']}
+                    </ui:define>
+                    #{selectedTest.shortDescription}
+                </g:column>
+                <g:column>
+                    <ui:define name="header">#{messages['gazelle.tm.monitors.PeerType']}</ui:define>
+                    #{messages[selectedTest.testPeerType.labelToDisplay]}
+                </g:column>
+                <g:column>
+                    <ui:define name="header">#{messages['gazelle.common.application.about.version']}</ui:define>
+                    #{selectedTest.version}
+                </g:column>
+                <g:column>
+                    <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+                    <div class="gzl-never-wrap">
+
+                        <a4j:commandLink event="click" render="globalForm:testListDiv"
+                                         width="22" title="#{messages['gazelle.common.button.Delete']}"
+                                         actionListener="#{monitorInSessionAdministrationManager.removeTestFromMonitorList(selectedTest)}">
+                            <span class="gzl-icon-trash-o"/>
+                        </a4j:commandLink>
+
+                    </div>
+
+                </g:column>
+                <f:facet name="footer">
+                    <ui:include src="/util/datatableFooter.xhtml">
+                        <ui:param name="dataScrollerId" value="ds"/>
+                        <ui:param name="dataTableId" value="testListTable"/>
+                    </ui:include>
+                </f:facet>
+            </rich:dataTable>
+
+        </s:div>
+        <s:div id="editpart">
+            <div align="right">
+                <a4j:commandButton id="editTestAssignmentButton"
+                                   rendered="#{!monitorInSessionAdministrationManager.showAddTestsPanel}"
+                                   value="#{messages['gazelle.tm.monitors.EditTestAssignment']}"
+                                   action="#{monitorInSessionAdministrationManager.showAddTestsPanel()}"
+                                   styleClass="gzl-btn" render="editpart"/>
+            </div>
+
+            <h:panelGroup rendered="#{monitorInSessionAdministrationManager.showAddTestsPanel}">
+                <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                    <ui:param name="panel_id" value="testAssignmentPanel"/>
+                    <ui:define name="panel_title">#{messages['gazelle.tm.monitors.TestAssignment']}</ui:define>
+                    <s:decorate id="panelListPossibleSearchCriterion" style="font-size: 11px;"
+                                template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="PossibleSearchCriterionListBox"/>
+                        <ui:define name="label">#{messages['gazelle.tm.monitors.PossibleSearchCriteria']}</ui:define>
+                        <h:selectOneMenu styleClass="form-control gzl-form-control" id="PossibleSearchCriterionListBox"
+                                         value="#{monitorInSessionAdministrationManager.selectedCriterion}">
+                            <s:selectItems
+                                    value="#{monitorInSessionAdministrationManager.getPossibleSearchCriterionList()}"
+                                    var="selectedCriterion"
+                                    noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                    label="#{messages[selectedCriterion]}"/>
+                            <a4j:ajax event="change"
+                                      render="testAssignmentPanel,messageDecEdit"
+                                      listener="#{monitorInSessionAdministrationManager.findTestsForSelectedCriteria()}"/>
+
+                        </h:selectOneMenu>
+                    </s:decorate>
+                    <s:decorate id="decorationListDomain" style="font-size: 11px;" template="/layout/form/_edit.xhtml"
+                                rendered="#{monitorInSessionAdministrationManager.selectedCriterion.equals(monitorInSessionAdministrationManager.getSEARCH_BY_DOMAIN_LABEL_TO_DISPLAY())}">
+                        <ui:define name="label">#{messages['gazelle.tf.Domain']}</ui:define>
+                        <ui:param name="id" value="DomainListBox"/>
+                        <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text" id="DomainListBox"
+                                         value="#{monitorInSessionAdministrationManager.selectedDomain}">
+                            <s:selectItems value="#{gazelleDAO.getSelectedTestingSession().domains}"
+                                           var="domainFromList"
+                                           noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                           label="#{domainFromList.keyword} - #{domainFromList.name}"/>
+                            <a4j:ajax event="change"
+                                      render="testSelectionPanel,messageDecEdit"
+                                      listener="#{monitorInSessionAdministrationManager.findTestsForSelectedCriteria()}"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                    <s:decorate id="deconrationListIP" style="font-size: 11px;" template="/layout/form/_edit.xhtml"
+                                rendered="#{monitorInSessionAdministrationManager.selectedCriterion.equals(monitorInSessionAdministrationManager.getSEARCH_BY_PROFILE_LABEL_TO_DISPLAY())}">
+                        <ui:define name="label">#{messages['gazelle.tf.IntegrationProfile']}</ui:define>
+                        <ui:param name="id" value="integrationProfileListBox"/>
+                        <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text" id="integrationProfileListBox"
+                                         value="#{monitorInSessionAdministrationManager.selectedIntegrationProfile}">
+                            <s:selectItems value="#{gazelleDAO.getSelectedTestingSession().getIntegrationProfiles()}"
+                                           var="integrationProfileFromList"
+                                           noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                           label="#{integrationProfileFromList.keyword}:#{integrationProfileFromList.name}"/>
+                            <a4j:ajax event="change" render="testSelectionPanel,messageDecEdit"
+                                      listener="#{monitorInSessionAdministrationManager.findTestsForSelectedCriteria()}"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                    <s:decorate id="deconrationListActor" style="font-size: 11px;" template="/layout/form/_edit.xhtml"
+                                rendered="#{monitorInSessionAdministrationManager.selectedCriterion.equals(monitorInSessionAdministrationManager.getSEARCH_BY_ACTOR_LABEL_TO_DISPLAY())}">
+                        <ui:define name="label">#{messages['gazelle.tf.Actor']}</ui:define>
+                        <ui:param name="id" value="actorListBox"/>
+                        <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text" id="actorListBox"
+                                         value="#{monitorInSessionAdministrationManager.selectedActor}">
+                            <s:selectItems value="#{gazelleDAO.getSelectedTestingSession().getActorList()}"
+                                           var="actorFromList"
+                                           noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                           label="#{actorFromList.keyword}:#{actorFromList.name}"/>
+                            <a4j:ajax event="change" render="testSelectionPanel,messageDecEdit"
+                                      listener="#{monitorInSessionAdministrationManager.findTestsForSelectedCriteria()}"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                    <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                        <ui:param name="panel_id" value="testSelectionPanel"/>
+                        <a4j:region id="addTestRegion">
+                            <s:decorate id="addTestDecoration" template="/layout/form/_edit.xhtml">
+                                <ui:define name="label">#{messages['gazelle.tests.tests']}</ui:define>
+                                <ui:param name="id" value="addtest2mon"/>
+                                <rich:pickList listsHeight="240px" sourceListWidth="260px" targetListWidth="260px"
+                                               id="addtest2mon"
+                                               value="#{monitorInSessionAdministrationManager.selectedTests}">
+                                    <s:selectItems value="#{monitorInSessionAdministrationManager.availableTests}"
+                                                   var="selectedTest"
+                                                   label="#{selectedTest.keyword}:#{selectedTest.name}"/>
+                                    <s:convertEntity></s:convertEntity>
+                                </rich:pickList>
+                            </s:decorate>
+                        </a4j:region>
+                        <div align="right">
+                            <a4j:commandButton value="#{messages['gazelle.tm.monitors.UpdateMonitorTestList']}"
+                                               id="updatemon"
+                                               action="#{monitorInSessionAdministrationManager.addSelectedTestsToMonitor()}"
+                                               styleClass="gzl-btn" render="testManagementDiv"/>
+                            <a4j:commandButton value="#{messages['gazelle.tm.CloseTestAssignment']}" id="closetass"
+                                               action="#{monitorInSessionAdministrationManager.setShowAddTestsPanel(false)}"
+                                               styleClass="gzl-btn" render="editpart"/>
+                        </div>
+                    </ui:decorate>
+                </ui:decorate>
+            </h:panelGroup>
+        </s:div>
+    </s:div>
+</ui:composition>

@@ -1,0 +1,34 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+
+    <ui:param name="pageNameTitle" value="#{applicationPreferenceManager.getApplicationName()} "/>
+    <ui:define name="body">
+        <!-- Installation -->
+        <s:div id="installation" rendered="#{not applicationPreferenceManager.getInstallationDone()}">
+            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                <ui:define name="panel_title">#{messages['gazelle.tm.application.Installation']}</ui:define>
+                <h:outputText value="#{messages['gazelle.tm.home.installationRequired']}"/>
+                <br/>
+                <br/>
+                <h:form id="fromForInstall">
+                    <s:token allowMultiplePosts="true"/>
+                    <a4j:commandButton id="startInstallButton" value="#{messages['gazelle.tm.home.startInstallation']}"
+                                       action="/install/installation.seam"
+                                       styleClass="gzl-btn-green"/>
+                </h:form>
+            </ui:decorate>
+        </s:div>
+        <!-- GMM -->
+        <ui:include src="homeGMM.xhtml"/>
+        <!-- TM -->
+        <s:div rendered="#{applicationManager.isTestManagement()}">
+            <ui:include src="homeTM.xhtml"/>
+        </s:div>
+        <!-- PR -->
+        <s:div rendered="#{applicationManager.isProductRegistry()}">
+            <ui:include src="homePR.xhtml"/>
+        </s:div>
+    </ui:define>
+</ui:composition>

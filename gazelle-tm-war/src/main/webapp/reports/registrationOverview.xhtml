@@ -1,0 +1,167 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tm.RegistrationOverview']}"/>
+    <ui:define name="body">
+        #{dataTableStateHolder.setAscendingOn('system.keyword')}
+
+        <p class="gzl-alert gzl-alert-blue">
+            <span class="gzl-icon-info-circle"/>
+            <h:outputText id="reportsFormOutputTextId"
+                          value="#{messages['gazelle.systems.system.ReportIntroductionTest']}"/>
+        </p>
+        <h:form id="reportsFormId">
+            <s:token allowMultiplePosts="true"/>
+            <h:commandButton id="profileCoverageId" value="#{messages['gazelle.systems.system.ProfileCoverage']}"
+                             actionListener="#{reportManagerBean.listSystemsForAllActorIntegrationProfilePDF()}"
+                             styleClass="gzl-btn"/>
+            <h:commandButton id="systemsCoverageId" value="#{messages['gazelle.systems.system.SystemsSummary']}"
+                             action="#{reportManagerBean.listSystemsSummary()}" styleClass="gzl-btn"
+                             rendered="#{(s:hasRole('admin_role') || s:hasRole('monitor_role'))}"/>
+        </h:form>
+
+        <h:form id="globalform" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <h:inputHidden id="filterUrlParameters" name="filterUrlParameters"
+                           value="#{systemInSessionOverview.filterSAP.urlParameters}"/>
+            <script>
+                updateUrl("globalform:filterUrlParameters");
+                $("#globalform\\:filterUrlParameters").bind('change',
+                    function () {
+                        updateUrl("globalform:filterUrlParameters");
+                    });
+            </script>
+            <s:div id="globalDiv">
+                <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter" value="#{systemInSessionOverview.filterSAP}"/>
+                                <ui:param name="filterWidth" value="240"/>
+                                <ui:param name="filterId" value="testing_session"/>
+                                <ui:param name="filterName"
+                                          value="#{messages['gazelle.systems.testingSession']}"/>
+                                <ui:param name="filterForm" value="globalform"/>
+                            </ui:include>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter" value="#{systemInSessionOverview.filterSAP}"/>
+                                <ui:param name="filterWidth" value="240"/>
+                                <ui:param name="filterId" value="institution"/>
+                                <ui:param name="filterName" value="#{messages['gazelle.users.Institution']}"/>
+                                <ui:param name="filterForm" value="globalform"/>
+                            </ui:include>
+                        </div>
+                    </div>
+                    <!--  AIPO selection -->
+                    <ui:include src="/testing/research/filterAIPO.xhtml">
+                        <ui:param name="filter" value="#{systemInSessionOverview.filterSAP}"/>
+                        <ui:param name="filterForm" value="globalform"/>
+                    </ui:include>
+                    <!--  test selection -->
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter" value="#{systemInSessionOverview.filterSAP}"/>
+                                <ui:param name="filterWidth" value="240"/>
+                                <ui:param name="filterId" value="test"/>
+                                <ui:param name="filterName" value="#{messages['gazelle.tests.test']}"/>
+                                <ui:param name="filterForm" value="globalform"/>
+                            </ui:include>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter" value="#{systemInSessionOverview.filterSAP}"/>
+                                <ui:param name="filterWidth" value="240"/>
+                                <ui:param name="filterId" value="demonstration"/>
+                                <ui:param name="filterName"
+                                          value="#{messages['gazelle.systems.demonstration.Demonstration']}"/>
+                                <ui:param name="filterForm" value="globalform"/>
+                            </ui:include>
+                        </div>
+                    </div>
+                    <ui:define name="filter_buttons">
+                        <a4j:commandLink actionListener="#{systemInSessionOverview.filterSAP.clear()}"
+                                         title="#{messages['gazelle.users.reset']}" type="submit"
+                                         execute="@this" render="globalform">
+                            <span class="fa fa-times-circle"/>
+                        </a4j:commandLink>
+                    </ui:define>
+                </ui:decorate>
+            </s:div>
+
+            <h:commandButton id="systemsCoverageByDomainId"
+                             value="#{messages['gazelle.systems.system.SystemsSummary']} #{messages['net.ihe.gazelle.tm.ForDomain']} #{systemInSessionOverview.getDomainFromFilter().getKeyword()}"
+                             action="#{systemInSessionOverview.listSystemsSummary()}" styleClass="gzl-btn"
+                             rendered="#{(s:hasRole('admin_role') || s:hasRole('monitor_role')) and systemInSessionOverview.getDomainFromFilter()!=null}"/>
+
+            <rich:dataTable id="sapTable" var="currentSystemActorProfile"
+                            value="#{systemInSessionOverview.systemActorProfiles}" rowKeyVar="rowNumber"
+                            rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                <g:column>
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['gazelle.tf.domain']}"/>
+                    </ui:define>
+                    <h:outputText
+                            value="#{tmCheckListManager.checkForDomainOf(currentSystemActorProfile.actorIntegrationProfileOption)}"/>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.OrganisationKeyword']}"/>
+                    </ui:define>
+                    <h:outputText
+                            value="#{currentSystemActorProfile.system.getUniqueInstitution().getKeyword()}"/>
+                </g:column>
+                <g:column sortBy="#{'system.keyword'}"
+                          sortOrder="#{datatablestateholder.sortorders['system.keyword']}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['gazelle.systems.system.SystemKeyword']}"/>
+                    </ui:define>
+                    <g:link value="#{currentSystemActorProfile.system}" detailed="true"/>
+                </g:column>
+                <g:column
+                        sortBy="#{'actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.keyword'}"
+                        sortOrder="#{datatablestateholder.sortorders['actorintegrationprofileoption.actorintegrationprofile.integrationprofile.keyword']}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['gazelle.productregistry.system.label.IP']}"/>
+                    </ui:define>
+                    <g:link value="#{currentSystemActorProfile.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile}"
+                            detailed="true"/>
+                </g:column>
+                <g:column sortBy="#{'actorIntegrationProfileOption.actorIntegrationProfile.actor.keyword'}"
+                          sortOrder="#{datatablestateholder.sortorders['actorintegrationprofileoption.actorintegrationprofile.actor.keyword']}">
+                    <ui:define name="header">
+                        <h:outputText
+                                value="#{messages['gazelle.testmanagement.system.label.Actor']}"/>
+                    </ui:define>
+                    <g:link value="#{currentSystemActorProfile.actorIntegrationProfileOption.actorIntegrationProfile.actor}"
+                            detailed="true"/>
+                </g:column>
+                <g:column sortBy="#{'actorIntegrationProfileOption.integrationProfileOption.keyword'}"
+                          sortOrder="#{datatablestateholder.sortorders['actorintegrationprofileoption.integrationprofileoption.keyword']}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['gazelle.tests.test.option']}"/>
+                    </ui:define>
+                    <g:link value="#{currentSystemActorProfile.actorIntegrationProfileOption.integrationProfileOption}"
+                            detailed="true"/>
+                </g:column>
+                <f:facet name="footer">
+                    <ui:include src="/util/datatableFooter.xhtml">
+                        <ui:param name="dataScrollerId" value="ds"/>
+                        <ui:param name="dataTableId" value="sapTable"/>
+                    </ui:include>
+                </f:facet>
+            </rich:dataTable>
+            <h:commandLink value="#{messages['gazelle.common.export.ExportAsExcel']}"
+                           action="#{gazelleExcelExporterJboss7.export('globalform:sapTable',false)}"/>
+        </h:form>
+
+    </ui:define>
+</ui:composition>

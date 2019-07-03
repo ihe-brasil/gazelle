@@ -1,0 +1,44 @@
+<!--
+ * Copyright 2008 IHE International (http://www.ihe.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.2
+ -->
+<!--@formatter:off-->
+<m:message xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:m="http://jboss.org/schema/seam/mail"
+           xmlns="http://www.w3.org/1999/xhtml"
+           charset="UTF8">
+    <m:from name="#{applicationPreferenceManager.getApplicationNoReplyEmail()}"
+            address="#{applicationPreferenceManager.getApplicationNoReplyEmail()}"/>
+    <m:replyTo name="#{applicationPreferenceManager.getApplicationAdminName()}"
+               address="#{applicationPreferenceManager.getApplicationAdminEmail()}"/>
+    <m:to name="#{interpolator.interpolate(messages['gazelle.common.mail.to'], emailManager.recipient.firstname, emailManager.recipient.lastname)}">
+        #{emailManager.recipient.email}</m:to>
+    <m:bcc name="History">#{applicationPreferenceManager.getApplicationEmailAccountForHistory()}</m:bcc>
+    <m:subject>#{applicationPreferenceManager.getApplicationName()} - #{messages['gazelle.common.AccountActivation']}
+    </m:subject>
+    <m:body type="plain">
+        #{interpolator.interpolate(messages['gazelle.common.mail.headerWithInstitution'], emailManager.recipient.firstname, emailManager.recipient.lastname, emailManager.recipient.institution.name)}
+
+        #{interpolator.interpolate(messages['gazelle.common.mail.confirmation.thankyou'], applicationPreferenceManager.getApplicationName())}
+        #{messages['net.ihe.gazelle.tm.YourAccountIsNotActivatedYetYouWillAutomatically']}
+        <ui:repeat value="#{emailManager.institutionAdmins}" var="user">
+            #{interpolator.interpolate(messages['gazelle.common.mail.waiting.admin'], user.firstname, user.lastname)}
+        </ui:repeat>
+
+        #{interpolator.interpolate(messages['gazelle.common.mail.confirmation.login'], emailManager.concerned.username)}
+        #{messages['gazelle.common.mail.confirmation.username']}
+
+        #{applicationPreferenceManager.getApplicationAdminName()}
+    </m:body>
+</m:message>
+<!--@formatter:on-->

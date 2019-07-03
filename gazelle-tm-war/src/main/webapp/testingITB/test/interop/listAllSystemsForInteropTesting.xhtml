@@ -1,0 +1,95 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tm.testing.listOfSystemsForTesting']}"/>
+    <ui:define name="body">
+        <h:form id="selectInstitutionForm">
+            <s:token allowMultiplePosts="true"/>
+            <f:facet name="header">#{messages['gazelle.systems.system.ListSystemsLabel2']}</f:facet>
+            <h:panelGrid columns="2">
+                <ui:include src="/filter/filter.xhtml">
+                    <ui:param name="filter" value="#{mesaTestManager.systemsInSession.filter}"/>
+                    <ui:param name="filterWidth" value="240"/>
+                    <ui:param name="filterId" value="testing_session"/>
+                    <ui:param name="filterName" value="#{messages['gazelle.systems.testingSession']}"/>
+                    <ui:param name="filterForm" value="selectInstitutionForm"/>
+                </ui:include>
+                <ui:include src="/filter/filter.xhtml">
+                    <ui:param name="filter" value="#{mesaTestManager.systemsInSession.filter}"/>
+                    <ui:param name="filterWidth" value="240"/>
+                    <ui:param name="filterId" value="institution"/>
+                    <ui:param name="filterName" value="#{messages['gazelle.users.Institution']}"/>
+                    <ui:param name="filterForm" value="selectInstitutionForm"/>
+                </ui:include>
+            </h:panelGrid>
+            <br/>
+            <s:div id="systemPanel">
+                <rich:dataTable id="systemTable" var="currentSystemInSession"
+                                value="#{mesaTestManager.systemsInSession}" rowKeyVar="rowNumber"
+
+
+                                rows="#{dataScrollerMemory.numberOfResultsPerPage}">
+                    <g:column>
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.systems.system.SystemKeyword']}"/>
+                        </ui:define>
+                        <h:commandLink
+                                action="#{systemInSessionListManager.viewSystemInSession(currentSystemInSession)}"
+                                value="#{currentSystemInSession.system.keyword}" target="_blank"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">
+                            <h:outputText
+                                    value="#{messages['gazelle.systems.system.SystemName']} (#{messages['gazelle.systems.system.SystemVersion']})"/>
+                        </ui:define>
+                        <h:outputText value="#{currentSystemInSession.system.name}"/>
+                        <h:outputText value=" (#{currentSystemInSession.system.version})"
+                                      rendered="#{currentSystemInSession.system.version!=null and  currentSystemInSession.system.version.length()&gt;0}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.tm.testing.numberTestsToDo']}"/>
+                        </ui:define>
+                        <h:commandLink action="#{mesaTestManager.displayListOfTests(currentSystemInSession, null)}"
+                                       value="#{mesaTestManager.getNumberOfTestToDo(currentSystemInSession)}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.ToComplete']}"/>
+                        </ui:define>
+                        <h:commandLink
+                                action="#{mesaTestManager.displayListOfTests(currentSystemInSession, 'TO_COMPLETE_BY_VENDOR')}"
+                                value="#{mesaTestManager.getNumberOfTestToComplete(currentSystemInSession)}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.Completed']}"/>
+                        </ui:define>
+                        <h:commandLink
+                                action="#{mesaTestManager.displayListOfTests(currentSystemInSession, 'TO_VERIFY_BY_ADMIN')}"
+                                value="#{mesaTestManager.getNumberOfTestCompleted(currentSystemInSession)}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.tm.testing.status.verified']}"/>
+                        </ui:define>
+                        <h:commandLink
+                                action="#{mesaTestManager.displayListOfTests(currentSystemInSession, 'VERIFIED')}"
+                                value=" #{mesaTestManager.getNumberOfTestVerified(currentSystemInSession)}"/>
+                    </g:column>
+                    <f:facet name="footer">
+                        <ui:include src="/util/datatableFooter.xhtml">
+                            <ui:param name="dataTableId" value="systemTable"/>
+                        </ui:include>
+                    </f:facet>
+                </rich:dataTable>
+                <h:commandLink value="#{messages['gazelle.common.export.ExportAsExcel']}"
+                               action="#{gazelleExcelExporterJboss7.export('selectInstitutionForm:systemTable')}"/>
+
+                <br/>
+            </s:div>
+        </h:form>
+    </ui:define>
+</ui:composition>

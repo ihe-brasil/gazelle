@@ -1,0 +1,40 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle"
+              value="#{messages['net.ihe.gazelle.tm.AddDomainsToOrRemoveDomainsFromProfile_2']} #{integrationProfileManager.selectedIntegrationProfile.name}"/>
+    <ui:define name="body">
+        <div  id="integrationProfileManager">
+            <h:form>
+                <s:token allowMultiplePosts="true"/>
+
+                <ui:decorate template="/layout/panels/_panel.xhtml">
+                    <rich:pickList value="#{integrationProfileManager.domainsTarget}"
+                                   minListHeight="120px" maxListHeight="200px" var="p"
+                                   sourceCaption="#{messages['net.ihe.gazelle.tm.AvailableDomains']}"
+                                   targetCaption="#{messages['net.ihe.gazelle.tm.DomainsCurrentlyInProfil']}">
+                        <f:selectItems value="#{integrationProfileManager.getDomainsSource()}"/>
+                        <s:convertEntity/>
+                        <g:column>
+                            <h:outputText value="#{p.keyword}"/>
+                        </g:column>
+                        <g:column>
+                            <h:outputText value="#{p.name}"/>
+                        </g:column>
+                    </rich:pickList>
+
+                    <h:commandButton id="save" type="submit" styleClass="gzl-btn-green"
+                                     value="#{messages['gazelle.common.button.Save']}"
+                                     action="#{integrationProfileManager.saveProfileDomains()}"
+                                     rendered="#{s:hasPermission('MasterModel', 'edit', null)}"/>
+                    <h:commandButton id="cancel" type="submit" styleClass="gzl-btn"
+                                     value="#{messages['gazelle.common.button.Cancel']}"
+                                     action="#{integrationProfileManager.cancelProfileDomains()}"/>
+                </ui:decorate>
+
+            </h:form>
+        </div>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,252 @@
+<s:div xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:h="http://java.sun.com/jsf/html"
+       xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+       xmlns:f="http://java.sun.com/jsf/core"
+       xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml" id="ViewSelectedObjectTypeDiv">
+
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="ViewSelectedObjectType"/>
+            <ui:define name="popup_title">#{objectTypeManager.selectedObjectType.keyword} :#{objectTypeManager.selectedObjectType.description}</ui:define>
+            <div style="width: 98%; overflow: auto;">
+                <h:outputText value="#{messages['gazelle.testmanagement.object.Nameofobjecttype']} :"
+                              styleClass="tooltipData"/>
+                <h:outputText value="#{objectTypeManager.selectedObjectType.keyword}"/>
+                <br/>
+                <br/>
+                <h:outputText value="#{messages['gazelle.testmanagement.object.Description']} :" styleClass="tooltipData"/>
+                <h:outputText value=":#{objectTypeManager.selectedObjectType.description}"/>
+                <br/>
+                <br/>
+
+                <div id="tabpanelForViewCaracteristic">
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active"><a href="#summaryOfObjT" aria-controls="summaryOfObjT"
+                                                                  role="tab" data-toggle="tab">#{messages['gazelle.testmanagement.object.summary']}</a>
+                        </li>
+                        <li role="presentation"><a href="#richatbofcreator" aria-controls="richatbofcreator" role="tab"
+                                                   data-toggle="tab">#{messages['gazelle.testmanagement.object.creators']}</a>
+                        </li>
+                        <li role="presentation"><a href="#richtabReader" aria-controls="richtabReader" role="tab"
+                                                   data-toggle="tab">#{messages['gazelle.testmanagement.object.readers']}</a>
+                        </li>
+                        <li role="presentation"><a href="#richtabfiles" aria-controls="richtabfiles" role="tab"
+                                                   data-toggle="tab">#{messages['gazelle.testmanagement.object.files']}</a>
+                        </li>
+                        <li role="presentation"><a href="#richtabattributes" aria-controls="richtabattributes" role="tab"
+                                                   data-toggle="tab">#{messages['gazelle.testmanagement.object.attributes']}</a>
+                        </li>
+                    </ul>
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active" id="summaryOfObjT">
+                            <h:outputText value="#{messages['gazelle.testmanagement.object.DefaultDesc']} : "
+                                          styleClass="tooltipData"/>
+                            <br/>
+                            <g:safehtml value="#{objectTypeManager.selectedObjectType.default_desc}"/>
+                            <br/>
+                            <br/>
+                            <h:outputText value="#{messages['gazelle.testmanagement.object.Instructions']} : "
+                                          styleClass="tooltipData"/>
+                            <br/>
+                            <g:safehtml value="#{objectTypeManager.selectedObjectType.instructions}"/>
+                            <br/>
+                            <br/></div>
+                        <div role="tabpanel" class="tab-pane" id="richatbofcreator">
+                            <h:outputText
+                                    value="#{messages['gazelle.testmanagement.object.CreatorsOf']}: #{objectTypeManager.selectedObjectType.keyword}"
+                                    styleClass="tooltipData"/>
+                            <br/>
+                            <rich:dataTable id="listObjectTypeCreators" var="currentCreator"
+                                            value="#{objectTypeManager.getListOfObjectCreatorForSelectedObjectType()}"
+
+
+                                            rowKeyVar="rowNumber" rows="10">
+                                <g:column sortBy="#{'id'}" sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                    <h:outputText value="#{currentCreator.id}"/>
+                                </g:column>
+                                <g:column sortBy="#{'AIPO.actorIntegrationProfile.integrationProfile.name'}"
+                                          sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Profile']}
+                                    </ui:define>
+                                    <h:outputText
+                                            value="#{currentCreator.AIPO.actorIntegrationProfile.integrationProfile.name}"/>
+                                </g:column>
+                                <g:column sortBy="#{'AIPO.actorIntegrationProfile.actor.name'}"
+                                          sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Actor']}</ui:define>
+                                    <h:outputText value="#{currentCreator.AIPO.actorIntegrationProfile.actor.name}"/>
+                                </g:column>
+                                <g:column sortBy="#{'AIPO.integrationProfileOption.name'}" sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Option']}</ui:define>
+                                    <h:outputText value="#{currentCreator.AIPO.integrationProfileOption.name}"/>
+                                </g:column>
+                                <g:column sortBy="#{'description'}" sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Description']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentCreator.description}"/>
+                                </g:column>
+                                <f:facet name="footer">
+                                    <rich:dataScroller maxPages="10" renderIfSinglePage="false"/>
+                                </f:facet>
+                            </rich:dataTable>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="richtabReader">
+                            <h:outputText
+                                    value="#{messages['gazelle.testmanagement.object.ReadersOf']}: #{objectTypeManager.selectedObjectType.keyword}"
+                                    styleClass="tooltipData"/>
+                            <br/>
+                            <rich:dataTable id="listObjectTypeReader" var="currentReader"
+                                            value="#{objectTypeManager.getListOfObjectReaderForSelectedObjectType()}"
+
+
+                                            rowKeyVar="rowNumber" rows="10">
+                                <g:column sortBy="#{'id'}" sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                    <h:outputText value="#{currentReader.id}"/>
+                                </g:column>
+                                <g:column sortBy="#{'AIPO.actorIntegrationProfile.integrationProfile.name'}"
+                                          sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Profile']}
+                                    </ui:define>
+                                    <h:outputText
+                                            value="#{currentReader.AIPO.actorIntegrationProfile.integrationProfile.name}"/>
+                                </g:column>
+                                <g:column sortBy="#{'AIPO.actorIntegrationProfile.actor.name'}"
+                                          sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Actor']}</ui:define>
+                                    <h:outputText value="#{currentReader.AIPO.actorIntegrationProfile.actor.name}"/>
+                                </g:column>
+                                <g:column sortBy="#{'AIPO.integrationProfileOption.name'}" sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Option']}</ui:define>
+                                    <h:outputText value="#{currentReader.AIPO.integrationProfileOption.name}"/>
+                                </g:column>
+                                <g:column sortBy="#{'description'}" sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Description']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentReader.description}"/>
+                                </g:column>
+                                <f:facet name="footer">
+                                    <rich:dataScroller maxPages="10" renderIfSinglePage="false"/>
+                                </f:facet>
+                            </rich:dataTable>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="richtabfiles">
+                            <h:outputText
+                                    value="#{messages['gazelle.testmanagement.object.Associatedfilesof']} #{objectTypeManager.selectedObjectType.keyword} #{messages['gazelle.testmanagement.object.forcreator']}"
+                                    styleClass="tooltipData"/>
+                            <br/>
+                            <rich:dataTable id="listObjectTypeAssociatedFile" var="currentObjectFile"
+                                            value="#{objectTypeManager.getListOfObjectFileForSelectedObjectTypeForCreator()}"
+
+
+                                            rows="10">
+                                <g:column sortBy="#{'id'}" sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                    <h:outputText value="#{currentObjectFile.id}"/>
+                                </g:column>
+                                <g:column sortBy="#{'type.keyword'}" sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.FileType']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentObjectFile.type.keyword}"/>
+                                </g:column>
+                                <g:column sortBy="#{'description'}" sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Description']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentObjectFile.description}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Minimum']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentObjectFile.min}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Maximum']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentObjectFile.max}"/>
+                                </g:column>
+                                <f:facet name="footer">
+                                    <rich:dataScroller maxPages="10" renderIfSinglePage="false"/>
+                                </f:facet>
+                            </rich:dataTable>
+                            <br/>
+                            <br/>
+                            <h:outputText
+                                    value="#{messages['gazelle.testmanagement.object.Associatedfilesof']} #{objectTypeManager.selectedObjectType.keyword} #{messages['gazelle.testmanagement.object.forreaders']}"
+                                    styleClass="tooltipData"/>
+                            <br/>
+                            <rich:dataTable id="listObjectTypeAssociatedFileForR" var="currentObjectFile"
+                                            value="#{objectTypeManager.getListOfObjectFileForSelectedObjectTypeForReaders()}"
+
+
+                                            rows="10">
+                                <g:column sortBy="#{'id'}" sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                    <h:outputText value="#{currentObjectFile.id}"/>
+                                </g:column>
+                                <g:column sortBy="#{'type.keyword'}" sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.FileType']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentObjectFile.type.keyword}"/>
+                                </g:column>
+                                <g:column sortBy="#{'description'}" sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Description']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentObjectFile.description}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Minimum']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentObjectFile.min}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Maximum']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentObjectFile.max}"/>
+                                </g:column>
+                                <f:facet name="footer">
+                                    <rich:dataScroller maxPages="10" renderIfSinglePage="false"/>
+                                </f:facet>
+                            </rich:dataTable>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="richtabattributes">
+                            <h:outputText
+                                    value="#{messages['gazelle.testmanagement.object.AssociatedAttributesof']} #{objectTypeManager.selectedObjectType.keyword}"
+                                    styleClass="tooltipData"/>
+                            <br/>
+                            <rich:dataTable id="listObjectTypeAssociatedAttribute" var="currentObjectAttribute"
+                                            value="#{objectTypeManager.getListOfObjectAttributeForSelectedObjectType()}"
+
+
+                                            rows="10">
+                                <g:column sortBy="#{'id'}" sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                    <h:outputText value="#{currentObjectAttribute.id}"/>
+                                </g:column>
+                                <g:column sortBy="#{'keyword'}" sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.AttributeType']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentObjectAttribute.keyword}"/>
+                                </g:column>
+                                <g:column sortBy="#{'description'}" sortOrder="ascending">
+                                    <ui:define name="header">
+                                        #{messages['gazelle.testmanagement.object.AttributeDescription']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentObjectAttribute.description}"/>
+                                </g:column>
+                                <f:facet name="footer">
+                                    <rich:dataScroller maxPages="10" renderIfSinglePage="false"/>
+                                </f:facet>
+                            </rich:dataTable>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <ui:define name="popup_footer">
+                <button type="button" class="gzl-btn" data-dismiss="modal">
+                    #{messages['gazelle.tm.Cancel']}
+                </button>
+            </ui:define>
+        </ui:decorate>
+</s:div>

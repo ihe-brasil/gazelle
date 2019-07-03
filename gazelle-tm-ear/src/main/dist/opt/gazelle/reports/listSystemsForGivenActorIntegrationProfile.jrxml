@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="963422d9-f39e-4622-bb57-aa57ed602162">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="testingSessionId" class="java.lang.Integer" isForPrompting="false">
+		<defaultValueExpression><![CDATA[new Integer(14)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="integrationProfileId" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[new Integer(53)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="actorId" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[new Integer(32)]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT DISTINCT
+     tm_system."name" AS tm_system_name,
+     tm_system_in_session."registration_status" AS registration_status,
+     usr_institution."name" AS usr_institution_name,
+     usr_institution."keyword" AS usr_institution_keyword,
+     case when char_length(tm_system."keyword_suffix")>0 then
+	 sys_system_type."keyword"  || '_'  ||  usr_institution."keyword" || '_' ||tm_system."keyword_suffix"
+     else
+	 sys_system_type."keyword"  || '_'  ||  usr_institution."keyword"
+     end AS tm_system_keyword,
+     tm_testing_type."keyword" AS tm_testing_type_keyword
+FROM
+     "public"."tm_system_actor_profiles" tm_system_actor_profiles INNER JOIN "public"."tm_system" tm_system ON tm_system_actor_profiles."system_id" = tm_system."id"
+     INNER JOIN "public"."tm_system_in_session" tm_system_in_session ON tm_system."id" = tm_system_in_session."system_id"
+     INNER JOIN "public"."tm_institution_system" tm_institution_system ON tm_system."id" = tm_institution_system."system_id"
+     INNER JOIN "public"."usr_institution" usr_institution ON tm_institution_system."institution_id" = usr_institution."id"
+     INNER JOIN "public"."tm_testing_session" tm_testing_session ON tm_system_in_session."testing_session_id" = tm_testing_session."id"
+     INNER JOIN "public"."sys_system_type" sys_system_type ON tm_system."system_type_id" = sys_system_type."id"
+     INNER JOIN "public"."tm_testing_type" tm_testing_type ON tm_system_actor_profiles."testing_type_id" = tm_testing_type."id"
+     INNER JOIN "public"."tf_actor_integration_profile_option" tf_actor_integration_profile_option ON tm_system_actor_profiles."actor_integration_profile_option_id" = tf_actor_integration_profile_option."id"
+     INNER JOIN "public"."tf_actor_integration_profile" tf_actor_integration_profile ON tf_actor_integration_profile_option."actor_integration_profile_id" = tf_actor_integration_profile.id
+WHERE
+     tf_actor_integration_profile."actor_id" = $P{actorId}
+ AND tf_actor_integration_profile."integration_profile_id" = $P{integrationProfileId}
+ AND tm_testing_session."id" = $P{testingSessionId}]]>
+	</queryString>
+	<field name="tm_system_name" class="java.lang.String"/>
+	<field name="usr_institution_name" class="java.lang.String"/>
+	<field name="usr_institution_keyword" class="java.lang.String"/>
+	<field name="tm_system_keyword" class="java.lang.String"/>
+	<field name="tm_testing_type_keyword" class="java.lang.String"/>
+	<field name="registration_status" class="java.lang.Integer"/>
+	<detail>
+		<band height="15">
+			<printWhenExpression><![CDATA[$F{registration_status} == null ? true : (!$F{registration_status}.equals(1) )]]></printWhenExpression>
+			<textField>
+				<reportElement isPrintRepeatedValues="false" x="198" y="0" width="176" height="15" isRemoveLineWhenBlank="true" uuid="81c30484-cc17-4b7b-8cb1-0bf481dbe440"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_system_name}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="RemotePage" hyperlinkTarget="Blank">
+				<reportElement x="387" y="0" width="168" height="15" isRemoveLineWhenBlank="true" uuid="15388ebd-6aed-4345-8938-e1ce42a81889"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{usr_institution_keyword}]]></textFieldExpression>
+				<anchorNameExpression><![CDATA[$F{usr_institution_name}]]></anchorNameExpression>
+				<hyperlinkTooltipExpression><![CDATA[$F{usr_institution_name}]]></hyperlinkTooltipExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement isPrintRepeatedValues="false" x="0" y="0" width="41" height="15" isRemoveLineWhenBlank="true" uuid="50b8518c-e396-4891-a038-f5ca9800ce75"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="Reference" hyperlinkTarget="Blank">
+				<reportElement x="41" y="0" width="183" height="15" uuid="ba59a2fb-c215-49b1-bfd1-8f5897431213"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_system_keyword}]]></textFieldExpression>
+				<hyperlinkReferenceExpression><![CDATA["http://gazelle.ihe.net/EU-CAT/systemInSession.seam?system=" + $F{tm_system_keyword}+ "&testingSessionId=" + $P{testingSessionId}]]></hyperlinkReferenceExpression>
+				<hyperlinkTooltipExpression><![CDATA["http://gazelle.ihe.net/EU-CAT/systemInSession.seam?system=" + $F{tm_system_keyword}+ "&testingSessionId=21"]]></hyperlinkTooltipExpression>
+			</textField>
+			<textField evaluationTime="Band">
+				<reportElement x="374" y="0" width="13" height="15" isRemoveLineWhenBlank="true" uuid="80b73328-83ae-4242-bbf5-64f87dddbc1f"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_testing_type_keyword}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="17">
+			<printWhenExpression><![CDATA[$F{registration_status}.equals(1)]]></printWhenExpression>
+			<textField>
+				<reportElement isPrintRepeatedValues="false" x="198" y="1" width="176" height="15" isRemoveLineWhenBlank="true" uuid="81c30484-cc17-4b7b-8cb1-0bf481dbe440"/>
+				<textElement>
+					<font fontName="Arial" isStrikeThrough="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_system_name}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="RemotePage" hyperlinkTarget="Blank">
+				<reportElement x="387" y="1" width="168" height="15" isRemoveLineWhenBlank="true" uuid="15388ebd-6aed-4345-8938-e1ce42a81889"/>
+				<textElement>
+					<font fontName="Arial" isStrikeThrough="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{usr_institution_keyword}]]></textFieldExpression>
+				<anchorNameExpression><![CDATA[$F{usr_institution_name}]]></anchorNameExpression>
+				<hyperlinkTooltipExpression><![CDATA[$F{usr_institution_name}]]></hyperlinkTooltipExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement isPrintRepeatedValues="false" x="0" y="1" width="41" height="15" isRemoveLineWhenBlank="true" uuid="50b8518c-e396-4891-a038-f5ca9800ce75"/>
+				<textElement>
+					<font fontName="Arial" isStrikeThrough="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="Reference" hyperlinkTarget="Blank">
+				<reportElement x="41" y="1" width="183" height="15" uuid="ba59a2fb-c215-49b1-bfd1-8f5897431213"/>
+				<textElement>
+					<font fontName="Arial" isStrikeThrough="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_system_keyword}]]></textFieldExpression>
+				<hyperlinkReferenceExpression><![CDATA["http://gazelle.ihe.net/EU-CAT/systemInSession.seam?system=" + $F{tm_system_keyword}+ "&testingSessionId=" + $P{testingSessionId}]]></hyperlinkReferenceExpression>
+				<hyperlinkTooltipExpression><![CDATA["http://gazelle.ihe.net/EU-CAT/systemInSession.seam?system=" + $F{tm_system_keyword}+ "&testingSessionId=21"]]></hyperlinkTooltipExpression>
+			</textField>
+			<textField evaluationTime="Band">
+				<reportElement x="374" y="1" width="13" height="15" isRemoveLineWhenBlank="true" uuid="80b73328-83ae-4242-bbf5-64f87dddbc1f"/>
+				<textElement>
+					<font fontName="Arial" isStrikeThrough="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_testing_type_keyword}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<noData>
+		<band height="16">
+			<staticText>
+				<reportElement x="0" y="0" width="555" height="15" forecolor="#FF0033" uuid="8186285b-930e-4b7a-a096-73bd05c243b9"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[No system registered for this combination]]></text>
+			</staticText>
+		</band>
+	</noData>
+</jasperReport>

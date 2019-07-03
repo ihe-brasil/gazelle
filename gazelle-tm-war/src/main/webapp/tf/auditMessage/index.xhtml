@@ -1,0 +1,193 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['net.ihe.gazelle.tm.AuditMessages']}"/>
+    <ui:define name="body">
+        <h:form id="globalform" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <h:inputHidden id="filterUrlParameters" name="filterUrlParameters"
+                           value="#{auditMessageManager.filter.urlParameters}"/>
+            <script>
+                updateUrl("globalform:filterUrlParameters");
+                $("#globalform\\:filterUrlParameters").bind('change',
+                        function () {
+                            updateUrl("globalform:filterUrlParameters");
+                        });
+            </script>
+            <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{auditMessageManager.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="event"/>
+                            <ui:param name="filterName" value="#{messages['net.ihe.gazelle.tm.Event']}"/>
+                            <ui:param name="filterForm" value="globalform "/>
+                        </ui:include>
+                    </div>
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{auditMessageManager.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="actor"/>
+                            <ui:param name="filterName"
+                                      value="#{messages['gazelle.testmanagement.system.label.Actor']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{auditMessageManager.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="transaction"/>
+                            <ui:param name="filterName" value="#{messages['gazelle.tf.Transaction']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{auditMessageManager.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="docSection"/>
+                            <ui:param name="filterName"
+                                      value="#{messages['net.ihe.gazelle.tm.DocumentSection_2']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{auditMessageManager.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="oid"/>
+                            <ui:param name="filterName" value="#{messages['gazelle.tf.OID']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <ui:define name="filter_buttons">
+                    <a4j:commandLink actionListener="#{auditMessageManager.filter.clear()}"
+                                     title="#{messages['gazelle.users.reset']}" type="submit"
+                                     execute="@this" render="globalform">
+                        <span class="fa fa-times-circle"/>
+                    </a4j:commandLink>
+                </ui:define>
+            </ui:decorate>
+            <h:outputLink value="new.seam" styleClass="gzl-btn-green"
+                          rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}">
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.NewAuditMessage']}"/>
+            </h:outputLink>
+            <rich:dataTable id="DocumentTable" var="currentAuditMessage" value="#{auditMessageManager.auditMessages}"
+                            rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                            rendered="#{not empty auditMessageManager.auditMessages}" render="ds">
+                <g:column sortBy="#{'auditedEvent'}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.AuditedEvent']}"/>
+                    </ui:define>
+                    <h:outputText value="#{currentAuditMessage.auditedEvent.getKeyword()}"/>
+                    <h:outputText value=" (#{currentAuditMessage.eventCodeType})"
+                                  rendered="#{not empty currentAuditMessage.eventCodeType}"/>
+                </g:column>
+                <g:column sortBy="#{'issuingActor.keyword'}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['gazelle.testmanagement.system.label.Actor']}"/>
+                    </ui:define>
+                    <h:commandLink
+                            value="#{currentAuditMessage.issuingActor.keyword} - #{currentAuditMessage.issuingActor.name}"
+                            action="#{actorManager.editActor(currentAuditMessage.issuingActor, false)}"/>
+                </g:column>
+                <g:column sortBy="#{'auditedTransaction.keyword'}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['gazelle.tf.Transaction']}"/>
+                    </ui:define>
+                    <h:commandLink
+                            value="#{currentAuditMessage.auditedTransaction.keyword} - #{currentAuditMessage.auditedTransaction.name}"
+                            action="#{transactionManager.editTransaction(currentAuditMessage.auditedTransaction, false)}"/>
+                </g:column>
+                <g:column sortBy="#{'documentSection.section'}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.DocumentSection_2']}"/>
+                    </ui:define>
+                    <ui:include src="/tf/documents/_documentSection.xhtml">
+                        <ui:param name="documentSectionParam" value="#{currentAuditMessage.documentSection}"/>
+                        <ui:param name="displayedName"
+                                  value="#{currentAuditMessage.documentSection.section}"/>
+                    </ui:include>
+                </g:column>
+                <g:column sortBy="#{'oid'}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.Specification']}"/>
+                    </ui:define>
+                    <h:outputLink value="#{auditMessageManager.getAuditMessageSpecUrl(currentAuditMessage)}"
+                                  rendered="#{not empty currentAuditMessage.oid}">
+                        <h:outputText value="#{currentAuditMessage.oid}"/>
+                    </h:outputLink>
+                </g:column>
+                <g:column align="center">
+                    <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+                    <div class="gzl-never-wrap">
+                        <h:outputLink title="#{messages['net.ihe.gazelle.tm.Show']}" value="show.seam">
+                            <f:param name="id" value="#{currentAuditMessage.id}"/>
+                            <span class="gzl-icon-search"/>
+                        </h:outputLink>
+                        <h:outputLink title="#{messages['gazelle.tm.Edit']}" value="edit.seam"
+                                      rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}">
+                            <f:param name="id" value="#{currentAuditMessage.id}"/>
+                            <span class="gzl-icon-pencil"/>
+                        </h:outputLink>
+                        <a4j:commandLink event="click" title="#{messages['gazelle.common.button.Delete']}"
+                                         rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}"
+                                         oncomplete="jq162('#DeleteConfirmationModalPanel').modal('show');"
+                                         render="DeleteConfirmationModalPanel, :deleteForm" execute="@this"
+                                         actionListener="#{auditMessageManager.setCurrentAuditMessage(currentAuditMessage)}">
+                            <span class="gzl-icon-trash-o"/>
+                        </a4j:commandLink>
+                    </div>
+                </g:column>
+                <f:facet name="footer">
+                    <ui:include src="/util/datatableFooter.xhtml">
+                        <ui:param name="dataScrollerId" value="ds"/>
+                        <ui:param name="dataTableId" value="DocumentTable"/>
+                    </ui:include>
+                </f:facet>
+            </rich:dataTable>
+        </h:form>
+        <h:form id="deleteForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteConfirmationModalPanel"/>
+                <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.PleaseConfirmDeleteOfTheAuditMessage']}</ui:define>
+                <p>
+                    <h:outputText
+                            value="#{messages['net.ihe.gazelle.tm.Event_2']} #{auditMessageManager.currentAuditMessage.auditedEvent} "/>
+                </p>
+                <p>
+                    <h:outputText
+                            value="#{messages['net.ihe.gazelle.tm.Actor']}  #{auditMessageManager.currentAuditMessage.issuingActor.name}"/>
+                </p>
+                <p>
+                    <h:outputText
+                            value="#{messages['net.ihe.gazelle.tm.Transaction_2']} #{auditMessageManager.currentAuditMessage.auditedTransaction.name}"/>
+                </p>
+                <p>
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.WillBeDeleted']}"/>
+                </p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="deleteButtonConfirm" value="#{messages['gazelle.common.button.Delete']}"
+                                       ignoreDupResponses="true" styleClass="gzl-btn-red"
+                                       actionListener="#{auditMessageManager.delete()}"
+                                       onclick="jq162('#DeleteConfirmationModalPanel').modal('hide');"
+                                       render="globalform"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

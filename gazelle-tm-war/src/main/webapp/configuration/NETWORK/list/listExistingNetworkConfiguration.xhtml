@@ -1,0 +1,104 @@
+<div xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+     xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+     xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml">
+
+    #{networkConfigurationManager.getNetworkConfigurationListDependingSystemInSession()}
+
+    <div align="right">
+        <a4j:region>
+            <a4j:commandButton id="buttonAddNewNetworkConfiguration" styleClass="gzl-btn-green"
+                               value="#{messages['gazelle.configuration.network.button.AddANetworkConfig']}"
+                               action="#{networkConfigurationManager.addANetworkConfigButtonClick()}"
+                               rendered="#{!gazelleDAO.getSelectedTestingSession().testingSessionClosedForUser()}">
+
+            </a4j:commandButton>
+        </a4j:region>
+    </div>
+    <br/> <br/>
+    <rich:dataTable id="networkConfigurationTable" var="currentNetworkConf"
+                    value="#{networkConfigurationManager.networkConfigurationList}" rowKeyVar="rowNumber"
+                    rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+        <g:column sortBy="#{'hostname'}" sortOrder="ascending">
+            <ui:define name="header">
+                <h:outputText id="networkConfHostnameHeaderOutputText"
+                              value="#{messages['gazelle.configuration.network.hostname']}"/>
+            </ui:define>
+            <h:outputText id="networkConfHostnameOutputText" value="#{currentNetworkConf.hostname}"/>
+        </g:column>
+        <g:column sortBy="#{'alias'}" sortOrder="ascending"
+                  style="max-width: 140px;word-wrap: break-word;">
+            <ui:define name="header">
+                <h:outputText id="networkConfAliasHeaderOutputText"
+                              value="#{messages['gazelle.configuration.network.alias']}"/>
+            </ui:define>
+            <h:outputText id="networkConfAliasOutputText" value="#{currentNetworkConf.alias}"/>
+        </g:column>
+        <g:column sortBy="#{'ip'}" sortOrder="ascending">
+            <ui:define name="header">
+                <h:outputText id="networkConfIPHeaderOutputText"
+                              value="#{messages['gazelle.configuration.network.ip']}"/>
+            </ui:define>
+            <h:outputText id="networkConfIPOutputText" value="#{currentNetworkConf.ip}"/>
+        </g:column>
+        <g:column style="max-width: 140px;word-wrap: break-word;">
+            <ui:define name="header">
+                <h:outputText id="networkConfCommentHeaderOutputText"
+                              value="#{messages['gazelle.configuration.network.comment']}"/>
+            </ui:define>
+            <h:outputText id="networkConfCommentOutputText" value="#{currentNetworkConf.comment}"/>
+        </g:column>
+        <g:column
+                  rendered="#{!gazelleDAO.getSelectedTestingSession().testingSessionClosedForUser()}">
+            <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+            <div class="gzl-never-wrap">
+
+                <a4j:commandLink id="networkConfEditActionSupport" title="#{messages['gazelle.common.button.Edit']}"
+                                 action="#{networkConfigurationManager.editANetworkConfigButtonClick(currentNetworkConf)}"
+                                 immediate="true"
+                                 render="DicomSCPTable">
+                    <span class="gzl-icon-pencil"/>
+                </a4j:commandLink>
+
+                <h:panelGroup
+                        rendered="#{(s:hasRole('admin_role') or s:hasRole('vendor_admin_role')) and  networkConfigurationManager.displayDeleteButton(currentNetworkConf)}">
+
+                    <a4j:commandLink id="networkConfDeleteActionSupport"
+                                     title="#{messages['gazelle.common.button.Delete']}"
+                                     actionListener="#{networkConfigurationManager.setSelectedNetworkConfiguration(currentNetworkConf)}"
+                                     oncomplete="jq162('#DeleteHostModalPanel').modal('show');"
+                                     immediate="true"
+                                     render="DeleteHostModalPanel, DeleteHostDiv,networkConfigurationTable, regionId">
+                        <span class="gzl-icon-trash-o"/>
+                    </a4j:commandLink>
+                </h:panelGroup>
+            </div>
+
+        </g:column>
+        <f:facet name="footer">
+            <ui:include src="/util/datatableFooter.xhtml">
+                <ui:param name="dataScrollerId" value="ds"/>
+                <ui:param name="dataTableId" value="networkConfigurationTable"/>
+            </ui:include>
+        </f:facet>
+    </rich:dataTable>
+
+    <!-- delete modal panel -->
+    <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+        <ui:param name="popup_id" value="DeleteHostModalPanel"/>
+        <ui:define name="popup_title">#{messages['gazelle.tm.ConfigurationDeletion']}</ui:define>
+        <s:div id="DeleteHostDiv">
+            <p>#{messages['gazelle.tm.DoYouWantToDeleteThisNetworkConfiguration']} ?</p>
+        </s:div>
+        <ui:define name="popup_footer">
+            <button type="button" class="gzl-btn" data-dismiss="modal">
+                #{messages['gazelle.tm.Cancel']}
+            </button>
+            <a4j:commandButton id="confirmHostDeletionButton" styleClass="gzl-btn-red"
+                               value="#{messages['gazelle.configuration.button.DeleteConfig']}"
+                               actionListener="#{networkConfigurationManager.deleteCurrentNetworkConfiguration()}"
+                               onclick="jq162('#DeleteHostModalPanel').modal('hide');"
+                               render="networkConfigurationsForm" immediate="true"/>
+        </ui:define>
+    </ui:decorate>
+</div>

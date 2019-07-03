@@ -1,0 +1,102 @@
+<html
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:s="http://jboss.org/schema/seam/taglib"
+        xmlns="http://www.w3.org/1999/xhtml">
+<h:head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link type="text/css" rel="stylesheet"
+          href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css"/>
+    <link type="text/css" rel="stylesheet" href="./stylesheet/rickshaw/graph.css"/>
+    <link type="text/css" rel="stylesheet" href="./stylesheet/rickshaw/detail.css"/>
+    <link type="text/css" rel="stylesheet" href="./stylesheet/rickshaw/legend.css"/>
+    <script src="./jscript/rickshaw/d3.min.js"></script>
+    <script src="./jscript/rickshaw/d3.layout.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/jquery-ui.min.js"></script>
+    <script src="./jscript/rickshaw/Rickshaw.js"></script>
+    <script src="./jscript/rickshaw/Rickshaw.Class.js"></script>
+    <script src="./jscript/rickshaw/Rickshaw.Compat.ClassList.js"></script>
+    <script src="./jscript/rickshaw/Rickshaw.Graph.js"></script>
+    <script src="./jscript/rickshaw/Rickshaw.Graph.Renderer.js"></script>
+    <script src="./jscript/rickshaw/Rickshaw.Graph.Renderer.Area.js"></script>
+    <script src="./jscript/rickshaw/Rickshaw.Graph.Renderer.Line.js"></script>
+    <script src="./jscript/rickshaw/Rickshaw.Graph.Renderer.Bar.js"></script>
+    <script src="./jscript/rickshaw/Rickshaw.Graph.Renderer.ScatterPlot.js"></script>
+    <script src="./jscript/rickshaw/Rickshaw.Graph.RangeSlider.js"></script>
+    <script src="./jscript/rickshaw/Rickshaw.Graph.HoverDetail.js"></script>
+    <script src="./jscript/rickshaw/Rickshaw.Graph.Annotate.js"></script>
+    <script src="./jscript/rickshaw/Rickshaw.Graph.Legend.js"></script>
+    <script src="./jscript/rickshaw/Rickshaw.Graph.Axis.Time.js"></script>
+    <script src="./jscript/rickshaw/Rickshaw.Graph.Behavior.Series.Toggle.js"></script>
+    <script src="./jscript/rickshaw/Rickshaw.Graph.Behavior.Series.Order.js"></script>
+    <script src="./jscript/rickshaw/Rickshaw.Graph.Behavior.Series.Highlight.js"></script>
+    <script src="./jscript/rickshaw/Rickshaw.Graph.Smoother.js"></script>
+    <script src="./jscript/rickshaw/Rickshaw.Graph.Unstacker.js"></script>
+    <script src="./jscript/rickshaw/Rickshaw.Fixtures.Time.js"></script>
+    <script src="./jscript/rickshaw/Rickshaw.Fixtures.Number.js"></script>
+    <script src="./jscript/rickshaw/Rickshaw.Fixtures.RandomData.js"></script>
+    <script src="./jscript/rickshaw/Rickshaw.Fixtures.Color.js"></script>
+    <script src="./jscript/rickshaw/Rickshaw.Color.Palette.js"></script>
+    <script src="./jscript/rickshaw/Rickshaw.Graph.Axis.Y.js"></script>
+</h:head>
+<h:body>
+    <h:panelGrid columns="2">
+        <s:div>
+            <div id="legend"></div>
+        </s:div>
+        <s:div>
+            <div id="chart_container">
+                <div id="chart"></div>
+                <div id="timeline"></div>
+                <div id="slider"></div>
+            </div>
+        </s:div>
+    </h:panelGrid>
+    <script>
+        #{sessionView.javascriptSeries()}
+
+        var palette = new Rickshaw.Color.Palette({
+            scheme: 'classic9'
+        });
+
+        var series = [{
+            color: palette.color(),
+            data: seriesData,
+        }];
+
+        var graph = new Rickshaw.Graph({
+            element: document.getElementById("chart"),
+            width: 800,
+            height: 400,
+            renderer: 'line',
+            stroke: true,
+            series: series,
+            interpolation: '#{sessionView.interpolation()}'
+        });
+
+        graph.render();
+
+        var slider = new Rickshaw.Graph.RangeSlider({
+            graph: graph,
+            element: $('#slider')
+        });
+
+        var ticksTreatment = 'glow';
+
+        var xAxis = new Rickshaw.Graph.Axis.Time({
+            graph: graph,
+            ticksTreatment: ticksTreatment
+        });
+
+        xAxis.render();
+
+        var yAxis = new Rickshaw.Graph.Axis.Y({
+            graph: graph,
+            tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+            ticksTreatment: ticksTreatment
+        });
+
+        yAxis.render();
+    </script>
+</h:body>
+</html>

@@ -1,0 +1,41 @@
+<s:div xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:h="http://java.sun.com/jsf/html"
+       xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+       xmlns="http://www.w3.org/1999/xhtml">
+
+    #{testingSessionManager.initializeTestingSessionChoosen()}
+    #{oidsAndIPParamForSessionManager.initializeNetworkConfiguration()}
+
+    <s:div id="hostDiv">
+        <h3>#{messages['gazelle.common.menu.NetworkConfigurationInformation']}</h3>
+        <s:decorate id="descriptionAdminDecoration" template="/layout/form/_edit.xhtml">
+            <ui:param name="id" value="description"/>
+            <h:panelGroup rendered="#{s:hasRole('admin_role')}">
+                <ui:decorate template="/layout/editor/_text_editor.xhtml">
+                    <ui:param name="text" value="#{testingSessionManager.getTestingSessionChoosen().configurationOverview}"/>
+                    <ui:param name="id" value="description"/>
+                    <ui:param name="isFocus" value="true"/>
+                </ui:decorate>
+            </h:panelGroup>
+            <a4j:commandButton id="saveConfig" rendered="#{s:hasRole('admin_role')}" styleClass="gzl-btn-green"
+                               value="#{messages['gazelle.common.button.Save']}"
+                               actionListener="#{testingSessionManager.saveConfigurationOverview()}"/>
+        </s:decorate>
+        <s:decorate id="descriptionDecoration" template="/layout/display/_display.xhtml" rendered="#{!s:hasRole('admin_role')}">
+            <g:safehtml value="#{testingSessionManager.getTestingSessionChoosen().configurationOverview}"/>
+        </s:decorate>
+        <s:decorate id="hostHeaderDecoration" template="/layout/form/_edit.xhtml" rendered="#{s:hasRole('admin_role')}">
+            <ui:param name="id" value="hostHeaderInput"/>
+            <ui:define name="label">#{messages['gazelle.systems.session.networkConfig.hostHeader']}</ui:define>
+            <h:inputTextarea id="hostHeaderInput" styleClass=" form-control" value="#{oidsAndIPParamForSessionManager.networkConfigurationForTestingSession.hostHeader}"
+                             rows="10" cols="60"/>
+        </s:decorate>
+        <h:commandButton styleClass="gzl-btn-green"
+                         value="#{messages['gazelle.systems.session.networkConfig.saveHostHeader']}"
+                         actionListener="#{oidsAndIPParamForSessionManager.saveNetworkConfigurationForTestingSession()}"
+                         rendered="#{s:hasRole('admin_role')}" execute="@this" render="hostHeaderDecoration"/>
+        <h:commandButton id="downloadConfig" styleClass="gzl-btn"
+                         value="#{messages['gazelle.common.button.DownloadHostsFile']}"
+                         actionListener="#{oidsAndIPParamForSessionManager.generateHostsFile()}"/>
+    </s:div>
+</s:div>

@@ -1,0 +1,47 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tm.EditSimulator']}"/>
+    <ui:define name="body">
+        <h:form id="form">
+            <s:token allowMultiplePosts="true"/>
+            #{systemManager.setSelectedSystemInSession(simulatorInSessionManager.selectedSimulatorInSession)}
+            #{iheImplementationForSystemManager.setSelectedSystemInSession(simulatorInSessionManager.selectedSimulatorInSession)}
+
+            <div>
+
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#editSimulatorInSessionSummaryTab"
+                                                              aria-controls="editSimulatorInSessionSummaryTab"
+                                                              role="tab" data-toggle="tab">#{messages['gazelle.tm.system.DisplaySimulatorLabel']}</a>
+                    </li>
+                    <li role="presentation"><a href="#simulatorImplementationTab"
+                                               aria-controls="simulatorImplementationTab" role="tab" data-toggle="tab">#{messages['gazelle.tm.ProfilesActors']}</a>
+                    </li>
+                </ul>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="editSimulatorInSessionSummaryTab">
+                        <ui:include id="inc1" src="editSimulatorInSessionSummary.xhtml"/>
+                        <a4j:commandButton id="saveButton" styleClass="gzl-btn-green"
+                                           value="#{messages['gazelle.common.button.Save']}"
+                                           actionListener="#{simulatorInSessionManager.persistSelectedSimulatorInSession()}"
+                                           render="messageDecoration"/>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="simulatorImplementationTab">
+                        <ui:include id="inc2" src="editSimulatorImplementation.xhtml"/>
+                    </div>
+                </div>
+
+            </div>
+
+            <a4j:commandButton value="#{messages['gazelle.tm.BackToListSimulator']}" id="backbutt"
+                               action="/administration/listSimulators.xhtml" styleClass="gzl-btn"
+                               execute="@this"/>
+        </h:form>
+    </ui:define>
+</ui:composition>

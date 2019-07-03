@@ -1,0 +1,60 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <s:decorate id="eventDecoration" template="/layout/form/_edit.xhtml">
+        <ui:define name="label">#{messages['net.ihe.gazelle.tm.TriggerEvent']}</ui:define>
+        <ui:param name="id" value="triggerInput"/>
+        <h:selectOneMenu styleClass="gzl-select-text gzl-form-control" id="triggerInput"
+                         value="#{selectedAuditMessage.auditedEvent}"
+                         requiredMessage="#{messages['gazelle.common.PleaseSelect']}" required="true">
+            <f:selectItem itemValue="#{null}" itemLabel="#{messages['gazelle.common.PleaseSelect']}"/>
+            <f:selectItems value="#{auditMessageManager.triggerEventList()}"/>
+            <a4j:ajax event="blur" render="eventDecoration" execute="@this"/>
+        </h:selectOneMenu>
+    </s:decorate>
+    <s:decorate id="actorDecoration" template="/layout/form/_edit.xhtml">
+        <ui:define name="label">#{messages['net.ihe.gazelle.tm.IssuingActor']}</ui:define>
+        <ui:param name="id" value="actorsListBox"/>
+        <h:selectOneMenu styleClass="gzl-select-text gzl-form-control" id="actorsListBox"
+                         value="#{selectedAuditMessage.issuingActor}"
+                         required="true">
+            <s:selectItems value="#{auditMessageManager.getIssuingActors()}" var="actor"
+                           noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                           label="#{actor.keyword} - #{actor.name}"/>
+            <a4j:ajax event="change" render="actorDecoration,transactionDecoration" execute="@this"/>
+        </h:selectOneMenu>
+    </s:decorate>
+    <s:decorate id="transactionDecoration" template="/layout/form/_edit.xhtml">
+        <ui:define name="label">#{messages['net.ihe.gazelle.tm.AuditedTransaction']}</ui:define>
+        <ui:param name="id" value="transactionListBox"/>
+        <h:selectOneMenu styleClass="gzl-select-text gzl-form-control" id="transactionListBox"
+                         value="#{selectedAuditMessage.auditedTransaction}"
+                         required="true">
+            <s:selectItems value="#{auditMessageManager.getTransactions()}" var="tran"
+                           noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                           label="#{tran.keyword} - #{tran.name}"/>
+            <a4j:ajax event="blur" render="transactionDecoration" execute="@this"/>
+        </h:selectOneMenu>
+    </s:decorate>
+    <s:decorate template="/layout/form/_edit.xhtml">
+        <ui:param name="id" value="eventCodeTypeInput"/>
+        <ui:define name="label">#{messages['net.ihe.gazelle.tm.EventCodeType']}</ui:define>
+        <h:inputText id="eventCodeTypeInput" styleClass=" form-control"
+                     value="#{selectedAuditMessage.eventCodeType}" size="80"/>
+    </s:decorate>
+    <s:decorate template="/layout/form/_edit.xhtml">
+        <ui:param name="id" value="commentInput"/>
+        <ui:define name="label">#{messages['gazelle.testmanagement.object.Comment']}</ui:define>
+        <h:inputTextarea id="commentInput" styleClass=" form-control"
+                         value="#{selectedAuditMessage.comment}" cols="80" rows="3"
+                         style="resize:both;"/>
+    </s:decorate>
+    <s:decorate template="/layout/form/_edit.xhtml">
+        <ui:param name="id" value="oidInput"/>
+        <ui:define name="label">#{messages['net.ihe.gazelle.tm.AuditMessageSpecificationOID']}</ui:define>
+        <h:inputText id="oidInput" styleClass=" form-control" value="#{selectedAuditMessage.oid}"
+                     size="100"/>
+    </s:decorate>
+</ui:composition>

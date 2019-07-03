@@ -1,0 +1,64 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <!--  Testing session -->
+    <div class="row">
+        <div class="col-lg-6">
+            <ui:include src="/filter/filter.xhtml">
+                <ui:param name="filter" value="#{testInstancesOverview.filter}"/>
+                <ui:param name="filterWidth" value="240"/>
+                <ui:param name="filterId" value="testingSession"/>
+                <ui:param name="filterName" value="#{messages['gazelle.systems.TestingSession']}"/>
+                <ui:param name="filterForm" value="globalform"/>
+            </ui:include>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6">
+            <!--  institution selection -->
+            <ui:include src="/filter/filter.xhtml">
+                <ui:param name="filter" value="#{testInstancesOverview.filter}"/>
+                <ui:param name="filterWidth" value="240"/>
+                <ui:param name="filterId" value="institution"/>
+                <ui:param name="filterName" value="#{messages['gazelle.users.institution.InstitutionKeyword']}"/>
+                <ui:param name="filterForm" value="globalform"/>
+            </ui:include>
+        </div>
+        <div class="col-lg-6">
+            <!--  system -->
+            <ui:include src="/filter/filter.xhtml">
+                <ui:param name="filter" value="#{testInstancesOverview.filter}"/>
+                <ui:param name="filterWidth" value="240"/>
+                <ui:param name="filterId" value="system"/>
+                <ui:param name="filterName" value="#{messages['gazelle.configuration.system.system']}"/>
+                <ui:param name="filterForm" value="globalform"/>
+            </ui:include>
+        </div>
+    </div>
+    <!--  AIPO selection -->
+    <ui:include src="/testing/research/filterAIPO.xhtml">
+        <ui:param name="filter" value="#{testInstancesOverview.filter}"/>
+        <ui:param name="filterForm" value="globalform"/>
+    </ui:include>
+    <!--  test selection -->
+    <div class="row">
+        <div class="col-lg-6">
+            <ui:include src="/filter/filter.xhtml">
+                <ui:param name="filter" value="#{testInstancesOverview.filter}"/>
+                <ui:param name="filterWidth" value="240"/>
+                <ui:param name="filterId" value="test"/>
+                <ui:param name="filterName" value="#{messages['gazelle.tests.test']}"/>
+                <ui:param name="filterForm" value="globalform"/>
+            </ui:include>
+        </div>
+        <div class="col-lg-6">
+            <!--  test selection -->
+            <ui:include src="/filter/filter.xhtml">
+                <ui:param name="filter" value="#{testInstancesOverview.filter}"/>
+                <ui:param name="filterWidth" value="240"/>
+                <ui:param name="filterId" value="testTypeReal"/>
+                <ui:param name="filterName" value="#{messages['gazelle.tm.monitors.TestType']}"/>
+                <ui:param name="filterForm" value="globalform"/>
+            </ui:include>
+        </div>
+    </div>
+</ui:composition>

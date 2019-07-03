@@ -1,0 +1,83 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{domainManager.getDomainTitle()}"/>
+    <ui:define name="body">
+
+        <h:form id="domainSearchResultsForm">
+            <s:token allowMultiplePosts="true"/>
+            <h:commandButton styleClass="gzl-btn-green"
+                             value="#{messages['gazelle.tf.domain.button.AddNewDomain']}"
+                             action="#{domainManager.addNewDomainButton()}"
+                             rendered="#{s:hasPermission('MasterModel', 'edit', null)}"/>
+        </h:form>
+        <div id="domainManager">
+            <h:form id="domainManagerForm">
+                <s:token allowMultiplePosts="true"/>
+                <a4j:queue requestDelay="300" ignoreDupResponses="true"/>
+                #{dataTableStateHolder.setAscendingOn('keyword')}
+                <rich:dataTable id="domainList" var="dom" value="#{domainManager.domains}"
+                                rows="#{userManagerExtra.selectedUserPreferences.numberOfResultsPerPage}"
+                                render="ds">
+                    <g:column sortBy="#{'id'}" sortOrder="#{dataTableStateHolder.sortOrders['id']}">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                        #{dom.id}
+                    </g:column>
+                    <g:column sortBy="#{'keyword'}" filterBy="#{'keyword'}" filterEvent="onkeyup"
+                              sortOrder="#{dataTableStateHolder.sortOrders['keyword']}">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Keyword']}</ui:define>
+                        #{dom.keyword}
+                    </g:column>
+                    <g:column sortBy="#{'name'}" filterBy="#{'name'}" filterEvent="onkeyup"
+                              sortOrder="#{dataTableStateHolder.sortOrders['name']}">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Name']}</ui:define>
+                        #{dom.name}
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.tf.table.Description']}</ui:define>
+                        <h:panelGroup rendered="#{dom.description != null  and !(empty dom.description)}">
+                            <pre style="word-wrap: break-word;word-break:break-all;white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -o-pre-wrap;">
+                                <g:safehtml value="#{dom.description}"/>
+                            </pre>
+                        </h:panelGroup>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.tf.table.Action']}</ui:define>
+                        <div class="gzl-never-wrap">
+                            <a4j:commandLink action="#{domainManager.viewDomain(dom)}"
+                                             title="#{messages['gazelle.common.button.View']}"
+                                             onRowMouseOver="this.style.cursor='pointer'">
+                                <span class="gzl-icon-search"/>
+                            </a4j:commandLink>
+
+                            <a4j:commandLink action="#{domainManager.editDomain(dom)}"
+                                             rendered="#{s:hasPermission('MasterModel', 'edit', null)}"
+                                             title="#{messages['gazelle.common.button.Edit']}"
+                                             onRowMouseOver="this.style.cursor='pointer'">
+                                <span class="gzl-icon-pencil"/>
+                            </a4j:commandLink>
+                            <a4j:commandLink action="#{domainManager.removeDomain(dom)}"
+                                             rendered="#{s:hasPermission('MasterModel', 'edit', null)}"
+                                             title="#{messages['gazelle.common.button.Delete']}"
+                                             onRowMouseOver="this.style.cursor='pointer'">
+                                <span class="gzl-icon-trash-o"/>
+                            </a4j:commandLink>
+                        </div>
+                    </g:column>
+                    <f:facet name="footer">
+                        <ui:include src="/util/datatableFooter.xhtml">
+                            <ui:param name="dataScrollerId" value="ds"/>
+                            <ui:param name="dataTableId" value="domainList"/>
+                        </ui:include>
+                    </f:facet>
+                </rich:dataTable>
+                <h:commandLink value="#{messages['gazelle.common.export.ExportAsExcel']}"
+                               action="#{gazelleExcelExporterJboss7.export('domainManagerForm:domainList')}"/>
+
+            </h:form>
+        </div>
+
+    </ui:define>
+</ui:composition>

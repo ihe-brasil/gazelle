@@ -1,0 +1,41 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3 col-lg-4 col-lg-offset-4">
+            <s:decorate id="loginPanel1" template="/layout/panels/_panel_title.xhtml">
+                <ui:define name="panel_title">#{messages['gazelle.users.registration.LoginLabel1']}</ui:define>
+                <h:form id="login">
+                    <s:token allowMultiplePosts="true"/>
+
+                    <s:decorate id="username" template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="username"/>
+                        <ui:define name="label">#{messages['gazelle.users.registration.Username']}</ui:define>
+                        <h:inputText id="username" value="#{identity.username}" styleClass="form-control"/>
+                    </s:decorate>
+
+                    <s:decorate id="passwordField" template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="passwordNotHashed"/>
+                        <ui:define name="label">#{messages['gazelle.users.registration.Password']}</ui:define>
+                        <h:inputSecret id="passwordNotHashed" value="userManager.fakedPasswordField" styleClass="form-control"/>
+                    </s:decorate>
+
+                    <h:inputHidden id="password" name="password" value="#{identity.password}"/>
+
+                    <h:commandButton id="submit" type="submit" styleClass="gzl-btn-green"
+                                       value="#{messages['gazelle.users.registration.Login']}"
+                                       onclick="hashGazelleAuthentication();" action="#{identity.login}"
+                                       rendered="#{!identity.loggedIn}"/>
+                </h:form>
+                <div>
+                    <a4j:commandLink actionListener="#{userManager.intializeSelectedUser()}"
+                                     oncomplete="jq162('#passwordAssistance').modal('show');"
+                                     value="#{messages['gazelle.users.registration.ForgotPassword']}"
+                                     execute="@this"
+                                     render=" :passwordAssistanceForm, passwordAssistance"/>
+                </div>
+            </s:decorate>
+        </div>
+    </div>
+</ui:composition>

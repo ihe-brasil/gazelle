@@ -1,0 +1,192 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{aipoManager.getAddTitle()}"/>
+    <ui:define name="body">
+
+        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+            <ui:define name="panel_title">#{aipoManager.getAddTitle()}</ui:define>
+            <div id="aipoManager">
+                <!-- **********************************************************************************************
+                     * Panel for add to actor
+                     ********************************************************************************************** -->
+                <h:panelGroup rendered="#{aipoManager.isCallerClass('ACTOR')}">
+                    <ui:decorate template="/layout/panels/_panel.xhtml">
+                        <s:decorate id="vaid" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Id']}</ui:define>
+                            #{aipoActor.id}
+                        </s:decorate>
+                        <s:decorate id="vakeywordDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Keyword']}</ui:define>
+                            #{aipoActor.keyword}
+                        </s:decorate>
+                        <s:decorate id="vanameDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Name']}</ui:define>
+                            #{aipoActor.name}
+                        </s:decorate>
+                        <s:decorate id="vadescriptionDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Description']}</ui:define>
+                            #{aipoActor.description}
+                        </s:decorate>
+                    </ui:decorate>
+                </h:panelGroup>
+                <!-- **********************************************************************************************
+                     * Panel for add to integration profile
+                     ********************************************************************************************** -->
+                <h:panelGroup rendered="#{aipoManager.isCallerClass('INTEGRATION_PROFILE')}">
+                    <ui:decorate template="/layout/panels/_panel.xhtml">
+                        <s:decorate id="vipid" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Id']}</ui:define>
+                            #{aipoIntegrationProfile.id}
+                        </s:decorate>
+                        <s:decorate id="viplabelDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Keyword']}</ui:define>
+                            #{aipoIntegrationProfile.keyword}
+                        </s:decorate>
+                        <s:decorate id="vipnameDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Name']}</ui:define>
+                            #{aipoIntegrationProfile.name}
+                        </s:decorate>
+                        <s:decorate id="vipdescriptionDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Description']}</ui:define>
+                            #{aipoIntegrationProfile.description}
+                        </s:decorate>
+                    </ui:decorate>
+                </h:panelGroup>
+            </div>
+            <!-- **********************************************************************************************
+                 * Panel for add to IntegrationProfileOption
+                 ********************************************************************************************** -->
+            <h:panelGroup rendered="#{aipoManager.isCallerClass('OPTION')}">
+                <ui:decorate template="/layout/panels/_panel.xhtml">
+                    <s:decorate id="vtid" template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['gazelle.tf.table.Id']}</ui:define>
+                        #{aipoOption.id}
+                    </s:decorate>
+                    <s:decorate id="vtkeywordDecoration" template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['gazelle.tf.table.Label']}</ui:define>
+                        #{aipoOption.keyword}
+                    </s:decorate>
+                    <s:decorate id="vtnameDecoration" template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['gazelle.tf.table.Name']}</ui:define>
+                        #{aipoOption.name}
+                    </s:decorate>
+                    <s:decorate id="vtdescriptionDecoration" template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['gazelle.tf.table.Description']}</ui:define>
+                        #{aipoOption.description}
+                    </s:decorate>
+                    <s:decorate id="vtreferenceDecoration" template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['gazelle.tf.table.TFReference']}</ui:define>
+                        #{aipoOption.reference}
+                    </s:decorate>
+                </ui:decorate>
+            </h:panelGroup>
+            <!-- **********************************************************************************************
+                 * lists panel
+                 **********************************************************************************************  -->
+
+            <ui:decorate template="/layout/panels/_panel.xhtml">
+                <h:form id="addaipo">
+                    <s:token allowMultiplePosts="true"/>
+                    <h:panelGrid columns="3" columnClasses="alignTop,alignTop,alignTop">
+
+                        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                            <ui:define name="panel_title">#{messages['gazelle.tf.ActorsTab']}</ui:define>
+                            <h:selectManyListbox id="ActorsTabId" size="#{actorSize}" style="max-width:300px"
+                                                 value="#{aipoManager.aipoSelectedActors}"
+                                                 readonly="#{actorReadOnly}"
+                                                 disabled="#{actorReadOnly}">
+                                <s:selectItems var="a" value="#{aipoActors}"
+                                               label="#{a.keyword} - #{a.name}"/>
+                                <s:convertEntity/>
+                            </h:selectManyListbox>
+                        </ui:decorate>
+
+                        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                            <ui:define name="panel_title">#{messages['gazelle.tf.IntegrationProfilesTab']}</ui:define>
+                            <h:selectManyListbox id="IntegrationProfilesTabId" size="#{integrationProfileSize}"
+                                                 style="max-width:300px"
+                                                 value="#{aipoManager.aipoSelectedIntegrationProfiles}"
+                                                 readonly="#{integrationProfileReadOnly}"
+                                                 disabled="#{integrationProfileReadOnly}">
+                                <s:selectItems var="b" value="#{aipoIntegrationProfiles}"
+                                               label="#{b.keyword} - #{b.name}"/>
+                                <s:convertEntity/>
+                            </h:selectManyListbox>
+                        </ui:decorate>
+
+
+                        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                            <ui:define name="panel_title">#{messages['gazelle.tf.ProfileOptionsTab']}</ui:define>
+                            <h:selectManyListbox id="ProfileOptionsTabId" size="#{optionSize}" style="max-width:300px"
+                                                 value="#{aipoManager.aipoSelectedOptions}"
+                                                 readonly="#{optionReadOnly}"
+                                                 disabled="#{optionReadOnly}">
+                                <s:selectItems var="c" value="#{aipoOptions}"
+                                               label="#{c.keyword} - #{c.name}"/>
+                                <s:convertEntity/>
+                            </h:selectManyListbox>
+                        </ui:decorate>
+
+                    </h:panelGrid>
+                    <s:div id="buttons">
+                        <a4j:commandButton id="cancel" styleClass="gzl-btn"
+                                           value="#{messages['gazelle.tf.aipoDone']}"
+                                           action="#{aipoManager.finished()}"
+                                           render="gazelle-messages,listDiv"/>
+                        <a4j:commandButton id="save" styleClass="gzl-btn-green"
+                                           value="#{messages['gazelle.tf.aipoCreate']}"
+                                           action="#{aipoManager.createLinks()}"
+                                           render="gazelle-messages,listDiv"/>
+                    </s:div>
+                    <s:div id="listDiv">
+                        <h:panelGrid>
+                            <rich:dataTable id="profilesOptionsRelatedToActor" var="ipIpo"
+                                            value="#{actorManager.integrationProfilesAndIntegrationProfileOptionsForActor}"
+                                            rendered="#{aipoManager.actorReadOnly and actorManager.integrationProfilesAndIntegrationProfileOptionsForActor != null and not empty actorManager.integrationProfilesAndIntegrationProfileOptionsForActor}">
+                                <f:facet name="header">
+                                    #{messages['net.ihe.gazelle.tm.IntegrationProfilesAndOptionsAlreadyPresent']}
+                                </f:facet>
+                                <g:column sortBy="#{'actorIntegrationProfile.integrationProfile.keyword'}"
+                                          sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.tf.IntegrationProfile']}</ui:define>
+                                    <h:outputText
+                                            value="#{ipIpo.actorIntegrationProfile.integrationProfile.keyword} - #{ipIpo.actorIntegrationProfile.integrationProfile.name}"/>
+                                </g:column>
+                                <g:column sortBy="#{'integrationProfileOption.keyword'}">
+                                    <ui:define name="header">#{messages['gazelle.tf.IntegrationProfileOption']}
+                                    </ui:define>
+                                    <h:outputText
+                                            value="#{ipIpo.integrationProfileOption.keyword} - #{ipIpo.integrationProfileOption.name}"/>
+                                </g:column>
+                            </rich:dataTable>
+                        </h:panelGrid>
+                        <h:panelGrid>
+                            <rich:dataTable id="actorsOptionsRelatedToIntegrationProfile" var="aipo"
+                                            value="#{integrationProfileManager.getAipoList()}"
+                                            rendered="#{aipoManager.integrationProfileReadOnly and integrationProfileManager.getAipoList() != null and not empty integrationProfileManager.aipoList}">
+                                <f:facet name="header">#{messages['net.ihe.gazelle.tm.ActorsAndOptionsAlreadyPresent']}
+                                </f:facet>
+                                <g:column sortBy="#{'actorIntegrationProfile.actor.keyword'}">
+                                    <ui:define name="header">#{messages['gazelle.tf.Actor']}</ui:define>
+                                    <h:outputText
+                                            value="#{aipo.actorIntegrationProfile.actor.keyword} - #{aipo.actorIntegrationProfile.actor.name}"/>
+                                </g:column>
+                                <g:column sortBy="#{'integrationProfileOption.keyword'}">
+                                    <ui:define name="header">#{messages['gazelle.tf.IntegrationProfileOption']}
+                                    </ui:define>
+                                    <h:outputText
+                                            value="#{aipo.integrationProfileOption.keyword} - #{aipo.integrationProfileOption.name}"/>
+                                </g:column>
+                            </rich:dataTable>
+                        </h:panelGrid>
+                    </s:div>
+                </h:form>
+            </ui:decorate>
+
+        </ui:decorate>
+
+    </ui:define>
+</ui:composition>

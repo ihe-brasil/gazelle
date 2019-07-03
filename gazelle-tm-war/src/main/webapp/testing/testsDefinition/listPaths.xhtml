@@ -1,0 +1,172 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.common.menu.ListPath']}"/>
+    <ui:define name="body">
+        <h:form id="form">
+            <s:token allowMultiplePosts="true"/>
+            <a4j:queue requestDelay="300" ignoreDupResponses="true"/>
+
+            <a4j:commandButton id="newww" value="#{messages['gazelle.tm.AddNewPath']}" styleClass="gzl-btn-green"
+                               rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"
+                               actionListener="#{pathManager.initSelectedPath()}"
+                               oncomplete="jq162('#EditSelectedPATH').modal('show');"
+                               execute="@this"
+                               render="EditSelectedPATH, :CommentSampleFormFC"/>
+            <s:div id="packagetab">
+                <rich:dataTable id="pathdatatable" var="currentPath" value="#{pathManager.getListAllPath()}"
+                                rowKeyVar="rowNumber"
+
+                                rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                    <g:column filterBy="#{'id'}" filterEvent="onkeyup" sortBy="#{'id'}"
+                              sortOrder="#{dataTableStateHolder.sortOrders['id']}" width="50">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                        <h:outputText value="#{currentPath.id}"/>
+                    </g:column>
+                    <g:column filterBy="#{'keyword'}" filterEvent="onkeyup"
+                              sortBy="#{'keyword'}" sortOrder="#{dataTableStateHolder.sortOrders['keyword']}">
+                        <ui:define name="header">#{messages['gazelle.testmanagement.object.keyword']}</ui:define>
+                        <h:outputText value="#{currentPath.keyword}"/>
+                    </g:column>
+                    <g:column sortBy="#{'lastChanged'}" sortOrder="#{dataTableStateHolder.sortOrders['lastChanged']}">
+                        <ui:define name="header">#{messages['gazelle.testmanagement.object.CreationDate']}
+                        </ui:define>
+                        <g:date tooltip="true" value="#{currentPath.lastChanged}"/>
+                    </g:column>
+                    <g:column filterBy="#{'lastModifierId'}" filterEvent="onkeyup"
+                              sortBy="#{'lastModifierId'}" sortOrder="#{dataTableStateHolder.sortOrders['lastModifierId']}">
+                        <ui:define name="header">#{messages['gazelle.tm.search.user']}</ui:define>
+                        <h:outputText value="#{currentPath.lastModifierId}"/>
+                    </g:column>
+                    <g:column filterBy="#{'description'}"
+                              filterEvent="onkeyup" sortBy="#{'description'}" sortOrder="#{dataTableStateHolder.sortOrders['description']}">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Description']}</ui:define>
+                        <h:outputText value="#{currentPath.description}"/>
+                    </g:column>
+                    <g:column sortBy="#{'type'}" sortOrder="#{dataTableStateHolder.sortOrders['type']}">
+                        <ui:define name="header">#{messages['gazelle.systems.session.Type']}</ui:define>
+                        <h:outputText value="#{currentPath.type}"/>
+                    </g:column>
+                    <g:column width="50"
+                              rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}">
+                        <ui:define name="header">#{messages['gazelle.testmanagement.object.Action']}</ui:define>
+                        <a4j:commandLink event="click"
+                                         oncomplete="jq162('#DeleteSelectedPath').modal('show');"
+                                         render="DeleteSelectedPath, :deleteForm" execute="@this"
+                                         title="#{messages['gazelle.common.button.Delete']}"
+                                         actionListener="#{pathManager.setSelectedPath(currentPath)}">
+                            <span class="gzl-icon-trash-o"/>
+                        </a4j:commandLink>
+
+
+                        <a4j:commandLink event="click"
+                                         oncomplete="jq162('#EditSelectedPATH').modal('show');"
+                                         execute="@this" render="EditSelectedPATH, :CommentSampleFormFC"
+                                         title="#{messages['gazelle.common.button.Edit']}"
+                                         actionListener="#{pathManager.setSelectedPath(currentPath)}">
+                            <span class="gzl-icon-pencil"/>
+                        </a4j:commandLink>
+                    </g:column>
+                    <f:facet name="footer">
+                        <ui:include src="/util/datatableFooter.xhtml">
+                            <ui:param name="dataScrollerId" value="ds"/>
+                            <ui:param name="dataTableId" value="pathdatatable"/>
+                        </ui:include>
+                    </f:facet>
+                </rich:dataTable>
+            </s:div>
+
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Delete selected path -->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="deleteForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteSelectedPath"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.DeleteSelectedPath']}</ui:define>
+                #{pathManager.calculateListCIRelatedToSelectedPath()}
+                <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+                <s:div rendered="#{pathManager.listCIRelatedToSelectedPath != null}">
+                    <h:outputText
+                            value="#{messages['gazelle.tm.YouHaveToDeleteTheseContextualInformationFromThe']} :"/>
+                    <rich:list value="#{pathManager.listCIRelatedToSelectedPath}" var="contextualInformation"
+                               rowKeyVar="5" type="unordered">
+                        <h:outputText
+                                value="#{contextualInformation.label} - #{contextualInformation.value} "/>
+                        (#{messages['gazelle.tm.monitors.test']} :
+                        <h:outputText style="color:#aa0000;"
+                                      value="#{contextualInformation.getRelatedTestKeyword()}"/>
+                        )
+                    </rich:list>
+                </s:div>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="deleteOTbutton" value="#{messages['gazelle.tm.DeleteThisPath']}"
+                                       styleClass="gzl-btn-red"
+                                       rendered="#{pathManager.listCIRelatedToSelectedPath == null}"
+                                       actionListener="#{pathManager.deleteSelectedPath()}"
+                                       onclick="jq162('#DeleteSelectedPath').modal('hide');"
+                                       render="pathdatatable,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Edit selected path -->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="CommentSampleFormFC">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="EditSelectedPATH"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.EditPath']}</ui:define>
+                <s:decorate template="/layout/form/_edit.xhtml">
+                    <ui:param name="id" value="CommentEditorIdFC"/>
+                    <ui:define name="label">#{messages['gazelle.testmanagement.object.keyword']}</ui:define>
+                    <h:inputText styleClass=" form-control" id="CommentEditorIdFC" required="true"
+                                 value="#{pathManager.selectedPath.keyword}"/>
+                </s:decorate>
+                <s:decorate template="/layout/form/_edit.xhtml">
+                    <ui:param name="id" value="DescriptionInput"/>
+                    <ui:define name="label">#{messages['gazelle.tf.table.Description']}</ui:define>
+                    <h:inputText id="DescriptionInput" styleClass=" form-control" required="true"
+                                 value="#{pathManager.selectedPath.description}"/>
+                </s:decorate>
+                <s:decorate template="/layout/form/_edit.xhtml">
+                    <ui:define name="label">#{messages['gazelle.systems.session.Type']}</ui:define>
+                    <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                     value="#{pathManager.selectedPath.type}" required="true">
+                        <f:selectItem itemValue="java.lang.String"
+                                      itemLabel="#{messages['gazelle.tm.JavalangString']}"/>
+                        <f:selectItem itemValue="java.lang.Integer"
+                                      itemLabel="#{messages['gazelle.tm.JavalangInteger']}"/>
+                        <f:selectItem itemValue="java.lang.Boolean"
+                                      itemLabel="#{messages['gazelle.tm.JavalangBoolean']}"/>
+                        <f:selectItem itemValue="java.lang.Long"
+                                      itemLabel="#{messages['gazelle.tm.JavalangLong']}"/>
+                        <f:selectItem itemValue="java.lang.Float"
+                                      itemLabel="#{messages['gazelle.tm.JavalangFloat']}"/>
+                        <f:selectItem itemValue="java.lang.Double"
+                                      itemLabel="#{messages['gazelle.tm.JavalangDouble']}"/>
+                        <f:selectItem itemValue="java.lang.Character"
+                                      itemLabel="#{messages['gazelle.tm.JavalangCharacter']}"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="saveCommentbuttonFC"
+                                       value="#{messages['gazelle.common.button.Save']}"
+                                       styleClass="gzl-btn-green"
+                                       actionListener="#{pathManager.saveModifications()}"
+                                       onclick="jq162('#EditSelectedPATH').modal('hide');"
+                                       render="pathdatatable,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

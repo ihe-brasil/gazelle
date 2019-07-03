@@ -1,0 +1,254 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.configuration.Host']}"/>
+    <ui:define name="body">
+        #{networkConfigurationManager.initFilter()}
+        #{systemConfigurationManager.setSelectedSystemInSession(null)}
+        <h:form id="listAllHostsConfig" rendered="#{s:hasRole('admin_role')}" stleClass="form-horizontal">
+            <h:inputHidden id="filterUrlParameters" name="filterUrlParameters"
+                           value="#{networkConfigurationManager.hostFilter.urlParameters}"/>
+            <!--@formatter:off-->
+            <script>
+                updateUrl("listAllHostsConfig:filterUrlParameters");
+                $("#listAllHostsConfig\\:filterUrlParameters").bind('change',
+                    function () {
+                        updateUrl("listAllHostsConfig:filterUrlParameters");
+                    });
+            </script>
+            <!--@formatter:on-->
+            <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                <div class="row">
+                    <ui:include src="/filter/filter.xhtml">
+                        <ui:param name="filter" value="#{networkConfigurationManager.hostFilter}"/>
+                        <ui:param name="filterWidth" value="240"/>
+                        <ui:param name="filterId" value="testingSession"/>
+                        <ui:param name="filterName" value="#{messages['gazelle.systems.TestingSession']}"/>
+                        <ui:param name="filterForm" value="listAllHostsConfig"/>
+                    </ui:include>
+                </div>
+                <div class="row">
+                    <ui:include src="/filter/filter.xhtml">
+                        <ui:param name="filter" value="#{networkConfigurationManager.hostFilter}"/>
+                        <ui:param name="filterWidth" value="240"/>
+                        <ui:param name="filterId" value="institution"/>
+                        <ui:param name="filterName" value="#{messages['gazelle.users.institution.InstitutionKeyword']}"/>
+                        <ui:param name="filterForm" value="listAllHostsConfig"/>
+                    </ui:include>
+                </div>
+                <div class="row">
+                    <ui:include src="/filter/filter.xhtml">
+                        <ui:param name="filter" value="#{networkConfigurationManager.hostFilter}"/>
+                        <ui:param name="filterWidth" value="240"/>
+                        <ui:param name="filterId" value="systemInSession"/>
+                        <ui:param name="filterName" value="#{messages['gazelle.configuration.system.system']}"/>
+                        <ui:param name="filterForm" value="listAllHostsConfig"/>
+                    </ui:include>
+                </div>
+                <ui:define name="filter_buttons">
+                    <a4j:commandLink title="#{messages['gazelle.common.button.Refresh']}"
+                                     render="listAllHostsConfig">
+                        <span class="fa fa-refresh"/>
+                    </a4j:commandLink>
+
+                    <a4j:commandLink actionListener="#{networkConfigurationManager.hostFilter.clear()}"
+                                     title="#{messages['gazelle.users.reset']}" type="submit"
+                                     execute="@this" render="listAllHostsConfig">
+                        <span class="fa fa-times-circle"/>
+                    </a4j:commandLink>
+                </ui:define>
+
+            </ui:decorate>
+            <h:outputText value="#{messages['net.ihe.gazelle.tm.HostsConfigurationShownAreOnlyForCompletedAndAcc']}" />
+            <div align="right">
+                <s:div id="panelAddNewConfig">
+                    <a4j:region>
+                        <a4j:commandButton id="buttonAddNewNetworkConfiguration" styleClass="gzl-btn-green"
+                                           value="#{messages['gazelle.configuration.network.button.AddANetworkConfig']}"
+                                           action="#{networkConfigurationManager.addANetworkConfigButtonClickFirst()}"/>
+
+                    </a4j:region>
+                </s:div>
+            </div>
+            <div align="left">
+                <a4j:region>
+                    <a4j:commandButton id="view" styleClass="gzl-btn"
+                                       value="#{messages['net.ihe.gazelle.tm.ViewHostWithoutConfigurations']}"
+                                       action="#{networkConfigurationManager.goToListAllHostsWithoutConfsForAdminPage()}"
+                                       rendered="#{s:hasRole('admin_role')}"/>
+                </a4j:region>
+            </div>
+            <h:panelGroup rendered="#{s:hasRole('admin_role')}" id="hostPanel">
+                <rich:dataTable id="HostTable" var="currentNetworkConfiguration"
+                                value="#{networkConfigurationManager.getAllNetworkConfigurations()}"
+                                rowKeyVar="rowNumber"
+                                rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                                render="ds">
+                    <g:column rendered="#{ empty institutionManager.choosenInstitutionForAdmin }">
+                        <ui:define name="header">
+                            <h:outputText
+                                    value="#{messages['gazelle.users.institution.InstitutionKeyword']}"/>
+                        </ui:define>
+                        <h:outputText
+                                value="#{systemManager.displayInstitutionKeywordForHost(currentNetworkConfiguration)}"
+                                title="#{systemManager.displayInstitutionNameForHost(currentNetworkConfiguration)}"/>
+                    </g:column>
+                    <g:column
+                            sortOrder="ascending">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.configuration.system.system']}"/>
+                        </ui:define>
+                        <a4j:repeat value="#{currentNetworkConfiguration.getSystemsInSession()}" var="sis"
+                                    rowKeyVar="rowKey">
+                            <s:span rendered="#{rowKey gt 0}">
+                                <h:outputText value=" / "/>
+                            </s:span>
+                            <h:outputText
+                                    value="#{sis.system.keyword}"
+                                    title="#{sis.system.name}"/>
+                        </a4j:repeat>
+                    </g:column>
+                    <g:column sortBy="#{'hostname'}" sortOrder="ascending">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.configuration.network.hostname']}"/>
+                        </ui:define>
+                        <h:outputText value="#{currentNetworkConfiguration.hostname}"/>
+                    </g:column>
+                    <g:column sortBy="#{'alias'}" sortOrder="ascending">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.configuration.network.alias']}"/>
+                        </ui:define>
+                        <h:outputText value="#{currentNetworkConfiguration.alias}"/>
+                    </g:column>
+                    <g:column sortBy="#{'ip'}">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.configuration.network.ip']}"/>
+                        </ui:define>
+                        <h:outputText value="#{currentNetworkConfiguration.ip} "/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.configuration.network.comment']}"/>
+                        </ui:define>
+                        <h:outputText value="#{currentNetworkConfiguration.comment}"/>
+                    </g:column>
+                    <h:column>
+                        <f:facet name="header">#{messages['gazelle.common.Action']}</f:facet>
+                        <div class="gzl-never-wrap">
+
+                            <a4j:commandLink title="#{messages['gazelle.common.button.Edit']}"
+                                             action="#{networkConfigurationManager.editANetworkConfigButtonClick(currentNetworkConfiguration)}"
+                                             actionListener="#{systemConfigurationManager.setSelectedSystemInSession(currentNetworkConfiguration.getSystemsInSession().get(0))}"
+                                             render="DicomSCPTable">
+                                <span class="gzl-icon-pencil"/>
+                            </a4j:commandLink>
+
+
+                            <a4j:commandLink title="#{messages['gazelle.common.button.Delete']}"
+                                             rendered="#{networkConfigurationManager.displayDeleteButton(currentNetworkConfiguration)}"
+                                             actionListener="#{networkConfigurationManager.setSelectedNetworkConfiguration(currentNetworkConfiguration)}"
+                                             oncomplete="jq162('#deleteIP').modal('show');"
+                                             render="HostTable, :deleteConfForm">
+                                <span class="gzl-icon-trash-o"/>
+                            </a4j:commandLink>
+
+
+                            <a4j:commandLink
+                                    actionListener="#{networkConfigurationManager.generateIP( currentNetworkConfiguration )}"
+                                    value="#{messages['gazelle.tm.GetAnIP']}" execute="@this"
+                                    rendered="#{currentNetworkConfiguration.ip == null }" render="HostTable"/>
+
+                        </div>
+                    </h:column>
+                    <f:facet name="footer">
+                        <ui:include src="/util/datatableFooter.xhtml">
+                            <ui:param name="dataScrollerId" value="ds"/>
+                            <ui:param name="dataTableId" value="HostTable"/>
+                        </ui:include>
+                    </f:facet>
+                </rich:dataTable>
+                <br/>
+                <h:commandLink value="#{messages['gazelle.common.export.ExportAsCSV']}" target="_blank"
+                               action="#{gazelleCSVExporterJboss7.exportCSV('listAllHostsConfig:HostTable')}"/>
+                <br/>
+                <h:commandLink value="#{messages['gazelle.common.export.ExportAsExcel']}"
+                               action="#{gazelleExcelExporterJboss7.export('listAllHostsConfig:HostTable')}"/>
+            </h:panelGroup>
+            <s:div id="buttonsGenerateDelete">
+                <a4j:commandButton styleClass="gzl-btn-green"
+                                   value="#{messages['gazelle.configuration.button.AttributeIPAddress']} ..."
+                                   oncomplete="jq162('#generateIPs').modal('show');"
+                                   execute="@this"/>
+                <a4j:commandButton styleClass="gzl-btn-red"
+                                   value="#{messages['net.ihe.gazelle.tm.ReleaseIPAddresses']} ..."
+                                   oncomplete="jq162('#deleteIPs').modal('show');"
+                                   execute="@this"/>
+            </s:div>
+        </h:form>
+        <h:form id="generateIPsForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="generateIPs"/>
+                <ui:define name="popup_title">
+                    #{messages['net.ihe.gazelle.tm.ReassignAllIPAddresses']}
+                </ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.ThisActionWillRemoveAllIPAdressesBeforeGettingNe']}</p>
+                <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton styleClass="gzl-btn-green"
+                                       value="#{messages['gazelle.configuration.button.AttributeIPAddress']}"
+                                       actionListener="#{networkConfigurationManager.generateIPsForAllHosts()}"
+                                       onclick="jq162('#generateIPs').modal('hide');"
+                                       render="listAllHostsConfig"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <h:form id="deleteIPsForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="deleteIPs"/>
+                <ui:define name="popup_title">
+                    #{messages['gazelle.tm.application.preferences.gmm.confirmation.Confirmation']}
+                </ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton styleClass="gzl-btn-red"
+                                       value="#{messages['net.ihe.gazelle.tm.ReleaseIPAddresses']}"
+                                       actionListener="#{networkConfigurationManager.releaseIPsForAllHosts()}"
+                                       onclick="jq162('#deleteIPs').modal('hide');"
+                                       render="listAllHostsConfig"
+                                       execute="@this"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <h:form id="deleteConfForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="deleteIP"/>
+                <ui:define name="popup_title">
+                    #{messages['gazelle.tm.application.preferences.gmm.confirmation.Confirmation']}
+                </ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton styleClass="gzl-btn-red"
+                                       value="#{messages['net.ihe.gazelle.tm.RemoveThisNetworkConfiguration']}"
+                                       actionListener="#{networkConfigurationManager.deleteCurrentNetworkConfiguration()}"
+                                       onclick="jq162('#deleteIP').modal('hide');"
+                                       render="listAllHostsConfig"
+                                       execute="@this"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

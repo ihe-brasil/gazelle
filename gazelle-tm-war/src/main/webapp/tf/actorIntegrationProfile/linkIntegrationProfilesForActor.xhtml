@@ -1,0 +1,39 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle"
+              value="#{messages['gazelle.tf.ActorIntegrationProfileLinksFor']} #{actorManager.selectedActor.name}"/>
+    <ui:define name="body">
+        <div  id="pickIntegrationProfilesForActorDivId">
+            <h:form id="pickIntegrationProfilesForActorFormId">
+                <s:token allowMultiplePosts="true"/>
+
+                <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                    <ui:define name="panel_title">#{messages['gazelle.tf.ChooseIntegrationProfilesLinkedTo']}
+                        #{actorManager.selectedActor.name}
+                    </ui:define>
+
+                    <rich:pickList id="picklistForSelectingIP"
+                                   value="#{actorManager.linkedProfiles}"
+                                   minListHeight="120px" maxListHeight="200px"
+                                   sourceCaption="#{messages['gazelle.tf.AvailableIntegrationProfiles']}"
+                                   targetCaption="#{messages['gazelle.tf.IntegrationProfilesCurrentlyLinkedToActor']}">
+                        <s:selectItems value="#{actorManager.getUnlinkedProfiles()}" var="p"
+                                       label="#{p.keyword} - #{p.name}"/>
+                        <s:convertEntity/>
+                    </rich:pickList>
+
+                    <h:commandButton id="save" type="submit" styleClass="gzl-btn-green"
+                                     value="#{messages['gazelle.common.button.Save']}"
+                                     action="#{actorManager.saveActorProfiles(actorManager.selectedActor)}"
+                                     rendered="#{s:hasPermission('MasterModel', 'edit', null)}"/>
+                    <h:commandButton id="cancel" styleClass="gzl-btn"
+                                     value="#{messages['gazelle.common.button.Cancel']}"
+                                     action="#{actorManager.editActor(actorManager.selectedActor, actorManager.getEdit())}"/>
+                </ui:decorate>
+
+            </h:form>
+        </div>
+    </ui:define>
+</ui:composition>

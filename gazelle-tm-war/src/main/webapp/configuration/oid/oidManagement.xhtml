@@ -1,0 +1,404 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns:gri="http://java.sun.com/jsf/composite/gri"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tm.OIDManagement']}"/>
+    <ui:define name="body">
+
+        <s:div id="tabsId">
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#configureOIDs" aria-controls="configureOIDs" role="tab"
+                                                          data-toggle="tab">#{messages['gazelle.tm.OIDSystemAssignment']}</a>
+                </li>
+                <li role="presentation"><a href="#overview" aria-controls="overview" role="tab"
+                                           data-toggle="tab">#{messages['gazelle.tm.OIDRequirements']}</a></li>
+                <li role="presentation"><a href="#configureIPAndDNS" aria-controls="configureIPAndDNS" role="tab"
+                                           data-toggle="tab">#{messages['gazelle.tm.OIDRoots']}</a>
+                </li>
+                <li role="presentation"><a href="#configts" aria-controls="configts" role="tab" data-toggle="tab">#{messages['gazelle.tm.OIDTestingSessionManagement']}</a>
+                </li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="configureOIDs">
+                    <ui:include src="oidSystemAssignment.xhtml"/>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="overview">
+                    <h:form id="configForm">
+                        <s:token allowMultiplePosts="true"/>
+                        <br/>
+                        <a4j:commandButton id="addoidrbutt" value="#{messages['gazelle.tm.AddNewOIDRequirement']}"
+                                           styleClass="gzl-btn-green"
+                                           action="#{oidManager.addNewOIDRequirement()}"/>
+                        <br/>
+                        <br/>
+                        <rich:dataTable id="oidreqdatatab" var="currentOIDRequirement"
+                                        value="#{gazelleDAO.getAllOIDRequirement()}" rowKeyVar="rowNumber"
+                                        rowClasses="row-grey"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                            <f:facet name="header">
+                                <rich:columnGroup>
+                                    <g:column rowspan="2">
+                                        <h:outputText value="#{messages['gazelle.tf.table.Id']}"/>
+                                    </g:column>
+                                    <g:column rowspan="2">
+                                        <h:outputText value="#{messages['gazelle.tf.table.Label']}"/>
+                                    </g:column>
+                                    <g:column rowspan="2">
+                                        <h:outputText value="#{messages['gazelle.tm.OIDRoot']}"/>
+                                    </g:column>
+                                    <g:column colspan="3">
+                                        <h:outputText
+                                                value="#{messages['gazelle.tf.table.IntegrationProfileOption']}"/>
+                                    </g:column>
+                                    <g:column rowspan="2" rendered="#{s:hasRole('admin_role')}">
+                                        <h:outputText value="#{messages['gazelle.common.Action']}"/>
+                                    </g:column>
+                                    <g:column breakRowBefore="true">
+                                        <h:outputText value="#{messages['gazelle.tf.IntegrationProfile']}"/>
+                                    </g:column>
+                                    <g:column>
+                                        <h:outputText
+                                                value="#{messages['gazelle.testmanagement.system.label.Actor']}"/>
+                                    </g:column>
+                                    <g:column>
+                                        <h:outputText value="#{messages['gazelle.tf.LabelOption']}"/>
+                                    </g:column>
+                                </rich:columnGroup>
+                            </f:facet>
+                            <g:column>
+                                <h:outputText value="#{currentOIDRequirement.id}"/>
+                            </g:column>
+                            <g:column>
+                                <h:outputText value="#{currentOIDRequirement.label}"/>
+                            </g:column>
+                            <g:column>
+                                <h:outputText
+                                        value="#{currentOIDRequirement.oidRootDefinition.rootOID}(#{messages['gazelle.tm.LastValue']} : #{currentOIDRequirement.oidRootDefinition.lastValue})"/>
+                            </g:column>
+                            <g:column colspan="3"/>
+                            <g:column rendered="#{s:hasRole('admin_role')}">
+
+                                <a4j:commandLink event="click"
+                                                 title="#{messages['gazelle.tm.DeleteThisOidRequirement']}"
+                                                 oncomplete="jq162('#DeleteSelectedOIDRequirement').modal('show');"
+                                                 render=" :deleteForm"
+                                                 actionListener="#{oidManager.setSelectedOIDRequirement(currentOIDRequirement) }">
+                                    <span class="gzl-icon-trash-o"/>
+                                </a4j:commandLink>
+
+
+                                <a4j:commandLink id="editActionImageSupportForObjectType"
+                                                 title="#{messages['gazelle.tm.EditThisOIDRequirement']}"
+                                                 action="#{oidManager.editSelectedOIDRequirement(currentOIDRequirement)}"
+                                                 immediate="true" execute="@this">
+                                    <span class="gzl-icon-pencil"/>
+                                </a4j:commandLink>
+
+                            </g:column>
+                            <rich:collapsibleSubTable
+
+                                    var="aipo"
+                                    value="#{currentOIDRequirement.actorIntegrationProfileOptionList}">
+                                <g:column colspan="3"/>
+                                <g:column>
+                                    <h:outputText
+                                            value="#{aipo.actorIntegrationProfile.integrationProfile.keyword}"/>
+                                </g:column>
+                                <g:column>
+                                    <h:outputText value="#{aipo.actorIntegrationProfile.actor.keyword}"/>
+                                </g:column>
+                                <g:column>
+                                    <h:outputText value="#{aipo.integrationProfileOption.keyword}"/>
+                                </g:column>
+                                <g:column rendered="#{s:hasRole('admin_role')}"/>
+                            </rich:collapsibleSubTable>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId" value="oidreqdatatab"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </h:form>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="configureIPAndDNS">
+                    <h:form id="oidRootF">
+                        <s:token allowMultiplePosts="true"/>
+                        <a4j:queue requestDelay="300" ignoreDupResponses="true"/>
+                        <br/>
+                        <a4j:commandButton id="addoidrdbutt" value="#{messages['gazelle.tm.AddNewOIDRoot']}"
+                                           styleClass="gzl-btn-green"
+                                           actionListener="#{oidManager.initializeOIDRootDefinition()}"
+                                           oncomplete="jq162('#EditOIDRootDefinition').modal('show');"
+                                           render=" :editrdform"/>
+                        <br/>
+                        <br/>
+                        #{dataTableStateHolder.setAscendingOn('rootOID')}
+                        <rich:dataTable id="oidroodatatab" var="currentOIDRootDefinition"
+                                        value="#{oidManager.getOIDRoots()}" rowKeyVar="rowNumber"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds2">
+                            <g:column filterBy="#{'rootOID'}" filterEvent="onkeyup"
+                                      sortBy="#{'rootOID'}" sortOrder="#{dataTableStateHolder.sortOrders['rootOID']}">
+                                <ui:define name="header">#{messages['gazelle.tm.OIDRoot']}</ui:define>
+                                <h:outputText value="#{currentOIDRootDefinition.rootOID}"/>
+                            </g:column>
+                            <g:column>
+                                <ui:define name="header">#{messages['gazelle.tm.LastValue_2']}</ui:define>
+                                <h:outputText value="#{currentOIDRootDefinition.lastValue}"/>
+                            </g:column>
+                            <g:column sortBy="#{'label'}" filterBy="#{'label'}" filterEvent="onkeyup">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Label']}
+                                </ui:define>
+                                <h:outputText value="#{currentOIDRootDefinition.label.label}"/>
+                            </g:column>
+                            <g:column>
+                                <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+                                <div class="gzl-never-wrap">
+
+                                    <a4j:commandLink event="click"
+                                                     title="#{messages['gazelle.tm.DeleteThisOidRoot']}"
+                                                     oncomplete="jq162('#DeleteOIDRootDefinition').modal('show');"
+                                                     render=" :delordform"
+                                                     actionListener="#{oidManager.setSelectedOIDRootDefinition(currentOIDRootDefinition)}">
+                                        <span class="gzl-icon-trash-o"/>
+                                    </a4j:commandLink>
+
+
+                                    <a4j:commandLink event="click"
+                                                     title="#{messages['gazelle.tm.EditOIDRoot']}"
+                                                     oncomplete="jq162('#EditOIDRootDefinition').modal('show');"
+                                                     render=" :editrdform"
+                                                     actionListener="#{oidManager.setSelectedOIDRootDefinition(currentOIDRootDefinition)}">
+                                        <span class="gzl-icon-pencil"/>
+                                    </a4j:commandLink>
+
+                                </div>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds2"/>
+                                    <ui:param name="dataTableId" value="oidroodatatab"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </h:form>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="configts">
+                    <h:form id="tstabform">
+                        <s:token allowMultiplePosts="true"/>
+                        <s:div id="buttgen" rendered="#{s:hasRole('admin_role')}">
+                            <br/>
+                            <a4j:commandLink id="deloidreq"
+                                             value="#{messages['gazelle.tm.DeleteAllOIDSystemAssignment']}..."
+                                             oncomplete="jq162('#DeleteAllOSA').modal('show');"
+                                             execute="@this"
+                                             render=" :deleteosaForm"/>
+                            <br/>
+                            <br/>
+                            <a4j:commandLink id="delgenoidreq"
+                                             value="#{messages['gazelle.tm.DeleteAndGenerateAllOIDSystemAssignment']}..."
+                                             oncomplete="jq162('#DeleteAndGenAllOSA').modal('show');"
+                                             execute="@this"
+                                             render=" :deletegenForm"/>
+                            <br/>
+                            <br/>
+                            <a4j:commandLink id="updoidreq"
+                                             value="#{messages['gazelle.tm.UpdateSystemOIDSystemAssignment']}..."
+                                             oncomplete="jq162('#UpdateOSA').modal('show');"
+                                             execute="@this"
+                                             render=" :updateForm"/>
+                            <br/>
+                            <br/>
+                        </s:div>
+                    </h:form>
+                </div>
+            </div>
+        </s:div>
+
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Delete selected oid requirement -->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="deleteForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteSelectedOIDRequirement"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.DeleteSelectedOIDRequirement']}</ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+                <ui:define name="popup_footer">
+                    <s:div rendered="#{oidManager.canDeleteSelectedOIDRequirement()}">
+                        <button type="button" class="gzl-btn" data-dismiss="modal">
+                            #{messages['gazelle.tm.Cancel']}
+                        </button>
+                        <a4j:commandButton id="deleteOTbutton"
+                                           value="#{messages['gazelle.tm.DeleteThisOIDRequirement']}"
+                                           styleClass="gzl-btn-red"
+                                           actionListener="#{oidManager.deleteSelectedOIDRequirement()}"
+                                           onclick="jq162('#DeleteSelectedOIDRequirement').modal('hide');"
+                                           render="oidreqdatatab,messageDecoration"/>
+                    </s:div>
+                    <s:div rendered="#{!oidManager.canDeleteSelectedOIDRequirement()}">
+                        <h:outputText
+                                value="#{messages['gazelle.tm.ThisLabelIsAssignedToSomeSystemsYouCanNotDeleteI']}."
+                                style="color:#aa0000;"/>
+                    </s:div>
+
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Edit OID Root -->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="editrdform">
+            <gri:popupPanel id="EditOIDRootDefinition" bodyStyleClass="gzl-select-modal-overflow-visible">
+                <f:facet name="header">
+                    <h:outputText
+                            value="#{messages['gazelle.tm.DeleteSelectedOIDRequirement']}"/>
+                </f:facet>
+
+                <s:decorate id="ordec" template="/layout/form/_edit.xhtml">
+                    <ui:param name="id" value="oidRootInput"/>
+                    <ui:define name="label">#{messages['gazelle.tm.OIDRoot']}</ui:define>
+                    <h:inputText id="oidRootInput" styleClass=" form-control" size="50" required="true"
+                                 value="#{oidManager.selectedOIDRootDefinition.rootOID}">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate id="lasvdec" template="/layout/form/_edit.xhtml">
+                    <ui:param name="id" value="lastValueInput"/>
+                    <ui:define name="label">#{messages['gazelle.tm.LastValue_2']}</ui:define>
+                    <h:inputText id="lastValueInput" styleClass=" form-control" size="50" required="true"
+                                 value="#{oidManager.selectedOIDRootDefinition.lastValue}">
+                        <a4j:ajax event="blur" render="lasvdec" execute="@this"/>
+                    </h:inputText>
+                </s:decorate>
+                <h:panelGroup rendered="#{oidManager.selectedOIDRootDefinition!=null}">
+                    <s:decorate id="labeldec" template="/layout/form/_edit.xhtml">
+                        <ui:define name="label">#{messages['gazelle.tf.table.Label']}</ui:define>
+                        <ui:param name="id" value="labelinput"/>
+                        <h:selectOneMenu value="#{oidManager.selectedOIDRootDefinition.label}" id="labelinput"
+                                         styleClass="form-control gzl-select-text">
+                            <s:selectItems value="#{oidLabelManager.getLabels()}"
+                                           noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}" var="rootLabel"
+                                           label="#{rootLabel.label}"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                </h:panelGroup>
+
+                <f:facet name="footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="editordbut" value="#{messages['gazelle.tm.SaveOIDRoot']}"
+                                       styleClass="gzl-btn-green"
+                                       actionListener="#{oidManager.saveOIDRootDefinition()}"
+                                       oncomplete="jq162('#EditOIDRootDefinition').modal('hide');"
+                                       render="oidroodatatab,messageDecoration"/>
+                </f:facet>
+            </gri:popupPanel>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Delete OID Root -->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="delordform">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteOIDRootDefinition"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.DeleteOIDRoot']}</ui:define>
+                <s:div rendered="#{!oidManager.canDeleteSelectedOIDRootDefinition()}">
+                    <h:outputText
+                            value="#{messages['gazelle.tm.ThisOIDRootIsUsedBySomeOIDRequirementYouCanNotDe']}">
+                        <br/>
+                        <rich:list id="listtodel" var="oidreq"
+                                   value="#{oidManager.selectedOIDRootDefinition.getListOIDRequirements()}"
+                                   type="unordered">
+                            <h:outputText value="#{oidreq.label}" style="color:#aa0000;"/>
+                        </rich:list>
+                    </h:outputText>
+                </s:div>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <s:span rendered="#{oidManager.canDeleteSelectedOIDRootDefinition()}">
+                        <a4j:commandButton id="delordordbut" value="#{messages['gazelle.tm.DeleteOIDRoot']}"
+                                           styleClass="gzl-btn-red"
+                                           actionListener="#{oidManager.deleteOIDRootDefinition()}"
+                                           onclick="jq162('#DeleteOIDRootDefinition').modal('hide');"
+                                           render="oidroodatatab,messageDecoration"/>
+                    </s:span>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Delete all oid system assignment -->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="deleteosaForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteAllOSA"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.DeleteOIDRoot']}</ui:define>
+                <p>#{messages['gazelle.tm.AreYouSureYouWantToDeleteAllOIDSystemAssignmentR']} :
+                    #{gazelleDAO.getSelectedTestingSession().description}.</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton value="#{messages['gazelle.tm.DeleteAllOIDSystemAssignment']}"
+                                       styleClass="gzl-btn-red"
+                                       action="#{oidManager.deleteAllOIDSystemAssignment()}"
+                                       onclick="jq162('#DeleteAllOSA').modal('hide');"
+                                       render="tabsId,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Delete and regenerate all system assignement -->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="deletegenForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteAndGenAllOSA"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.DeleteAndGenerateAllOIDSystemAssignment']}
+                </ui:define>
+                <p>#{messages['gazelle.tm.AreYouSureYouWantToDeleteAndRegenerateAllOIDSyst']} :
+                    #{gazelleDAO.getSelectedTestingSession().description}.</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton
+                            value="#{messages['gazelle.tm.DeleteAndGenerateAllOIDSystemAssignment']}"
+                            styleClass="gzl-btn-red"
+                            action="#{oidManager.deleteAndGenerateAllOIDSystemAssignment()}"
+                            onclick="jq162('#DeleteAndGenAllOSA').modal('hide');"
+                            render="tabsId,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- update all system assignement -->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="updateForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="UpdateOSA"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.UpdateOIDSystemAssignment']}</ui:define>
+                <p>#{messages['gazelle.tm.YouWillUpdateOIDSystemForThisSessionIfThereAreSo']}.</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="updoidreq"
+                                       value="#{messages['gazelle.tm.UpdateSystemOIDSystemAssignment']}"
+                                       styleClass="gzl-btn-green"
+                                       action="#{oidManager.updateOIDSystemAssignment()}"
+                                       onclick="jq162('#UpdateOSA').modal('hide');"
+                                       render="tabsId,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

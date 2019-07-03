@@ -1,0 +1,1 @@
+UPDATE tm_configuration_type SET type_name='HTTP' where class_name='net.ihe.gazelle.tm.configurations.model.WebServiceConfiguration';

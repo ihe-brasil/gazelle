@@ -1,0 +1,173 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:gri="http://java.sun.com/jsf/composite/gri"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['net.ihe.gazelle.tm.ConfigurationEdition']}"/>
+    <ui:define name="body">
+        <h:form id="sisFrom">
+            <s:decorate template="/layout/form/_edit.xhtml" id="systemSelectForConfigurationDecorate"
+                        rendered="#{systemConfigurationManager.selectedSystemInSession == null}">
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.SystemForThisConfiguration']}</ui:define>
+                <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text"
+                                 value="#{systemConfigurationManager.selectedSystemInSession}">
+                    <s:selectItems value="#{systemConfigurationManager.possibleSystems}" var="sis"
+                                   noSelectionLabel="${messages.PleaseSelect}" label="#{sis.label}"/>
+                    <a4j:ajax event="change" render="editDiv,addNetworkConfigurationEditForm,sisFrom" execute="@this"/>
+                </h:selectOneMenu>
+            </s:decorate>
+        </h:form>
+        <s:div id="editDiv">
+            <h:panelGroup rendered="#{systemConfigurationManager.selectedSystemInSession != null}">
+                #{networkConfigurationManager.addANetworkConfig()}
+
+                <h:form id="addNetworkConfigurationEditForm">
+                    <gri:panel pid="configPanel">
+                        <f:facet name="header">
+                            <h:outputText value="#{systemConfigurationManager.getInstitutionKeywordForASystem()}"/>
+                        </f:facet>
+                        <h:panelGroup rendered="#{networkConfigurationManager.canEditHost()}">
+                            <a4j:region id="hostnameRegion">
+                                <s:decorate template="/layout/form/_edit.xhtml" id="hostDecorate">
+                                    <ui:param name="id" value="hostnameInputText"/>
+                                    <ui:define name="label">#{messages['gazelle.configuration.network.hostname']}
+                                    </ui:define>
+                                    <h:inputText styleClass=" form-control" id="hostnameInputText"
+                                                 value="#{networkConfigurationManager.selectedNetworkConfiguration.hostname}">
+                                    </h:inputText>
+                                </s:decorate>
+                            </a4j:region>
+                        </h:panelGroup>
+
+                        <h:panelGroup rendered="#{not networkConfigurationManager.canEditHost()}">
+                            <s:decorate template="/layout/display/_display.xhtml">
+                                <ui:define name="label">#{messages['gazelle.configuration.network.hostname']}</ui:define>
+                                <h:outputText
+                                        value="#{networkConfigurationManager.selectedNetworkConfiguration.hostname}"/>
+                            </s:decorate>
+                        </h:panelGroup>
+
+                        <s:div rendered="#{networkConfigurationManager.canHostDNS()}">
+                            <h:panelGroup rendered="#{networkConfigurationManager.canEditHostDNS()}">
+                                <s:decorate template="/layout/form/_edit.xhtml">
+                                    <ui:define name="label">
+                                        #{messages['net.ihe.gazelle.tm.ExternalHostignoringDomainName']})
+                                    </ui:define>
+                                    <h:selectBooleanCheckbox
+                                            value="#{networkConfigurationManager.selectedNetworkConfiguration.ignoreDomainName}">
+                                        <a4j:ajax event="change" execute="@this"
+                                                  render="addNetworkConfigurationEditForm"/>
+                                    </h:selectBooleanCheckbox>
+                                </s:decorate>
+                            </h:panelGroup>
+                            <h:panelGroup
+                                    rendered="#{not networkConfigurationManager.canEditHostDNS()}">
+                                <s:decorate template="/layout/display/_display.xhtml">
+                                    <ui:define name="label">
+                                        #{messages['net.ihe.gazelle.tm.ExternalHostignoringDomainName']})
+                                    </ui:define>
+                                    <h:outputText
+                                            value="#{networkConfigurationManager.selectedNetworkConfiguration.ignoreDomainName}"/>
+                                </s:decorate>
+                            </h:panelGroup>
+                        </s:div>
+                        <h:panelGroup>
+                            <a4j:region id="aliasRegion">
+                                <s:decorate template="/layout/form/_edit.xhtml" id="aliasDecorate">
+                                    <ui:param name="id" value="aliasInputText"/>
+                                    <ui:define name="label">#{messages['gazelle.configuration.network.alias']}</ui:define>
+                                    <h:inputText styleClass=" form-control" id="aliasInputText"
+                                                 value="#{networkConfigurationManager.selectedNetworkConfiguration.alias}">
+                                    </h:inputText>
+                                </s:decorate>
+                            </a4j:region>
+
+                            <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                <ui:param name="id" value="part#{selectedTestRoles.id}"/>
+                                <ui:param name="placement" value="bottom"/>
+                                <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                                <ui:param name="trigger" value="focus"/>
+                                <ui:define name="content">
+                                    <h:outputText
+                                            value="#{messages['net.ihe.gazelle.tm.AnameNetHostGatewayOrDomainNameIsATextStringUpbr']}"
+                                            escape="false"/>
+                                </ui:define>
+                            </ui:decorate>
+
+                        </h:panelGroup>
+                        <h:panelGroup id="ipPanel"
+                                      rendered="#{networkConfigurationManager.canEditIP()}">
+                            <a4j:region id="ipRegion">
+                                <s:decorate template="/layout/form/_edit.xhtml" id="ipDecorate">
+                                    <ui:param name="id" value="hostIP"/>
+                                    <ui:define name="label">#{messages['gazelle.configuration.network.ipAddress']}
+                                    </ui:define>
+                                    <h:inputText styleClass=" form-control" id="hostIP"
+                                                 value="#{networkConfigurationManager.ipToValidate}">
+                                    </h:inputText>
+                                    <a4j:commandButton id="getInternalIPButton"
+                                                       rendered="#{networkConfigurationManager.canGenerateIP()}"
+                                                       styleClass="gzl-btn-green"
+                                                       value="#{messages['gazelle.tm.GetInternalIP']}"
+                                                       actionListener="#{networkConfigurationManager.generateIP( )}"
+                                                       execute="@this" render="ipPanel,messagesGlobal"/>
+                                </s:decorate>
+                            </a4j:region>
+                        </h:panelGroup>
+
+                        <h:panelGroup rendered="#{networkConfigurationManager.canGenerateIP()}">
+                            <ui:decorate template="/layout/panels/_panel.xhtml">
+                                <b>#{messages['gazelle.tm.ToAttributeAnIPAddressYouHaveToChoices']}
+                                    :</b>
+                                <ul>
+                                    <li>
+                                        #{messages['gazelle.tm.YouCanGetAnIPAddressInTheLocalAreaNetwork']}
+                                        #{messages['gazelle.tm.ForTheCurrentSession']}
+                                        #{messages['gazelle.tm.ClickingOnTheButtongetInternalIP']}"
+                                    </li>
+                                    <li>#{messages['gazelle.tm.IfYourServerIsOutsideTheLANForThisSessionYouCanS']}</li>
+                                </ul>
+                            </ui:decorate>
+                        </h:panelGroup>
+                        <h:panelGroup id="ipPanelView"
+                                      rendered="#{not networkConfigurationManager.canEditIP()}">
+                            <a4j:region id="ipRegionView">
+                                <s:decorate template="/layout/form/_edit.xhtml" id="ipDecorateView">
+                                    <ui:define name="label">#{messages['gazelle.configuration.network.ipAddress']}
+                                    </ui:define>
+                                    <h:outputText id="hostIPView"
+                                                  value="#{networkConfigurationManager.selectedNetworkConfiguration.ip}"
+                                                  rendered="#{not empty networkConfigurationManager.selectedNetworkConfiguration.ip}"/>
+                                    <h:outputText id="hostIPViewNote"
+                                                  value="#{messages['gazelle.tm.YourIPIsCurrentlyEmptyItWillBeAttributedLaterByA']}"
+                                                  rendered="#{empty networkConfigurationManager.selectedNetworkConfiguration.ip}"/>
+                                </s:decorate>
+                            </a4j:region>
+                        </h:panelGroup>
+
+                        <a4j:region id="commentRegion">
+                            <s:decorate template="/layout/form/_edit.xhtml" id="commentDecorate">
+                                <ui:param name="id" value="inputComment"/>
+                                <ui:define name="label">#{messages['gazelle.configuration.network.comment']}</ui:define>
+                                <h:inputText styleClass=" form-control" id="inputComment"
+                                             value="#{networkConfigurationManager.selectedNetworkConfiguration.comment}">
+                                </h:inputText>
+                            </s:decorate>
+                        </a4j:region>
+
+                        <s:div id="buttonsDiv">
+                            <a4j:commandButton id="saveNetworkConf" styleClass="gzl-btn-green"
+                                               value="#{messages['gazelle.common.button.Save']}"
+                                               action="#{networkConfigurationManager.addEditNetworkConfiguration()}"
+                                               render="addNetworkConfigurationEditForm,gazelle-messages"/>
+                            <a4j:commandButton id="cancel" styleClass="gzl-btn"
+                                               value="#{messages['gazelle.common.button.Cancel']}"
+                                               action="#{networkConfigurationManager.cancelAction()}"
+                                               immediate="true"/>
+                        </s:div>
+                    </gri:panel>
+                </h:form>
+            </h:panelGroup>
+        </s:div>
+    </ui:define>
+</ui:composition>

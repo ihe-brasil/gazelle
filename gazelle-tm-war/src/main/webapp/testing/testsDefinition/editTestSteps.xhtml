@@ -1,0 +1,760 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle"
+              value="#{messages['net.ihe.gazelle.tm.EditTestStepsOf']} #{editTestDefinitionManager.getEditedTest().name}"/>
+    <!-- ======================= -->
+    <!-- Test Descriptions section-->
+    <!-- ======================= -->
+    <ui:define name="body">
+        <h:form>
+            <a4j:commandButton styleClass="gzl-btn" immediate="true"
+                               value="#{messages['net.ihe.gazelle.tm.BackToTest']}"
+                               action="#{editTestDefinitionManager.backTo(editTestDefinitionManager.getEditedTest().id)}"
+                               execute="@this"/>
+        </h:form>
+        <s:div id="editTestStepsDiv"
+               rendered="#{editTestDefinitionManager.getEditedTest().id != null and s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}">
+            <h:panelGroup rendered="#{editedTestForTestSteps.testDescription.size()&gt;0}">
+                <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                    <ui:define name="panel_title">#{messages['gazelle.tm.test.TestDescription']}
+                        #{messages['net.ihe.gazelle.tm.In']}
+                        #{editedTestForTestSteps.getContextualDescription().gazelleLanguage.keyword}
+                    </ui:define>
+                    <g:safehtml value="#{editedTestForTestSteps.getContextualDescription().description}"/>
+                </ui:decorate>
+            </h:panelGroup>
+            <h:form id="testStepsManagement">
+                <s:token allowMultiplePosts="true"/>
+                <h:panelGroup rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}">
+                    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                        <ui:define name="panel_title">#{messages['gazelle.tm.TestSteps']}</ui:define>
+                        <rich:dataTable id="testStepsTable" var="currentTestStep" rowKeyVar="rowNumber"
+                                        value="#{editTestStepsManager.listOfTestSteps}" first="0"
+                                        columnClasses="center">
+                            <g:column id="stepIndexColumn" styleClass="#{styleClassColumn}" rowspan="2">
+                                <ui:define name="header">
+                                    <h:outputText id="stepIndexHeaderOutputText"
+                                                  value="#{messages['gazelle.tm.StepIndex']}"/>
+                                </ui:define>
+                                <h:inputText id="testStepInputText" value="#{currentTestStep.stepIndex}" styleClass="form-control"
+                                             rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}">
+                                    <a4j:ajax event="blur" execute="@this"
+                                              render="testStepsManagement"
+                                              listener="#{editTestStepsManager.persistTestSteps(currentTestStep)}"/>
+                                </h:inputText>
+                            </g:column>
+                            <g:column id="initiatorRoleColumn" styleClass="#{styleClassColumn}">
+                                <ui:define name="header">
+                                    <h:outputText id="initiatorRoleHeaderOutputText"
+                                                  value="#{messages['gazelle.tm.InitiatorRole']}"/>
+                                </ui:define>
+                                <h:outputText id="initiatorRoleOutputText"
+                                              value="#{currentTestStep.testRolesInitiator.roleInTest.keyword}"
+                                />
+                            </g:column>
+                            <g:column id="responderRoleColumn" styleClass="#{styleClassColumn}">
+                                <ui:define name="header">
+                                    <h:outputText id="responderRoleHeaderOutputText"
+                                                  value="#{messages['gazelle.tm.ResponderRole']}"/>
+                                </ui:define>
+                                <h:outputText id="responderRoleOutputText"
+                                              value="#{currentTestStep.testRolesResponder.roleInTest.keyword}"
+                                />
+                            </g:column>
+                            <g:column id="transactionColumn" styleClass="#{styleClassColumn}">
+                                <ui:define name="header">
+                                    <h:outputText id="transactionHeaderOutputText"
+                                                  value="#{messages['gazelle.tf.Transaction']}"/>
+                                </ui:define>
+                                <h:outputText id="transactionOutputText"
+                                              value="#{currentTestStep.transaction.keyword}"
+                                />
+                            </g:column>
+                            <g:column id="isSecuredColumn" styleClass="#{styleClassColumn}">
+                                <ui:define name="header">
+                                    <h:outputText id="isSecuredHeaderOutputText"
+                                                  value="#{messages['gazelle.tm.testing.testsDefinition.secured']}"/>
+                                </ui:define>
+                                <h:selectBooleanCheckbox styleClass="form-control-static"
+                                                         id="isSecuredForTestStepsList"
+                                                         value="#{currentTestStep.secured}">
+                                    <a4j:ajax event="change"
+                                              render="testStepsManagement"
+                                              listener="#{editTestStepsManager.persistTestSteps(currentTestStep)}"/>
+                                </h:selectBooleanCheckbox>
+                            </g:column>
+                            <g:column id="messageTypeColumn" styleClass="#{styleClassColumn}">
+                                <ui:define name="header">
+                                    <h:outputText id="messageTypeHeaderOutputText"
+                                                  value="#{messages['gazelle.tf.table.mptrans']}"/>
+                                </ui:define>
+                                <h:inputText id="messageTypeInputText" value="#{currentTestStep.messageType}" styleClass="form-control"
+                                             rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}">
+                                    <a4j:ajax event="blur" execute="@this"
+                                              render="testStepsManagement"
+                                              listener="#{editTestStepsManager.persistTestSteps(currentTestStep)}"/>
+                                </h:inputText>
+                            </g:column>
+                            <g:column id="testStepOptionColumn" styleClass="#{styleClassColumn}">
+                                <ui:define name="header">
+                                    <h:outputText id="testStepOptionHeaderOutputText"
+                                                  value="#{messages['gazelle.tf.LabelOption']}"/>
+                                </ui:define>
+                                <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                 id="testStepsOptionListBox"
+                                                 value="#{currentTestStep.testStepsOption}"
+                                                 style="font-weight:bold;text-align:center;"
+                                                 rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}">
+                                    <s:selectItems id="testStepOptionSelectItems"
+                                                   value="#{editTestStepsManager.possibleTestStepsOptions}"
+                                                   var="selectedTestStepsOption"
+                                                   noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                   label="#{selectedTestStepsOption.labelToDisplay}"/>
+                                    <a4j:ajax event="change" execute="@this"
+                                              render="testStepsManagement"
+                                              listener="#{editTestStepsManager.persistTestSteps(currentTestStep)}"/>
+                                </h:selectOneMenu>
+                            </g:column>
+                            <g:column id="testStepDescriptionColumn" styleClass="#{styleClassColumn}">
+                                <ui:define name="header">
+                                    <h:outputText id="testStepDescriptionHeaderOutputText"
+                                                  value="#{messages['gazelle.tf.table.Description']}"/>
+                                </ui:define>
+                                <h:inputTextarea styleClass=" form-control" id="testStepDescriptionInputTextarea"
+                                                 rows="3"
+                                                 cols="50"
+                                                 value="#{currentTestStep.description}"
+                                                 rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}">
+                                    <a4j:ajax event="blur" execute="@this"
+                                              render="testStepsManagement"
+                                              listener="#{editTestStepsManager.persistTestSteps(currentTestStep)}"/>
+                                </h:inputTextarea>
+                            </g:column>
+                            <g:column id="testStepActionColumn">
+                                <ui:define name="header">
+                                    <h:outputText id="testStepActionHeaderOutputText"
+                                                  value="#{messages['gazelle.common.Action']}"/>
+                                </ui:define>
+                                <div class="gzl-never-wrap">
+                                    <a4j:commandLink id="testStepsCopySupport"
+                                                     actionListener="#{editTestStepsManager.copySelectedTestStep(currentTestStep)}"
+                                                     onRowMouseOver="this.style.cursor='pointer'"
+                                                     title="#{messages['gazelle.common.button.Copy']}"
+                                                     render="testStepsManagement" execute="@this">
+                                        <span class="gzl-icon-files-o"/>
+                                    </a4j:commandLink>
+                                    <a4j:commandLink id="testStepsEditSupport"
+                                                     title="#{messages['gazelle.common.button.Edit']}"
+                                                     oncomplete="document.getElementById('testStepsManagement:stepIndexDecoration:stepIndex').focus()"
+                                                     actionListener="#{editTestStepsManager.editTestStepsAndInitializeVar(currentTestStep)}"
+                                                     render="testStepsManagement" execute="@this">
+                                        <span class="gzl-icon-pencil"/>
+                                    </a4j:commandLink>
+                                    <a4j:commandLink id="testStepsDeleteSupport"
+                                                     actionListener="#{editTestStepsManager.setSelectedTestSteps(currentTestStep)}"
+                                                     oncomplete="jq162('#TestStepsDeleteConfirmationModalPanel').modal('show');"
+                                                     execute="@this"
+                                                     rendered="#{applicationPreferenceManager.isPossibleToDeleteOnGMM()}"
+                                                     title="#{messages['gazelle.common.button.Delete']}"
+                                                     render=" :TestStepsDeleteConfirmationModalPanelForm,TestStepsDeleteConfirmationModalPanel">
+                                        <span class="gzl-icon-trash-o"/>
+                                    </a4j:commandLink>
+                                </div>
+                            </g:column>
+                            <g:column colspan="8" breakRowBefore="true" id="sdddddd"
+                                      style="background-color:#ccddee;">
+                                <rich:togglePanel id="panel" initialState="empty" switchType="client"
+                                                  stateOrder="empty,first">
+                                    <rich:togglePanelItem name="empty">
+                                        <h:panelGroup id="pangroup1">
+                                            <h:commandLink id="toggview" style="font-weight:bold;"
+                                                           value="#{messages['net.ihe.gazelle.tm.InputAndOutputContextualInformation']} (#{currentTestStep.sizeOfInputCI()} - #{currentTestStep.sizeOfOutputCI()})">
+                                                <rich:toggleControl targetItem="first">
+                                                </rich:toggleControl>
+                                            </h:commandLink>
+                                        </h:panelGroup>
+                                    </rich:togglePanelItem>
+                                    <rich:togglePanelItem name="first">
+                                        <h:panelGroup>
+                                            <h:commandLink style="font-weight:bold;"
+                                                           value="#{messages['gazelle.common.button.Hide']}">
+                                                <rich:toggleControl targetItem="empty">
+                                                </rich:toggleControl>
+                                            </h:commandLink>
+                                            <table width="100%">
+                                                <tr>
+                                                    <td style="width: 45%">
+                                                        <h:outputText
+                                                                value="#{messages['gazelle.tm.test.InputContextualInformations']}"/>
+                                                        <br/>
+                                                        <br/>
+                                                        <rich:dataTable id="CIIndt2" var="currentCI" rowKeyVar="10"
+                                                                        value="#{currentTestStep.inputContextualInformationList}"
+                                                                        first="0">
+                                                            <g:column>
+                                                                <ui:define name="header">
+                                                                    #{messages['gazelle.tf.table.Id']}
+                                                                </ui:define>
+                                                                <h:outputText value="#{currentCI.id}"/>
+                                                            </g:column>
+                                                            <g:column>
+                                                                <ui:define name="header">
+                                                                    #{messages['gazelle.tf.table.Label']}
+                                                                </ui:define>
+                                                                <h:outputText value="#{currentCI.label}"/>
+                                                            </g:column>
+                                                            <g:column>
+                                                                <ui:define name="header">
+                                                                    #{messages['gazelle.financial.invoice.InvoicePathForArray']}
+                                                                </ui:define>
+                                                                <h:outputText value="#{currentCI.path.keyword}"/>
+                                                            </g:column>
+                                                            <g:column>
+                                                                <ui:define name="header">
+                                                                    #{messages['gazelle.tm.testing.instance.ValueURL']}
+                                                                </ui:define>
+                                                                <h:outputText value="#{currentCI.value}"/>
+                                                            </g:column>
+                                                        </rich:dataTable>
+                                                    </td>
+                                                    <td style="vertical-align: middle;">
+                                                        <span class="gzl-icon-forward"/>
+                                                    </td>
+                                                    <td style="width: 45%">
+                                                        <h:outputText
+                                                                value="#{messages['gazelle.tm.test.OutputContextualInformations']}"/>
+                                                        <br/>
+                                                        <br/>
+                                                        <rich:dataTable id="CIoutdt" var="currentCI" rowKeyVar="10"
+                                                                        value="#{currentTestStep.outputContextualInformationList}"
+                                                                        first="0">
+                                                            <g:column>
+                                                                <ui:define name="header">
+                                                                    #{messages['gazelle.tf.table.Id']}
+                                                                </ui:define>
+                                                                <h:outputText value="#{currentCI.id}"/>
+                                                            </g:column>
+                                                            <g:column>
+                                                                <ui:define name="header">
+                                                                    #{messages['gazelle.tf.table.Label']}
+                                                                </ui:define>
+                                                                <h:outputText value="#{currentCI.label}"/>
+                                                            </g:column>
+                                                            <g:column>
+                                                                <ui:define name="header">
+                                                                    #{messages['gazelle.financial.invoice.InvoicePathForArray']}
+                                                                </ui:define>
+                                                                <h:outputText value="#{currentCI.path.keyword}"/>
+                                                            </g:column>
+                                                            <g:column>
+                                                                <ui:define name="header">
+                                                                    #{messages['gazelle.tm.testing.instance.ValueURL']}
+                                                                </ui:define>
+                                                                <h:outputText value="#{currentCI.value}"/>
+                                                            </g:column>
+                                                        </rich:dataTable>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </h:panelGroup>
+                                    </rich:togglePanelItem>
+                                </rich:togglePanel>
+                            </g:column>
+                        </rich:dataTable>
+                        <br/>
+
+                        <div>
+                            <h:outputLink
+                                    value="#{applicationPreferenceManager.getApplicationUrl()}testing/testsDefinition/editTestRoles.seam"
+                                    styleClass="gzl-btn"
+                                    rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}">
+                                <f:param name="id" value="#{editedTestForTestSteps.id}"/>
+                                <h:outputText value="#{messages['net.ihe.gazelle.tm.BackEditTestRoles']}"/>
+                            </h:outputLink>
+                            <a4j:commandButton value="#{messages['gazelle.tm.AddANewStep']}" id="addnewsteps"
+                                               rendered="#{!editTestStepsManager.showTestStepsEditionPanel}"
+                                               actionListener="#{editTestStepsManager.addNewTestSteps()}"
+                                               styleClass="gzl-btn-green" render="testStepsManagement"/>
+                        </div>
+                    </ui:decorate>
+                </h:panelGroup>
+                <br/>
+                <h:panelGroup
+                        rendered="#{!editTestStepsManager.showTestStepsEditionPanel and s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}">
+                    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                        <ui:define name="panel_title">#{messages['gazelle.tm.TestSummary']}
+                            <h:commandButton id="refDiag" value="#{messages['net.ihe.gazelle.tm.RefreshDiagram']}"
+                                             action="#{editTestStepsManager.updateDiagram(editTestDefinitionManager.getEditedTest())}"
+                                             styleClass="gzl-btn-orange btn-sm"/>
+                        </ui:define>
+                        <h:graphicImage library="img"
+                                        value="#{editTestDefinitionManager.getEditedTest().sequenceDiagramAsUrl}"
+                                        title="#{messages['gazelle.tm.SequenceDiagram']}"/>
+
+                    </ui:decorate>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{editTestStepsManager.showTestStepsEditionPanel}">
+                    <ui:decorate template="/layout/panels/_panel_title_footer_id.xhtml">
+                        <ui:param name="panel_id" value="AddNewTestStepsPanel"/>
+                        <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.AddANewTestStep']}</ui:define>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <a4j:region id="stepIndexRegion">
+                                    <s:decorate id="stepIndexDecoration" template="/layout/form/_edit.xhtml">
+                                        <ui:param name="id" value="stepIndex"/>
+                                        <ui:define name="label">#{messages['gazelle.tm.StepIndex']}</ui:define>
+                                        <h:inputText id="stepIndex" styleClass="form-control"
+                                                     value="#{editTestStepsManager.selectedTestSteps.stepIndex}"
+                                                     required="true">
+                                            <a4j:ajax event="blur" render="stepIndexDecoration"
+                                                      listener="#{editTestStepsManager.validateStepIndex()}"/>
+                                        </h:inputText>
+                                    </s:decorate>
+                                </a4j:region>
+                            </div>
+                            <div class="col-md-4">
+                                <a4j:region id="isSecuredRegion">
+                                    <s:decorate id="isSecuredDecoration"
+                                                template="/layout/form/_checkbox.xhtml">
+                                        <ui:define name="label">
+                                            <h:outputText id="isSecuredText"
+                                                          value="#{messages['gazelle.tm.testing.testsDefinition.secured']}"/>
+                                        </ui:define>
+                                        <h:selectBooleanCheckbox id="isSecured"
+                                                                 value="#{editTestStepsManager.selectedTestSteps.secured}"/>
+                                    </s:decorate>
+                                </a4j:region>
+                            </div>
+                            <div class="col-md-4">
+                                <a4j:region id="autoResponseRegion">
+                                    <s:decorate id="autoResponseDecoration" template="/layout/form/_checkbox.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.tm.AutoResponse']}</ui:define>
+                                        <h:selectBooleanCheckbox id="autoResponse"
+                                                                 value="#{editTestStepsManager.autoResponse}">
+                                            <a4j:ajax event="change"
+                                                      render="testRolesInitiatorDecoration,transactionTestRolesResponderIfNotAutoResponse,messageTypeDecoration"
+                                                      listener="#{editTestStepsManager.resetTransactionValue()}"/>
+                                        </h:selectBooleanCheckbox>
+                                    </s:decorate>
+                                </a4j:region>
+                            </div>
+                        </div>
+                        <a4j:region id="testRolesInitiatorRegion">
+                            <s:decorate id="testRolesInitiatorDecoration" template="/layout/form/_edit.xhtml">
+                                <ui:define name="label">#{messages['gazelle.tm.InitiatorRole']}</ui:define>
+                                <ui:param name="id" value="creationInitiatorListBox"/>
+                                <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                 id="creationInitiatorListBox"
+                                                 value="#{editTestStepsManager.selectedTestSteps.testRolesInitiator}"
+                                                 style="font-weight:bold;text-align:center;" required="true">
+                                    <s:selectItems value="#{editTestStepsManager.getPossibleInitiatorTestRoles()}"
+                                                   var="selectedInitiatorTestRoles"
+                                                   noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                   label="#{selectedInitiatorTestRoles.roleInTest.keyword}"/>
+                                    <a4j:ajax event="change" render="transactionDecoration,udagediv" execute="@this"
+                                              listener="#{editTestStepsManager.resetTransactionValue()}"/>
+                                </h:selectOneMenu>
+                                <rich:message for="creationInitiatorListBox" style="color:red;font-size:x-small;">
+                                    <f:facet name="errorMarker">
+                                        <span class="gzl-icon-times-circle"/>
+                                    </f:facet>
+                                </rich:message>
+                            </s:decorate>
+                        </a4j:region>
+                        <s:div id="transactionTestRolesResponderIfNotAutoResponse">
+                            <h:panelGrid columns="2">
+                                <a4j:region id="transactionRegion" rendered="#{!editTestStepsManager.autoResponse}">
+                                    <s:decorate id="transactionDecoration" template="/layout/form/_edit.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.tf.Transaction']}</ui:define>
+                                        <ui:param name="id" value="CreateTransactionListBox"/>
+                                        <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                         id="CreateTransactionListBox" required="true"
+                                                         value="#{editTestStepsManager.selectedTestSteps.transaction}"
+                                                         style="font-weight:bold;text-align:center;"
+                                                         disabled="#{editTestStepsManager.autoResponse}">
+                                            <s:selectItems value="#{editTestStepsManager.possibleTransactions}"
+                                                           var="selectedTransaction" noSelectionLabel="..."
+                                                           label="#{selectedTransaction.keyword}"/>
+                                            <a4j:ajax event="change"
+                                                      render="testRolesResponderDecoration,udagediv,messageTypeDecoration"
+                                                      execute="@this"
+                                                      listener="#{editTestStepsManager.resetTestRolesResponderValue()}"/>
+                                        </h:selectOneMenu>
+                                        <rich:message for="CreateTransactionListBox"
+                                                      style="color:red;font-size:x-small;">
+                                            <f:facet name="errorMarker">
+                                                <span class="gzl-icon-times-circle"/>
+                                            </f:facet>
+                                        </rich:message>
+                                    </s:decorate>
+                                </a4j:region>
+                                <s:div id="udagediv">
+                                    <s:decorate id="usagedec" template="/layout/form/_edit.xhtml"
+                                                rendered="#{editTestStepsManager.canEditUsage()}">
+                                        <ui:define name="label">#{messages['gazelle.tf.Usage']}</ui:define>
+                                        <ui:param name="id" value="usagesel"/>
+                                        <h:selectOneMenu styleClass="form-control gzl-form-control" id="usagesel"
+                                                         value="#{editTestStepsManager.selectedTestSteps.wstransactionUsage}"
+                                                         disabled="#{editTestStepsManager.autoResponse}">
+                                            <s:selectItems value="#{editTestStepsManager.possibleWSTransactionUsages}"
+                                                           var="wstr" noSelectionLabel="..." label="#{wstr.usage}"/>
+                                        </h:selectOneMenu>
+                                    </s:decorate>
+                                </s:div>
+                            </h:panelGrid>
+                            <a4j:region id="testRolesResponderRegion" rendered="#{!editTestStepsManager.autoResponse}">
+                                <s:decorate id="testRolesResponderDecoration" template="/layout/form/_edit.xhtml">
+                                    <ui:define name="label">#{messages['gazelle.tm.ResponderRole']}</ui:define>
+                                    <ui:param name="id" value="creationResponderListBox"/>
+                                    <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                     id="creationResponderListBox" required="true"
+                                                     value="#{editTestStepsManager.selectedTestSteps.testRolesResponder}"
+                                                     style="font-weight:bold;text-align:center;"
+                                                     disabled="#{editTestStepsManager.autoResponse}">
+                                        <s:selectItems value="#{editTestStepsManager.possibleTestRolesResponder}"
+                                                       var="selectedResponderTestRoles"
+                                                       noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                       label="#{selectedResponderTestRoles.roleInTest.keyword}"/>
+                                    </h:selectOneMenu>
+                                </s:decorate>
+                            </a4j:region>
+                        </s:div>
+                        <a4j:region id="messageTypeRegion">
+                            <s:decorate id="messageTypeDecoration" template="/layout/form/_edit.xhtml">
+                                <ui:param name="id" value="messageTypeIfAutoResponse"/>
+                                <ui:define name="label">#{messages['gazelle.tf.table.mptrans']}</ui:define>
+                                <ui:param name="id" value="messageTypeIfAutoResponse"/>
+                                <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                 id="creationMessageTypeListBox"
+                                                 required="true"
+                                                 value="#{editTestStepsManager.selectedTestSteps.messageType}"
+                                                 style="font-weight:bold;text-align:center;"
+                                                 disabled="#{editTestStepsManager.autoResponse}"
+                                                 rendered="#{!editTestStepsManager.autoResponse and editTestStepsManager.getPossibleMessageType()!=null}">
+                                    <s:selectItems value="#{editTestStepsManager.getPossibleMessageType()}"
+                                                   var="messageType"
+                                                   noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                   label="#{messageType}"/>
+                                </h:selectOneMenu>
+                                <h:inputText id="messageTypeIfAutoResponse" styleClass="form-control"
+                                             rendered="#{editTestStepsManager.autoResponse or editTestStepsManager.getPossibleMessageType()==null}"
+                                             value="#{editTestStepsManager.selectedTestSteps.messageType}"
+                                             required="true">
+                                </h:inputText>
+                            </s:decorate>
+                        </a4j:region>
+                        <a4j:region id="optionRegion">
+                            <s:decorate id="optionDecoration" template="/layout/form/_edit.xhtml">
+                                <ui:define name="label">#{messages['gazelle.tf.LabelOption']}</ui:define>
+                                <ui:param name="id" value="testStepsOptionListBox"/>
+                                <h:selectOneMenu styleClass="form-control gzl-form-control" id="testStepsOptionListBox"
+                                                 value="#{editTestStepsManager.selectedTestSteps.testStepsOption}"
+                                                 style="font-weight:bold;text-align:center;">
+                                    <s:selectItems value="#{editTestStepsManager.possibleTestStepsOptions}"
+                                                   var="selectedTestStepsOption" hideNoSelectionLabel="true"
+                                                   label="#{selectedTestStepsOption.labelToDisplay}"/>
+                                </h:selectOneMenu>
+                            </s:decorate>
+                        </a4j:region>
+                        <a4j:region id="testStepsDescriptionRegion">
+                            <s:decorate id="testStepsDescriptionDecoration" template="/layout/form/_edit.xhtml">
+                                <ui:param name="id" value="descarea"/>
+                                <ui:define name="label">#{messages['gazelle.tf.table.Description']}</ui:define>
+                                <h:inputTextarea styleClass=" form-control" rows="10" cols="100" id="descarea"
+                                                 value="#{editTestStepsManager.selectedTestSteps.description}"
+                                                 required="true">
+                                    <a4j:ajax event="blur" render="testStepsDescriptionDecoration"
+                                              listener="#{editTestStepsManager.validateTestStepsDescription()}"/>
+                                </h:inputTextarea>
+                            </s:decorate>
+                        </a4j:region>
+                        <br/>
+                        <br/>
+                        <s:div id="ListCIInput">
+                            <h:panelGrid columns="5" id="columnGrToCIIn">
+                                <h:outputText value="#{messages['gazelle.tm.ContextualInformationInput']}"
+                                              style="font-weight:bold;"/>
+
+                                <a4j:commandLink event="click"
+                                                 title="#{messages['gazelle.tm.AddContextualInformation']}"
+                                                 oncomplete="jq162('#AddContextualInformation').modal('show');"
+                                                 execute="@this" render="AddContextualInformation, :CIForm"
+                                                 actionListener="#{editTestStepsManager.initializeContextualInformation(1)}">
+                                    <span class="gzl-icon-plus"/>
+                                </a4j:commandLink>
+
+                                <a4j:commandLink event="click"
+                                                 title="#{messages['gazelle.tm.LinkToContextualInformation']}"
+                                                 oncomplete="jq162('#LinkContextualInformation').modal('show');"
+                                                 execute="@this" render="LinkContextualInformation, :CILinkForm"
+                                                 actionListener="#{editTestStepsManager.initializeContextualInformation(1)}">
+                                    <span class="gzl-icon-arrow-circle-down"/>
+                                </a4j:commandLink>
+
+                            </h:panelGrid>
+                            <br/>
+                            <rich:dataTable id="dataTabOfCI" var="currentCI"
+                                            value="#{editTestStepsManager.selectedTestSteps.inputContextualInformationList}"
+                                            rowKeyVar="rowNumber"
+                                            rendered="#{editTestStepsManager.viewTableOfCIInput()}"
+
+
+                                            rows="10" render="ds">
+                                <g:column sortBy="#{'id'}" sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                    <h:outputText value="#{currentCI.id}"/>
+                                </g:column>
+                                <g:column sortBy="#{'label'}" sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Label']}</ui:define>
+                                    <h:outputText value="#{currentCI.label}"/>
+                                </g:column>
+                                <g:column sortBy="#{'path'}" sortOrder="ascending">
+                                    <ui:define name="header">
+                                        #{messages['gazelle.financial.invoice.InvoicePathForArray']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentCI.path.keyword}"/>
+                                </g:column>
+                                <g:column sortBy="#{'value'}" sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.tm.testing.instance.ValueURL']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentCI.value}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+                                    <div class="gzl-never-wrap">
+
+                                        <a4j:commandLink event="click"
+                                                         rendered="#{editTestStepsManager.canEditCIAsInput(currentCI)}"
+                                                         oncomplete="jq162('#AddContextualInformation').modal('show');"
+                                                         render="AddContextualInformation, :CIForm"
+                                                         actionListener="#{editTestStepsManager.updateSelectedContextualInformation(currentCI,1)}">
+                                            <span class="gzl-icon-pencil"/>
+                                        </a4j:commandLink>
+
+
+                                        <a4j:commandLink event="click"
+                                                         rendered="#{applicationPreferenceManager.isPossibleToDeleteOnGMM()}"
+                                                         oncomplete="jq162('#DeleteCIModal').modal('show');"
+                                                         render=" :deleteCIForm, DeleteCIModal"
+                                                         actionListener="#{editTestStepsManager.updateSelectedContextualInformationForInput(currentCI)}">
+                                            <span class="gzl-icon-trash-o"/>
+                                        </a4j:commandLink>
+
+
+                                    </div>
+
+                                </g:column>
+                                <f:facet name="footer">
+                                    <rich:dataScroller id="ds" maxPages="10" renderIfSinglePage="false"/>
+                                </f:facet>
+                            </rich:dataTable>
+                        </s:div>
+                        <br/>
+                        <s:div id="ListCIOutput">
+                            <h:panelGrid columns="3" id="columnGrToCIOut">
+                                <h:outputText value="#{messages['gazelle.tm.ContextualInformationOutput']}"
+                                              style="font-weight:bold;"/>
+
+                                <a4j:commandLink event="click"
+                                                 title="#{messages['gazelle.tm.AddContextualInformation']}"
+                                                 oncomplete="jq162('#AddContextualInformation').modal('show');"
+                                                 execute="@this" render="AddContextualInformation, :CIForm"
+                                                 actionListener="#{editTestStepsManager.initializeContextualInformation(2)}">
+                                    <span class="gzl-icon-plus"/>
+                                </a4j:commandLink>
+
+                            </h:panelGrid>
+                            <br/>
+                            <br/>
+                            <rich:dataTable id="dataTabOfCIOut" var="currentCI"
+                                            value="#{editTestStepsManager.selectedTestSteps.outputContextualInformationList}"
+                                            rowKeyVar="rowNumber"
+                                            rendered="#{editTestStepsManager.viewTableOfCIOutput()}"
+
+
+                                            rows="10" render="dsOut">
+                                <g:column sortBy="#{'id'}" sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                    <h:outputText value="#{currentCI.id}"/>
+                                </g:column>
+                                <g:column sortBy="#{'label'}" sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Label']}</ui:define>
+                                    <h:outputText value="#{currentCI.label}"/>
+                                </g:column>
+                                <g:column sortBy="#{'path'}" sortOrder="ascending">
+                                    <ui:define name="header">
+                                        #{messages['gazelle.financial.invoice.InvoicePathForArray']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentCI.path.keyword}"/>
+                                </g:column>
+                                <g:column sortBy="#{'value'}" sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.tm.testing.instance.ValueURL']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentCI.value}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+                                    <div class="gzl-never-wrap">
+
+                                        <a4j:commandLink event="click"
+                                                         oncomplete="jq162('#AddContextualInformation').modal('show');"
+                                                         render="AddContextualInformation, :CIForm"
+                                                         actionListener="#{editTestStepsManager.updateSelectedContextualInformation(currentCI,2)}">
+                                            <span class="gzl-icon-pencil"/>
+                                        </a4j:commandLink>
+
+
+                                        <a4j:commandLink event="click"
+                                                         rendered="#{applicationPreferenceManager.isPossibleToDeleteOnGMM()}"
+                                                         oncomplete="jq162('#DeleteCIModal').modal('show');"
+                                                         render=" :deleteCIForm, DeleteCIModal"
+                                                         actionListener="#{editTestStepsManager.updateSelectedContextualInformationForOutput(currentCI)}">
+                                            <span class="gzl-icon-trash-o"/>
+                                        </a4j:commandLink>
+                                    </div>
+                                </g:column>
+                                <f:facet name="footer">
+                                    <rich:dataScroller id="dsOut" maxPages="10" renderIfSinglePage="false"/>
+                                </f:facet>
+                            </rich:dataTable>
+                        </s:div>
+                        <ui:define name="panel_footer">
+                            <a4j:commandButton styleClass="gzl-btn" id="cancedit"
+                                               value="#{messages['gazelle.common.button.Cancel']}"
+                                               actionListener="#{editTestStepsManager.cancelTestStepsCreation()}"
+                                               rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"
+                                               render="testStepsManagement" execute="@this"/>
+                            <a4j:commandButton value="#{messages['gazelle.tm.AddThisStep']}" id="addthissteps"
+                                               actionListener="#{editTestStepsManager.persistSelectedTestSteps()}"
+                                               styleClass="gzl-btn-green"
+                                               rendered="#{editTestStepsManager.selectedTestSteps.id == null and s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"
+                                               render="testStepsManagement"/>
+                            <a4j:commandButton value="#{messages['gazelle.tm.UpdateThisStep']}" id="updatethissteps"
+                                               actionListener="#{editTestStepsManager.persistSelectedTestStepsAndDeleteNonUsedCI()}"
+                                               styleClass="btn btn-warning"
+                                               rendered="#{editTestStepsManager.selectedTestSteps.id != null and s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"
+                                               render="testStepsManagement"/>
+                        </ui:define>
+                    </ui:decorate>
+                </h:panelGroup>
+            </h:form>
+        </s:div>
+        <h:form id="TestStepsDeleteConfirmationModalPanelForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="TestStepsDeleteConfirmationModalPanel"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.DeleteTestStep']}</ui:define>
+                <p>#{messages['gazelle.tm.DeleteTestStep']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="TestStepsDeleteConfirmationPanelButton"
+                                       value="#{messages['gazelle.common.button.Delete']}"
+                                       styleClass="gzl-btn-red" ignoreDupResponses="true"
+                                       actionListener="#{editTestStepsManager.deleteSelectedTestSteps()}"
+                                       onclick="jq162('#TestStepsDeleteConfirmationModalPanel').modal('hide');"
+                                       render="testStepsManagement"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  modal panel for adding contextual information -->
+        <h:form id="CIForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="AddContextualInformation"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.AddContextualInformation']}</ui:define>
+                <s:validateAll>
+                    <s:decorate id="declabelCI" template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="inpCILabel"/>
+                        <ui:define name="label">#{messages['gazelle.tf.table.Label']}</ui:define>
+                        <h:inputText styleClass=" form-control" id="inpCILabel"
+                                     value="#{editTestStepsManager.selectedContextualInformation.label}"
+                                     required="true"/>
+                    </s:decorate>
+                    <s:decorate id="decpathCI" template="/layout/form/_edit.xhtml">
+                        <ui:define name="label">#{messages['gazelle.financial.invoice.InvoicePathForArray']}
+                        </ui:define>
+                        <h:selectOneMenu styleClass="form-control gzl-form-control" id="StatusListBox"
+                                         value="#{editTestStepsManager.selectedContextualInformation.path}"
+                                         required="true">
+                            <s:selectItems id="ListStatusSelectItems" value="#{pathManager.getAllPath()}"
+                                           var="selectedPath"
+                                           noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                           label="#{selectedPath.keyword}"/>
+                            <s:convertEntity/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                    <s:decorate id="decvalueCI" template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="inpCIvalue"/>
+                        <ui:define name="label">#{messages['gazelle.tm.testing.instance.ValueURL']}</ui:define>
+                        <h:inputText styleClass=" form-control" id="inpCIvalue"
+                                     value="#{editTestStepsManager.selectedContextualInformation.value}"/>
+                    </s:decorate>
+                </s:validateAll>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="ConfCIbutton" value="#{messages['gazelle.common.button.Confirm']}"
+                                       styleClass="gzl-btn-green"
+                                       actionListener="#{editTestStepsManager.addSelectedCIToTestSteps()}"
+                                       onclick="jq162('#AddContextualInformation').modal('hide');"
+                                       render="ListCIInput,ListCIOutput,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  modal panel for linking contextual information -->
+        <h:form id="CILinkForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="LinkContextualInformation"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.LinkContextualInformation']}</ui:define>
+                <h3>#{messages['gazelle.tm.PreviousOutput']}</h3>
+                <h:selectOneMenu styleClass="form-control gzl-form-control" id="CILinkvall"
+                                 value="#{editTestStepsManager.selectedContextualInformation}"
+                                 required="true">
+                    <s:selectItems id="ListCIItems"
+                                   value="#{editTestStepsManager.possibleContextualInformations}"
+                                   var="selectedCI"
+                                   noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                   label="#{selectedCI.id} :: #{selectedCI.label} - #{selectedCI.path.keyword}"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="LinkCIbutton" value="#{messages['gazelle.common.button.Confirm']}"
+                                       styleClass="gzl-btn-green"
+                                       actionListener="#{editTestStepsManager.addSelectedCIToTestSteps()}"
+                                       onclick="jq162('#LinkContextualInformation').modal('hide');"
+                                       render="ListCIInput,ListCIOutput,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!-- Delete selected CI -->
+        <h:form id="deleteCIForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteCIModal"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.DeleteContextualInformation']}</ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="deleteCIbutton"
+                                       value="#{messages['gazelle.tm.DeleteThisContextualInformation']}"
+                                       styleClass="gzl-btn-red"
+                                       actionListener="#{editTestStepsManager.deleteSelectedContextualInformation()}"
+                                       onclick="jq162('#DeleteCIModal').modal('hide');"
+                                       render="ListCIInput,ListCIOutput,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

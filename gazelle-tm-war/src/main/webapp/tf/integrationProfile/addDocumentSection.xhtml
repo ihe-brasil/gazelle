@@ -1,0 +1,114 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['net.ihe.gazelle.tm.AddDocumentSection']}"/>
+    <ui:define name="body">
+        <b>#{messages['net.ihe.gazelle.tm.IntegrationProfile']} </b>
+        <h:outputText
+                value="#{messages['net.ihe.gazelle.tm.AddADocumentSection']} #{messages['net.ihe.gazelle.tm.To']} &quot;#{integrationProfileManager.selectedIntegrationProfile.name} (#{integrationProfileManager.selectedIntegrationProfile.keyword})&quot;"/>
+        <br/>
+        <h:form id="globalform" styleClass="form-horizontal"
+                rendered="#{ s:hasRole('admin_role') || s:hasRole('tests_editor_role')}">
+            <s:div id="DocumentSection">
+                <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{integrationProfileManager.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="domain"/>
+                            <ui:param name="filterName"
+                                      value="#{messages['gazelle.productregistry.system.label.Domain']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{integrationProfileManager.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="document_type"/>
+                            <ui:param name="filterName"
+                                      value="#{messages['net.ihe.gazelle.tm.DocumentType']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{integrationProfileManager.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="document"/>
+                            <ui:param name="filterName" value="#{messages['net.ihe.gazelle.tm.Document']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{integrationProfileManager.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="type"/>
+                            <ui:param name="filterName" value="#{messages['gazelle.systems.session.Type']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+
+                    <ui:define name="filter_buttons">
+                        <a4j:commandLink
+                                actionListener="#{integrationProfileManager.filter.clear()}"
+                                title="#{messages['gazelle.users.reset']}" type="submit" execute="@this"
+                                render="DocumentSection">
+                            <span class="fa fa-refresh"/>
+                        </a4j:commandLink>
+                    </ui:define>
+                </ui:decorate>
+
+                <a4j:commandButton id="cancelButton" value="#{messages['gazelle.common.button.Cancel']}"
+                                   action="#{integrationProfileManager.cancelAddDocumentSection(integrationProfileManager.selectedIntegrationProfile)}"
+                                   immediate="true" styleClass="gzl-btn">
+                </a4j:commandButton>
+
+                <s:div id="results">
+                    <h:panelGroup rendered="#{integrationProfileManager.documentSections.size() == 0}">
+                        <br/>
+                        <p class="gzl-alert gzl-alert-orange">
+                            #{messages['net.ihe.gazelle.tm.ThereAreNoDocumentSectionsRegisteredForTheDomain_2']}
+                        </p>
+                    </h:panelGroup>
+                    <s:div rendered="#{integrationProfileManager.documentSections.size() &gt; 0}">
+                        <h:outputText
+                                value="#{integrationProfileManager.documentSections.size()} #{messages['net.ihe.gazelle.tm.SectionsForThisSearch']}"/>
+
+                        <rich:dataTable id="DocumentSectionTable" var="documentSection"
+                                        value="#{integrationProfileManager.documentSections}"
+
+
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                            <g:column sortBy="#{'section'}" filterBy="#{'section'}"
+                                      filterEvent="onkeyup">
+                                <ui:define name="header">#{messages['net.ihe.gazelle.tm.Section']}</ui:define>
+                                <ui:include src="/tf/documents/_documentSection.xhtml">
+                                    <ui:param name="documentSectionParam" value="#{documentSection}"/>
+                                    <ui:param name="displayedName" value="#{documentSection.getSection()}"/>
+                                </ui:include>
+                            </g:column>
+                            <g:column>
+                                <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+                                <a4j:commandButton id="sectionSelectionButton"
+                                                   rendered="#{ s:hasRole('admin_role') || s:hasRole('tests_editor_role')}"
+                                                   value="#{messages['net.ihe.gazelle.tm.SlectionnerCetteSection']}"
+                                                   ignoreDupResponses="true" immediate="true" styleClass="gzl-btn-green"
+                                                   action="#{integrationProfileManager.addThisSection(documentSection)}"/>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId" value="DocumentSectionTable"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </s:div>
+                </s:div>
+            </s:div>
+        </h:form>
+    </ui:define>
+</ui:composition>

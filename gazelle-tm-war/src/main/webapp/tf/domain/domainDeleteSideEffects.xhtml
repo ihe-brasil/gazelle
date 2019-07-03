@@ -1,0 +1,100 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle"
+              value="#{domainManager.selectedDomain.keyword} - #{domainManager.selectedDomain.name}"/>
+    <ui:define name="body">
+        <h:form id="domainDeleteConfirmation">
+            <s:token allowMultiplePosts="true"/>
+            <h:outputText value="#{messages['gazelle.tf.domainDelete.Confirmation']}"/>
+            <h:commandButton id="delete" styleClass="gzl-btn-red"
+                             value="#{messages['gazelle.common.button.Delete']}"
+                             action="#{domainManager.deleteDomain( )}"/>
+            <h:commandButton id="cancel" styleClass="gzl-btn"
+                             value="#{messages['gazelle.common.button.Cancel']}"
+                             action="#{domainManager.listDomains()}"/>
+        </h:form>
+        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+            <ui:define name="panel_title">#{messages['gazelle.tf.domain.DE.UnlinkIntegrationProfilesSection']}
+            </ui:define>
+            <h:form id="domainUnlinkIntegrationProfilesSection">
+                <s:token allowMultiplePosts="true"/>
+                <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                              rendered="#{domainManager.getIntegrationProfilesForDP().size()==0}"/>
+                <rich:dataTable id="unlinkedIntegrationProfiles" var="ip"
+                                value="#{domainManager.getIntegrationProfilesForDP()}"
+                                rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                                rendered="#{domainManager.getIntegrationProfilesForDP().size()&gt;0}"
+                                render="ds">
+                    <g:column sortBy="#{'id'}" width="100">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                        #{ip.id}
+                    </g:column>
+                    <g:column sortBy="#{'keyword'}" width="350">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Keyword']}</ui:define>
+                        #{ip.keyword}
+                    </g:column>
+                    <g:column sortBy="#{'name'}" width="500">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Name']}</ui:define>
+                        #{ip.name}
+                    </g:column>
+                    <g:column width="200">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Orphan']}</ui:define>
+                        <h:outputText value="#{messages['gazelle.common.Yes']}"
+                                      rendered="#{ip.getDomainCount()==1}"/>
+                    </g:column>
+                    <f:facet name="footer">
+                        <ui:include src="/util/datatableFooter.xhtml">
+                            <ui:param name="dataScrollerId" value="ds"/>
+                            <ui:param name="dataTableId" value="unlinkedIntegrationProfiles"/>
+                        </ui:include>
+                    </f:facet>
+                </rich:dataTable>
+
+            </h:form>
+        </ui:decorate>
+        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+            <ui:define name="panel_title">#{messages['gazelle.tf.domain.DE.DeleteHl7MessageProfileSection']}</ui:define>
+            <h:form id="domaindeletehl7mpsection">
+                <s:token allowMultiplePosts="true"/>
+                <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                              rendered="#{domainManager.hl7MessageProfilesForDP.size()==0}"/>
+                <rich:dataTable id="deletedHl7mp" var="mp" value="#{domainManager.hl7MessageProfilesForDP}"
+
+
+                                rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                                rendered="#{domainManager.hl7MessageProfilesForDP.size()&gt;0}" render="ds2">
+                    <g:column sortBy="#{'id'}" width="100">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                        #{mp.id}
+                    </g:column>
+                    <g:column sortBy="#{'profileOid'}" width="350">
+                        <ui:define name="header">#{messages['gazelle.tf.table.profileOid']}</ui:define>
+                        #{mp.profileOid}
+                    </g:column>
+                    <g:column sortBy="#{'hl7Version'}" width="200">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Hl7Version']}</ui:define>
+                        #{mp.hl7Version}
+                    </g:column>
+                    <g:column sortBy="#{'transaction'}" width="250">
+                        <ui:define name="header">#{messages['gazelle.tf.table.mptrans']}</ui:define>
+                        #{mp.messageType}
+                    </g:column>
+                    <g:column sortBy="#{'messageOrderControlCode'}" width="250">
+                        <ui:define name="header">#{messages['gazelle.tf.table.messageOrderControlCode']}</ui:define>
+                        #{mp.messageOrderControlCode}
+                    </g:column>
+                    <f:facet name="footer">
+                        <ui:include src="/util/datatableFooter.xhtml">
+                            <ui:param name="dataScrollerId" value="ds2"/>
+                            <ui:param name="dataTableId" value="deletedHl7mp"/>
+                        </ui:include>
+                    </f:facet>
+                </rich:dataTable>
+
+            </h:form>
+        </ui:decorate>
+    </ui:define>
+</ui:composition>

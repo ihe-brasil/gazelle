@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.3.final using JasperReports Library version 6.0.3  -->
+<!-- 2015-03-16T17:45:08 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report2" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="786" leftMargin="28" rightMargin="28" topMargin="28" bottomMargin="28" uuid="9152970a-9189-41bc-be77-36c0577af45d">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gazelle EU-CAT Production"/>
+	<parameter name="testingSessionId" class="java.lang.Integer" isForPrompting="false">
+		<defaultValueExpression><![CDATA[new Integer(32)]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT usr_institution.name,
+number_system,
+number_system + number_extra_participant/2 as table_old, get_number_of_participant_for_institution(usr_institution.id, $P{testingSessionId}) as count,
+ case when (get_number_of_participant_for_institution(usr_institution.id, $P{testingSessionId} ) - number_system * 2) > 0
+then number_system + (get_number_of_participant_for_institution(usr_institution.id, $P{testingSessionId} ) - number_system * 2)/2 else number_system end as table,
+ case when get_number_of_participant_for_institution(usr_institution.id, $P{testingSessionId} )  > number_system * 2
+then get_number_of_participant_for_institution(usr_institution.id, $P{testingSessionId} )  else number_system * 2 end as participants
+
+FROM
+  public.tm_invoice,
+  public.usr_institution,
+  public.tm_institution_system,
+  public.tm_system_in_session,
+ public.tm_system
+WHERE
+  tm_invoice.institution_id = usr_institution.id AND
+  tm_institution_system.institution_id = usr_institution.id AND
+  tm_institution_system.system_id = tm_system_in_session.system_id AND
+  tm_system_in_session.testing_session_id = tm_invoice.testing_session_id AND
+  tm_invoice.testing_session_id = $P{testingSessionId} and
+  tm_system.id = tm_system_in_session.system_id and
+	tm_system.is_tool = 'f'
+  group by
+   usr_institution.name,
+   usr_institution.id,
+  tm_invoice.number_system,
+  tm_invoice.number_extra_participant,
+  tm_invoice.number_participant
+ORDER by usr_institution.name asc
+  ;]]>
+	</queryString>
+	<field name="name" class="java.lang.String"/>
+	<field name="number_system" class="java.lang.Integer"/>
+	<field name="table_old" class="java.lang.Integer"/>
+	<field name="count" class="java.lang.Integer"/>
+	<field name="table" class="java.lang.Integer"/>
+	<field name="participants" class="java.lang.Integer"/>
+	<variable name="numberOfTable" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{table}]]></variableExpression>
+	</variable>
+	<variable name="numberOfSystem" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{number_system}]]></variableExpression>
+	</variable>
+	<variable name="numberOfOrganizations" class="java.lang.Integer" calculation="Count">
+		<variableExpression><![CDATA[$F{name}]]></variableExpression>
+	</variable>
+	<variable name="numberOfParticipants" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{participants}]]></variableExpression>
+	</variable>
+	<variable name="numberOfExtraParticipant" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{participants}-$F{number_system}*2]]></variableExpression>
+	</variable>
+	<variable name="numberOfEstimated" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count}==0?1:0]]></variableExpression>
+	</variable>
+	<title>
+		<band height="48" splitType="Stretch">
+			<frame>
+				<reportElement mode="Opaque" x="-20" y="0" width="822" height="48" forecolor="#000000" backcolor="#FFFFFF" uuid="01143f27-8e50-4e30-8ca9-c31526a39c1e"/>
+				<staticText>
+					<reportElement x="115" y="4" width="700" height="39" uuid="0a7e76d5-6e82-4e3e-b37e-3e0c99f536b6"/>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="26" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Number of table and participants per organization]]></text>
+				</staticText>
+			</frame>
+			<line>
+				<reportElement x="0" y="0" width="802" height="1" uuid="9f6c2112-b465-4c55-97b8-44af0632a13c"/>
+			</line>
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="43" width="802" height="1" uuid="7d43c38c-6efe-4451-96e5-c864448904d6"/>
+			</line>
+			<image scaleImage="RetainShape">
+				<reportElement stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="4" width="115" height="37" uuid="40d677d2-74be-41a5-834a-2785986a5540"/>
+				<imageExpression><![CDATA["ihe.gif"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="14" splitType="Stretch">
+			<frame>
+				<reportElement mode="Opaque" x="0" y="0" width="802" height="14" backcolor="#CCCCFF" uuid="431421a6-120d-4141-a7e8-436713dee2d3"/>
+				<staticText>
+					<reportElement positionType="Float" x="0" y="0" width="132" height="14" forecolor="#000000" uuid="2f7728ea-cfe8-4663-beb2-c2ccdb853bc2"/>
+					<textElement>
+						<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica"/>
+					</textElement>
+					<text><![CDATA[Organization keyword]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="132" y="0" width="100" height="14" forecolor="#000000" uuid="cd609dcc-1ca0-4797-b091-baa9e8843699"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica"/>
+					</textElement>
+					<text><![CDATA[# of Systems]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="232" y="0" width="100" height="14" forecolor="#000000" uuid="e5f3696a-8325-4e78-8bec-7b1aa808c5c8"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica"/>
+					</textElement>
+					<text><![CDATA[# of Tables]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="532" y="0" width="150" height="14" forecolor="#000000" uuid="ff44a8f3-4759-43ea-abbc-71740bd3661d"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica"/>
+					</textElement>
+					<text><![CDATA[# of Participants (total)]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="332" y="0" width="200" height="14" forecolor="#000000" uuid="148dad23-e6a4-47fd-ba73-7462b076d8e7"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica"/>
+					</textElement>
+					<text><![CDATA[# of extra Participants]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="682" y="0" width="75" height="14" forecolor="#000000" uuid="ec1ef092-25a9-4fdc-b6d5-fba73df4bd30"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica"/>
+					</textElement>
+					<text><![CDATA[estimated]]></text>
+				</staticText>
+			</frame>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="14" width="802" height="1" uuid="d6f9961b-ef0b-46fa-92b1-e393f04a9514"/>
+			</line>
+			<frame>
+				<reportElement x="0" y="0" width="802" height="14" uuid="81ba31f5-b2b0-4f92-bf5b-dcb32df0aba1"/>
+				<textField isBlankWhenNull="true">
+					<reportElement positionType="Float" x="0" y="0" width="132" height="14" uuid="e1a2c9a7-25c2-45d3-b5a8-5f4fed7fdd46"/>
+					<textElement>
+						<font fontName="Arial" size="12" isBold="false" pdfFontName="Helvetica"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement positionType="Float" x="132" y="0" width="100" height="14" uuid="cc2fdd16-040a-454c-b939-17d4c1afd6c9"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="12" isBold="false" pdfFontName="Helvetica"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{number_system}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement positionType="Float" x="232" y="0" width="100" height="14" uuid="4a44b76a-2afc-4a9d-bf07-553534fddea5"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="12" isBold="false" pdfFontName="Helvetica"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{table}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="532" y="0" width="150" height="14" uuid="2f5554c6-f5c8-412f-87c8-5977de361fbe"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="12" isBold="false" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{participants}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="332" y="0" width="200" height="14" uuid="d53b17a8-ac5d-4d05-9b25-f13aa9a0e742"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="12" isBold="false" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{participants} - $F{number_system} * 2]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="682" y="0" width="75" height="14" uuid="5bde38f6-3d88-4db2-9fb9-bfa40c923840"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="12" isBold="false" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{count} == 0? "yes":""]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="20" splitType="Stretch">
+			<frame>
+				<reportElement x="0" y="0" width="802" height="14" uuid="dab52225-1e77-4796-b3fd-828c8b0ee1a9"/>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement positionType="Float" x="232" y="0" width="100" height="14" uuid="c87b68d1-888a-43cb-b29f-06815fb38c98"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{numberOfTable}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement positionType="Float" x="0" y="0" width="132" height="14" uuid="a0a59d42-b503-409c-a978-46fbb8ee9a8f"/>
+					<textElement>
+						<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Totals : "+$V{numberOfOrganizations}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement positionType="Float" x="132" y="0" width="100" height="14" uuid="0d6f0d29-ee17-488c-9eb2-170c5e2387ca"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{numberOfSystem}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="532" y="0" width="150" height="14" uuid="fed41b36-0755-4a2f-8f7d-5f8ad2259339"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{numberOfParticipants}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="332" y="0" width="200" height="14" uuid="addabbfc-e88e-4042-b72b-41421f4cddc8"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{numberOfExtraParticipant}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="682" y="0" width="75" height="14" uuid="15cd8763-8973-48af-98ed-900e4cb1b2ff"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{numberOfEstimated}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="16" splitType="Stretch">
+			<frame>
+				<reportElement mode="Opaque" x="2" y="0" width="800" height="16" forecolor="#CCCCFF" backcolor="#CCCCFF" uuid="3a94da2d-6e3a-44cb-86f8-f10402ef771e"/>
+				<textField evaluationTime="Report">
+					<reportElement x="753" y="0" width="40" height="16" forecolor="#000000" uuid="bd803d82-2fb6-4078-b2e6-cb80f0fc9b4a"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="12" isBold="false" pdfFontName="Helvetica"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="673" y="0" width="80" height="16" forecolor="#000000" uuid="d63c17e3-8d2b-4534-9927-414014498717"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="12" isBold="false" pdfFontName="Helvetica"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+				</textField>
+				<textField pattern="">
+					<reportElement x="2" y="0" width="197" height="16" forecolor="#000000" uuid="8a86ac23-2673-4d3c-b8b4-d8c21684a9e1"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="12" isBold="false" pdfFontName="Helvetica"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new Date()]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

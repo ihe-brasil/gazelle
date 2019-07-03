@@ -1,0 +1,126 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.common.menu.MenuManageDemonstrations']}"/>
+    <ui:define name="body">
+        <h:form id="globalDiv" class="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <h:panelGroup id="allDemonstrationsPanel"
+                          rendered="#{demonstrationManager.displayList}">
+                <ui:decorate template="/layout/panels/_panel.xhtml">
+                    <div align="left">
+                        <a4j:commandButton styleClass="gzl-btn-green"
+                                           value="#{messages['gazelle.common.menu.MenuRegisterANewDemonstration']}"
+                                           actionListener="#{demonstrationManager.addNewDemonstration()}"
+                                           immediate="true" render="globalDiv"/>
+                    </div>
+                    #{dataTableStateHolder.setAscendingOn('name')}
+                    <rich:dataTable id="demonstrationTable" var="currentDemonstration"
+                                    value="#{demonstrationManager.findAllDemonstrations(true)}"
+                                    rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                        <g:column sortBy="#{'name'}"
+                                  sortOrder="#{dataTableStateHolder.sortOrders['name']}">
+                            <ui:define name="header">
+                                #{messages['gazelle.systems.demonstration.Name']}
+                            </ui:define>
+                            <a href="#{currentDemonstration.url}" target="_blank">#{currentDemonstration.name}</a>
+                        </g:column>
+                        <g:column sortBy="#{'description'}" sortOrder="ascending">
+                            <ui:define name="header">#{messages['gazelle.systems.demonstration.Description']}
+                            </ui:define>
+                            #{currentDemonstration.description}
+                        </g:column>
+                        <g:column sortBy="#{'iso3166CountryCode.printableName'}"
+                                  sortOrder="#{dataTableStateHolder.sortOrders['iso3166CountryCode.printableName']}">
+                            <ui:define name="header">#{messages['gazelle.systems.demonstration.country']}
+                            </ui:define>
+                            <div class="gzl-never-wrap">
+                                <h:graphicImage library="img"
+                                                name="#{currentDemonstration.iso3166CountryCode.flagUrl}"/>
+                                #{currentDemonstration.iso3166CountryCode.printableName}
+                            </div>
+                        </g:column>
+                        <g:column>
+                            <ui:define name="header">#{messages['gazelle.systems.demonstration.isActivated']}
+                            </ui:define>
+                            <h:outputText value="#{messages['gazelle.common.Yes']}"
+                                          rendered="#{currentDemonstration.active == true}"/>
+                            <h:outputText value="#{messages['gazelle.common.No']}"
+                                          rendered="#{currentDemonstration.active == false}"/>
+                        </g:column>
+                        <g:column width="100px">
+                            <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+                            <div class="gzl-never-wrap">
+                                <a4j:commandLink
+                                        actionListener="#{demonstrationManager.showSelectedDemonstration(currentDemonstration)}"
+                                        onRowMouseOver="this.style.cursor='pointer'"
+                                        title="#{messages['gazelle.common.button.View']}"
+                                        render="globalDiv,a4jIncludeForView">
+                                    <span class="gzl-icon-search"/>
+                                </a4j:commandLink>
+                                <h:panelGroup rendered="#{identity.loggedIn}">
+                                    <a4j:commandLink
+                                            actionListener="#{demonstrationManager.editSelectedDemonstration(currentDemonstration)}"
+                                            onRowMouseOver="this.style.cursor='pointer'"
+                                            title="#{messages['gazelle.common.button.Edit']}"
+                                            render="globalDiv, a4jIncludeForEdit">
+                                        <span class="gzl-icon-pencil"/>
+                                    </a4j:commandLink>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{s:hasRole('admin_role')}">
+                                    <a4j:commandLink
+                                            actionListener="#{demonstrationManager.deleteSelectedDemonstration( currentDemonstration ) }"
+                                            oncomplete="jq162('#DeleteConfirmationModalPanel').modal('show');"
+                                            onRowMouseOver="this.style.cursor='pointer'"
+                                            title="#{messages['gazelle.common.button.Delete']}"
+                                            render="DeleteConfirmationModalPanel,DeleteConfirmationDiv">
+                                        <span class="gzl-icon-trash-o"/>
+                                    </a4j:commandLink>
+                                </h:panelGroup>
+                            </div>
+                        </g:column>
+                        <f:facet name="footer">
+                            <ui:include src="/util/datatableFooter.xhtml">
+                                <ui:param name="dataScrollerId" value="ds"/>
+                                <ui:param name="dataTableId" value="demonstrationTable"/>
+                            </ui:include>
+                        </f:facet>
+                    </rich:dataTable>
+
+                    <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                        <ui:param name="popup_id" value="DeleteConfirmationModalPanel"/>
+                        <ui:define name="popup_title">
+                            #{messages['gazelle.systems.demonstration.confirmation.delete.header']}
+                        </ui:define>
+                        <s:div id="DeleteConfirmationDiv">
+                            <p>#{messages['gazelle.systems.demonstration.confirmation.delete.label']}
+                                #{demonstrationManager.getSelectedDemonstration().getName()}</p>
+                        </s:div>
+                        <ui:define name="popup_footer">
+                            <button type="button" class="gzl-btn" data-dismiss="modal">
+                                #{messages['gazelle.tm.Cancel']}
+                            </button>
+                            <a4j:commandButton value="#{messages['gazelle.common.button.Delete']}"
+                                               styleClass="gzl-btn-red"
+                                               actionListener="#{demonstrationManager.confirmDemonstrationDeletion()}"
+                                               onclick="jq162('#DeleteConfirmationModalPanel').modal('hide');"
+                                               render="allDemonstrationsPanel"/>
+                        </ui:define>
+                    </ui:decorate>
+                </ui:decorate>
+            </h:panelGroup>
+
+            <s:div rendered="#{demonstrationManager.editDemonstration}">
+                <ui:include id="a4jIncludeForEdit"
+                            src="/systems/demonstration/editDemonstration.xhtml"/>
+            </s:div>
+
+            <s:div rendered="#{demonstrationManager.showDemonstration}">
+                <ui:include id="a4jIncludeForView"
+                            src="/systems/demonstration/showDemonstration.xhtml"/>
+            </s:div>
+        </h:form>
+    </ui:define>
+</ui:composition>

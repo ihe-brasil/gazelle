@@ -1,0 +1,261 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.users.contact.ListContactsLabel1']}"/>
+    <ui:define name="body">
+        <h:outputScript library="jscript" name="jsf_updated.js" target="head"/>
+        #{personManager.initListContacts()}
+        <h:form id="contactsPage" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <a4j:queue requestDelay="300" ignoreDupResponses="true"/>
+            #{personManager.initializePanelsAndGetInjections()}
+            <s:div id="generalDiv">
+                <h:panelGroup rendered="#{personManager.displayListOfContactsPanel}">
+                    <div class="help-block">
+                        <h:outputText value="#{messages['gazelle.users.contacts.info1']}"/>
+                        <br/>
+                        <h:outputText value="#{messages['gazelle.users.contacts.info3']}"/>
+                        <br/>
+                        <h:outputText value="#{messages['gazelle.users.contacts.info4']}"/>
+                    </div>
+                    <s:decorate template="/layout/panels/_panel_filter_criteria.xhtml"
+                                rendered="#{s:hasRole('admin_role') || s:hasRole('institutions_editor_role') || s:hasRole('project-manager_role') || s:hasRole('accounting_role')}">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <ui:include src="/filter/filter.xhtml">
+                                    <ui:param name="filterName" value="#{messages['net.ihe.gazelle.tm.Institution']}"/>
+                                    <ui:param name="filterId" value="institution"/>
+                                    <ui:param name="filter" value="#{personManager.filter}"/>
+                                    <ui:param name="filterForm" value="contactsPage"/>
+                                </ui:include>
+                            </div>
+                        </div>
+                        <ui:define name="filter_buttons">
+                            <a4j:commandLink title="#{messages['gazelle.common.button.Refresh']}"
+                                             render="contactsPage">
+                                <span class="fa fa-refresh"></span>
+                            </a4j:commandLink>
+                            <a4j:commandLink title="#{messages['gazelle.users.reset']}"
+                                             actionListener="#{personManager.filter.clear()}"
+                                             render="contactsPage">
+                                <span class="fa fa-times-circle"></span>
+                            </a4j:commandLink>
+                        </ui:define>
+                    </s:decorate>
+                    <a4j:commandButton id="ListContactsAddNewContactButton" styleClass="gzl-btn-green"
+                                       value="#{messages['gazelle.contacts.AddNewContact']}"
+                                       actionListener="#{personManager.addNewContactButton()}"
+                                       render="generalDiv"
+                                       rendered="#{!s:hasRole('testing_session_admin_role')}"/>
+                    <br/>
+                    <rich:dataTable id="contactTable" var="currentContactToUse"
+                                    value="#{personManager.getFilteredPersons()}"
+                                    rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                        <g:column sortBy="#{'institution.keyword'}"
+                                  sortOrder="ascending" filterBy="#{'institution.keyword'}"
+                                  filterEvent="onkeyup"
+                                  rendered="#{s:hasRole('admin_role') || s:hasRole('institutions_editor_role') || s:hasRole('project-manager_role')}">
+                            <ui:define name="header">
+                                <h:outputText id="contactInstitutionKeywordOutputText"
+                                              value="#{messages['gazelle.users.institution.InstitutionKeyword']}"/>
+                            </ui:define>
+                            <h:outputText value="#{currentContactToUse.institution.keyword}"/>
+                        </g:column>
+                        <g:column sortBy="#{'lastname'}"
+                                  sortOrder="ascending" filterBy="#{'lastname'}"
+                                  filterEvent="onkeyup">
+                            <ui:define name="header">
+                                <h:outputText id="contactLastNameOutputText"
+                                              value="#{messages['gazelle.contacts.Lastname']}"/>
+                            </ui:define>
+                            <h:outputText value="#{currentContactToUse.lastname}"/>
+                        </g:column>
+                        <g:column sortBy="#{'firstname'}"
+                                  sortOrder="ascending" filterBy="#{'firstname'}"
+                                  filterEvent="onkeyup">
+                            <ui:define name="header">
+                                <h:outputText id="contactFirstNameOutputText"
+                                              value="#{messages['gazelle.contacts.Firstname']}"/>
+                            </ui:define>
+                            <h:outputText value="#{currentContactToUse.firstname}"/>
+                        </g:column>
+                        <g:column sortBy="#{'email'}"
+                                  sortOrder="ascending" filterBy="#{'email'}"
+                                  filterEvent="onkeyup">
+                            <ui:define name="header">
+                                <h:outputText id="contactEMailAddressOutputText"
+                                              value="#{messages['gazelle.contacts.Email']}"/>
+                            </ui:define>
+                            <a href="mailto:#{currentContactToUse.email}">
+                                <h:outputText value="#{currentContactToUse.email}"/>
+                            </a></g:column>
+                        <g:column>
+                            <ui:define name="header">
+                                <h:outputText value="#{messages['gazelle.contacts.Phone']}"/>
+                            </ui:define>
+                            <h:outputText value="#{currentContactToUse.personalPhone}"/>
+                        </g:column>
+                        <g:column>
+                            <ui:define name="header">
+                                <h:outputText value="#{messages['net.ihe.gazelle.tm.Cell']}"/>
+                            </ui:define>
+                            <h:outputText value="#{currentContactToUse.cellPhone}"/>
+                        </g:column>
+                        <g:column>
+                            <ui:define name="header">
+                                <h:outputText value="#{messages['gazelle.contacts.Fax']}"/>
+                            </ui:define>
+                            <h:outputText value="#{currentContactToUse.personalFax}"/>
+                        </g:column>
+                        <g:column>
+                            <ui:define name="header">
+                                <h:outputText
+                                        value="#{messages['gazelle.users.function.marketing']}"/>
+                            </ui:define>
+                            <h:outputText value="#{currentContactToUse.isAMarketingContact()}"/>
+                        </g:column>
+                        <g:column>
+                            <ui:define name="header">
+                                <h:outputText value="#{messages['gazelle.users.Billing']}"/>
+                            </ui:define>
+                            <h:outputText value="#{currentContactToUse.isABillingContact()}"/>
+                        </g:column>
+                        <g:column>
+                            <ui:define name="header">
+                                <h:outputText
+                                        value="#{messages['gazelle.users.function.technical']}"/>
+                            </ui:define>
+                            <h:outputText value="#{currentContactToUse.technicalContact()}"/>
+                        </g:column>
+                        <g:column width="100px" rendered="#{!s:hasRole('testing_session_admin_role')}">
+                            <ui:define name="header">
+                                <h:outputText value="#{messages['gazelle.common.Action']}"/>
+                            </ui:define>
+                            <div class="gzl-never-wrap">
+
+                                <a4j:commandLink id="contactViewActionButtonSupport"
+                                                 actionListener="#{personManager.viewContact(currentContactToUse)}"
+                                                 onRowMouseOver="this.style.cursor='pointer'"
+                                                 title="#{messages['gazelle.common.button.View']}"
+                                                 execute="@this" render="generalDiv">
+                                    <span class="gzl-icon-search"/>
+                                </a4j:commandLink>
+
+                                <h:panelGroup rendered="#{identity.loggedIn}">
+                                    <a4j:commandLink id="contactEditActionButtonSupport"
+                                                     title="#{messages['gazelle.common.button.Edit']}"
+                                                     actionListener="#{personManager.updateContact(currentContactToUse)}"
+                                                     execute="@this" render="generalDiv">
+                                        <span class="gzl-icon-pencil"/>
+                                    </a4j:commandLink>
+
+                                    <a4j:commandLink id="contactDeleteActionButtonSupport"
+                                                     actionListener="#{personManager.setSelectedContact (currentContactToUse)}"
+                                                     oncomplete="jq162('#DeleteConfirmationModalPanel').modal('show');"
+                                                     render="DeleteConfirmationDiv"
+                                                     title="#{messages['gazelle.common.button.Delete']}"
+                                                     execute="@this">
+                                        <span class="gzl-icon-trash-o"/>
+                                    </a4j:commandLink>
+
+                                </h:panelGroup>
+                            </div>
+                        </g:column>
+                        <f:facet name="footer">
+                            <ui:include src="/util/datatableFooter.xhtml">
+                                <ui:param name="dataScrollerId" value="ds"/>
+                                <ui:param name="dataTableId" value="contactTable"/>
+                            </ui:include>
+                        </f:facet>
+                    </rich:dataTable>
+
+                    <s:div style="text-align: left;">
+                        <h:commandLink value="#{messages['gazelle.common.export.ExportAsExcel']}"
+                                       action="#{gazelleExcelExporterJboss7.export('contactsPage:contactTable')}"/>
+                    </s:div>
+
+                    <h:panelGroup
+                            rendered="#{not personManager.hasContact()}">
+                        <ui:decorate template="/layout/panels/_panel.xhtml">
+
+                            <span class="gzl-icon-stack gzl-icon-4x">
+                              <span class="gzl-icon-users gzl-icon-stack-1x"/>
+                              <span class="gzl-icon-exclamation-triangle gzl-icon-stack-1x gzl-icon-stack-bottom-right"/>
+                            </span>
+                            <br/>
+
+                            <h3>
+                                <h:outputText id="noContactLabel"
+                                              value="#{messages['gazelle.users.contact.NoContactYetRegisteredLabel1']}"
+                                              style="font-style:italic"/>
+                            </h3>
+                            <br/><br/>
+
+                            <h3>#{messages['gazelle.users.Note']} :</h3>
+                            <h:outputText id="noContactLabel2"
+                                          value="#{messages['gazelle.users.contact.NoContactYetRegisteredLabel2']}"
+                                          style="font-style:italic"/>
+                            <a4j:commandLink id="consultFinancialContactCommandLink"
+                                             value="#{messages['gazelle.users.contact.NoContactYetRegisteredLabel3']}"
+                                             style="height:5px;"
+                                             action="#{institutionManagerTM.viewInstitutionForTM()}"
+                                             execute="@this"/>
+
+                            <h:panelGrid id="noContactGrid" columns="3">
+                                <a4j:commandLink actionListener="#{personManager.addNewContactButton()}"
+                                                 onRowMouseOver="this.style.cursor='pointer'" execute="@this"
+                                                 render="generalDiv">
+                                    <span class="gzl-icon-plus"/>
+                                </a4j:commandLink>
+                                <a4j:commandLink id="addContactCommandLink"
+                                                 value="#{messages['gazelle.users.contact.NoContactYetRegisteredLabel4']}"
+                                                 style="height:5px;"
+                                                 actionListener="#{personManager.addNewContactButton()}"
+                                                 execute="@this" render="generalDiv"/>
+                            </h:panelGrid>
+                        </ui:decorate>
+                    </h:panelGroup>
+
+                    <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+                    <!-- Delete contact confirmation Modal Panel																			-->
+                    <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+                    <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                        <ui:param name="popup_id" value="DeleteConfirmationModalPanel"/>
+                        <ui:define name="popup_title">#{messages['gazelle.users.contact.confirmation.delete.header']}</ui:define>
+                        <s:div id="DeleteConfirmationDiv">
+                            <p>#{messages['gazelle.users.contact.confirmation.delete.label']} #{personManager.selectedContact.firstname} #{personManager.selectedContact.lastname} ?</p>
+                        </s:div>
+                        <ui:define name="popup_footer">
+                            <button type="button" class="gzl-btn" data-dismiss="modal">
+                                #{messages['gazelle.tm.Cancel']}
+                            </button>
+                            <a4j:commandButton id="deleteContactButton"
+                                               value="#{messages['gazelle.common.button.Delete']}"
+                                               styleClass="gzl-btn-red" ignoreDupResponses="true"
+                                               actionListener="#{personManager.deleteContact()}"
+                                               onclick="jq162('#DeleteConfirmationModalPanel').modal('hide');"
+                                               render="contactsPage" execute="@this"/>
+
+                        </ui:define>
+                    </ui:decorate>
+                    <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+                    <!-- END - Delete contact confirmation Modal Panel																			-->
+                    <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+
+                </h:panelGroup>
+                <s:div id="addEditAContact" rendered="#{personManager.displayAddEditContactsPanel}">
+                    <ui:include src="/users/contact/editContact.xhtml">
+                        <ui:param name="panelsToReRender" value="generalDiv"/>
+                    </ui:include>
+                </s:div>
+                <s:div id="viewAContact" rendered="#{personManager.displayViewContactsPanel}">
+                    <ui:include src="/users/contact/showContact.xhtml">
+                        <ui:param name="panelsToReRender" value="generalDiv"/>
+                    </ui:include>
+                </s:div>
+            </s:div>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_1_0.xsd" version="1.0">
+
+	<named-query name="findTmStepInstanceMsgValidationByTsimvId">
+		<query>
+			<![CDATA[
+			select tsimv from TmStepInstanceMsgValidation tsimv where tsimv.id=:id
+			]]>
+		</query>
+	</named-query>
+	<named-query name="findProxyTypeByKey">
+		<query><![CDATA[
+				select pt 
+				from ProxyType pt 
+				where pt.keyword=:key
+		]]></query>
+	</named-query>
+
+	<named-query name="findAllProxyTypes">
+		<query><![CDATA[
+				select pt 
+				from ProxyType pt
+		]]></query>
+	</named-query>
+
+	<named-query name="findValidationStatusByKey">
+		<query><![CDATA[
+				select vs 
+				from ValidationStatus vs 
+				where vs.key=:key
+		]]></query>
+	</named-query>
+
+	<named-query name="findAllValidationStatuss">
+		<query><![CDATA[
+				select vs 
+				from ValidationStatus vs
+		]]></query>
+	</named-query>
+
+	<named-query name="findTestStepInstMessageProcessStatusByKey">
+		<query><![CDATA[
+				select s 
+				from TestStepInstMessageProcessStatus s 
+				where s.key=:key
+		]]></query>
+	</named-query>
+
+	<named-query name="findAllTestStepInstMessageProcessStatuses">
+		<query><![CDATA[
+				select s 
+				from TestStepInstMessageProcessStatus s
+		]]></query>
+	</named-query>
+
+	<named-query name="findTmStepInstanceMsgByProxyMsgIdAndTypeAndHost">
+		<query><![CDATA[
+				select tsim 
+				from TmStepInstanceMessage tsim 
+					join tsim.proxyType pt
+				where tsim.proxyMsgId=:proxyMsgId 
+					and pt.keyword=:proxyTypeEnum 
+					and tsim.proxyHostName=:proxyHostName
+		]]></query>
+	</named-query>
+
+	<named-query name="findTmStepInstanceMsgByProxyTypeAndHostAndDirectionAndConnId">
+		<query><![CDATA[
+				select tsim 
+				from TmStepInstanceMessage tsim 
+						left join fetch tsim.tmTestStepInstance
+						join tsim.proxyType pt
+				where pt.keyword=:proxyTypeEnum 
+					and tsim.proxyHostName=:proxyHostName 
+					and tsim.direction=:messageDirection 
+					and tsim.connectionId=:connectionId
+		]]></query>
+	</named-query>
+
+	<named-query name="findTsiByTiIdAndSenderHostIPandExecStatus">
+		<query><![CDATA[
+				select tsi 
+				from TestStepsInstance tsi 
+					join tsi.testInstance ti
+					join tsi.executionStatus tsiStatus
+					join ti.executionStatus tiStatus
+					join tsi.systemInSessionInitiator senderSis
+					join senderSis.system senderSystem
+					join senderSis.configurations senderTmConfig
+					join senderTmConfig.host senderHost
+				where ti.id=:tiId and senderHost.ip=:senderHostIPAddress 
+						and ti.proxyUsed=true and tiStatus.key=:tiStatus 
+						and tsiStatus.key in (:tsiStatuses)
+				order by ti.id desc, tsi.id asc
+		]]></query>
+	</named-query>
+
+	<named-query name="findTsisByTiId">
+		<query><![CDATA[
+				select tsi 
+				from TestStepsInstance tsi 
+					join tsi.testInstance ti
+				where ti.id=:tiId
+				order by tsi.id asc
+		]]></query>
+	</named-query>
+
+	<named-query name="findTestStepMessageProfileByTsiId">
+		<query><![CDATA[
+				select stepMsgProfile 
+				from TmTestStepMessageProfile stepMsgProfile 
+					join stepMsgProfile.tmTestStep step
+					join step.testStepsInstances tsi
+				where tsi.id=:tsiId
+		]]></query>
+	</named-query>
+
+	<named-query name="findTestStepMessageProfileByTsiIdAndMsgTypeAndDirection">
+		<query><![CDATA[
+				select stepMsgProfile 
+				from TmTestStepMessageProfile stepMsgProfile 
+					join stepMsgProfile.tmTestStep step
+					join stepMsgProfile.tfHl7MessageProfile msgProfile
+					join step.testStepsInstances tsi
+				where tsi.id=:tsiId
+					and stepMsgProfile.direction=:direction
+					and msgProfile.messageType=:messageType
+				order by tsi.id desc, stepMsgProfile.id desc
+		]]></query>
+	</named-query>
+
+	<named-query name="findTestStepMessageProfileByTsiIdAndDirection">
+		<query><![CDATA[
+				select stepMsgProfile 
+				from TmTestStepMessageProfile stepMsgProfile 
+					join stepMsgProfile.tmTestStep step
+					join stepMsgProfile.tfHl7MessageProfile msgProfile
+					join step.testStepsInstances tsi
+				where tsi.id=:tsiId
+					and stepMsgProfile.direction=:direction
+				order by tsi.id desc, stepMsgProfile.id desc
+		]]></query>
+	</named-query>
+
+	<named-query name="findTmStepInstanceMessagesByTsiIdOrderByDirAsc">
+		<query><![CDATA[
+				select tsim 
+				from TmStepInstanceMessage tsim 
+					join tsim.tmTestStepInstance tsi
+					left join fetch tsim.relatesToStepInstanceMessage relatesTo
+					left join fetch tsim.tmStepInstanceMsgValidations msgValidation
+					left join fetch msgValidation.validationStatus status
+				where tsi.id=:tsiId
+				order by tsim.direction asc
+		]]></query>
+	</named-query>
+
+	<named-query name="findTmStepInstanceMessagesByTsiIdOrderByDirDesc">
+		<query><![CDATA[
+				select tsim 
+				from TmStepInstanceMessage tsim 
+					join tsim.tmTestStepInstance tsi
+					left join fetch tsim.relatesToStepInstanceMessage relatesTo
+					left join fetch tsim.tmStepInstanceMsgValidations msgValidation
+					left join fetch msgValidation.validationStatus status
+				where tsi.id=:tsiId
+				order by tsim.direction desc
+		]]></query>
+	</named-query>
+
+	<named-query name="findNextTsiToActivate">
+		<query><![CDATA[
+				select tsi 
+				from TestStepsInstance tsi 
+					join tsi.testInstance ti
+					join tsi.testSteps ts
+					join tsi.executionStatus tsiStatus
+				where ti.id=:tiId
+					and	ts.stepIndex>:currentStepIndex
+					and tsiStatus.key in ('INACTIVE','PAUSED')	
+					and ts.autoTriggered=true
+				order by ts.stepIndex, tsi.id asc
+		]]></query>
+	</named-query>
+
+	<named-query name="findFirstTsiToActivate">
+		<query><![CDATA[
+				select tsi 
+				from TestStepsInstance tsi 
+					join tsi.testInstance ti
+					join tsi.testSteps ts
+					join tsi.executionStatus tsiStatus
+					join ti.executionStatus tiStatus
+					join tsi.systemInSessionInitiator sis
+					join sis.systemInSessionStatus sisStatus
+				where ti.id=:tiId
+					and tsiStatus.key='INACTIVE'
+					and tiStatus.key='ACTIVE'
+					and ts.autoTriggered=true
+					and sis.id=:sisId
+				order by ts.stepIndex, tsi.id asc	
+		]]></query>
+	</named-query>
+
+	<named-query name="findTisToDeactivate">
+		<query><![CDATA[
+				select distinct ti 
+				from TestInstance ti
+					left join fetch ti.testStepsInstanceList tsi
+					join tsi.testSteps ts
+					join tsi.executionStatus tsiStatus
+					join ti.executionStatus tiStatus
+					join tsi.systemInSessionInitiator sis
+					join sis.systemInSessionStatus sisStatus
+				where tiStatus.key='ACTIVE'
+					and ti.id != :tiId
+					and sis.id = :sisId
+				order by ti.id, tsi.id asc				
+		]]></query>
+	</named-query>
+
+	<named-query name="findHostWithSystemAndInstitution">
+		<query><![CDATA[
+				select distinct host 
+				from Host host
+					join fetch host.configurations confs
+					join fetch confs.systemInSession sis
+					join fetch sis.system system
+					left join fetch system.institutionSystems instSystem
+					left join fetch host.configurations configs
+					join fetch instSystem.institution 
+				where host.ip=:hostIP
+		]]></query>
+	</named-query>
+
+</entity-mappings>	
+

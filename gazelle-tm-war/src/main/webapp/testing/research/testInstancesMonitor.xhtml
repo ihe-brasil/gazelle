@@ -1,0 +1,115 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.common.menu.MonitorWorkList']}"/>
+    <ui:define name="body">
+
+        #{testInstancesOverview.setInteroperabilityTestsOnly(false)}
+        #{testInstancesOverview.setMonitorWorkList(true)}
+
+        <h:form id="globalform" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <h:inputHidden id="filterUrlParameters" name="filterUrlParameters"
+                           value="#{testInstancesOverview.filter.urlParameters}"/>
+            <script>
+                updateUrl("globalform:filterUrlParameters");
+                $("#globalform\\:filterUrlParameters").bind('change',
+                    function () {
+                        updateUrl("globalform:filterUrlParameters");
+                    });
+            </script>
+
+            <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+
+
+                <ui:include src="testInstancesCommonFilter.xhtml">
+                    <ui:param name="SuffixForID" value="MonitorTests"/>
+                </ui:include>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <!--  monitor selection -->
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{testInstancesOverview.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="monitor"/>
+                            <ui:param name="filterName" value="#{messages['gazelle.tm.monitors.Monitor']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <s:decorate template="/layout/form/_checkbox.xhtml">
+                            <h:selectBooleanCheckbox value="#{testInstancesOverview.filter.monitorWorklistAny}">
+                                <a4j:ajax event="click" render="globalform" execute="@this"
+                                          listener="#{testInstancesOverview.filter.modified()}"/>
+                            </h:selectBooleanCheckbox>
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.ShowAllTestInstances']}"/>
+                        </s:decorate>
+                        <s:decorate template="/layout/form/_checkbox.xhtml">
+                            <h:selectBooleanCheckbox value="#{testInstancesOverview.filter.monitorWorklistClaimed}">
+                                <a4j:ajax event="click" render="globalform" execute="@this"
+                                          listener="#{testInstancesOverview.filter.modified()}"/>
+                            </h:selectBooleanCheckbox>
+                            <h:outputText
+                                    value="#{messages['net.ihe.gazelle.tm.ShowOnlyClaimedTests']} #{messages['gazelle.tm.For']} #{testInstancesOverview.getMonitorName()}"
+                                    rendered="#{testInstancesOverview.getMonitorName()!=null}"/>
+                            <h:outputText
+                                    value="#{messages['net.ihe.gazelle.tm.ShowOnlyClaimedTests']} #{messages['net.ihe.gazelle.tm.ForAllMonitors']}"
+                                    rendered="#{testInstancesOverview.getMonitorName()==null}"/>
+                        </s:decorate>
+                    </div>
+                </div>
+
+                <ui:define name="filter_buttons">
+                    <a4j:commandLink actionListener="#{testInstancesOverview.filter.modified()}"
+                                     title="#{messages['gazelle.common.button.Refresh']}"
+                                     render="globalform">
+                        <span class="fa fa-refresh"/>
+                    </a4j:commandLink>
+
+                    <a4j:commandLink actionListener="#{testInstancesOverview.resetFilter()}"
+                                     title="#{messages['gazelle.users.reset']}" type="submit"
+                                     execute="@this" render="globalform">
+                        <span class="fa fa-times-circle"/>
+                    </a4j:commandLink>
+                </ui:define>
+            </ui:decorate>
+            <s:div id="ViewTableOfTestVal">
+                <s:div id="criticalTestInstancePanel"
+                       rendered="#{gazelleDAO.getSelectedTestingSession().isCriticalStatusEnabled and testInstancesOverview.testsCritical.size()&gt;0}">
+                    <ui:include src="monitorTestInstanceListPanel2.xhtml">
+                        <ui:param name="dataTableHeader"
+                                  value="#{messages['gazelle.tm.CriticalEvaluateTheseFirst']} ! "/>
+                        <ui:param name="varList" value="#{testInstancesOverview.testsCritical}"/>
+                        <ui:param name="varTableId" value="criticalTestInstanceDataTable"/>
+                        <ui:param name="varColor" value="panel-danger"/>
+                    </ui:include>
+                    <br/></s:div>
+                <s:div id="toBeVerifiedTestInstancePanel"
+                       rendered="#{testInstancesOverview.testsCompleted.size()&gt;0}">
+                    <ui:include src="monitorTestInstanceListPanel2.xhtml">
+                        <ui:param name="dataTableHeader"
+                                  value="#{messages['gazelle.tm.TestsThatNeedToBeVerified']}"/>
+                        <ui:param name="varList" value="#{testInstancesOverview.testsCompleted}"/>
+                        <ui:param name="varTableId" value="completedTestInstanceDataTable"/>
+                        <ui:param name="varColor" value="panel-info"/>
+                    </ui:include>
+                    <br/></s:div>
+                <s:div id="partiallyVerifiedTestInstancePanel"
+                       rendered="#{testInstancesOverview.testsPartiallyVerified.size()&gt;0}">
+                    <ui:include src="monitorTestInstanceListPanel2.xhtml">
+                        <ui:param name="dataTableHeader"
+                                  value="#{messages['gazelle.tm.PartiallyVerifiedTests']}"/>
+                        <ui:param name="varList" value="#{testInstancesOverview.testsPartiallyVerified}"/>
+                        <ui:param name="varTableId" value="partiallyVerifiedTestInstanceDataTable"/>
+                        <ui:param name="varColor" value="panel-warning"/>
+                    </ui:include>
+                    <br/></s:div>
+            </s:div>
+        </h:form>
+
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,173 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.testmanagement.object.ViewObjectList']}"/>
+    <ui:define name="body">
+        <h:form id="form">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                <ui:define name="panel_title">#{messages['gazelle.testmanagement.object.Viewobjectlistrelatedto']}
+                    #{objectTypeManager.selectedObjectType.keyword}
+                </ui:define>
+                <a4j:region id="ObjectTypeSelectionRegion">
+                    <s:decorate id="ObjectTypeSelectionDecoration" template="/layout/form/_edit.xhtml">
+                        <ui:define name="label">#{messages['gazelle.testmanagement.object.Selectobjecttype']}
+                        </ui:define>
+                        <h:selectOneMenu styleClass="form-control gzl-form-control" id="ListOfObjectType"
+                                         value="#{objectTypeManager.selectedObjectType}">
+                            <s:selectItems value="#{objectTypeManager.getListOfAllObjectTypeReady()}"
+                                           var="currentObjectType"
+                                           noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                           label="#{currentObjectType.keyword} - #{currentObjectType.description}"/>
+                            <a4j:ajax event="change" execute="@this"
+                                      render="existaingInstanceList,SISAIPOTable,SISTableForReaders"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                </a4j:region>
+                <br/>
+                <br/>
+                <h:outputText
+                        value="#{messages['gazelle.testmanagement.object.Listofthesystemsthatneedtocreate']}"/>
+                <br/>
+                <rich:dataTable id="SISAIPOTable" var="currentSIS"
+                                value="#{objectTypeManager.getListSISofSelectedObjectTypeForCreation()}">
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                        <h:outputText value="#{currentSIS.id}"/>
+                    </g:column>
+                    <g:column sortBy="#{'system.keyword'}" sortOrder="ascending">
+                        <ui:define name="header">#{messages['gazelle.tm.SystemInSession']}</ui:define>
+                        <h:outputText value="#{currentSIS.system.keyword} - #{currentSIS.system.name}"/>
+                        <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                            <ui:param name="id" value="nn#{currentSIS.id}"/>
+                            <ui:param name="placement" value="bottom"/>
+                            <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                            <ui:define name="content">
+                                <rich:dataTable id="listOfAIPOBySIS" var="currentAIPO"
+                                                value="#{objectTypeManager.getListOfAIPOCreatorImplementedBySISForSelectedObjectType(currentSIS)}">
+                                    <g:column>
+                                        <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                        <h:outputText value="#{currentAIPO.id}"/>
+                                    </g:column>
+                                    <g:column>
+                                        <ui:define name="header">#{messages['gazelle.tests.test.integrationProfile']}
+                                        </ui:define>
+                                        <h:outputText
+                                                value="#{currentAIPO.actorIntegrationProfile.integrationProfile.keyword}"/>
+                                    </g:column>
+                                    <g:column>
+                                        <ui:define name="header">#{messages['gazelle.testmanagement.object.Actor']}
+                                        </ui:define>
+                                        <h:outputText
+                                                value="#{currentAIPO.actorIntegrationProfile.actor.keyword}"/>
+                                    </g:column>
+                                    <g:column>
+                                        <ui:define name="header">#{messages['gazelle.testmanagement.object.Option']}
+                                        </ui:define>
+                                        <h:outputText
+                                                value="#{currentAIPO.integrationProfileOption.keyword}"/>
+                                    </g:column>
+                                </rich:dataTable>
+
+                            </ui:define>
+                        </ui:decorate>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.systems.systemInSession.table']}</ui:define>
+                        <h:outputText value="#{objectTypeManager.getTableOfSIS(currentSIS)}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.testmanagement.object.ExistingInstances']}
+                        </ui:define>
+                        <a4j:commandLink action="#{objectManager.returnToSystemObjectPageForTheTabCreator()}"
+                                         id="sysobjdesc"
+                                         actionListener="#{objectManager.initialiseSystemObjectPage(currentSIS)}"
+                                         value="#{objectTypeManager.getNumberOfObjectInstanceBySISForSelectedObjectType(currentSIS)} #{messages['gazelle.tm.Instances']}"
+                                         execute="@this"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">
+                            #{messages['gazelle.testmanagement.object.CompleteExistingInstances']}
+                        </ui:define>
+                        <a4j:commandLink action="#{objectManager.returnToSystemObjectPageForTheTabCreator()}"
+                                         id="sysobjdesc2"
+                                         actionListener="#{objectManager.initialiseSystemObjectPage(currentSIS)}"
+                                         value="#{objectTypeManager.getNumberOfCompletedObjectInstanceBySISForSelectedObjectType(currentSIS)} #{messages['gazelle.tm.Instances']}"
+                                         execute="@this"/>
+                    </g:column>
+                </rich:dataTable>
+                <br/>
+                <br/>
+                <h:outputText
+                        value="#{messages['gazelle.testmanagement.object.Listofthesystemsthatcanread']}"/>
+                <br/>
+                <rich:dataTable id="SISTableForReaders" var="currentSIS"
+                                value="#{objectTypeManager.getListSISofSelectedObjectTypeForReading()}">
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                        <h:outputText value="#{currentSIS.id}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.tm.SystemInSession']}</ui:define>
+                        <h:outputText value="#{currentSIS.system.keyword} - #{currentSIS.system.name}"/>
+                        <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                            <ui:param name="id" value="n#{currentSIS.id}"/>
+                            <ui:param name="placement" value="bottom"/>
+                            <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                            <ui:define name="content">
+
+                                <rich:dataTable id="listOfAIPOBySISForReaders" var="currentAIPO"
+                                                value="#{objectTypeManager.getListOfAIPOReaderImplementedBySISForSelectedObjectType(currentSIS)}">
+                                    <g:column>
+                                        <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                        <h:outputText value="#{currentAIPO.id}"/>
+                                    </g:column>
+                                    <g:column>
+                                        <ui:define name="header">#{messages['gazelle.tests.test.integrationProfile']}
+                                        </ui:define>
+                                        <h:outputText
+                                                value="#{currentAIPO.actorIntegrationProfile.integrationProfile.keyword}"/>
+                                    </g:column>
+                                    <g:column>
+                                        <ui:define name="header">#{messages['gazelle.testmanagement.object.Actor']}
+                                        </ui:define>
+                                        <h:outputText
+                                                value="#{currentAIPO.actorIntegrationProfile.actor.keyword}"/>
+                                    </g:column>
+                                    <g:column>
+                                        <ui:define name="header">#{messages['gazelle.testmanagement.object.Option']}
+                                        </ui:define>
+                                        <h:outputText
+                                                value="#{currentAIPO.integrationProfileOption.keyword}"/>
+                                    </g:column>
+                                </rich:dataTable>
+
+                            </ui:define>
+                        </ui:decorate>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.systems.systemInSession.table']}</ui:define>
+                        <h:outputText value="#{objectTypeManager.getTableOfSIS(currentSIS)}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.testmanagement.object.ExistingInstancesToRead']}
+                        </ui:define>
+                        <a4j:commandLink action="#{objectManager.returnToSystemObjectPageForTheTabReader()}"
+                                         actionListener="#{objectManager.initialiseSystemObjectPage(currentSIS)}"
+                                         value="#{objectTypeManager.getNumberOfObjectInstanceToReadBySIS(currentSIS)} #{messages['gazelle.tm.Instances']}"
+                                         immediate="true" execute="@this"/>
+                    </g:column>
+                </rich:dataTable>
+                <br/>
+                <a4j:commandButton styleClass="gzl-btn" id="BackButton"
+                                   value="#{messages['gazelle.testmanagement.object.BackToOType']}"
+                                   action="/objects/listObjectType.seam" execute="@this"/>
+                <br/>
+                <br/>
+            </ui:decorate>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

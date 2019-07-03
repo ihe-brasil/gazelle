@@ -1,0 +1,46 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <!-- parameter is an encounter -->
+    <rich:togglePanel id="panel" activeItem="#{sampleDisplayManager.displayList(oif)}" switchType="client" >
+        <rich:togglePanelItem name="empty">
+            <h:panelGroup id="pangroup1">
+                <h:commandLink id="toggview" style="font-weight:bold;"
+                               value="#{messages['net.ihe.gazelle.tm.EVSClientResultsclickToOpen']})">
+                    <rich:toggleControl targetItem="first"/>
+                </h:commandLink>
+            </h:panelGroup>
+        </rich:togglePanelItem>
+        <rich:togglePanelItem name="first">
+            <h:panelGroup>
+                <h:commandLink style="font-weight:bold;" value="#{messages['gazelle.common.button.Hide']}">
+                    <rich:toggleControl targetItem="empty"/>
+                </h:commandLink>
+                <br/>
+                <br/>
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.NoValidationResultRecordedForThisFile']}"
+                              rendered="#{empty oif.resultOid}" style="font-weight:bold;"/>
+                <a4j:repeat value="#{oif.resultOid}" var="resultEntry" id="evsClientResultTable"
+                            rendered="#{not empty oif.resultOid}">
+                    <h:outputLink target="_blank" value="#{managedBean.getLinkToResult(resultEntry,oif.id)}">
+                        <h:outputText value="#{resultEntry}"/>
+                    </h:outputLink>
+                    <span style="width:10px"/>
+                    <h:outputText value="#{managedBean.getValidationStatus(resultEntry,oif.id)}"
+                                  styleClass="gzl-label #{managedBean.getValidationColor(resultEntry,oif.id)}"
+                                  title="#{managedBean.getValidationDate(resultEntry,oif.id)}"
+                                  style="text-transform: uppercase"/>
+                    <span style="width:10px"/>
+                    <a4j:commandLink render="evsClientResultTable,instanceFileForm"
+                                     title="#{messages['net.ihe.gazelle.tm.RemoveValidationResult']}"
+                                     rendered="#{s:hasRole('admin_role') || s:hasRole('monitor_role')}"
+                                     actionListener="#{oif.removeResultOid(resultEntry)}">
+                        <span class="gzl-icon-trash-o"/>
+                    </a4j:commandLink>
+                    <br/><br/>
+                </a4j:repeat>
+            </h:panelGroup>
+        </rich:togglePanelItem>
+    </rich:togglePanel>
+</ui:composition>

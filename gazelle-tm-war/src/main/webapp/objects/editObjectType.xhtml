@@ -1,0 +1,940 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.testmanagement.object.editObjectType']}"/>
+    <ui:define name="body">
+        <h:outputScript library="jscript" name="disable_input_spinner_mouse_wheel.js"/>
+        <h:form id="form">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                <ui:define name="panel_title">#{messages['gazelle.testmanagement.object.EditoftheObjectType']} :
+                    #{objectTypeManager.selectedObjectType.keyword}
+                </ui:define>
+                <div id="tabPanelForEditObjectType">
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active"><a href="#globalVariablesTab"
+                                                                  aria-controls="globalVariablesTab" role="tab"
+                                                                  data-toggle="tab">#{messages['gazelle.testmanagement.object.summary']}</a>
+                        </li>
+                        <li role="presentation"><a href="#AddACreatorPanel" aria-controls="AddACreatorPanel" role="tab"
+                                                   data-toggle="tab">#{messages['gazelle.testmanagement.object.creators']}</a>
+                        </li>
+                        <li role="presentation"><a href="#AddAReaderPanel" aria-controls="AddAReaderPanel" role="tab"
+                                                   data-toggle="tab">#{messages['gazelle.testmanagement.object.readers']}</a>
+                        </li>
+                        <li role="presentation"><a href="#AddAFileAssociatedPanel"
+                                                   aria-controls="AddAFileAssociatedPanel" role="tab"
+                                                   data-toggle="tab">#{messages['gazelle.testmanagement.object.files']}</a>
+                        </li>
+                        <li role="presentation"><a href="#AddAAttributeAssociatedPanel"
+                                                   aria-controls="AddAAttributeAssociatedPanel" role="tab"
+                                                   data-toggle="tab">#{messages['gazelle.testmanagement.object.attributes']}</a>
+                        </li>
+                    </ul>
+
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active" id="globalVariablesTab">
+                            <a4j:region id="ObjectTypeKeyword">
+                                <s:decorate id="keywordDecoration" template="/layout/form/_edit.xhtml">
+                                    <ui:param name="id" value="OTkeyword"/>
+                                    <ui:define name="label">#{messages['gazelle.testmanagement.object.keyword']}
+                                    </ui:define>
+                                    <h:inputText styleClass=" form-control" id="OTkeyword" tabindex="2" size="37"
+                                                 required="true" maxlength="96"
+                                                 value="#{objectTypeManager.selectedObjectType.keyword}">
+                                    </h:inputText>
+                                </s:decorate>
+                            </a4j:region>
+                            <br/>
+                            <a4j:region id="ObjectTypeDescription">
+                                <s:decorate id="descriptionDecoration" template="/layout/form/_edit.xhtml">
+                                    <ui:param name="id" value="OTdescription"/>
+                                    <ui:define name="label">#{messages['gazelle.tm.testing.instance.description']}
+                                    </ui:define>
+                                    <h:inputText styleClass=" form-control" id="OTdescription" tabindex="2" size="150"
+                                                 required="false" maxlength="250"
+                                                 value="#{objectTypeManager.selectedObjectType.description}">
+                                    </h:inputText>
+                                </s:decorate>
+                            </a4j:region>
+                            <br/>
+                            <a4j:region id="ObjectTypeStatus">
+                                <s:decorate id="statusDecoration" template="/layout/form/_edit.xhtml">
+                                    <ui:param name="id" value="StatusListBox"/>
+                                    <ui:define name="label">#{messages['gazelle.tm.testing.instance.status']}
+                                    </ui:define>
+                                    <h:selectOneMenu styleClass="form-control gzl-form-control" id="StatusListBox"
+                                                     value="#{objectTypeManager.selectedObjectType.objectTypeStatus}">
+                                        <s:selectItems id="ListStatusSelectItems"
+                                                       value="#{objectTypeManager.possibleObjectTypeStatus}"
+                                                       var="selectedStatus"
+                                                       noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                       label="#{selectedStatus.labelToDisplay}"/>
+                                    </h:selectOneMenu>
+                                </s:decorate>
+                            </a4j:region>
+                            <br/>
+                            <a4j:region id="ObjectTypeDefaultDesc">
+                                <label class="control-label">#{messages['gazelle.testmanagement.object.DefaultDesc']}</label>
+                                <ui:decorate template="/layout/editor/_text_editor.xhtml">
+                                    <ui:param name="text"
+                                              value="#{objectTypeManager.selectedObjectType.default_desc}"/>
+                                    <ui:param name="id" value="OTdefaultdesc"/>
+                                    <ui:param name="isFocus" value="true"/>
+                                </ui:decorate>
+                            </a4j:region>
+                            <br/>
+                            <a4j:region id="ObjectTypeInstructions">
+                                <label class="control-label">#{messages['gazelle.testmanagement.object.Instructions']}</label>
+                                <ui:decorate template="/layout/editor/_text_editor.xhtml">
+                                    <ui:param name="text"
+                                              value="#{objectTypeManager.selectedObjectType.instructions}"/>
+                                    <ui:param name="id" value="OTinstructions"/>
+                                    <ui:param name="isFocus" value="true"/>
+                                </ui:decorate>
+                            </a4j:region>
+                            <br/>
+
+                            <h:commandButton styleClass="gzl-btn-orange" id="UpdateObjectTypeButton"
+                                             value="#{messages['gazelle.common.button.Update']} #{objectTypeManager.selectedObjectType.keyword}"
+                                             actionListener="#{objectTypeManager.updateSelectedObjectType()}"
+                                             render="messageDecoration,headerOfPanel"/>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="AddACreatorPanel"><br/>
+                            <rich:dataTable id="listObjectTypeCreators" var="currentCreator"
+                                            value="#{objectTypeManager.getListOfObjectCreatorForSelectedObjectType()}"
+
+
+                                            rowKeyVar="rowNumber" rows="10">
+                                <g:column sortBy="#{'id'}" sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                    <h:outputText value="#{currentCreator.id}"/>
+                                </g:column>
+                                <g:column
+                                        sortBy="#{'AIPO.actorIntegrationProfile.integrationProfile.name'}"
+                                        sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Profile']}
+                                    </ui:define>
+                                    <h:outputText
+                                            value="#{currentCreator.AIPO.actorIntegrationProfile.integrationProfile.name}"/>
+                                </g:column>
+                                <g:column
+                                        sortBy="#{'AIPO.actorIntegrationProfile.actor.name'}"
+                                        sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Actor']}
+                                    </ui:define>
+                                    <h:outputText
+                                            value="#{currentCreator.AIPO.actorIntegrationProfile.actor.name}"/>
+                                </g:column>
+                                <g:column
+                                        sortBy="#{'AIPO.integrationProfileOption.name'}"
+                                        sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Option']}
+                                    </ui:define>
+                                    <h:outputText
+                                            value="#{currentCreator.AIPO.integrationProfileOption.name}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Description']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentCreator.description}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Action']}
+                                    </ui:define>
+
+                                    <a4j:commandLink id="deleteActionImageSupportForObjectTypeCreator"
+                                                     actionListener="#{objectTypeManager.setSelectedCreator( currentCreator ) }"
+                                                     oncomplete="jq162('#DeleteSelectedCreator').modal('show');"
+                                                     title="#{messages['gazelle.common.button.Delete']}"
+                                                     render="DeleteSelectedCreator, :deleteFormOfCreator">
+                                        <span class="gzl-icon-trash-o"/>
+                                    </a4j:commandLink>
+                                    <a4j:commandLink id="editActionImageSupportForObjectTypeCreator"
+                                                     actionListener="#{objectTypeManager.setSelectedCreator( currentCreator ) }"
+                                                     oncomplete="jq162('#editSelectedCreator').modal('show');"
+                                                     title="#{messages['gazelle.common.button.Edit']}"
+                                                     render="editSelectedCreator, :editFormOfObjectCreator">
+                                        <span class="gzl-icon-pencil"/>
+                                    </a4j:commandLink>
+
+
+                                </g:column>
+                                <f:facet name="footer">
+                                    <rich:dataScroller maxPages="10" renderIfSinglePage="false"/>
+                                </f:facet>
+                            </rich:dataTable>
+                            <br/>
+                            <br/>
+                            <s:div id="CriteriaSelectionPanel">
+                                <s:decorate id="domainDecorationForCreator" template="/layout/form/_edit.xhtml">
+                                    <ui:param name="id" value="DomainListBox"/>
+                                    <ui:define name="label">#{messages['gazelle.tf.domain.ManageDomainsLabel1']}
+                                    </ui:define>
+                                    <h:selectOneMenu styleClass="form-control gzl-form-control" id="DomainListBox"
+                                                     value="#{objectTypeManager.selectedDomainForCreators}">
+                                        <s:selectItems value="#{objectTypeManager.getPossibleDomains()}"
+                                                       var="domainFromList"
+                                                       noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                       label="#{domainFromList.keyword} - #{domainFromList.name}"/>
+                                        <a4j:ajax event="change" execute="@this"
+                                                  render="ipDecorationForCreator,actorsDecorationForCreator,optionDecorationForCreator"
+                                                  listener="#{objectTypeManager.resetSelectionValuesForCreator(1)}"/>
+                                    </h:selectOneMenu>
+                                </s:decorate>
+                                <s:decorate id="ipDecorationForCreator" template="/layout/form/_edit.xhtml">
+                                    <ui:param name="id" value="ListOfIntegrationProfileForCreator"/>
+                                    <ui:define name="label">#{messages['gazelle.tests.test.integrationProfile']}
+                                    </ui:define>
+                                    <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                     id="ListOfIntegrationProfileForCreator"
+                                                     value="#{objectTypeManager.selectedIntegrationProfileForCreator }">
+                                        <s:selectItems
+                                                value="#{objectTypeManager.possibleIntegrationProfilesForCreator}"
+                                                var="currentIP"
+                                                noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                label="#{currentIP.keyword}-#{currentIP.name}"/>
+                                        <a4j:ajax event="change" execute="@this"
+                                                  render="actorsDecorationForCreator,optionDecorationForCreator"
+                                                  listener="#{objectTypeManager.resetSelectionValuesForCreator(2)}"/>
+                                    </h:selectOneMenu>
+                                </s:decorate>
+                                <s:decorate id="actorsDecorationForCreator" template="/layout/form/_edit.xhtml">
+                                    <ui:param name="id" value="ListOfActorsForCreator"/>
+                                    <ui:define name="label">#{messages['gazelle.testmanagement.object.Actor']}
+                                    </ui:define>
+                                    <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                     id="ListOfActorsForCreator"
+                                                     value="#{objectTypeManager.selectedActorForCreator}">
+                                        <s:selectItems value="#{objectTypeManager.possibleActorsForCreator}"
+                                                       var="currentAct"
+                                                       noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                       label="#{currentAct.keyword} - #{currentAct.name}"/>
+                                        <a4j:ajax event="change" execute="@this"
+                                                  render="optionDecorationForCreator"
+                                                  listener="#{objectTypeManager.resetSelectionValuesForCreator(3)}"/>
+                                    </h:selectOneMenu>
+                                </s:decorate>
+                                <s:decorate id="optionDecorationForCreator" template="/layout/form/_edit.xhtml">
+                                    <ui:param name="id" value="OptionListBoxForCreator"/>
+                                    <ui:define name="label">#{messages['gazelle.testmanagement.object.Option']}
+                                    </ui:define>
+                                    <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                     id="OptionListBoxForCreator"
+                                                     value="#{objectTypeManager.selectedIntegrationProfileOptionForCreator }">
+                                        <s:selectItems value="#{objectTypeManager.possibleOptionsForCreator}"
+                                                       var="optionFromList"
+                                                       noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                       label="#{optionFromList.keyword} - #{optionFromList.name}"/>
+                                        <a4j:ajax event="change" execute="@this"/>
+                                    </h:selectOneMenu>
+                                </s:decorate>
+                                <a4j:region id="creatorDescriptionRegion">
+                                    <s:decorate id="CreatorDescriptionDecoration" template="/layout/form/_edit.xhtml">
+                                        <ui:param name="id" value="OTCreatorDescription"/>
+                                        <ui:define name="label">
+                                            #{messages['gazelle.testmanagement.object.CreatorDescription']}
+                                        </ui:define>
+                                        <h:inputText styleClass=" form-control" id="OTCreatorDescription"
+                                                     maxlength="100"
+                                                     size="50"
+                                                     value="#{objectTypeManager.creatorDescription}">
+                                        </h:inputText>
+                                    </s:decorate>
+                                </a4j:region>
+
+                                <a4j:commandButton styleClass="gzl-btn-green" id="addButtonForCreator"
+                                                   value="#{messages['gazelle.testmanagement.object.Addacreatorfor']} #{objectTypeManager.selectedObjectType.keyword}"
+                                                   actionListener="#{objectTypeManager.addNewCreatorOfcurrentObjectType()}"
+                                                   render="listObjectTypeCreators,CreatorDescriptionDecoration,ipDecorationForCreator,actorsDecorationForCreator,optionDecorationForCreator,messageDecoration"/>
+                            </s:div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="AddAReaderPanel">
+                            <rich:dataTable id="listObjectTypeReaders" var="currentReader"
+                                            value="#{objectTypeManager.getListOfObjectReaderForSelectedObjectType()}"
+
+
+                                            rowKeyVar="rowNumber" rows="10">
+                                <g:column sortBy="#{'id'}" sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                    <h:outputText value="#{currentReader.id}"/>
+                                </g:column>
+                                <g:column
+                                        sortBy="#{'AIPO.actorIntegrationProfile.integrationProfile.name'}"
+                                        sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Profile']}
+                                    </ui:define>
+                                    <h:outputText
+                                            value="#{currentReader.AIPO.actorIntegrationProfile.integrationProfile.name}"/>
+                                </g:column>
+                                <g:column
+                                        sortBy="#{'AIPO.actorIntegrationProfile.actor.name'}"
+                                        sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Actor']}
+                                    </ui:define>
+                                    <h:outputText
+                                            value="#{currentReader.AIPO.actorIntegrationProfile.actor.name}"/>
+                                </g:column>
+                                <g:column
+                                        sortBy="#{'AIPO.integrationProfileOption.name'}"
+                                        sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Option']}
+                                    </ui:define>
+                                    <h:outputText
+                                            value="#{currentReader.AIPO.integrationProfileOption.name}"/>
+                                </g:column>
+                                <g:column sortBy="#{'description'}"
+                                          sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Description']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentReader.description}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Action']}
+                                    </ui:define>
+
+                                    <a4j:commandLink id="deleteActionImageSupportForObjectTypeReader"
+                                                     actionListener="#{objectTypeManager.setSelectedReader( currentReader ) }"
+                                                     oncomplete="jq162('#DeleteSelectedReader').modal('show');"
+                                                     title="#{messages['gazelle.common.button.Delete']}"
+                                                     render="DeleteSelectedReader, :deleteFormOfReader">
+                                        <span class="gzl-icon-trash-o"/>
+                                    </a4j:commandLink>
+
+                                    <a4j:commandLink id="editActionImageSupportForObjectTypeReader"
+                                                     actionListener="#{objectTypeManager.setSelectedReader( currentReader ) }"
+                                                     oncomplete="jq162('#editSelectedReader').modal('show');"
+                                                     title="#{messages['gazelle.common.button.Edit']}"
+                                                     render="editSelectedReader, :editFormOfObjectReader">
+                                        <span class="gzl-icon-pencil"/>
+                                    </a4j:commandLink>
+                                </g:column>
+                                <f:facet name="footer">
+                                    <rich:dataScroller maxPages="10" renderIfSinglePage="false"/>
+                                </f:facet>
+                            </rich:dataTable>
+                            <br/>
+                            <br/>
+                            <s:div id="CriteriaSelectionPanelForReader">
+                                <s:decorate id="domainDecorationForReader" template="/layout/form/_edit.xhtml">
+                                    <ui:param name="id" value="DomainListBoxForReader"/>
+                                    <ui:define name="label">#{messages['gazelle.tf.domain.ManageDomainsLabel1']}
+                                    </ui:define>
+                                    <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                     id="DomainListBoxForReader"
+                                                     value="#{objectTypeManager.selectedDomainForReaders}">
+                                        <s:selectItems value="#{objectTypeManager.getPossibleDomains()}"
+                                                       var="domainFromList"
+                                                       noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                       label="#{domainFromList.keyword} - #{domainFromList.name}"/>
+                                        <a4j:ajax event="change" execute="@this"
+                                                  render="ipDecorationForReader,actorsDecorationForReader,optionDecorationForReader"
+                                                  listener="#{objectTypeManager.resetSelectionValuesForReader(1)}"/>
+                                    </h:selectOneMenu>
+                                </s:decorate>
+                                <s:decorate id="ipDecorationForReader" template="/layout/form/_edit.xhtml">
+                                    <ui:param name="id" value="ListOfIntegrationProfileForReader"/>
+                                    <ui:define name="label">#{messages['gazelle.tests.test.integrationProfile']}
+                                    </ui:define>
+                                    <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                     id="ListOfIntegrationProfileForReader"
+                                                     value="#{objectTypeManager.selectedIntegrationProfileForReader }">
+                                        <s:selectItems
+                                                value="#{objectTypeManager.possibleIntegrationProfilesForReader}"
+                                                var="currentIP"
+                                                noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                label="#{currentIP.keyword}-#{currentIP.name}"/>
+                                        <a4j:ajax event="change" execute="@this"
+                                                  render="actorsDecorationForReader,optionDecorationForReader"
+                                                  listener="#{objectTypeManager.resetSelectionValuesForReader(2)}"/>
+                                    </h:selectOneMenu>
+                                </s:decorate>
+                                <s:decorate id="actorsDecorationForReader" template="/layout/form/_edit.xhtml">
+                                    <ui:param name="id" value="ListOfActorsForReader"/>
+                                    <ui:define name="label">#{messages['gazelle.testmanagement.object.Actor']}
+                                    </ui:define>
+                                    <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                     id="ListOfActorsForReader"
+                                                     value="#{objectTypeManager.selectedActorForReader}">
+                                        <s:selectItems value="#{objectTypeManager.possibleActorsForReader}"
+                                                       var="currentAct"
+                                                       noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                       label="#{currentAct.keyword} - #{currentAct.name}"/>
+                                        <a4j:ajax event="change" execute="@this"
+                                                  render="optionDecorationForReader"
+                                                  listener="#{objectTypeManager.resetSelectionValuesForReader(3)}"/>
+                                    </h:selectOneMenu>
+                                </s:decorate>
+                                <s:decorate id="optionDecorationForReader" template="/layout/form/_edit.xhtml">
+                                    <ui:param name="id" value="OptionListBoxForReader"/>
+                                    <ui:define name="label">#{messages['gazelle.testmanagement.object.Option']}
+                                    </ui:define>
+                                    <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                     id="OptionListBoxForReader"
+                                                     value="#{objectTypeManager.selectedIntegrationProfileOptionForReader }">
+                                        <s:selectItems value="#{objectTypeManager.possibleOptionsForReader}"
+                                                       var="optionFromList"
+                                                       noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                       label="#{optionFromList.keyword} - #{optionFromList.name}"/>
+                                        <a4j:ajax event="change" execute="@this"/>
+                                    </h:selectOneMenu>
+                                </s:decorate>
+                                <a4j:region id="readerDescriptionRegion">
+                                    <s:decorate id="readerDescriptionDecoration" template="/layout/form/_edit.xhtml">
+                                        <ui:param name="id" value="OTReaderDescription"/>
+                                        <ui:define name="label">
+                                            #{messages['gazelle.testmanagement.object.ReaderDescription']}
+                                        </ui:define>
+                                        <h:inputText styleClass=" form-control" id="OTReaderDescription" maxlength="100"
+                                                     size="50"
+                                                     value="#{objectTypeManager.readerDescription}">
+                                        </h:inputText>
+                                    </s:decorate>
+                                </a4j:region>
+
+                                <a4j:commandButton styleClass="gzl-btn-green" id="addButtonForReader"
+                                                   value="#{messages['gazelle.testmanagement.object.Addareaderfor']} #{objectTypeManager.selectedObjectType.keyword}"
+                                                   actionListener="#{objectTypeManager.addNewReaderOfcurrentObjectType()}"
+                                                   render="listObjectTypeReaders,readerDescriptionDecoration,ipDecorationForReader,actorsDecorationForReader,optionDecorationForReader,messageDecoration"/>
+                            </s:div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="AddAFileAssociatedPanel">
+                            <h:outputText value="#{messages['gazelle.testmanagement.object.ListObjectFileCreator']} : "
+                                          styleClass="tooltipData"/>
+                            <br/>
+                            <br/>
+                            <rich:dataTable id="listObjectTypeAssociatedFile" var="currentObjectFile"
+                                            value="#{objectTypeManager.getListOfObjectFileForSelectedObjectTypeForCreator()}"
+
+
+                                            rows="10">
+                                <g:column sortBy="#{'id'}" sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                    <h:outputText value="#{currentObjectFile.id}"/>
+                                </g:column>
+                                <g:column sortBy="#{'type.keyword'}"
+                                          sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.FileType']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentObjectFile.type.keyword}"/>
+                                </g:column>
+                                <g:column sortBy="#{'description'}"
+                                          sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.tm.testing.instance.description']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentObjectFile.description}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Minimum']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentObjectFile.min}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Maximum']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentObjectFile.max}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Action']}
+                                    </ui:define>
+
+                                    <a4j:commandLink id="deleteActionImageSupportForOFile"
+                                                     actionListener="#{objectTypeManager.setSelectedObjectFile(currentObjectFile) }"
+                                                     oncomplete="jq162('#DeleteSelectedOFile').modal('show');"
+                                                     title="#{messages['gazelle.common.button.Delete']}"
+                                                     rendered="#{applicationPreferenceManager.isPossibleToDeleteOnGMM()}"
+                                                     render="DeleteSelectedOFile, :deleteFormOfOFile" execute="@this">
+                                        <span class="gzl-icon-trash-o"/>
+                                    </a4j:commandLink>
+
+                                    <a4j:commandLink id="editActionImageSupportForObjectFile"
+                                                     actionListener="#{objectTypeManager.setSelectedObjectFile( currentObjectFile) }"
+                                                     oncomplete="jq162('#editSelectedObjectFile').modal('show');"
+                                                     title="#{messages['gazelle.common.button.Edit']}"
+                                                     render="editSelectedObjectFile, :editFormOfObjectFile,spinnerScript">
+                                        <span class="gzl-icon-pencil"/>
+                                    </a4j:commandLink>
+                                </g:column>
+                                <f:facet name="footer">
+                                    <rich:dataScroller maxPages="10" renderIfSinglePage="false"/>
+                                </f:facet>
+                            </rich:dataTable>
+                            <br/>
+                            <br/>
+                            <h:outputText value="#{messages['gazelle.testmanagement.object.ListObjectFileReader']} : "
+                                          styleClass="tooltipData"/>
+                            <br/>
+                            <br/>
+                            <rich:dataTable id="listObjectTypeAssociatedFileForReaders" var="currentObjectFile"
+                                            value="#{objectTypeManager.getListOfObjectFileForSelectedObjectTypeForReaders()}"
+
+
+                                            rows="10">
+                                <g:column sortBy="#{'id'}" sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                    <h:outputText value="#{currentObjectFile.id}"/>
+                                </g:column>
+                                <g:column sortBy="#{'type.keyword'}"
+                                          sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.FileType']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentObjectFile.type.keyword}"/>
+                                </g:column>
+                                <g:column sortBy="#{'description'}"
+                                          sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.tm.testing.instance.description']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentObjectFile.description}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Minimum']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentObjectFile.min}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Maximum']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentObjectFile.max}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Action']}
+                                    </ui:define>
+                                    <a4j:commandLink id="deleteActionImageSupportForOFileForReaders"
+                                                     actionListener="#{objectTypeManager.setSelectedObjectFile(currentObjectFile) }"
+                                                     oncomplete="jq162('#DeleteSelectedOFile').modal('show');"
+                                                     rendered="#{applicationPreferenceManager.isPossibleToDeleteOnGMM()}"
+                                                     title="#{messages['gazelle.common.button.Delete']}"
+                                                     render="DeleteSelectedOFile, :deleteFormOfOFile" execute="@this">
+                                        <span class="gzl-icon-trash-o"/>
+                                    </a4j:commandLink>
+
+                                    <a4j:commandLink id="editActionImageSupportForObjectFileForReaders"
+                                                     actionListener="#{objectTypeManager.setSelectedObjectFile( currentObjectFile) }"
+                                                     oncomplete="jq162('#editSelectedObjectFile').modal('show');"
+                                                     title="#{messages['gazelle.common.button.Edit']}"
+                                                     render="editSelectedObjectFile, :editFormOfObjectFile,spinnerScript">
+                                        <span class="gzl-icon-pencil"/>
+                                    </a4j:commandLink>
+                                </g:column>
+                                <f:facet name="footer">
+                                    <rich:dataScroller maxPages="10" renderIfSinglePage="false"/>
+                                </f:facet>
+                            </rich:dataTable>
+                            <br/>
+                            <br/>
+                            <a4j:commandButton styleClass="gzl-btn-green" id="createButtonForNewFile"
+                                               value="#{messages['gazelle.testmanagement.object.AddFileAssocieted']} #{objectTypeManager.selectedObjectType.keyword}"
+                                               actionListener="#{objectTypeManager.initializeSelectedObjectFile()}"
+                                               oncomplete="jq162('#editSelectedObjectFile').modal('show');"
+                                               render="editSelectedObjectFile, :editFormOfObjectFile,spinnerScript"/>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="AddAAttributeAssociatedPanel">
+                            <rich:dataTable id="listObjectTypeAssociatedAttributes" var="currentObjectAttribute"
+                                            value="#{objectTypeManager.getListOfObjectAttributeForSelectedObjectType()}"
+
+
+                                            rows="10">
+                                <g:column sortBy="#{'id'}" sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                    <h:outputText value="#{currentObjectAttribute.id}"/>
+                                </g:column>
+                                <g:column sortBy="#{'keyword'}"
+                                          sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.AttributeType']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentObjectAttribute.keyword}"/>
+                                </g:column>
+                                <g:column sortBy="#{'description'}"
+                                          sortOrder="ascending">
+                                    <ui:define name="header">#{messages['gazelle.tm.testing.instance.description']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentObjectAttribute.description}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Action']}
+                                    </ui:define>
+                                    <a4j:commandLink id="deleteActionImageSupportForObjectAttribute"
+                                                     actionListener="#{objectTypeManager.setSelectedObjectAttribute( currentObjectAttribute ) }"
+                                                     oncomplete="jq162('#DeleteSelectedObjectAttribute').modal('show');"
+                                                     rendered="#{applicationPreferenceManager.isPossibleToDeleteOnGMM()}"
+                                                     title="#{messages['gazelle.common.button.Delete']}"
+                                                     render="DeleteSelectedObjectAttribute, :deleteFormOfObjectAttribute">
+                                        <span class="gzl-icon-trash-o"/>
+                                    </a4j:commandLink>
+
+                                    <a4j:commandLink id="editActionImageSupportForObjectAttribute"
+                                                     actionListener="#{objectTypeManager.setSelectedObjectAttribute( currentObjectAttribute) }"
+                                                     oncomplete="jq162('#editSelectedObjectAttribute').modal('show');"
+                                                     title="#{messages['gazelle.common.button.Edit']}"
+                                                     render="editSelectedObjectAttribute, :editFormOfObjectAttribute">
+                                        <span class="gzl-icon-pencil"/>
+                                    </a4j:commandLink>
+                                </g:column>
+                                <f:facet name="footer">
+                                    <rich:dataScroller maxPages="10" renderIfSinglePage="false"/>
+                                </f:facet>
+                            </rich:dataTable>
+                            <br/>
+                            <br/>
+                            <a4j:commandButton styleClass="gzl-btn-green" id="addButtonForAttributeAssociated"
+                                               value="#{messages['gazelle.testmanagement.object.AddAttrAssocieted']} #{objectTypeManager.selectedObjectType.keyword}"
+                                               oncomplete="jq162('#editSelectedObjectAttribute').modal('show');"
+                                               actionListener="#{objectTypeManager.initializeSelectedObjectAttribute()}"
+                                               render="editSelectedObjectAttribute, :editFormOfObjectAttribute"/>
+                        </div>
+                    </div>
+                </div>
+            </ui:decorate>
+            <a4j:commandButton styleClass="gzl-btn" id="BackButton"
+                               value="#{messages['gazelle.testmanagement.object.BackToOType']}"
+                               action="/objects/listObjectType.seam" execute="@this"/>
+
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Delete selected Creator-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="deleteFormOfCreator">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteSelectedCreator"/>
+                <ui:define name="popup_title">#{messages['gazelle.testmanagement.object.Deleteanobjectcreator']}
+                </ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="deleteCreatorbutton"
+                                       value="#{messages['gazelle.testmanagement.object.Deletethiscreator']}"
+                                       styleClass="gzl-btn-red"
+                                       actionListener="#{objectTypeManager.deleteSelectedCreatorFromDataBase()}"
+                                       onclick="jq162('#DeleteSelectedCreator').modal('hide');"
+                                       render="listObjectTypeCreators,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Delete selected Reader-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="deleteFormOfReader">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteSelectedReader"/>
+                <ui:define name="popup_title">#{messages['gazelle.testmanagement.object.Deleteareader']}</ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="deleteReaderbutton"
+                                       value="#{messages['gazelle.testmanagement.object.Deletethisreader']}"
+                                       styleClass="gzl-btn-red"
+                                       actionListener="#{objectTypeManager.deleteSelectedReaderFromDataBase()}"
+                                       onclick="jq162('#DeleteSelectedReader').modal('hide');"
+                                       render="listObjectTypeReaders,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Delete selected OFile-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="deleteFormOfOFile">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteSelectedOFile"/>
+                <ui:define name="popup_title">#{messages['gazelle.testmanagement.object.Deleteanobjectfile']}
+                </ui:define>
+                <s:decorate id="confirmationDeleteOFile">
+                    <h:outputText value="#{messages['gazelle.testmanagement.object.listOIToDelete']} :"
+                                  rendered="#{objectTypeManager.viewListOIFOnDeleting()}"/>
+                    <div id="DeleteOFile" style="overflow: auto; width: 220px; height: 60px;">
+                        <rich:list id="listObjIFileToDelete" var="ObjInstanceFile"
+                                   value="#{objectTypeManager.getListObjectInstanceFileForSelectedObjectFile()}"
+                                   type="unordered">
+                            <h:outputText value="#{ObjInstanceFile.url}" style="color:#aa0000;"/>
+                        </rich:list>
+                        <h:outputText value="#{messages['gazelle.testmanagement.object.NolistOIToDelete']}"
+                                      rendered="#{!objectTypeManager.viewListOIFOnDeleting()}"/>
+                    </div>
+                </s:decorate>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="deleteOFilebutton"
+                                       value="#{messages['gazelle.testmanagement.object.Deletethisobjectfile']}"
+                                       styleClass="gzl-btn-red"
+                                       actionListener="#{objectTypeManager.deleteSelectedObjectFileFromDataBase()}"
+                                       onclick="jq162('#DeleteSelectedOFile').modal('hide');"
+                                       render="listObjectTypeAssociatedFile,listObjectTypeAssociatedFileForReaders,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Delete selected ObjectAttribute-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="deleteFormOfObjectAttribute">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteSelectedObjectAttribute"/>
+                <ui:define name="popup_title">#{messages['gazelle.testmanagement.object.DeleteanObjAttr']}</ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="deleteObjectAttributebutton"
+                                       value="#{messages['gazelle.testmanagement.object.DeletethisObjAttr']}"
+                                       styleClass="gzl-btn-red"
+                                       actionListener="#{objectTypeManager.deleteSelectedObjectAttributeFromDataBase()}"
+                                       onclick="jq162('#DeleteSelectedObjectAttribute').modal('hide');"
+                                       render="listObjectTypeAssociatedAttributes,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Edit Selected Creator-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="editFormOfObjectCreator">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="editSelectedCreator"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.EditCreator']}</ui:define>
+
+                <s:decorate id="ipDecorationForCreatorOnPanel" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tests.test.integrationProfile']}
+                    </ui:define>
+                    <h:outputText
+                            value="#{objectTypeManager.selectedCreator.AIPO.actorIntegrationProfile.integrationProfile.keyword} : #{objectTypeManager.selectedCreator.AIPO.actorIntegrationProfile.integrationProfile.name}"/>
+                </s:decorate>
+                <s:decorate id="actorsDecorationForCreatorOnPanel"
+                            template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.testmanagement.object.Actor']}
+                    </ui:define>
+                    <h:outputText
+                            value="#{objectTypeManager.selectedCreator.AIPO.actorIntegrationProfile.actor.name}"/>
+                </s:decorate>
+                <s:decorate id="optionDecorationForCreatorOnPanel"
+                            template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.testmanagement.object.Option']}
+                    </ui:define>
+                    <h:outputText
+                            value="#{objectTypeManager.selectedCreator.AIPO.integrationProfileOption.name}"/>
+                </s:decorate>
+                <a4j:region id="creatorDescriptionRegionOnPanel">
+                    <s:decorate id="CreatorDescriptionDecorationOnPanel"
+                                template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="OTCreatorDescriptionOnPanel"/>
+                        <ui:define name="label">
+                            #{messages['gazelle.testmanagement.object.CreatorDescription']}
+                        </ui:define>
+                        <h:inputText styleClass=" form-control" id="OTCreatorDescriptionOnPanel" maxlength="100"
+                                     size="50"
+                                     value="#{objectTypeManager.selectedCreator.description}">
+                        </h:inputText>
+                    </s:decorate>
+                </a4j:region>
+
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton styleClass="gzl-btn-green" id="addButtonForCreatorOnPanel"
+                                       value="#{messages['gazelle.testmanagement.object.UpdateCreator']} #{objectTypeManager.selectedObjectType.keyword}"
+                                       onclick="jq162('#editSelectedCreator').modal('hide');"
+                                       actionListener="#{objectTypeManager.updateSelectedCreatorOfcurrentObjectType()}"
+                                       render="listObjectTypeCreators,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Edit Selected Reader-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="editFormOfObjectReader">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="editSelectedReader"/>
+                <ui:define name="popup_title">#{messages['gazelle.testmanagement.object.EditReader']}</ui:define>
+
+
+                <s:decorate id="ipDecorationForReaderOnPanel" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tests.test.integrationProfile']}
+                    </ui:define>
+                    <h:outputText
+                            value="#{objectTypeManager.selectedReader.AIPO.actorIntegrationProfile.integrationProfile.name}"/>
+                </s:decorate>
+                <s:decorate id="actorsDecorationForReaderOnPanel"
+                            template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.testmanagement.object.Actor']}
+                    </ui:define>
+                    <h:outputText
+                            value="#{objectTypeManager.selectedReader.AIPO.actorIntegrationProfile.actor.name}"/>
+                </s:decorate>
+                <s:decorate id="optionDecorationForReaderOnPanel"
+                            template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.testmanagement.object.Option']}
+                    </ui:define>
+                    <h:outputText
+                            value="#{objectTypeManager.selectedReader.AIPO.integrationProfileOption.keyword} : #{objectTypeManager.selectedReader.AIPO.integrationProfileOption.name}"/>
+                </s:decorate>
+                <a4j:region id="ReaderDescriptionRegionOnPanel">
+                    <s:decorate id="ReaderDescriptionDecorationOnPanel"
+                                template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="OTReaderDescriptionOnPanel"/>
+                        <ui:define name="label">
+                            #{messages['gazelle.testmanagement.object.ReaderDescription']}
+                        </ui:define>
+                        <h:inputText styleClass=" form-control" id="OTReaderDescriptionOnPanel"
+                                     maxlength="100" size="50"
+                                     value="#{objectTypeManager.selectedReader.description}">
+                        </h:inputText>
+                    </s:decorate>
+                </a4j:region>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton styleClass="gzl-btn-green" id="addButtonForReaderOnPanel"
+                                       value="#{messages['gazelle.testmanagement.object.UpdateReader']} #{objectTypeManager.selectedObjectType.keyword}"
+                                       onclick="jq162('#editSelectedReader').modal('hide');"
+                                       actionListener="#{objectTypeManager.updateSelectedReaderOfcurrentObjectType()}"
+                                       render="listObjectTypeReaders,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Edit Selected Object File-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="editFormOfObjectFile">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="editSelectedObjectFile"/>
+                <ui:define name="popup_title">#{messages['gazelle.testmanagement.object.EditObjFile']}</ui:define>
+                <s:decorate id="confirmationeditObjectFile" rendered="#{objectTypeManager.selectedObjectFile != null}">
+                <s:decorate id="FileTypeDecoration" template="/layout/form/_edit.xhtml">
+                    <ui:param name="id" value="TypeFileListBox"/>
+                    <ui:define name="label">#{messages['gazelle.testmanagement.object.FileType']}
+                    </ui:define>
+                    <h:selectOneMenu styleClass="form-control gzl-form-control" id="TypeFileListBox"
+                                     required="true"
+                                     value="#{objectTypeManager.selectedObjectFile.type}">
+                        <s:selectItems value="#{objectTypeManager.possibleFileTypes}"
+                                       var="FileTypeFromList"
+                                       noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                       label="#{FileTypeFromList.keyword}"/>
+                        <a4j:ajax event="change" render="editAttributesDecoration"
+                                  execute="@this"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <a4j:region id="UploaderFileRegion">
+                    <s:decorate id="UploaderFileDecoration" template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="selectOneMenuUploader"/>
+                        <ui:define name="label">#{messages['gazelle.testmanagement.object.Uploader']}
+                        </ui:define>
+                        <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                         id="selectOneMenuUploader" required="true"
+                                         value="#{objectTypeManager.selectedObjectFile.uploader}">
+                            <f:selectItem itemValue="creator"/>
+                            <f:selectItem itemValue="reader"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                </a4j:region>
+                <a4j:region id="DescriptionFileRegion">
+                    <s:decorate id="DescriptionFileDecoration" template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="DescriptionFileListBox"/>
+                        <ui:define name="label">
+                            #{messages['gazelle.testmanagement.object.FileDescription']}
+                        </ui:define>
+                        <h:inputTextarea styleClass=" form-control" id="DescriptionFileListBox" rows="3"
+                                         cols="70"
+                                         value="#{objectTypeManager.selectedObjectFile.description }"/>
+                    </s:decorate>
+                </a4j:region>
+                <a4j:region id="MinimumFileRegion">
+                    <s:decorate id="MinimumFileDecoration" template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="MinimumFileinputNumberSpinner"/>
+                        <ui:define name="label">#{messages['gazelle.testmanagement.object.Minimum']}
+                        </ui:define>
+                        <rich:inputNumberSpinner id="MinimumFileinputNumberSpinner"
+                                                 value="#{objectTypeManager.selectedObjectFile.min}"/>
+                    </s:decorate>
+                </a4j:region>
+                <a4j:region id="MaximumFileRegion">
+                    <s:decorate id="MaximumFileDecoration" template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="MaximumFileInputNumberSpinner"/>
+                        <ui:define name="label">#{messages['gazelle.testmanagement.object.Maximum']}
+                        </ui:define>
+                        <rich:inputNumberSpinner id="MaximumFileInputNumberSpinner" minValue="1"
+                                                 value="#{objectTypeManager.selectedObjectFile.max}"/>
+                    </s:decorate>
+                </a4j:region>
+                </s:decorate>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton styleClass="gzl-btn-green" id="updateButtonForFileAssociated"
+                                       value="#{messages['gazelle.testmanagement.object.UpdateFile']} #{objectTypeManager.selectedObjectType.keyword}"
+                                       oncomplete="jq162('#editSelectedObjectFile').modal('hide');"
+                                       actionListener="#{objectTypeManager.mergeObjectFileTypeOfObjectType()}"
+                                       rendered="#{objectTypeManager.selectedObjectFile != null}"
+                                       render="listObjectTypeAssociatedFile,listObjectTypeAssociatedFileForReaders,DescriptionFileDecoration,FileTypeDecoration,MinimumFileDecoration,MaximumFileRegion,spinnerScript,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Edit Selected Object Attribute-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="editFormOfObjectAttribute">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="editSelectedObjectAttribute"/>
+                <ui:define name="popup_title">#{messages['gazelle.testmanagement.object.EditObjAttr']}</ui:define>
+                <a4j:region id="AttributeTypeRegion">
+                    <s:decorate id="AttributeTypeDecoration" template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="NewAttributeTypeInput"/>
+                        <ui:define name="label">
+                            #{messages['gazelle.testmanagement.object.AttributeType']}
+                        </ui:define>
+                        <h:inputText styleClass=" form-control" id="NewAttributeTypeInput" maxlength="50"
+                                     size="50"
+                                     value="#{objectTypeManager.selectedObjectAttribute.keyword}"/>
+                    </s:decorate>
+                </a4j:region>
+                <a4j:region id="AttributeDescriptionRegion">
+                    <s:decorate id="AttributeDescriptionDecoration" template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="NewAttributeDescription"/>
+                        <ui:define name="label">
+                            #{messages['gazelle.testmanagement.object.AttributeDescription']}
+                        </ui:define>
+                        <h:inputText styleClass=" form-control" id="NewAttributeDescription" maxlength="150"
+                                     size="150"
+                                     value="#{objectTypeManager.selectedObjectAttribute.description}"/>
+                    </s:decorate>
+                </a4j:region>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton styleClass="gzl-btn-green" id="addButtonForAttributeAssociated"
+                                       value="#{messages['gazelle.testmanagement.object.EditAttrAssocietedTo']} #{objectTypeManager.selectedObjectType.keyword}"
+                                       onclick="jq162('#editSelectedObjectAttribute').modal('hide');"
+                                       actionListener="#{objectTypeManager.mergeObjectAttributeOfObjectType()}"
+                                       render="listObjectTypeAssociatedAttributes,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--@formatter:off-->
+        <s:span id="spinnerScript">
+            <script>
+                disable_input_spinner_mouse_wheel('#{rich:clientId('MinimumFileinputNumberSpinner')}');
+                disable_input_spinner_mouse_wheel('#{rich:clientId('MaximumFileInputNumberSpinner')}');
+            </script>
+        </s:span>
+        <!--@formatter:on-->
+    </ui:define>
+</ui:composition>

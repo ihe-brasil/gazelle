@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.2.2.final using JasperReports Library version 6.2.2  -->
+<!-- 2016-05-20T16:20:05 -->
+<jasperReport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			  xmlns="http://jasperreports.sourceforge.net/jasperreports"
+			  xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+			  name="GazelleTest" pageWidth="804" pageHeight="595" orientation="Landscape" whenNoDataType="NoDataSection"
+			  columnWidth="804" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0"
+			  uuid="70aaee7a-e44f-4e1f-97e7-1f40c31c98a1">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="294"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gazelle Production"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String">
+		<defaultValueExpression><![CDATA["/Users/epoiseau/workspace/gazelle-tm/gazelle-tm-ear/src/main/dist/opt/gazelle/reports/"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="tm_test_keyword" class="java.lang.String">
+		<defaultValueExpression><![CDATA["XDS.b_Consumer_Query_Retrieve"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="applicationurl" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["http://k-project.ihe-europe.net/gazelle"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="testDescriptionLanguageId" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[1]]></defaultValueExpression>
+	</parameter>
+	<parameter name="printSequenceDiagram" class="java.lang.Boolean">
+		<defaultValueExpression><![CDATA[true]]></defaultValueExpression>
+	</parameter>
+	<parameter name="printTitle" class="java.lang.Boolean">
+		<defaultValueExpression><![CDATA[true]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT DISTINCT
+     tm_test."keyword" AS tm_test_keyword,
+     tm_test."version" AS tm_test_version,
+     tm_test."author" AS tm_test_author,
+     tm_test."last_validator_id" AS tm_test_validator,
+     tm_test."name" AS tm_test_name,
+     tm_test_status."label_to_display" AS tm_test_status_label_to_display,
+     tm_test_type."label_to_display" AS tm_test_type_label_to_display,
+     tm_test_peer_type."keyword" AS tm_test_peer_type_label_to_display,
+     tm_test."short_description" AS tm_test_short_description,
+     tm_test_description."description" AS tm_test_description_description,
+     tm_test."id" AS tm_test_id
+FROM
+     "public"."tm_test_status" tm_test_status INNER JOIN "public"."tm_test" tm_test ON tm_test_status."id" = tm_test."test_status_id"
+     INNER JOIN "public"."tm_test_type" tm_test_type ON tm_test."test_type_id" = tm_test_type."id"
+     INNER JOIN "public"."tm_test_peer_type" tm_test_peer_type ON tm_test."test_peer_type_id" = tm_test_peer_type."id"
+     INNER JOIN "public"."tm_test_test_description" tm_test_test_description ON tm_test."id" = tm_test_test_description."test_id"
+     INNER JOIN "public"."tm_test_description" tm_test_description ON tm_test_test_description."test_description_id" = tm_test_description."id"
+WHERE
+    tm_test_description."gazelle_language_id" = $P{testDescriptionLanguageId}
+and tm_test."keyword" = $P{tm_test_keyword}]]>
+	</queryString>
+	<field name="tm_test_keyword" class="java.lang.String"/>
+	<field name="tm_test_version" class="java.lang.String"/>
+	<field name="tm_test_author" class="java.lang.String"/>
+	<field name="tm_test_validator" class="java.lang.String"/>
+	<field name="tm_test_name" class="java.lang.String"/>
+	<field name="tm_test_status_label_to_display" class="java.lang.String"/>
+	<field name="tm_test_type_label_to_display" class="java.lang.String"/>
+	<field name="tm_test_peer_type_label_to_display" class="java.lang.String"/>
+	<field name="tm_test_short_description" class="java.lang.String"/>
+	<field name="tm_test_description_description" class="java.lang.String"/>
+	<field name="tm_test_id" class="java.lang.Integer"/>
+	<detail>
+		<band height="19">
+			<printWhenExpression><![CDATA[$P{printTitle}]]></printWhenExpression>
+			<textField bookmarkLevel="1">
+				<reportElement mode="Opaque" x="0" y="0" width="803" height="19" isRemoveLineWhenBlank="true" forecolor="#FFFFFF" backcolor="#6666FF" uuid="f567a603-8e2c-4214-90c1-3643dd850f4e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_test_name}]]></textFieldExpression>
+				<anchorNameExpression><![CDATA[$F{tm_test_keyword}]]></anchorNameExpression>
+			</textField>
+		</band>
+		<band height="51" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="802" height="51" uuid="5f89ccf9-da31-4e77-a21a-5c108fd29059"/>
+				<subreportParameter name="applicationurl">
+					<subreportParameterExpression><![CDATA[$P{applicationurl}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="test_keyword">
+					<subreportParameterExpression><![CDATA[$F{tm_test_keyword}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["gazelleTestDescriptionSubReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="80" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="803" height="19" backcolor="#9999FF" uuid="22bd54b5-8650-4302-b3f1-7366d9dc096d"/>
+				<box leftPadding="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="12" isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Test Description]]></text>
+			</staticText>
+			<image scaleImage="RealHeight" isUsingCache="true" onErrorType="Icon">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="3" y="20" width="799" height="57" forecolor="#FFFFFF" uuid="b1cbf75e-af99-4b7c-a2e1-12abefe44015"/>
+				<imageExpression>
+					<![CDATA[new URL($P{applicationurl} + "testDescriptionImage.seam?id="+$F{tm_test_id}+"&languageId="+$P{testDescriptionLanguageId})]]></imageExpression>
+			</image>
+		</band>
+		<band height="40">
+			<subreport>
+				<reportElement x="0" y="0" width="803" height="40" uuid="9e0e3800-2bbe-41e2-b8bc-13868d9513af"/>
+				<subreportParameter name="test_keyword">
+					<subreportParameterExpression><![CDATA[$F{tm_test_keyword}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["gazelleTestParticipantsSubReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="95">
+			<subreport>
+				<reportElement x="0" y="39" width="803" height="51" uuid="6554bb3d-0132-4449-8584-68c23a41f0ad"/>
+				<subreportParameter name="test_id">
+					<subreportParameterExpression><![CDATA[$F{tm_test_id}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["gazelleTestStepsSubReport.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="803" height="19" backcolor="#9999FF" uuid="3418b0e0-71a9-4115-b41b-91cccd6463bb"/>
+				<box leftPadding="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Test Steps]]></text>
+			</staticText>
+			<frame>
+				<reportElement stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="19" width="803" height="19" backcolor="#CCCCF8" uuid="f5fc4a54-9b37-48b1-a269-ea38bab59438"/>
+				<box>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<staticText>
+					<reportElement mode="Transparent" x="42" y="0" width="105" height="19" backcolor="#FFFFFF" uuid="40efa534-4619-4d50-b973-c4c8e8857a2c"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Initiator]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="417" y="0" width="60" height="19" backcolor="#FFFFFF" uuid="7cf73870-4122-4768-acbd-b8ed80ef0424"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Secured ?]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="483" y="0" width="66" height="19" backcolor="#FFFFFF" uuid="01c4500f-7a2b-4024-a06c-13390dbbcbca"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Option]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="555" y="0" width="248" height="19" backcolor="#FFFFFF" uuid="752ccd63-65a0-4432-82fa-55bc75cb46e5"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Description]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="154" y="0" width="105" height="19" backcolor="#FFFFFF" uuid="5a641d98-08b5-4bc9-9031-3fa0b88722f0"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Responder]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="264" y="0" width="65" height="19" backcolor="#FFFFFF" uuid="446ec9f7-5d03-4e12-9a06-374c86db7244"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Transaction]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="1" y="0" width="36" height="19" backcolor="#FFFFFF" uuid="5f4eb5fe-0c76-413f-8ce9-177449d04267"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Index]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="334" y="0" width="78" height="19" backcolor="#FFFFFF" uuid="7b0df453-cc83-40c3-9387-e675a10e8d4a"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Message Type]]></text>
+				</staticText>
+			</frame>
+		</band>
+		<band height="69" splitType="Prevent">
+			<printWhenExpression><![CDATA[$P{printSequenceDiagram}.equals( true )]]></printWhenExpression>
+			<image scaleImage="RealSize" hAlign="Center" isUsingCache="true" onErrorType="Icon">
+				<reportElement x="0" y="19" width="803" height="50" forecolor="#FFFFFF" uuid="f371f067-07ba-4026-b604-b12e81f83d2a"/>
+				<imageExpression>
+					<![CDATA[new URL($P{applicationurl} + "testSequenceDiagram.seam?id="+$F{tm_test_id})]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="803" height="19" backcolor="#9999FF" uuid="1b2fc6d9-1173-4604-8686-4382358e859f"/>
+				<box leftPadding="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Sequence Diagram]]></text>
+			</staticText>
+		</band>
+		<band height="50">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="803" height="19" backcolor="#9999FF" uuid="38743ad4-7581-445f-ad10-7af4384c96e0"/>
+				<box leftPadding="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Assertions Tested]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="20" width="246" height="30" uuid="741e1f2e-1218-486f-bec5-40630f2b8ae9"/>
+				<box padding="5"/>
+				<text><![CDATA[No available for the moment]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<noData>
+		<band height="20">
+			<textField>
+				<reportElement mode="Opaque" x="0" y="0" width="803" height="20" backcolor="#FF6666" uuid="17b2bbcc-8298-4d9d-ac86-7fa9e6ac037b"/>
+				<box leftPadding="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["No Data found in the database for the test keyword :"+ $P{tm_test_keyword}]]></textFieldExpression>
+			</textField>
+		</band>
+	</noData>
+</jasperReport>

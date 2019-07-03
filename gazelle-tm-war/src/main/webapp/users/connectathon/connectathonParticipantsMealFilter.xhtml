@@ -1,0 +1,98 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <div class="form-horizontal">
+        <!-- MONDAY -->
+        <div class="col-lg-3">
+            <s:decorate id="mondayDeco"
+                        template="/layout/form/_form_checkbox_horizontal_1-11.xhtml">
+                <ui:define name="label">
+                    <h:outputText value="#{messages['gazelle.common.Monday']}"/>
+                    <h:outputText value=" (#{connectathonParticipantManager.countUsersByCategory('mondayMeal')})"/>
+                </ui:define>
+                <h:selectBooleanCheckbox value="#{connectathonParticipantManager.monday}">
+                    <a4j:ajax event="change" execute="@this" render="_f"/>
+                </h:selectBooleanCheckbox>
+            </s:decorate>
+
+            <!--  TUESDAY -->
+            <s:decorate id="tuesdayDeco"
+                        template="/layout/form/_form_checkbox_horizontal_1-11.xhtml">
+                <ui:define name="label">
+                    <h:outputText value="#{messages['gazelle.common.Tuesday']}"/>
+                    <h:outputText value=" (#{connectathonParticipantManager.countUsersByCategory('tuesdayMeal')})"/>
+                </ui:define>
+                <h:selectBooleanCheckbox value="#{connectathonParticipantManager.tuesday}">
+                    <a4j:ajax event="change" execute="@this" render="_f"/>
+                </h:selectBooleanCheckbox>
+            </s:decorate>
+        </div>
+
+        <!--  WEDNESDAY -->
+        <div class="col-lg-3">
+            <s:decorate id="wednesdayDeco"
+                        template="/layout/form/_form_checkbox_horizontal_1-11.xhtml">
+                <ui:define name="label">
+                    <h:outputText value="#{messages['gazelle.common.Wednesday']}"/>
+                    <h:outputText value=" (#{connectathonParticipantManager.countUsersByCategory('wednesdayMeal')})"/>
+                </ui:define>
+                <h:selectBooleanCheckbox value="#{connectathonParticipantManager.wednesday}">
+                    <a4j:ajax event="change" execute="@this" render="_f"/>
+                </h:selectBooleanCheckbox>
+            </s:decorate>
+
+            <!--  THURSDAY -->
+            <s:decorate id="thursdayDeco"
+                        template="/layout/form/_form_checkbox_horizontal_1-11.xhtml">
+                <ui:define name="label">
+                    <h:outputText value="#{messages['gazelle.common.Thursday']}"/>
+                    <h:outputText value=" (#{connectathonParticipantManager.countUsersByCategory('thursdayMeal')})"/>
+                </ui:define>
+                <h:selectBooleanCheckbox value="#{connectathonParticipantManager.thursday}">
+                    <a4j:ajax event="change" execute="@this" render="_f"/>
+                </h:selectBooleanCheckbox>
+            </s:decorate>
+        </div>
+        <!-- FRIDAY -->
+        <div class="col-lg-3">
+            <s:decorate id="fridayDeco"
+                        template="/layout/form/_form_checkbox_horizontal_1-11.xhtml">
+                <ui:define name="label">
+                    <h:outputText value="#{messages['gazelle.common.Friday']}"/>
+                    <h:outputText value=" (#{connectathonParticipantManager.countUsersByCategory('fridayMeal')})"/>
+                </ui:define>
+                <h:selectBooleanCheckbox value="#{connectathonParticipantManager.friday}">
+                    <a4j:ajax event="change" execute="@this" render="_f"/>
+                </h:selectBooleanCheckbox>
+            </s:decorate>
+        </div>
+
+        <!-- VEGETARIAN -->
+        <div class="col-lg-3">
+            <s:decorate id="vegetarianDeco"
+                        template="/layout/form/_form_checkbox_horizontal_1-11.xhtml">
+                <ui:define name="label">
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.Vegetarian']}"/>
+                    <h:outputText value=" (#{connectathonParticipantManager.countUsersByCategory('vegetarianMeal')})"/>
+                </ui:define>
+                <h:selectBooleanCheckbox value="#{connectathonParticipantManager.vegetarian}">
+                    <a4j:ajax event="change" execute="@this" render="_f"/>
+                </h:selectBooleanCheckbox>
+            </s:decorate>
+
+            <!-- SOCIAL Event -->
+            <s:decorate id="socialEventDeco"
+                        template="/layout/form/_form_checkbox_horizontal_1-11.xhtml">
+                <ui:define name="label">
+                    <h:outputText value="#{messages['gazelle.users.connectaton.participants.SocialEvent']}"/>
+                    <h:outputText value=" (#{connectathonParticipantManager.countUsersByCategory('socialEvent')})"/>
+                </ui:define>
+                <h:selectBooleanCheckbox value="#{connectathonParticipantManager.socialEvent}">
+                    <a4j:ajax event="change" execute="@this" render="_f"/>
+                </h:selectBooleanCheckbox>
+            </s:decorate>
+        </div>
+
+    </div>
+</ui:composition>

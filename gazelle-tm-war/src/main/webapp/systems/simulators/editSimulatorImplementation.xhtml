@@ -1,0 +1,163 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml"><!-- ======================= --><!-- System IHE implementations section --><!-- ======================= -->
+
+    #{simulatorInSessionManager.resetSelectedItems()}
+
+    <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+        <ui:param name="panel_id" value="systemImplementations"/>
+        <ui:define name="panel_title">#{messages['gazelle.systems.system.DisplayIntegrationStatementLabel1']}
+            #{simulatorInSessionManager.selectedSimulatorInSession.system.name}
+        </ui:define>
+        <p>
+            <h:outputText value="#{messages['gazelle.systems.system.ImplementationLabel1']}"/>
+        </p>
+        <p>
+            <h:outputText value="#{messages['gazelle.systems.system.ImplementationLabel2']}"/>
+        </p>
+        <!--  Section containing the drop down list boxes for AIPO -->
+        <ui:decorate template="/layout/panels/_panel.xhtml">
+            <s:div id="panelListBoxes">
+                <!--  Listbox Domain ........................................................................ -->
+                <s:decorate id="domainDecoration" template="/layout/form/_edit.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.Domain']}</ui:define>
+                    <h:selectOneMenu styleClass="form-control gzl-form-control" id="DomainListBox"
+                                     value="#{simulatorInSessionManager.selectedDomain}">
+                        <s:selectItems value="#{simulatorInSessionManager.possibleDomains}" var="domainFromList"
+                                       noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                       label="#{domainFromList.keyword} - #{domainFromList.name}"/>
+                        <a4j:ajax event="change" render="ipDecoration,actorDecoration,ipoDecoration,buttons"
+                                  listener="#{simulatorInSessionManager.resetSelectedOtherItems()}" execute="@this"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <!--  END Listbox Domain ........................................................................ -->
+                <!--  Listbox Integration Profile ........................................................................ -->
+                <s:decorate id="ipDecoration" template="/layout/form/_edit.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.IntegrationProfile']}</ui:define>
+                    <h:selectOneMenu styleClass="form-control gzl-form-control" id="IntegrationProfileListBox"
+                                     value="#{simulatorInSessionManager.selectedActorIntegrationProfileOption.actorIntegrationProfile.integrationProfile }"
+                                     rendered="#{not empty simulatorInSessionManager.selectedDomain}">
+                        <s:selectItems
+                                value="#{gazelleDAO.getPossibleIntegrationProfiles(simulatorInSessionManager.selectedDomain)}"
+                                var="integrationProfileFromList"
+                                noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                label="#{integrationProfileFromList.keyword}  - #{integrationProfileFromList.name}"/>
+                        <a4j:ajax event="change" render="actorDecoration,ipoDecoration,buttons, ipDecoration"
+                                  execute="@this"/>
+                    </h:selectOneMenu>
+                    <h:outputText id="ipIsDeprecatedOutputText"
+                                  rendered="#{not empty simulatorInSessionManager.selectedDomain and not empty simulatorInSessionManager.selectedActorIntegrationProfileOption.actorIntegrationProfile.integrationProfile}"
+                                  value=" #{messages['gazelle.tm.tests.testStatus']} : #{simulatorInSessionManager.selectedActorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.integrationProfileStatusType.name}"/>
+                </s:decorate>
+                <!--  END Listbox Integration Profile ........................................................................ -->
+                <!--  Listbox Actor ........................................................................ -->
+                <s:decorate id="actorDecoration" template="/layout/form/_edit.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.Actor']}</ui:define>
+                    <h:selectOneMenu styleClass="form-control gzl-form-control" id="ActorListBox"
+                                     value="#{simulatorInSessionManager.selectedActorIntegrationProfileOption.actorIntegrationProfile.actor}"
+                                     rendered="#{not empty simulatorInSessionManager.selectedActorIntegrationProfileOption.actorIntegrationProfile.integrationProfile and not empty simulatorInSessionManager.selectedDomain}">
+                        <s:selectItems
+                                value="#{simulatorInSessionManager.selectedActorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.getActors()}"
+                                var="actorFromList" noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                label="#{actorFromList.keyword}  -  #{actorFromList.name} "/>
+                        <a4j:ajax event="change" render="ipoDecoration,buttons" execute="@this"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <!--  END Listbox Actor ........................................................................ -->
+                <!--  Listbox Integration Profile Option ........................................................................ -->
+                <s:decorate id="ipoDecoration" template="/layout/form/_edit.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.LabelOption']}</ui:define>
+                    <h:selectOneMenu styleClass="form-control gzl-form-control" id="IntegrationProfileOptionListBox"
+                                     value="#{simulatorInSessionManager.selectedActorIntegrationProfileOption.integrationProfileOption}"
+                                     rendered="#{(not empty simulatorInSessionManager.selectedActorIntegrationProfileOption.actorIntegrationProfile.actor) and (simulatorInSessionManager.getListOfIntegrationProfileOptions( simulatorInSessionManager.selectedActorIntegrationProfileOption.actorIntegrationProfile.actor , simulatorInSessionManager.selectedActorIntegrationProfileOption.actorIntegrationProfile.integrationProfile).size() &gt; 0)}">
+                        <s:selectItems value="#{simulatorInSessionManager.getPossibleIPOption() }"
+                                       var="integrationProfileOptionFromList"
+                                       noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                       label="#{integrationProfileOptionFromList.description}"/>
+                        <a4j:ajax event="change" render="buttons" execute="@this"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <!--  END Listbox Integration Profile Option ........................................................................ -->
+            </s:div>
+            <s:div id="buttons" style="border:0;">
+                <div style="clear: both">
+                    <a4j:commandButton id="addIHEImpButton"
+                                       value="#{messages['gazelle.systems.system.button.AddIHEImplementationForIS']}"
+                                       rendered="#{not empty simulatorInSessionManager.selectedActorIntegrationProfileOption.actorIntegrationProfile.actor}"
+                                       styleClass="gzl-btn-green"
+                                       actionListener="#{simulatorInSessionManager.addIHEImplementationForSimulator( simulatorInSessionManager.selectedDomain , simulatorInSessionManager.selectedActorIntegrationProfileOption )}"
+                                       ignoreDupResponses="true" execute="@this"
+                                       render="iheImplementationDataTable,checkDependenciesResetButton,pdfButton"/>
+                    <a4j:commandButton id="resetIHEImp"
+                                       value="#{messages['gazelle.systems.system.button.ResetIHEImplementationForIS']}"
+                                       rendered="#{not empty simulatorInSessionManager.selectedDomain}"
+                                       styleClass="gzl-btn"
+                                       actionListener="#{simulatorInSessionManager.resetSelectedItems()}"
+                                       ignoreDupResponses="true" execute="@this" render="panelListBoxes"/>
+                </div>
+            </s:div>
+        </ui:decorate>
+
+        <p/><!--  We retrieve the IHE implementation for this system -->
+        <s:div id="iheImplementationDataTable">
+            ${iheImplementationForSystemManager.getAllIHEImplementationsForSystemInSession(simulatorInSessionManager.selectedSimulatorInSession)}
+            <rich:dataTable id="iheImplementationForsimulatorInSessionManager" var="iheImplementationForSystem"
+                            value="#{iheImplementationForSystemManager.iheImplementationsToDisplay}"
+                            columnClasses="center">
+                <g:column style="text-align:right">
+                    <ui:define name="header">#{messages['gazelle.tf.IntegrationProfile']}</ui:define>
+                    #{iheImplementationForSystem.integrationProfile.toString()}
+                </g:column>
+                <g:column style="text-align:left">
+                    <ui:define name="header">#{messages['gazelle.tf.Actor']}</ui:define>
+                    #{iheImplementationForSystem.actor.toString()}
+                </g:column>
+                <g:column style="text-align:left">
+                    <ui:define name="header">#{messages['gazelle.tf.IntegrationProfileOption']}
+                    </ui:define>
+                    #{iheImplementationForSystem.integrationProfileOption.name}
+                </g:column>
+                <h:column id="testingTypeColumn">
+                    <f:facet name="header"> #{messages['gazelle.systems.TestingType']}</f:facet>
+
+                    <h:outputText value="#{iheImplementationForSystem.testingType.name}"
+                                  rendered="#{!s:hasRole('admin_role') and !s:hasRole('systems_editor_role') and !s:hasRole('project-manager_role')}"/>
+
+
+                    <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                     value="#{iheImplementationForSystem.testingType}"
+                                     rendered="#{s:hasRole('admin_role') || s:hasRole('systems_editor_role') || s:hasRole('project-manager_role')}">
+                        <s:selectItems value="#{testingTypeManager.possibleTestingTypes}" var="testingType"
+                                       label="#{testingType.name}"/>
+                        <a4j:ajax event="change"
+                                  listener="#{testingTypeManager.setTestingTypeFromListbox(iheImplementationForSystem,simulatorInSessionManager.selectedSimulatorInSession)}"
+                                  render="iheImplementationDataTable"/>
+                    </h:selectOneMenu>
+                </h:column>
+                <g:column style="text-align:left">
+                    <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+                    <a4j:commandLink id="removeIntegrationProfileCommandLink"
+                                     value="#{messages['gazelle.common.button.Remove']}" style="height:5px;"
+                                     actionListener="#{iheImplementationForSystemManager.deleteIHEImplementationForSystem(iheImplementationForSystem, false)}"
+                                     execute="@this"
+                                     render="iheImplementationDataTable,checkDependenciesResetButton,pdfButton"/>
+                </g:column>
+            </rich:dataTable>
+            <center>
+                <h:outputText id="autoSavedLabel" rendered="#{ not empty simulatorInSessionManager.iheImplementations}"
+
+                              value="#{messages['gazelle.systems.system.IHEImplementationAutomaticallySaved']}"
+                              style="font-style:italic"/>
+                <br/></center>
+
+
+            <p/>
+
+        </s:div>
+        <div style="clear: both"/>
+    </ui:decorate>
+
+
+</ui:composition>

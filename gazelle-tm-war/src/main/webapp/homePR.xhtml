@@ -1,0 +1,373 @@
+<s:div xmlns:g="http://www.ihe.net/gazelle" xmlns:h="http://java.sun.com/jsf/html"
+       xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:s="http://jboss.org/schema/seam/taglib"
+       xmlns:a4j="http://richfaces.org/a4j"
+       xmlns="http://www.w3.org/1999/xhtml">
+    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+        <ui:define name="panel_title">
+            <s:div id="prmainHeaderDiv">
+                <h:form id="prmainHeaderForm">
+                    <s:token allowMultiplePosts="true"/>
+
+                    <h:outputText value="#{homeManager.selectedHome.mainPanelHeader}"
+                                  rendered="#{not empty homeManager.selectedHome.mainPanelHeader and not homeManager.editMainPanelHeader}"/>
+                    <h:outputText value="#{messages['gazelle.tm.MainPanelHeader']}"
+                                  rendered="#{empty homeManager.selectedHome.mainPanelHeader and not homeManager.editMainPanelHeader}"/>
+                    <h:inputText styleClass=" form-control" value="#{homeManager.selectedHome.mainPanelHeader}"
+                                 maxlength="255" size="150"
+                                 rendered="#{homeManager.editMainPanelHeader}"/>
+
+                    <a4j:commandLink actionListener="#{homeManager.setEditMainPanelHeader(true)}"
+                                     rendered="#{s:hasRole('admin_role') and not homeManager.editMainPanelHeader}"
+                                     render="prmainHeaderDiv">
+                        <span class="gzl-icon-pencil" title="#{messages['gazelle.common.button.Edit']}"/>
+                    </a4j:commandLink>
+                    <a4j:commandLink actionListener="#{homeManager.saveHome('mainHeader')}"
+                                     rendered="#{s:hasRole('admin_role') and homeManager.editMainPanelHeader}"
+                                     render="prmainHeaderDiv">
+                        <span class="gzl-icon-save" title="#{messages['gazelle.common.button.Save']}"/>
+                    </a4j:commandLink>
+
+                </h:form>
+            </s:div>
+        </ui:define>
+
+        <h:form id="primaryPanelContentDiv">
+            <s:token allowMultiplePosts="true"/>
+            <s:span rendered="#{not homeManager.editMainContent}">
+                <g:safehtml value="#{homeManager.selectedHome.mainPanelContent}"/>
+            </s:span>
+            <a4j:region id="primaryContentRegion"
+                        rendered="#{s:hasRole('admin_role') and homeManager.editMainContent}">
+                <ui:decorate template="/layout/editor/_text_editor.xhtml">
+                    <ui:param name="text" value="#{homeManager.selectedHome.mainPanelContent}"/>
+                    <ui:param name="id" value="prmainEditor"/>
+                    <ui:param name="isFocus" value="true"/>
+                </ui:decorate>
+            </a4j:region>
+            <a4j:commandButton value="#{messages['gazelle.common.button.Edit']}"
+                               actionListener="#{homeManager.setEditMainContent(true)}"
+                               rendered="#{s:hasRole('admin_role') and not homeManager.editMainContent}"
+                               styleClass="gzl-btn-blue" render="primaryPanelContentDiv"/>
+            <a4j:commandButton value="#{messages['gazelle.common.button.Save']}"
+                               actionListener="#{homeManager.saveHome('mainContent')}"
+                               rendered="#{s:hasRole('admin_role') and homeManager.editMainContent}"
+                               styleClass="gzl-btn-green" render="primaryPanelContentDiv"/>
+            <br/>
+        </h:form>
+    </ui:decorate>
+
+    <s:div rendered="#{not identity.loggedIn}">
+        <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+            <ui:param name="panel_id" value="fadebox"/>
+            <ui:define name="panel_title">#{messages['gazelle.productregistry.home.QuickStartGuide']}</ui:define>
+            <h:form id="IwantToSearchForm">
+                <s:token allowMultiplePosts="true"/>
+                <center>
+                    <h4>
+                        <h:outputText value="#{messages['gazelle.productregistry.home.IwantToSearch']}"/>
+                    </h4>
+
+                    <h:panelGrid id="simpleSearchPanelGrid" columns="2">
+                        <h:outputText value="#{messages['gazelle.productregistry.home.ClickTo']} "/>
+
+                        <a4j:commandLink id="simpleSearchLink"
+                                         value="#{messages['gazelle.productregistry.home.StartASearch']}"
+                                         action="/pr/search.seam" immediate="true" execute="@this"/>
+
+                    </h:panelGrid>
+
+                    <h4>
+                        <h:outputText value="#{messages['gazelle.productregistry.home.IAmAVendor']}"
+                                      rendered="#{not identity.loggedIn}"/>
+                    </h4>
+
+                    <h:panelGrid id="NoAccountPanelGrid" columns="3" rendered="#{not identity.loggedIn}">
+                        <h:outputText value="#{messages['gazelle.productregistry.home.IDontHaveAnAccount']}"/>
+
+                        <a4j:commandLink id="NoAccountLink" immediate="true"
+                                         value="#{messages['gazelle.users.registration.CreateAccount']}"
+                                         view="/users/user/register.xhtml"
+                                         action="#{userManager.registerAction()}"/>
+
+                    </h:panelGrid>
+                    <h:panelGrid id="WithAccountPanelGrid" columns="3" rendered="#{not identity.loggedIn}">
+                        <h:outputText value="#{messages['gazelle.productregistry.home.IHaveAnAccount']}"/>
+
+                        <a4j:commandLink id="WithAccountLink" immediate="true"
+                                         value="#{messages['gazelle.users.registration.Login']}"
+                                         action="#{userManager.loginAction()}"/>
+
+                    </h:panelGrid>
+                </center>
+            </h:form>
+
+        </ui:decorate>
+    </s:div>
+    <s:div rendered="#{(s:hasRole('vendor_role') or s:hasRole('vendor_admin_role')) and not s:hasRole('admin_role')}">
+        <!-- ***************************************************************** -->
+        <!-- Vendor Panel     (vendor user and vendor admin)                   -->
+        <!-- ***************************************************************** -->
+        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+            <ui:define name="panel_title">#{messages['gazelle.productregistry.home.Welcome']}, #{identity.username}
+            </ui:define>
+            <h:form id="vendorFadeBoxForm">
+                <s:token allowMultiplePosts="true"/>
+                <h4>
+                    <!-- vendor user -->
+                    <h:panelGrid id="h4panelGridUserVendor" columns="2"
+                                 rendered="#{s:hasRole('vendor_role') and !s:hasRole('vendor_admin_role')}">
+                        <span class="gzl-icon-lock"/>
+                        <h:outputText
+                                value="#{messages['net.ihe.gazelle.tm.YouAreAUserFrom']}  #{userManager.getInstitution().getKeyword()} - #{userManager.getInstitution().getName()}"/>
+                    </h:panelGrid>
+                    <!-- vendor admin -->
+                    <h:panelGrid id="h4panelGridAdminVendor" columns="2"
+                                 rendered="#{s:hasRole('vendor_admin_role')}">
+
+                        <span class="gzl-icon-lock"/>
+                        <h:outputText rendered="#{s:hasRole('vendor_admin_role')}"
+                                      value="#{messages['net.ihe.gazelle.tm.YouAreAdministratorFrom']}  #{userManager.getInstitution().getKeyword()} - #{userManager.getInstitution().getName()}"/>
+                    </h:panelGrid>
+                </h4>
+                <div class="row">
+                    <div class="col-md-1">
+                        <h4 style="float: right"><span class="gzl-icon-globe"/>
+                            <h:outputText
+                                    value="#{messages['gazelle.productregistry.home.Status']}"/>
+                        </h4>
+                    </div>
+                    <div class="col-md-4">
+                        <ui:decorate template="/layout/panels/_panel.xhtml">
+                            <table id="nbSystemPanelGrid">
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        <!-- 0 IS -->
+                                        <h:outputText style="color: grey;font-weight: bold;"
+                                                      value="#{messages['net.ihe.gazelle.tm.NoIntegrationStatementIsRegisteredInIHEProductRe']} "
+                                                      rendered="#{prManager.getAllSystemsSize()==0}"/>
+                                        <!-- 1 IS -->
+                                        <h:outputText style="color: grey;font-weight: bold;"
+                                                      value="#{messages['gazelle.productregistry.home.1IntegrationStatementsIsRegistered']} "
+                                                      rendered="#{prManager.getAllSystemsSize()==1}"/>
+                                        <!-- 2 or + IS -->
+                                        <h:outputText style="color: grey;font-weight: bold;"
+                                                      value="#{prManager.allSystems.size()} #{messages['net.ihe.gazelle.tm.IntegrationStatementsAreRegisteredInIHEProductRe']} "
+                                                      rendered="#{prManager.getAllSystemsSize()&gt;1}"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <!-- Not referenced -->
+                                        <!-- 1 IS not referenced -->
+                                        <h:outputText style="color: red;font-weight: bold;"
+                                                      value="#{messages['net.ihe.gazelle.tm.OneIntegrationStatementIsNotReferenced']} "
+                                                      rendered="#{prManager.getSystemsNotReferencedSize()==1}"/>
+                                        <!-- 2 or + IS not referenced -->
+                                        <h:outputText style="color: red;font-weight: bold;"
+                                                      value="#{prManager.systemsNotReferenced.size()} #{messages['net.ihe.gazelle.tm.IntegrationStatementsAreNotReferenced']} "
+                                                      rendered="#{prManager.getSystemsNotReferencedSize()&gt;1}"/>
+                                        <!-- 1 or + IS not referenced -->
+                                        <a4j:commandLink style="color: red;text-decoration:underline;"
+                                                         id="manageUnreferencedISLink"
+                                                         rendered="#{prManager.getSystemsNotReferencedSize()&gt;0}"
+                                                         value="#{messages['gazelle.common.ClickHere']}"
+                                                         action="#{systemInSessionViewer.goToSystemList()}"
+                                                         immediate="true"
+                                                         execute="@this"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <!-- 1 referenced and 1 IS -->
+                                        <h:outputText style="color: grey;font-weight: bold;"
+                                                      value="#{messages['net.ihe.gazelle.tm.ItIsReferenced']}"
+                                                      rendered="#{prManager.getSystemsNotReferencedSize()==0 and (prManager.getAllSystemsSize()==1)}"/>
+                                        <!-- All reference -->
+                                        <h:outputText style="color: grey;font-weight: bold;"
+                                                      value="#{messages['net.ihe.gazelle.tm.TheyAreAllReferenced']}"
+                                                      rendered="#{prManager.getSystemsNotReferencedSize()==0 and (prManager.getAllSystemsSize()&gt;1)}"/>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </ui:decorate>
+                    </div>
+                </div>
+
+                <h:outputText id="YouMayOutput" value="#{messages['net.ihe.gazelle.tm.YouMay']} "/>
+                <ul>
+                    <li>
+                        <s:link value="#{messages['net.ihe.gazelle.tm.ManageIntegrationStatements']}"
+                                view="#{systemInSessionViewer.goToSystemList()}"/>
+                    </li>
+                    <s:span rendered="#{s:hasRole('vendor_admin_role')}">
+                        <li>
+                            <a4j:commandLink id="manageCompanyVendorLink"
+                                             value="#{messages['gazelle.common.menu.MenuViewAndEditInformations']}"
+                                             action="#{institutionManager.editInstitutionSession()}"/>
+                        </li>
+                        <li>
+                            #{userManager.getUsersListDependingInstitution()}
+                            <a4j:commandLink id="manageUsersVendorLink"
+                                             value="#{messages['gazelle.common.menu.MenuManageAllUsers']}"
+                                             action="/users/user/listUsersInstitution.xhtml" immediate="true"
+                                             execute="@this"/>
+                            <h:outputText value=" "/>
+                            <h:outputText value="("/>
+                            <h:outputText style="color: #00AA00;font-weight: bold;"
+                                          value="#{userManager.users.size()} "/>
+                            <h:outputText value=" #{messages['net.ihe.gazelle.tm.UserIsRegistered']} "
+                                          rendered="#{ userManager.users.size() == 1}"/>
+                            <h:outputText value=" #{messages['net.ihe.gazelle.tm.UsersAreRegistered']} "
+                                          rendered="#{ userManager.users.size() &gt; 1}"/>
+                            <h:outputText value=")"/>
+                        </li>
+                    </s:span>
+                    <li>
+                        <h:outputText
+                                value="#{messages['net.ihe.gazelle.tm.SearchSomeIntegrationStatementsWithinIHEProductR']} "/>
+                        <a4j:commandLink id="simpleSearchAdminVendorPanel"
+                                         value="#{messages['gazelle.common.ClickHere']} " action="/pr/search.xhtml"
+                                         immediate="true" execute="@this"/>
+                    </li>
+                </ul>
+
+                <h:outputText
+                        value="#{messages['net.ihe.gazelle.tm.ToReferenceAnIntegrationStatementWithinIHEProduc']} "/>
+                <ul>
+                    <li>
+                        <h:outputText
+                                value="#{messages['net.ihe.gazelle.tm.CreateAnIntegrationStatementCorrespondingToASyst']} "/>
+                    </li>
+                    <li>
+                        <h:outputText
+                                value="#{messages['net.ihe.gazelle.tm.AssociateIHEActorsIntegrationProfilesCorrespondi']} "/>
+                    </li>
+                    <li>
+                        <h:outputText
+                                value="#{messages['net.ihe.gazelle.tm.GenerateTheIntegrationStatementFilethroughIHEPro']} "/>
+                    </li>
+                    <li>
+                        <h:outputText
+                                value="#{messages['net.ihe.gazelle.tm.EnterTheReachableURLOfTheIntegrationStatementInS']} "/>
+                    </li>
+                    <li>
+                        <h:outputText
+                                value="#{messages['net.ihe.gazelle.tm.NoteThatIfEnteredURLDoesNotCorrespondToAnIntegra']} "/>
+                    </li>
+                </ul>
+            </h:form>
+        </ui:decorate>
+    </s:div>
+    <s:div rendered="#{s:hasRole('admin_role')}">
+        <!-- ***************************************************************** -->
+        <!-- Admin Panel     (PR admin)                                        -->
+        <!-- ***************************************************************** -->
+        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+            <ui:define name="panel_title">#{messages['gazelle.productregistry.home.Welcome']}, #{identity.username}
+            </ui:define>
+            <h:form id="adminForm">
+                <s:token allowMultiplePosts="true"/>
+                #{institutionManager.findInstitutions()}
+                #{userManager.getAllUsersListForAdmin()}
+
+                <h4>
+                    <h:panelGrid id="h4panelGridAppliAdminVendor" columns="2">
+
+                        <span class="gzl-icon-lock"/>
+                        <h:outputText
+                                value="#{messages['net.ihe.gazelle.tm.YouAreAdministratorOf']}  #{applicationPreferenceManager.getApplicationName()}."/>
+                    </h:panelGrid>
+                </h4>
+
+                <div class="row">
+                    <div class="col-md-1">
+                        <h4 style="float: right"><span class="gzl-icon-globe"/>
+                            <h:outputText
+                                    value="#{messages['gazelle.productregistry.home.Status']}"/>
+                        </h4>
+                    </div>
+                    <div class="col-md-4">
+                        <ui:decorate template="/layout/panels/_panel.xhtml">
+                            <table id="nbRegisteredPanelGridAdmin">
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        <h:outputText style="color: #00AA00;font-weight: bold;"
+                                                      value="#{prManager.getAllSystemsSize()} "/>
+                                        <h:outputText style="color: grey;font-weight: bold;"
+                                                      value=" #{messages['net.ihe.gazelle.tm.IntegrationStatementsAreRegisteredInIHEProductRe']} "/>
+                                        <a4j:commandLink style="color: grey;text-decoration:underline;"
+                                                         id="manageUAllISAdminLink"
+                                                         value="#{messages['net.ihe.gazelle.tm.Manage']}"
+                                                         action="/pr/systemsForAdmin.xhtml"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <s:div rendered="#{prManager.getSystemsWaitingForValidationSize() &gt; 0}">
+                                            <h:outputText style="color: grey;font-weight: bold;" value=" - "/>
+                                            <h:outputText style="color: red;font-weight: bold;"
+                                                          value="#{prManager.getSystemsWaitingForValidationSize()} "/>
+                                            <h:outputText style="color: red;font-weight: bold;"
+                                                          value=" #{messages['net.ihe.gazelle.tm.OfThemNeedAdministratorVerification']} "/>
+                                        </s:div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <h:outputText style="color: grey;font-weight: bold;" value=" - "/>
+                                        <h:outputText style="color: #00AA00;font-weight: bold;"
+                                                      value="#{prManager.getSystemsReferencedSize()} "/>
+                                        <h:outputText style="color: grey;font-weight: bold;"
+                                                      value="  #{messages['net.ihe.gazelle.tm.IntegrationStatementsAreValidatedAndReferenced']}"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <h:outputText style="color: grey;font-weight: bold;" value=" - "/>
+                                        <h:outputText style="color: red;font-weight: bold;"
+                                                      value="#{prManager.getSystemsNotReferencedSize()} "/>
+                                        <h:outputText style="color: grey;font-weight: bold;"
+                                                      value="  #{messages['net.ihe.gazelle.tm.IntegrationStatementsAreNotCompletedOrNotReferen']}"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <h:outputText style="color: #00AA00;font-weight: bold;"
+                                                      value="#{institutionManager.institutions.size()} "/>
+                                        <h:outputText style="color: grey;font-weight: bold;"
+                                                      value="#{messages['net.ihe.gazelle.tm.OrganizationsAreRegistered']} "/>
+                                        <a4j:commandLink style="color: grey;text-decoration:underline;"
+                                                         id="manageAllCompaniesAdminLink"
+                                                         value=" #{messages['gazelle.common.ClickHere']} "
+                                                         action="/administration/listInstitutions.xhtml"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <h:outputText style="color: #00AA00;font-weight: bold;"
+                                                      value="#{userManager.users.size()} "/>
+                                        <h:outputText style="color: grey;font-weight: bold;"
+                                                      value=" #{messages['net.ihe.gazelle.tm.UsersAreRegistered']} "/>
+                                        <a4j:commandLink style="color: grey;text-decoration:underline;"
+                                                         id="manageAllUsersAdminLink"
+                                                         value=" #{messages['gazelle.common.ClickHere']} "
+                                                         action="/users/user/listUsersInstitution.xhtml"/>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </ui:decorate>
+                    </div>
+                </div>
+            </h:form>
+        </ui:decorate>
+    </s:div>
+</s:div>

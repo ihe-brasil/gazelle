@@ -1,0 +1,30 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib">
+    <!-- ======================= -->
+    <!-- System notes section					  -->
+    <!-- ======================= -->
+    <h:form id="${formId}">
+        <s:token allowMultiplePosts="true"/>
+
+        <ui:decorate template="/layout/panels/_panel.xhtml">
+            <ui:param name="styleClass" value="#{twoColumns ? 'col-lg-6' : ''}"/>
+            <s:div style="font-size: 12px; max-height: 400px; overflow-y: scroll;">
+                <g:safehtml value="#{selectedSystemInSession.notes}"/>
+            </s:div>
+        </ui:decorate>
+        <s:div id="notesDiv" rendered="#{noteManager.userCanAddMessage()}">
+            <ui:decorate template="/layout/panels/_panel.xhtml">
+                <ui:param name="styleClass" value="#{twoColumns ? 'col-lg-6' : ''}"/>
+                <h:inputTextarea styleClass=" form-control" value="#{noteManager.noteTobeAdded}" rows="10"/>
+                <p class="text-muted">
+                    <h:outputText value="${explanationText}"/>
+                </p>
+                <a4j:commandButton styleClass="gzl-btn gzl-btn-green" execute="@form"
+                                   value="#{messages['net.ihe.gazelle.tm.AddNote']}"
+                                   actionListener="#{noteManager.addNotesOnSystem(selectedSystemInSession)}"
+                                   render="${formId},${idToRerender}"/>
+            </ui:decorate>
+        </s:div>
+    </h:form>
+</ui:composition>

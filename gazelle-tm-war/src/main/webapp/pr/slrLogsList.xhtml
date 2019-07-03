@@ -1,0 +1,91 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml">
+    <rich:dataTable id="#{tableType}_resDataTable" rowKeyConverter="searchLogReportConverter"
+                    var="prLog" value="#{prLogs.events}"
+                    rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="#{tableType}ds">
+        <g:column label="Search Date" sortBy="#{'searchLogReports.date'}">
+            <ui:define id="#{tableType}_searchDateHeader" name="header">
+                #{messages['gazelle.productregistry.search.Date']}
+            </ui:define>
+            <g:date tooltip="true" value="#{prLog.date}"/>
+        </g:column>
+        <g:column label="User" sortBy="#{'searchLogReports.performerUsername'}">
+            <ui:define id="#{tableType}_perfHead" name="header">#{messages['gazelle.tm.users.userInfo']}</ui:define>
+            #{prLog.performerUsername}
+        </g:column>
+        <g:column label="User IP Address" sortBy="#{'searchLogReports.performerIpAddress'}">
+            <ui:define id="#{tableType}_searchPerformerIpAddressHeader" name="header">
+                #{messages['gazelle.productregistry.search.PerformerIpAddress']}
+            </ui:define>
+            #{prLog.performerIpAddress}
+        </g:column>
+        <g:column label="User Hostname" sortBy="#{'searchLogReports.performerHostname'}">
+            <ui:define id="#{tableType}_searchPerformerHostnameHeader" name="header">
+                #{messages['gazelle.productregistry.search.PerformerHostname']}
+            </ui:define>
+            #{prLog.performerHostname}
+        </g:column>
+        <g:column label="Browser">
+            <ui:define id="#{tableType}_searchPerformerBrowserHeader" name="header">
+                #{messages['gazelle.productregistry.search.BrowserInformation']}
+            </ui:define>
+            <h:outputText value="#{prLogs.getBrowserInfo(prLog.browserInformation)}"/>
+        </g:column>
+        <g:column rendered="#{prLogs.isDownloadType()}">
+            <ui:define name="header">#{messages['net.ihe.gazelle.tm.IntegrationStatement']}</ui:define>
+            <h:outputText value="#{prLog.system.name} - #{prLog.system.version}"/>
+        </g:column>
+        <g:column rendered="#{prLogs.isSearchType()}">
+            <ui:define name="header">#{messages['gazelle.tf.menu.Downloads']}</ui:define>
+            <s:div rendered="#{not prLogs.showDownloads(prLog)}">
+                <h:outputText value="-"/>
+            </s:div>
+            <s:div rendered="#{prLogs.showDownloads(prLog)}">
+                <h:outputText value="#{prLog.isDownloads.size()} "/>
+                        <span title="#{messages['net.ihe.gazelle.tm.DownloadsMatchingInstitution']}"><a4j:commandLink
+                                value="(#{prLogs.getDownloadsFiltered(prLog).size()})"
+                                oncomplete="jq162('#listOfDownloadsModalPanel').modal('show');"
+                                actionListener="#{prLogs.setSearchLogReport(prLog)}"
+                                render=" :downloadsListForm"/></span></s:div>
+        </g:column>
+        <g:column label="# Found systems">
+            <ui:define name="header">
+                <h:outputText value="# #{messages['net.ihe.gazelle.tm.FoundSystems']}"/>
+            </ui:define>
+            <s:span rendered="#{prLogs.getNumberOfFoundSystemsForSearchLog(prLogs.getSearch(prLog)) &gt; -1}">
+                <h:outputText
+                        value="#{prLogs.getNumberOfFoundSystemsForSearchLog(prLogs.getSearch(prLog))}"/>
+                <h:outputText value=" - "/>
+                        <span title="#{messages['gazelle.productregistry.search.statistics.ManySystemsFoundText']}"><a4j:commandLink
+                                id="#{tableType}_listOfFoundSystemLinkTable"
+                                value="#{messages['gazelle.productregistry.crawler.ListThem']}"
+                                rendered="#{prLogs.getNumberOfFoundSystemsForSearchLog(prLogs.getSearch(prLog)) &gt; 0}"
+                                oncomplete="jq162('#listOfFoundSystemsModalPanel').modal('show');"
+                                actionListener="#{prLogs.setSearchLogReport(prLogs.getSearch(prLog))}"
+                                render=" :foundSystemsListForm"/></span></s:span>
+        </g:column>
+        <g:column label="# Criteria">
+            <ui:define name="header">
+                <h:outputText value="# #{messages['net.ihe.gazelle.tm.Criteria']}"/>
+            </ui:define>
+            <s:span rendered="#{prLogs.getNumberOfCriteria(prLogs.getSearch(prLog)) &gt; -1}">
+                <h:outputText value="#{prLogs.getNumberOfCriteria(prLogs.getSearch(prLog))}"/>
+                <h:outputText value=" - "/>
+                        <span title="#{messages['gazelle.productregistry.search.statistics.ManyCriteriaText']}"><a4j:commandLink
+                                id="#{tableType}_listOfCriteriaLinkTable"
+                                value="#{messages['gazelle.productregistry.crawler.ListThem']}"
+                                rendered="#{prLogs.getNumberOfCriteria(prLogs.getSearch(prLog)) &gt; 0}"
+                                oncomplete="jq162('#listOfCriteriaModalPanel').modal('show');"
+                                actionListener="#{prLogs.setSearchLogReport(prLogs.getSearch(prLog))}"
+                                render=" :criteriaListForm"/></span></s:span>
+        </g:column>
+        <f:facet name="footer">
+            <ui:include src="/util/datatableFooter.xhtml">
+                <ui:param name="dataScrollerId" value="#{tableType}_ds"/>
+                <ui:param name="dataTableId" value="#{tableType}_resDataTable"/>
+            </ui:include>
+        </f:facet>
+    </rich:dataTable>
+</ui:composition>

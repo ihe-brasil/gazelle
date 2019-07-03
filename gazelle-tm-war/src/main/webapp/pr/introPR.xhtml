@@ -1,0 +1,43 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value=" #{messages['gazelle.productregistry.applicationname']}"/>
+    <ui:define name="body">
+
+        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+            <ui:define name="panel_title">#{messages['gazelle.productregistry.home.WelcomeToProductRegistry']}
+            </ui:define>
+
+
+            <h:form id="introFormForTest2">
+                <s:token allowMultiplePosts="true"/>
+                <s:span rendered="#{not introManager.editMainContent}">
+                    <g:safehtml value="#{introManager.selectedIntro.mainPanelContent}"/>
+                </s:span>
+                <a4j:region id="introFormForTestContentRegion"
+                            rendered="#{s:hasRole('admin_role') and introManager.editMainContent}">
+                    <ui:decorate template="/layout/editor/_text_editor.xhtml">
+                        <ui:param name="text" value="#{introManager.selectedIntro.mainPanelContent}"/>
+                        <ui:param name="id" value="iffEditor"/>
+                        <ui:param name="isFocus" value="true"/>
+                    </ui:decorate>
+                </a4j:region>
+                <a4j:commandButton value="#{messages['gazelle.common.button.Edit']}"
+                                   actionListener="#{introManager.setEditMainContent(true)}"
+                                   rendered="#{s:hasRole('admin_role') and not introManager.editMainContent}"
+                                   styleClass="gzl-btn-blue" render="introFormForTest2"/>
+                <a4j:commandButton value="#{messages['gazelle.common.button.Save']}"
+                                   actionListener="#{introManager.saveIntro('mainContent')}"
+                                   rendered="#{s:hasRole('admin_role') and introManager.editMainContent}"
+                                   styleClass="gzl-btn-green" render="introFormForTest2"/>
+                <a4j:commandButton value="#{messages['gazelle.productregistry.intro.BackToHomepage']}"
+                                   action="/home.xhtml"
+                                   styleClass="gzl-btn"/>
+                <br/>
+            </h:form>
+
+        </ui:decorate>
+
+    </ui:define>
+</ui:composition>

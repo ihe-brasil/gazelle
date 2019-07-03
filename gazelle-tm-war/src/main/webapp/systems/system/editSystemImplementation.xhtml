@@ -1,0 +1,343 @@
+<s:div xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+       xmlns:a4j="http://richfaces.org/a4j"
+       xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:f="http://java.sun.com/jsf/core"
+       xmlns="http://www.w3.org/1999/xhtml">
+    <!-- ======================= -->
+    <!-- System IHE implementations section -->
+    <!-- ======================= -->
+    <s:div id="iheImplementationDataTable">
+        #{iheImplementationForSystemManager.getAllIHEImplementationsForSystemInSession()}
+        <ui:define name="panel_title">#{messages['gazelle.systems.system.DisplayIntegrationStatementLabel1']}
+            #{systemInSessionEditor.getSystem().name}
+        </ui:define>
+        <h:panelGroup
+                rendered="#{testingSessionManager.isRegistrationDeadlineExpired() and (s:hasRole('vendor_role') or s:hasRole('vendor_admin_role')) }">
+            <p class="gzl-alert gzl-alert-orange">
+                <span class="gzl-icon-history"/>
+                <i>#{messages['gazelle.systems.system.RegistrationDeadlineExpired1']}
+                </i>
+                <i>#{messages['gazelle.systems.system.RegistrationDeadlineExpired3']}
+                </i>
+                <a href="mailto:#{gazelleDAO.getSelectedTestingSession().contactEmail}">#{gazelleDAO.getSelectedTestingSession().contactFirstname}
+                    #{gazelleDAO.getSelectedTestingSession().contactLastname}</a>
+                <i>#{messages['gazelle.systems.system.RegistrationDeadlineExpired4']}
+                </i>
+            </p>
+        </h:panelGroup>
+
+        <p>
+            <h:outputText value="#{messages['gazelle.systems.system.ImplementationLabel1']}"/>
+        </p>
+        <h:form id="formSystemImplementations">
+            <s:token allowMultiplePosts="true"/>
+            <s:div id="checkDependenciesResetButton">
+                <div class="row">
+                    <div class="col-lg-6 col-md-6">
+                        <a4j:commandButton id="addImplementationButton" styleClass="gzl-btn-green btn-block"
+                                           value="#{messages['gazelle.systems.system.NoTransactionYetSupportedLabel2']}"
+                                           oncomplete="jq162('#AddImplementationModalPanel').modal('show');"
+                                           render="AddImplementationModalPanel, :formSystemImplementationsSelection"/>
+                        <h:panelGroup rendered="#{not empty iheImplementationForSystemManager.iheImplementations}">
+                            #{tfDependenciesManager.validateTFDependencies(systemInSessionEditor.getSystem())}
+
+                            <a4j:commandLink styleClass="gzl-btn-orange btn-block"
+                                             value="#{messages['gazelle.systems.system.CheckTFdependencies.Header']}"
+                                             rendered="#{tfDependenciesManager.missingTfDependencies}"
+                                             oncomplete="jq162('#TfDependenciesDBModalPanel').modal('show');"
+                                             render="TfDependenciesDBModalPanel, :validateTFDependenciesDBSelectedSystemForm"/>
+                            <span class="btn btn-block gzl-btn-invisible">
+                                <h:outputText rendered="#{not tfDependenciesManager.missingTfDependencies}"
+                                              value="#{messages['gazelle.systems.system.CheckTFdependencies.NoMissing']}"/>
+                            </span>
+                        </h:panelGroup>
+                    </div>
+                    <div class="col-lg-6 col-md-6">
+                        <h:panelGroup rendered="#{applicationManager.isTestManagement()}">
+                            <a4j:commandLink value="#{messages['gazelle.systems.system.GenerateSampleIS']}"
+                                             action="#{iheImplementationForSystemManager.generatePDF(systemInSessionEditor.systemInSession)}"
+                                             rendered="#{ not empty iheImplementationForSystemManager.iheImplementations and systemManager.canViewSystemInSessionAsVendor(systemInSessionEditor.systemInSession)}"
+                                             styleClass="gzl-btn btn-block" target="_blank">
+                                <span class="gzl-icon-pdf"/>
+                            </a4j:commandLink>
+                        </h:panelGroup>
+                        <a4j:commandButton id="resetAllIHEImplementationForSystemButton"
+                                           styleClass="gzl-btn-red btn-block"
+                                           value="#{messages['gazelle.systems.system.button.ResetAllIHEImplementationForSystem']} #{systemInSessionEditor.getSystem().name}"
+                                           rendered="#{not empty iheImplementationForSystemManager.iheImplementations}"
+                                           oncomplete="jq162('#ResetConfirmationModalPanel').modal('show');"
+                                           render=" :ResetConfirmationForm"/>
+                    </div>
+                </div>
+            </s:div>
+
+
+            <!--  We retrieve the IHE implementation for this system -->
+            <s:div>
+                <s:decorate template="/layout/display/_display.xhtml"
+                            rendered="#{applicationManager.isProductRegistry()}">
+                    <ui:define name="label">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.StatusOfIntegrationStatement']}"/>
+                    </ui:define>
+                    <h:outputText style="color: blue;font-weight: bold;"
+                                  value="#{systemInSessionEditor.getSystem().prStatus.details}"/>
+                </s:decorate>
+
+                <rich:dataTable id="iheImplementationForSystemManager" var="iheImplementationForSystem"
+                                value="#{iheImplementationForSystemManager.iheImplementationsToDisplay}"
+                                columnClasses="center">
+                    <g:column style="text-align:right">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.tf.IntegrationProfile']}"/>
+                        </ui:define>
+                        <g:link detailed="true" value="#{iheImplementationForSystem.integrationProfile}"/>
+                    </g:column>
+                    <g:column style="text-align:left">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.tf.Actor']}"/>
+                        </ui:define>
+                        <g:link detailed="true" value="#{iheImplementationForSystem.actor}"/>
+                    </g:column>
+                    <g:column style="text-align:left">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.tf.IntegrationProfileOption']}"/>
+                        </ui:define>
+                        <g:link detailed="true" value="#{iheImplementationForSystem.integrationProfileOption}"/>
+                    </g:column>
+                    <g:column rendered="#{applicationManager.isTestManagement()}">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.WantedTestingType']}"/>
+                        </ui:define>
+                        <h:outputText
+                                rendered="#{!testingTypeManager.couldSetWantedTestingType(iheImplementationForSystem)}"
+                                value="#{messages['gazelle.users.NA']}"/>
+                        <s:span rendered="#{testingTypeManager.couldSetWantedTestingType(iheImplementationForSystem)}">
+                            <s:span rendered="#{!testingTypeManager.canSetWantedTestingType(iheImplementationForSystem, systemInSessionEditor.getSystem())}">
+                                <h:outputText value="#{messages['net.ihe.gazelle.tm.NotSet']}"
+                                              rendered="#{empty iheImplementationForSystem.wantedTestingType}"/>
+                                <h:panelGrid columns="2"
+                                             rendered="#{not empty iheImplementationForSystem.wantedTestingType}">
+                                    <h:outputText value="#{iheImplementationForSystem.wantedTestingType.name}"/>
+                                </h:panelGrid>
+                            </s:span>
+                            #{testingTypeManager.initWantedTestingType(systemInSessionEditor.systemInSession,iheImplementationForSystem)}
+                            <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                             value="#{iheImplementationForSystem.wantedTestingType}"
+                                             rendered="#{testingTypeManager.canSetWantedTestingType(iheImplementationForSystem, systemInSessionEditor.getSystem())}">
+                                <s:selectItems value="#{testingTypeManager.possibleTestingTypes}"
+                                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                               var="testingType" label="#{testingType.name}"/>
+                                <a4j:ajax event="change"
+                                          render="iheImplementationDataTable,checkDependenciesResetButton,pdfButton"
+                                          listener="#{testingTypeManager.setWantedTestingTypeFromListbox(iheImplementationForSystem)}"/>
+                            </h:selectOneMenu>
+                        </s:span>
+                    </g:column>
+                    <g:column rendered="#{applicationManager.isTestManagement()}">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.TestingTypeReviewed']}"/>
+                        </ui:define>
+                        <h:outputText value="#{iheImplementationForSystem.testingTypeReviewed}"
+                                      rendered="#{testingTypeManager.getAIPO(iheImplementationForSystem).maybeSupportive and !testingTypeManager.canSetTestingType(iheImplementationForSystem)}"/>
+                        <h:selectBooleanCheckbox styleClass="form-control-static"
+                                                 rendered="#{testingTypeManager.getAIPO(iheImplementationForSystem).maybeSupportive and testingTypeManager.canSetTestingType(iheImplementationForSystem)}"
+                                                 value="#{iheImplementationForSystem.testingTypeReviewed}">
+                            <a4j:ajax event="click" execute="@this"
+                                      listener="#{testingTypeManager.setTestingTypeReviewed(iheImplementationForSystem, systemInSessionEditor.getSystem())}"/>
+                        </h:selectBooleanCheckbox>
+                    </g:column>
+                    <g:column rendered="#{applicationManager.isTestManagement()}">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.systems.TestingType']}"/>
+                        </ui:define>
+
+                        <h:outputText value="#{iheImplementationForSystem.testingType.name}"
+                                      rendered="#{!testingTypeManager.canSetTestingType(iheImplementationForSystem)}"/>
+
+                        <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                         value="#{iheImplementationForSystem.testingType}"
+                                         rendered="#{testingTypeManager.canSetTestingType(iheImplementationForSystem)}">
+                            <s:selectItems value="#{testingTypeManager.possibleTestingTypes}"
+                                           noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                           var="testingType" label="#{testingType.name}"/>
+                            <a4j:ajax event="change"
+                                      render="iheImplementationDataTable,checkDependenciesResetButton,pdfButton"
+                                      listener="#{testingTypeManager.setTestingTypeFromListbox(iheImplementationForSystem)}"/>
+                        </h:selectOneMenu>
+                    </g:column>
+                    <g:column style="text-align:left">
+                        <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+                        <a4j:commandLink id="removeIntegrationProfileCommandLink"
+                                         value="#{messages['gazelle.common.button.Remove']}" style="height:5px;"
+                                         rendered="#{iheImplementationForSystemManager.canDeleteIHEImplementationForSystem(iheImplementationForSystem)}"
+                                         actionListener="#{iheImplementationForSystemManager.setImplementationToDelete(iheImplementationForSystem) }"
+                                         oncomplete="jq162('#DeleteImplementationConfirmationModalPanel').modal('show');"
+                                         execute="@this"
+                                         render="DeleteImplementationConfirmationModalPanel, :DeleteImplementationConfirmationModalPanelForm"/>
+                    </g:column>
+                </rich:dataTable>
+                <center>
+                    <h:outputText id="autoSavedLabel"
+                                  rendered="#{ not empty iheImplementationForSystemManager.iheImplementations}"
+
+                                  value="#{messages['gazelle.systems.system.IHEImplementationAutomaticallySaved']}"
+                                  style="font-style:italic"/>
+                    <br/></center>
+
+                <p/>
+                <h:panelGroup rendered="#{ empty iheImplementationForSystemManager.iheImplementations}">
+                    <ui:decorate template="/layout/panels/_panel.xhtml">
+                        <p/>
+                        <span class="gzl-icon-exclamation-triangle"/>
+
+                        <p/>
+                        <h:outputText id="noSystemLabel"
+                                      value="#{messages['gazelle.systems.system.NoIHEImplementationLabel1']}"
+                                      style="font-style:italic"/>
+                        <br/>
+                        <h:outputText id="noSystemLabel2"
+                                      value="#{messages['gazelle.systems.system.NoIHEImplementationLabel3']}"
+                                      style="font-style:italic"/>
+                    </ui:decorate>
+                </h:panelGroup>
+            </s:div>
+            <div style="clear: both"/>
+            <div align="center">
+                <s:decorate id="iheValidationDecoration" template="/layout/display/_display.xhtml">
+                    <h:outputText id="validationBox"/>
+                </s:decorate>
+            </div>
+        </h:form>
+    </s:div>
+
+    <h:form id="DeleteImplementationConfirmationModalPanelForm">
+        <s:token allowMultiplePosts="true"/>
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="DeleteImplementationConfirmationModalPanel"/>
+            <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.PleaseConfirmTheDeletionOfProfileActor']}
+            </ui:define>
+            <p>#{messages['net.ihe.gazelle.tm.DoYouWantToRemoveThisActorintegrationProfileopti']}</p>
+            <p><strong>#{messages['net.ihe.gazelle.tm.IntegrationProfile_2']} </strong>#{iheImplementationForSystemManager.iheImplementationForSystemToDelete.integrationProfile.name}
+            </p>
+            <p><strong>#{messages['net.ihe.gazelle.tm.Actor']} </strong>#{iheImplementationForSystemManager.iheImplementationForSystemToDelete.actor.name}
+            </p>
+            <p><strong>#{messages['net.ihe.gazelle.tm.IntegrationProfileOption_2']} </strong>#{iheImplementationForSystemManager.iheImplementationForSystemToDelete.integrationProfileOption.name}
+            </p>
+            <ui:define name="popup_footer">
+                <button type="button" class="gzl-btn" data-dismiss="modal">
+                    #{messages['gazelle.tm.Cancel']}
+                </button>
+                <a4j:commandButton value="#{messages['gazelle.common.button.Delete']}"
+                                   styleClass="gzl-btn-red"
+                                   actionListener="#{iheImplementationForSystemManager.deleteIHEImplementationForSystem()}"
+                                   onclick="jq162('#DeleteImplementationConfirmationModalPanel').modal('hide');"
+                                   render="iheImplementationDataTable,checkDependenciesResetButton,pdfButton, :formSystemImplementations"
+                                   execute="@this"/>
+            </ui:define>
+        </ui:decorate>
+    </h:form>
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
+    <!-- MODAL PANEL : This is the modal panel to display the reset confirmation (reseting all implementations for the system) -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
+    <h:form id="ResetConfirmationForm">
+        <s:token allowMultiplePosts="true"/>
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="ResetConfirmationModalPanel"/>
+            <ui:define name="popup_title">
+                #{messages['gazelle.systems.system.button.ResetAllIHEImplementationForSystem']}
+                #{systemInSessionEditor.getSystem().name}
+            </ui:define>
+            <h2>#{messages['gazelle.tm.IHEImplementationsResetingConfirmation']}</h2>
+            <p>#{messages['gazelle.tm.PleaseConfirmThatYouWantToRemoveAllTheIHEImpleme']} :</p>
+            <ui:define name="popup_footer">
+                <button type="button" class="gzl-btn" data-dismiss="modal">
+                    #{messages['gazelle.tm.Cancel']}
+                </button>
+                <a4j:commandButton id="ResetAllIHEImplementationForSystemButton"
+                                   value="#{messages['gazelle.systems.system.button.ResetAllIHEImplementationForSystem']}  #{systemInSessionEditor.getSystem().name}"
+                                   styleClass="gzl-btn-red"
+                                   actionListener="#{iheImplementationForSystemManager.resetSelectedIHEImplementationForSystem()}"
+                                   onclick="jq162('#ResetConfirmationModalPanel').modal('hide');"
+                                   render="iheImplementationDataTable,pdfButton,checkDependenciesResetButton, :formSystemImplementations"/>
+            </ui:define>
+        </ui:decorate>
+    </h:form>
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
+    <!-- MODAL PANEL : This is the modal panel to select and add an AIPO -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
+    <h:form id="formSystemImplementationsSelection" class="form-horizontal">
+        <s:token allowMultiplePosts="true"/>
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="AddImplementationModalPanel"/>
+            <ui:param name="styleClass2" value="modal-xl"/>
+            <ui:define name="popup_title">#{messages['gazelle.systems.system.NoTransactionYetSupportedLabel2']}
+            </ui:define>
+            <s:div id="AddImplementationDiv">
+                #{dataTableStateHolder.setAscendingOn('actorIntegrationProfile.integrationProfile.name')}
+                <!--  Section containing the drop down list boxes for AIPO -->
+                <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                    <!--  AIPO selection -->
+                    <ui:include src="/testing/research/filterAIPOForSystemImplementation.xhtml">
+                        <ui:param name="filter" value="#{aipoSelector.filter}"/>
+                        <ui:param name="filterForm" value="AddImplementationDiv"/>
+                    </ui:include>
+
+                    <ui:define name="filter_buttons">
+                        <a4j:commandLink actionListener="#{aipoSelector.filter.clear()}"
+                                         title="#{messages['gazelle.users.reset']}" type="submit"
+                                         execute="@this" render="AddImplementationDiv">
+                            <span class="fa fa-times-circle"/>
+                        </a4j:commandLink>
+                    </ui:define>
+
+                </ui:decorate>
+
+                <rich:dataTable id="aipoList" value="#{aipoSelector.aipos}" var="aipo" render="ds"
+                                rows="5">
+                    <g:column sortBy="#{'actorIntegrationProfile.integrationProfile.name'}"
+                              sortOrder="ascending">
+                        <ui:define name="header">#{messages['gazelle.tf.IntegrationProfile']}</ui:define>
+                        #{aipo.actorIntegrationProfile.integrationProfile.name}
+                    </g:column>
+                    <g:column sortBy="#{'actorIntegrationProfile.actor.name'}"
+                              sortOrder="#{datatablestateholder.sortorders['actorintegrationprofile.actor.name']}">
+                        <ui:define name="header">#{messages['gazelle.tf.Actor']}</ui:define>
+                        #{aipo.actorIntegrationProfile.actor.name}
+                    </g:column>
+                    <g:column sortBy="#{'integrationProfileOption.keyword'}"
+                              sortOrder="#{datatablestateholder.sortorders['integrationprofileoption.keyword']}">
+                        <ui:define name="header">#{messages['gazelle.tf.IntegrationProfileOption']}</ui:define>
+                        #{aipo.integrationProfileOption.name}
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">
+                            #{messages['gazelle.systems.system.button.AddIHEImplementationForIS']}
+                        </ui:define>
+                        <a4j:commandButton id="addIHEImpButton" styleClass="gzl-btn-green"
+                                           value="#{messages['gazelle.systems.system.button.AddIHEImplementationForIS']}"
+                                           actionListener="#{iheImplementationForSystemManager.addIHEImplementationForSystem(aipo)}"
+                                           onclick="window.autoCloseAddImplementationPanel &amp;&amp; jq162('#AddImplementationModalPanel').modal('hide');"
+                                           ignoreDupResponses="true" execute="@this"
+                                           render="AddImplementationModalPanel,iheImplementationDataTable,checkDependenciesResetButton,pdfButton,TfDependenciesDBModalPanel, :validateTFDependenciesDBSelectedSystemForm, :formSystemImplementations"/>
+                    </g:column>
+                    <f:facet name="footer">
+                        <ui:include src="/util/datatableFooter.xhtml">
+                            <ui:param name="dataScrollerId" value="ds"/>
+                            <ui:param name="dataTableId" value="aipoList"/>
+                            <ui:param name="hideRowsSelect" value="#{messages['net.ihe.gazelle.True']}"/>
+                        </ui:include>
+                    </f:facet>
+                </rich:dataTable>
+            </s:div>
+            <ui:define name="popup_footer">
+                <button type="button" class="gzl-btn" data-dismiss="modal">
+                    #{messages['net.ihe.gazelle.assets.Close']}
+                </button>
+            </ui:define>
+        </ui:decorate>
+    </h:form>
+    <ui:include src="validateTFDependenciesPanel.xhtml">
+        <ui:param name="system" value="#{systemInSessionEditor.getSystem()}"/>
+        <ui:param name="display" value="true"/>
+    </ui:include>
+</s:div>

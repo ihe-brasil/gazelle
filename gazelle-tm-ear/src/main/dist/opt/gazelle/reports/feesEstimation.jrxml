@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.3.final using JasperReports Library version 6.0.3  -->
+<!-- 2015-03-16T17:29:39 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Fees" pageWidth="802" pageHeight="595" orientation="Landscape" columnWidth="762" leftMargin="20" rightMargin="20" topMargin="10" bottomMargin="10" whenResourceMissingType="Key" uuid="1cf6d2b1-0d92-4025-a651-ee104bb20f67">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gazelle EU-CAT Production"/>
+	<parameter name="testingSessionId" class="java.lang.Integer" isForPrompting="false">
+		<defaultValueExpression><![CDATA[new Integer(21)]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+     tm_invoice."number_system" AS count,
+     usr_institution."name" AS usr_institution_name,
+     tm_invoice."fees_amount" AS tm_invoice_fees_amount,
+     tm_invoice."contract_received" AS tm_invoice_contract_received,
+     tm_invoice."fees_discount" AS tm_invoice_fees_discount,
+     tm_invoice."fees_paid" AS tm_invoice_fees_paid,
+     tm_invoice."vat_amount" AS tm_invoice_vat_amount,
+     tm_invoice."number_participant" AS tm_invoice_number_participant,
+     tm_invoice."number_extra_participant" AS tm_invoice_number_extra_participant,
+     tm_testing_session."year" AS tm_testing_session_year,
+ usr_iso_3166_country_code."printable_name" AS usr_iso_3166_country_code_printable_name,
+     usr_iso_3166_country_code."iso" AS usr_iso_3166_country_code_iso,
+     tm_invoice."invoice_sent" AS tm_invoice_invoice_sent
+FROM
+     "public"."usr_institution" usr_institution INNER JOIN "public"."tm_invoice" tm_invoice ON usr_institution."id" = tm_invoice."institution_id"
+     INNER JOIN "public"."tm_testing_session" tm_testing_session ON tm_invoice."testing_session_id" = tm_testing_session."id"
+ INNER JOIN "public"."usr_address" usr_address ON usr_institution."mailing_address_id" = usr_address."id"
+     INNER JOIN "public"."usr_iso_3166_country_code" usr_iso_3166_country_code ON usr_address."country" = usr_iso_3166_country_code."iso"
+WHERE
+     tm_testing_session."id" = $P{testingSessionId} and tm_invoice.number_system > 0
+ORDER BY
+     usr_institution."name" ASC]]>
+	</queryString>
+	<field name="count" class="java.lang.Integer"/>
+	<field name="usr_institution_name" class="java.lang.String"/>
+	<field name="tm_invoice_fees_amount" class="java.math.BigDecimal"/>
+	<field name="tm_invoice_contract_received" class="java.lang.Boolean"/>
+	<field name="tm_invoice_fees_discount" class="java.math.BigDecimal"/>
+	<field name="tm_invoice_fees_paid" class="java.math.BigDecimal"/>
+	<field name="tm_invoice_vat_amount" class="java.math.BigDecimal"/>
+	<field name="tm_invoice_number_participant" class="java.lang.Integer"/>
+	<field name="tm_invoice_number_extra_participant" class="java.lang.Integer"/>
+	<field name="tm_testing_session_year" class="java.lang.Integer"/>
+	<field name="usr_iso_3166_country_code_printable_name" class="java.lang.String"/>
+	<field name="usr_iso_3166_country_code_iso" class="java.lang.String"/>
+	<field name="tm_invoice_invoice_sent" class="java.lang.Boolean"/>
+	<variable name="numberOfSystem" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{count}]]></variableExpression>
+	</variable>
+	<variable name="feeTotal" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{tm_invoice_invoice_sent}?$F{tm_invoice_fees_amount}:BigDecimal.valueOf(0)]]></variableExpression>
+	</variable>
+	<variable name="nbOfInstitution" class="java.lang.Integer" calculation="Count">
+		<variableExpression><![CDATA[$F{count}]]></variableExpression>
+	</variable>
+	<variable name="nbOfContractReceived" class="java.lang.Integer" resetType="Column" calculation="Count"/>
+	<variable name="vatTotal" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{tm_invoice_invoice_sent}?$F{tm_invoice_vat_amount}:BigDecimal.valueOf(0)]]></variableExpression>
+	</variable>
+	<variable name="paidTotal" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{tm_invoice_invoice_sent}?$F{tm_invoice_fees_paid}:BigDecimal.valueOf(0)]]></variableExpression>
+	</variable>
+	<variable name="extraTotal" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{tm_invoice_number_extra_participant}]]></variableExpression>
+	</variable>
+	<variable name="badgesTotal" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{tm_invoice_number_participant}]]></variableExpression>
+	</variable>
+	<variable name="tm_invoice_number_extra_participant" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{tm_invoice_number_extra_participant}]]></variableExpression>
+	</variable>
+	<variable name="numberOfTableTotal" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count} + $F{tm_invoice_number_extra_participant}/ 2 ]]></variableExpression>
+	</variable>
+	<variable name="tm_invoice_number_participant" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{tm_invoice_number_participant}]]></variableExpression>
+	</variable>
+	<background>
+		<band/>
+	</background>
+	<columnHeader>
+		<band height="23">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="122" height="20" backcolor="#CCCCFF" uuid="d49bba6f-9704-4029-af2b-b774bd3a9d5e"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Company]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="122" y="0" width="83" height="20" backcolor="#CCCCFF" uuid="2948680d-7674-4595-bd76-e6beabf111a3"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nb of Systems]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="471" y="0" width="72" height="20" backcolor="#CCCCFF" uuid="a973b933-d31d-4162-9472-0258060b5eb4"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Fee  Exc. VAT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="205" y="0" width="40" height="20" backcolor="#CCCCFF" uuid="9765c43f-df67-422d-a7dc-bc4ca30e6c36"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Country]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="369" y="0" width="45" height="20" backcolor="#CCCCFF" uuid="f996142d-47a1-4105-ae95-fa7840e8814b"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Contract]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="543" y="0" width="65" height="20" backcolor="#CCCCFF" uuid="73e167a0-a834-416c-ba0a-cf01c05c22c6"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[VAT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="608" y="0" width="73" height="20" backcolor="#CCCCFF" uuid="23eb3fa1-178a-4677-996e-3d1fd59b2863"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Amount Paid]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="681" y="0" width="81" height="20" backcolor="#CCCCFF" uuid="f2950588-4b33-4b8e-89c1-be8a7553942c"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Amount Due]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="414" y="0" width="57" height="20" backcolor="#CCCCFF" uuid="abc2d7e4-15c3-417a-90cb-162bdbb5c56d"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Invoiced]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="245" y="0" width="40" height="20" backcolor="#CCCCFF" uuid="53ab6178-295f-404e-80ae-08fd47977a15"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[#tables]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="285" y="0" width="40" height="20" backcolor="#CCCCFF" uuid="95cfd28e-f9ec-4990-b087-acae02357e85"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[#badges]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="325" y="0" width="40" height="20" backcolor="#CCCCFF" uuid="bde61c53-e728-4047-87bb-96db20ece4d6"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[#extras]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="21">
+			<printWhenExpression><![CDATA[$F{usr_institution_name}.length()>0]]></printWhenExpression>
+			<textField>
+				<reportElement mode="Opaque" x="414" y="1" width="57" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="5dfb7f6e-5107-449c-b301-3b2c35dbb338">
+					<printWhenExpression><![CDATA[$F{tm_invoice_invoice_sent}]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Yes"]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement mode="Opaque" x="325" y="1" width="40" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="d888af86-cf94-410c-af29-9d9e8bf255d6"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_invoice_number_extra_participant}]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement mode="Opaque" x="285" y="1" width="40" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="35e1429d-c6b6-40c4-8230-dba0342aab03"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_invoice_number_participant}]]></textFieldExpression>
+			</textField>
+			<textField pattern="€ #,##0.00">
+				<reportElement mode="Opaque" x="460" y="1" width="83" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="a5345d40-a804-45d3-8b7a-dbc8a91164d1"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_invoice_fees_amount}.subtract( $F{tm_invoice_fees_discount} )]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement mode="Opaque" x="0" y="0" width="122" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="5d2702bc-ae25-44c0-979c-7c622c23dd11"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{usr_institution_name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="122" y="0" width="82" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="855e961c-1cd6-4c5b-802c-d9c7496572d1"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{count}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="369" y="1" width="45" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="0b4c1742-663e-408f-8e9c-c457784c11ca">
+					<printWhenExpression><![CDATA[$F{tm_invoice_contract_received}]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Yes"]]></textFieldExpression>
+			</textField>
+			<image scaleImage="RetainShape" hAlign="Center" evaluationTime="Auto">
+				<reportElement mode="Transparent" x="205" y="0" width="40" height="14" uuid="d3531aea-5399-4a36-a394-87ab3fd67be1">
+					<printWhenExpression><![CDATA[$F{usr_iso_3166_country_code_iso}.equals( "-" )?Boolean.FALSE : Boolean.TRUE]]></printWhenExpression>
+				</reportElement>
+				<imageExpression><![CDATA["http://gazelle.ihe.net/EU-CAT/img/flags/"+$F{usr_iso_3166_country_code_iso}.toLowerCase()+".gif"]]></imageExpression>
+				<hyperlinkTooltipExpression><![CDATA[$F{usr_iso_3166_country_code_printable_name}]]></hyperlinkTooltipExpression>
+			</image>
+			<line>
+				<reportElement x="0" y="0" width="762" height="1" uuid="4323ab1e-ee93-4078-9cf2-6579ae76cc8f"/>
+			</line>
+			<textField pattern="€ #,##0.00">
+				<reportElement mode="Opaque" x="543" y="1" width="65" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="c0d9a71f-b434-4a2f-adae-92089c09465c"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_invoice_vat_amount}]]></textFieldExpression>
+			</textField>
+			<textField pattern="€ #,##0.00">
+				<reportElement mode="Opaque" x="608" y="1" width="73" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="553b3034-7732-4179-b046-b0bea42ce880"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_invoice_fees_paid}]]></textFieldExpression>
+			</textField>
+			<textField pattern="€ #,##0.00">
+				<reportElement mode="Opaque" x="681" y="1" width="81" height="15" forecolor="#FF3333" backcolor="#FFFFFF" uuid="8dbeda08-3f8f-4d6f-8e12-0fd2856ba6e7"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_invoice_fees_paid}.subtract(($F{tm_invoice_fees_amount}.add($F{tm_invoice_vat_amount})).subtract($F{tm_invoice_fees_discount}))]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement mode="Opaque" x="245" y="1" width="40" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="63b58285-7acd-4c06-96e5-252f6b863293"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{count} + $F{tm_invoice_number_extra_participant}/ 2 ]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="21" splitType="Prevent">
+			<textField pattern="#,##0.00">
+				<reportElement mode="Opaque" x="325" y="1" width="40" height="15" forecolor="#000000" backcolor="#CCCCFF" uuid="b9610feb-5f68-4a90-8326-6b6128a3b885"/>
+				<textElement textAlignment="Right" markup="styled">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{tm_invoice_number_extra_participant}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement mode="Opaque" x="285" y="1" width="40" height="15" forecolor="#000000" backcolor="#CCCCFF" uuid="350667e2-cbf8-464f-a1e8-36644a96c77d"/>
+				<textElement textAlignment="Right" markup="styled">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{tm_invoice_number_participant}]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement positionType="Float" mode="Opaque" x="122" y="1" width="83" height="15" forecolor="#000000" backcolor="#CCCCFF" uuid="4d1b8164-1814-440e-9ba9-8ac5756f0e6c"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{numberOfSystem}]]></textFieldExpression>
+			</textField>
+			<textField pattern="€ #,##0.00">
+				<reportElement mode="Opaque" x="471" y="1" width="72" height="15" forecolor="#000000" backcolor="#CCCCFF" uuid="6bcfc0a2-09f0-4220-ad3b-d5562e03498d"/>
+				<textElement textAlignment="Right" markup="styled">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{feeTotal}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="0" y="1" width="122" height="15" forecolor="#000000" backcolor="#CCCCFF" uuid="0459fa59-2e6e-40ff-9099-63fe7dbb5975"/>
+				<textElement markup="styled">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{nbOfInstitution}.toString() + " Companies"]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="0" width="762" height="1" uuid="e3c87fcd-c1c1-425c-9bdf-45675aa1dc4f"/>
+			</line>
+			<textField pattern="€ #,##0.00">
+				<reportElement mode="Opaque" x="543" y="1" width="65" height="15" forecolor="#000000" backcolor="#CCCCFF" uuid="54c8524a-ade8-4234-9679-3207911b73f2"/>
+				<textElement textAlignment="Right" markup="styled">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{vatTotal}]]></textFieldExpression>
+			</textField>
+			<textField pattern="€ #,##0.00">
+				<reportElement mode="Opaque" x="608" y="1" width="73" height="15" forecolor="#000000" backcolor="#CCCCFF" uuid="c6bf9ad9-1955-401f-ae25-5adb106e39ed"/>
+				<textElement textAlignment="Right" markup="styled">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{paidTotal}]]></textFieldExpression>
+			</textField>
+			<textField pattern="€ #,##0.00">
+				<reportElement mode="Opaque" x="681" y="1" width="81" height="15" forecolor="#FF3333" backcolor="#CCCCFF" uuid="d235991e-79ba-421f-8a95-881cf9809303"/>
+				<textElement textAlignment="Right" markup="styled">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{feeTotal}.subtract($V{paidTotal}).add($V{vatTotal})]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement mode="Opaque" x="245" y="0" width="40" height="15" forecolor="#000000" backcolor="#CCCCFF" uuid="32d19fae-b2ce-4206-bf88-b14abeb6ff8a"/>
+				<textElement textAlignment="Right" markup="styled">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{tm_invoice_number_extra_participant}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnFooter>
+	<noData>
+		<band height="15">
+			<staticText>
+				<reportElement x="0" y="0" width="555" height="15" forecolor="#FF0033" uuid="8186285b-930e-4b7a-a096-73bd05c243b9"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[No system registered for this combination]]></text>
+			</staticText>
+		</band>
+	</noData>
+</jasperReport>

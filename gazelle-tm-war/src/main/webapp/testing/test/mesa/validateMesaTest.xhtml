@@ -1,0 +1,242 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tm.mesatest.searchPage']}"/>
+    <ui:define name="body">
+        #{validatePreCATManager.setMainPreCatPage(true)}
+
+        <h:form id="criteriaForm" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <h:inputHidden id="filterUrlParameters" name="filterUrlParameters"
+                           value="#{validatePreCATManager.filter.urlParameters}"/>
+            <script>
+                updateUrl("criteriaForm:filterUrlParameters");
+                $("#criteriaForm\\:filterUrlParameters").bind('change',
+                    function () {
+                        updateUrl("criteriaForm:filterUrlParameters");
+                    });
+            </script>
+            <s:div id="globalDiv">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <!--  Testing session -->
+                                    <ui:include src="/filter/filter.xhtml">
+                                        <ui:param name="filter" value="#{validatePreCATManager.filter}"/>
+                                        <ui:param name="filterWidth" value="240"/>
+                                        <ui:param name="filterId" value="testingSession"/>
+                                        <ui:param name="filterName"
+                                                  value="#{messages['gazelle.systems.TestingSession']}"/>
+                                        <ui:param name="filterForm" value="criteriaForm,tableForm"/>
+                                    </ui:include>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <!--  institution selection -->
+                                    <ui:include src="/filter/filter.xhtml">
+                                        <ui:param name="filter" value="#{validatePreCATManager.filter}"/>
+                                        <ui:param name="filterWidth" value="240"/>
+                                        <ui:param name="filterId" value="institution"/>
+                                        <ui:param name="filterName"
+                                                  value="#{messages['gazelle.users.Institution']}"/>
+                                        <ui:param name="filterForm" value="criteriaForm,tableForm"/>
+                                    </ui:include>
+                                </div>
+                                <!--  system -->
+                                <div class="col-lg-6">
+                                    <ui:include src="/filter/filter.xhtml">
+                                        <ui:param name="filter" value="#{validatePreCATManager.filter}"/>
+                                        <ui:param name="filterWidth" value="240"/>
+                                        <ui:param name="filterId" value="system"/>
+                                        <ui:param name="filterName"
+                                                  value="#{messages['gazelle.configuration.system.system']}"/>
+                                        <ui:param name="filterForm" value="criteriaForm,tableForm"/>
+                                    </ui:include>
+                                </div>
+                            </div>
+                            <!--  AIPO selection -->
+                            <ui:include src="/testing/research/filterAIPO.xhtml">
+                                <ui:param name="filter" value="#{validatePreCATManager.filter}"/>
+                                <ui:param name="filterForm" value="criteriaForm,tableForm"/>
+                            </ui:include>
+
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <!--  test selection -->
+                                    <ui:include src="/filter/filter.xhtml">
+                                        <ui:param name="filter" value="#{validatePreCATManager.filter}"/>
+                                        <ui:param name="filterWidth" value="240"/>
+                                        <ui:param name="filterId" value="test"/>
+                                        <ui:param name="filterName" value="#{messages['gazelle.tests.test']}"/>
+                                        <ui:param name="filterForm" value="criteriaForm,tableForm"/>
+                                    </ui:include>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <!--  status selection -->
+                                    <ui:include src="/filter/filter.xhtml">
+                                        <ui:param name="filter" value="#{validatePreCATManager.filter}"/>
+                                        <ui:param name="filterWidth" value="240"/>
+                                        <ui:param name="filterId" value="status"/>
+                                        <ui:param name="filterName"
+                                                  value="#{messages['gazelle.tm.tests.testStatus']}"/>
+                                        <ui:param name="filterForm" value="criteriaForm,tableForm"/>
+                                    </ui:include>
+                                </div>
+                            </div>
+                            <ui:define name="filter_buttons">
+                                <a4j:commandLink actionListener="#{validatePreCATManager.filter.clear()}"
+                                                 title="#{messages['gazelle.users.reset']}" type="submit"
+                                                 execute="@this" render="criteriaForm,tableForm">
+                                    <span class="fa fa-times-circle"/>
+                                </a4j:commandLink>
+                            </ui:define>
+                        </ui:decorate>
+                    </div>
+                    <div class="col-lg-4">
+                        <ui:include src="../presets.xhtml">
+                            <ui:param name="formId" value="criteriaForm,tableForm"/>
+                            <ui:param name="formId2" value="criteriaForm"/>
+                            <ui:param name="connectathonResult" value="#{validatePreCATManager}"/>
+                            <ui:param name="min_height" value="209px"/>
+                        </ui:include>
+                    </div>
+                </div>
+            </s:div>
+        </h:form>
+        <h:form id="tableForm">
+            <s:token allowMultiplePosts="true"/>
+            <rich:dataTable id="testTable" border="0" var="currentInstanceParticipant"
+                            value="#{validatePreCATManager.listTestInstanceParticipants}"
+                            rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                            render="ds">
+                <g:column sortBy="#{'systemInSessionUser.systemInSession.system.keyword'}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['gazelle.configuration.system.system']}"/>
+                    </ui:define>
+                    <h:outputText
+                            value="#{currentInstanceParticipant.systemInSessionUser.systemInSession.system.keyword}"/>
+                </g:column>
+                <g:column sortBy="#{'testInstance.test.keyword'}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['gazelle.tests.test']}"/>
+                    </ui:define>
+
+                    <h:outputText value="#{currentInstanceParticipant.testInstance.test.keyword}"/>
+                    <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                        <ui:param name="id" value="t#{currentInstanceParticipant.testInstance.id}"/>
+                        <ui:param name="placement" value="bottom"/>
+                        <ui:param name="trigger" value="click"/>
+                        <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                        <ui:define name="content">
+                            <s:decorate template="/layout/display/_display.xhtml">
+                                <ui:define name="label">#{messages['gazelle.tests.test']}</ui:define>
+                                <h:outputText
+                                        value="#{currentInstanceParticipant.testInstance.test.keyword}-#{currentInstanceParticipant.testInstance.test.name}"/>
+                            </s:decorate>
+                            <s:decorate template="/layout/display/_display.xhtml">
+                                <ui:define name="label">#{messages['gazelle.tm.testing.URLDocumentation']}
+                                </ui:define>
+                                <a target="_blank"
+                                   href="#{testsRequirementsManager.findTestURLDocumentationByTestInstanceParticipants(currentInstanceParticipant)}">
+                                    <h:outputText
+                                            value="#{testsRequirementsManager.findTestURLDocumentationByTestInstanceParticipants(currentInstanceParticipant)}"/>
+                                </a></s:decorate>
+                            <s:decorate template="/layout/display/_display.xhtml">
+                                <ui:define name="label">#{messages['gazelle.tf.IntegrationProfileActorOption']}
+                                </ui:define>
+                                <a4j:repeat var="currentTestParticipant"
+                                            value="#{currentInstanceParticipant.roleInTest.testParticipantsList}">
+                                    <h:outputText
+                                            value="#{currentTestParticipant.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.keyword} - #{currentTestParticipant.actorIntegrationProfileOption.actorIntegrationProfile.actor.keyword} - #{currentTestParticipant.actorIntegrationProfileOption.integrationProfileOption.keyword}"/>
+                                    <br/></a4j:repeat>
+                            </s:decorate>
+                        </ui:define>
+                    </ui:decorate>
+                </g:column>
+                <g:column sortBy="#{'testInstance.lastStatus'}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['gazelle.tm.testing.instance.status']}"/>
+                    </ui:define>
+                    <s:span id="statusSpan">
+                        <h:selectOneMenu styleClass="form-control gzl-form-control input-sm" style="width: auto"
+                                         value="#{currentInstanceParticipant.testInstance.preCatLastStatus}">
+                            <s:selectItems
+                                    value="#{mesaTestManager.getPossibleStatusesWithStatus(currentInstanceParticipant.testInstance.getLastStatus())}"
+                                    var="statusFromList" noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                    label="#{messages[statusFromList.labelToDisplay]}" hideNoSelectionLabel="true"/>
+                            <a4j:ajax event="change" execute="@this" render="statusSpan,testTable"
+                                      listener="#{mesaTestManager.mergeStatus(currentInstanceParticipant.testInstance,currentInstanceParticipant.testInstance.getLastStatus())}"/>
+                        </h:selectOneMenu>
+                    </s:span>
+                </g:column>
+                <g:column style="word-wrap: break-word;word-break:break-all;">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['gazelle.tm.testing.instance.logFile']}"/>
+                    </ui:define>
+                    <a4j:repeat value="#{currentInstanceParticipant.testInstance.fileLogPathReturn}" var="file">
+                        <h:panelGroup
+                                rendered="#{mesaTestManager.isFileExist(currentInstanceParticipant,file)}">
+                            <h:outputLink
+                                    value="#{applicationPreferenceManager.getApplicationUrl()}testInstanceData/preti/#{file.id}/#{mesaTestManager.getURLValue(file)}"
+                                    target="_blank">
+                                <h:outputText value="#{file.name}"/>
+
+                                <span class="gzl-icon-search"/>
+                            </h:outputLink>
+                            <br/>
+                        </h:panelGroup>
+                        <h:panelGroup
+                                rendered="#{!mesaTestManager.isFileExist(currentInstanceParticipant,file)}">
+                            <h:outputText value="#{file.name} (#{messages['net.ihe.gazelle.tm.Missing_2']})"/>
+                            <br/>
+                        </h:panelGroup>
+                    </a4j:repeat>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['gazelle.tm.testing.instance.description']}"/>
+                    </ui:define>
+                    <pre style="word-wrap: break-word;word-break:break-all;white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -o-pre-wrap;">
+                        <g:safehtml
+                                value="#{currentInstanceParticipant.testInstance.getDescriptionXMLValidWithoutP(currentInstanceParticipant.testInstance.descriptionXMLValid)}"/>
+                    </pre>
+                </g:column>
+                <g:column sortBy="#{'testInstance.lastChanged'}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['gazelle.common.LastChanged']}"/>
+                    </ui:define>
+                    <g:date tooltip="true" value="#{currentInstanceParticipant.testInstance.lastChanged}"/>
+                </g:column>
+                <g:column>
+                    <ui:define name="header" sortBy="#{'testInstance.lastModifierId'}">
+                        <h:outputText value="#{messages['gazelle.common.LastModifier']}"/>
+                    </ui:define>
+                    <h:outputText value="#{currentInstanceParticipant.testInstance.lastModifierId}"/>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['gazelle.common.Action']}"/>
+                    </ui:define>
+                    <h:commandLink title="#{messages['gazelle.common.button.Edit']}"
+                                   action="#{mesaTestManager.editTestInstanceParticipantFromListInstances( currentInstanceParticipant )}"
+                                   immediate="true">
+                        <span class="gzl-icon-pencil"/>
+                    </h:commandLink>
+                </g:column>
+                <f:facet name="footer">
+                    <ui:include src="/util/datatableFooter.xhtml">
+                        <ui:param name="dataScrollerId" value="ds"/>
+                        <ui:param name="dataTableId" value="testTable"/>
+                    </ui:include>
+                </f:facet>
+            </rich:dataTable>
+        </h:form>
+    </ui:define>
+</ui:composition>

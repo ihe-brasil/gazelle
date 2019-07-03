@@ -1,0 +1,120 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <g:column styleClass="#{styleClassColumn}" sortBy="#{'keyword'}"
+              sortOrder="#{datatablestateholder.sortorders['keyword']}"
+              rowspan="2">
+        <ui:define name="header">
+            <h:outputText value="#{messages['gazelle.testmanagement.object.keyword']}"/>
+        </ui:define>
+        <h:outputLink id="linkmeta" target="_blank"
+                      value="#{metaTestAdministrationManager.getPermalinkToMetaTest(currentMetaTest)}">
+            <h:outputText value="#{currentMetaTest.keyword}"/>
+        </h:outputLink>
+        <s:div>
+            <h:outputText value="#{currentMetaTest.testRolesList.size} #{messages['gazelle.tests.tests']}"
+                          style="font-size:x-small;font-style:italic;"/>
+        </s:div>
+    </g:column>
+    <g:column styleClass="#{styleClassColumn}" colspan="4" sortBy="#{'description'}"
+              sortOrder="#{datatablestateholder.sortorders['description']}">
+        <ui:define name="header">
+            <h:outputText value="#{messages['gazelle.tf.table.Description']}"/>
+        </ui:define>
+        <h:outputText value="#{currentMetaTest.description}"/>
+    </g:column>
+    <g:column sortBy="#{'lastModifierId'}" sortOrder="#{datatablestateholder.sortorders['lastmodifierid']}">
+        <ui:define name="header">
+            <h:outputText value="#{messages['gazelle.common.LastModifier']}"/>
+        </ui:define>
+        <h:outputText value="#{currentMetaTest.lastModifierId}"/>
+    </g:column>
+    <g:column sortBy="#{'lastChanged'}" sortOrder="#{datatablestateholder.sortorders['lastchanged']}">
+        <ui:define name="header">
+            <h:outputText value="#{messages['gazelle.common.LastChanged']}"/>
+        </ui:define>
+        <g:date tooltip="true" value="#{currentMetaTest.lastChanged}"/>
+    </g:column>
+    <g:column>
+        <ui:define name="header">
+            <h:outputText value="#{messages['gazelle.common.Action']}"/>
+        </ui:define>
+        <div class="gzl-never-wrap">
+            <h:panelGroup rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}">
+                <h:commandLink id="editActionImageForMetaTest"
+                               title="#{messages['gazelle.common.button.Edit']}"
+                               action="#{metaTestAdministrationManager.editMetaTest(currentMetaTest)}">
+                    <span class="gzl-icon-pencil"/>
+                </h:commandLink>
+            </h:panelGroup>
+            <h:panelGroup
+                    rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}">
+                <a4j:commandLink id="metaTestListColumnsDeleteActionSupportForMetaTest"
+                                 title="#{messages['gazelle.common.button.Delete']}"
+                                 actionListener="#{metaTestAdministrationManager.setSelectedMetaTest(currentMetaTest)}"
+                                 oncomplete="jq162('#DeleteConfirmationModalPanel').modal('show');"
+                                 execute="@this"
+                                 render=" :DeleteConfirmationForm">
+                    <span class="gzl-icon-trash-o"/>
+                </a4j:commandLink>
+            </h:panelGroup>
+        </div>
+    </g:column>
+    <g:column colspan="7" breakRowBefore="true">
+
+
+        <a4j:repeat var="testRole"
+                    value="#{currentMetaTest.testRolesList}">
+            <div class="col-lg-6">
+
+                <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                    <ui:param name="styleClass" value="test-status-color-#{testRole.test.testStatus.id}"/>
+                    <ui:define name="panel_title">
+                        <h:outputText id="testsListColumnsTestKeywordOutputText" value="#{testRole.test.keyword}"
+                                      title="#{testRole.test.name}"/>
+                        <h:inputHidden id="testsListColumnsTestStatusInputHidden"
+                                       value="#{testRole.test.testStatus.id}"
+                                       rendered="#{testRole.test.testStatus!=null}"/>
+                        <h:outputText id="testsListColumnsTestStatusOutputText"
+                                      value="(#{testRole.test.testStatus.labelToDisplay})"
+                                      title="#{messages['net.ihe.gazelle.tm.TestStatus']}"/>
+
+                        <h:outputLink title="#{messages['gazelle.common.button.View']}"
+                                      value="#{applicationPreferenceManager.getApplicationUrl()}#{testRole.test.viewFolder()}/testsDefinition/viewTestPage.seam">
+                            <f:param name="id" value="#{testRole.test.id}"/>
+                            <f:param name="testKeyword" value="#{testRole.test.keyword}"/>
+                            <span class="gzl-icon-search"/>
+                        </h:outputLink>
+
+                        <h:commandLink id="printActionButton"
+                                       title="#{messages['gazelle.common.button.Print']}"
+                                       actionListener="#{testsDefinitionsAdministrationManager.downloadTestAsPdf(testRole.test)}">
+                            <span class="gzl-icon-pdf"/>
+                        </h:commandLink>
+                    </ui:define>
+                    <div class="col-lg-6">
+                        <label>#{messages['gazelle.systems.session.Type']} : </label>
+                        <span>#{testRole.test.testType.labelToDisplay}</span>
+                    </div>
+                    <div class="col-lg-6">
+                        <label>#{messages['gazelle.tm.tests.testPeerType']} : </label>
+                        <span>#{messages[testRole.test.testPeerType.labelToDisplay]}</span>
+                    </div>
+                    <div class="col-lg-6">
+                        <label>#{messages['gazelle.systems.system.SystemVersion']} : </label>
+                        <span>#{testRole.test.version}</span>
+                    </div>
+                    <div class="col-lg-6">
+                        <label>#{messages['gazelle.common.LastModifier']} : </label>
+                        <span>#{testRole.test.lastModifierId} (</span>
+                        <g:date tooltip="true" value="#{testRole.test.lastChanged}"/>
+                        <span>)</span>
+                    </div>
+                </ui:decorate>
+            </div>
+        </a4j:repeat>
+    </g:column>
+
+</ui:composition>

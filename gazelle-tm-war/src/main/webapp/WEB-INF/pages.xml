@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pages xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://jboss.org/schema/seam/pages"
+       xsi:schemaLocation="http://jboss.org/schema/seam/pages http://jboss.org/schema/seam/pages-2.3.xsd">
+    <!-- Login mechanism -->
+    <page view-id="/users/login/login.xhtml">
+        <navigation from-action="#{identity.login}">
+            <rule if="#{identity.loggedIn}">
+                <redirect view-id="/users/login/loggedIn.xhtml"/>
+            </rule>
+            <rule if="#{!identity.loggedIn}">
+                <redirect view-id="/users/login/login.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="*">
+        <restrict>#{gazelleSecurityCheck.checkSecurity()}</restrict>
+        <navigation from-action="#{identity.logout}">
+            <rule if="#{applicationPreferenceManager.getBooleanValue('cas_enabled')}">
+                <redirect view-id="/cas/logout.xhtml"/>
+            </rule>
+            <rule if="#{!applicationPreferenceManager.getBooleanValue('cas_enabled')}">
+                <redirect view-id="/home.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/cas/login">
+        <navigation>
+            <redirect view-id="/home.xhtml"/>
+        </navigation>
+    </page>
+
+    <page view-id="/users/login/loginPrivileged.xhtml">
+        <navigation from-action="#{identity.login}">
+            <rule if="#{identity.loggedIn}">
+                <redirect view-id="/users/login/loggedIn.xhtml"/>
+            </rule>
+            <rule if="#{!identity.loggedIn}">
+                <redirect view-id="/users/login/loginPrivileged.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <!-- Registration mechanism using activation code -->
+    <page view-id="/confirmRegistration.xhtml" action="#{authenticator.activate}">
+        <param name="activationCode" value="#{authenticator.activationCode}"/>
+        <navigation>
+            <rule if-outcome="activated">
+                <redirect view-id="/users/login/login.xhtml">
+                    <message>
+                        #{messages['gazelle.users.registration.AccountActivatedPleaseLogin']}
+                    </message>
+                    <param name="message" value="AccountActivatedPleaseLogin"/>
+                </redirect>
+            </rule>
+            <rule if-outcome="notFound">
+                <redirect view-id="/home.xhtml">
+                    <message>
+                        #{messages['gazelle.users.registration.InvalidActivationCodeOrAccountAlreadyActivated']}
+                    </message>
+                    <param name="message" value="InvalidActivationCode"/>
+                </redirect>
+            </rule>
+        </navigation>
+    </page>
+    <!-- Registration mechanism using activation code (when admin clicks on activation link for a user of his Organization) -->
+    <page view-id="/confirmRegistrationByVendorAdmin.xhtml" action="#{userManager.activateByVendorAdmin}">
+        <param name="activationCode" value="#{userManager.activationCode}"/>
+        <navigation>
+            <rule if-outcome="activated">
+                <redirect view-id="/home.xhtml">
+                    <message>#{messages['gazelle.users.registration.VendorAdmin.AccountActivatedForUser']}</message>
+                    <param name="message" value="AccountActivatedPleaseLogin"/>
+                </redirect>
+            </rule>
+            <rule if-outcome="notFound">
+                <redirect view-id="/home.xhtml">
+                    <message>
+                        #{messages['gazelle.users.registration.VendorAdmin.UserAlreadyValidatedByOtherVendorAdminOrInvalidActivationCode']}
+                    </message>
+                    <param name="message" value="InvalidActivationCode"/>
+                </redirect>
+            </rule>
+        </navigation>
+    </page>
+    <!-- Institution registration mechanism (after account activation) -->
+    <page view-id="/users/login/loggedIn.xhtml" action="#{userManager.isExistingInstitution}">
+        <navigation>
+            <rule if-outcome="existing">
+                <redirect view-id="/home.xhtml"/>
+            </rule>
+            <rule if-outcome="unknown">
+                <redirect view-id="/users/institution/createInstitution.xhtml">
+                    <message>
+                        #{messages['gazelle.users.registration.RegisterInstitution']}
+                    </message>
+                </redirect>
+            </rule>
+        </navigation>
+    </page>
+    <!-- Registration mechanism using activation code -->
+    <page view-id="/firstUserRegistration.xhtml" action="#{identity.logout}">
+        <param name="activationCode" value="#{authenticator.activationCode}"/>
+        <navigation>
+            <redirect view-id="/firstUserAfterLoggedOut.xhtml">
+                <param name="activationCode" value="#{authenticator.activationCode}"/>
+            </redirect>
+        </navigation>
+    </page>
+    <page view-id="/firstUserAfterLoggedOut.xhtml" action="#{authenticator.editUserWithActivationCode}">
+        <param name="activationCode" value="#{authenticator.activationCode}"/>
+        <navigation>
+            <rule if-outcome="changePassword">
+                <redirect view-id="/users/user/changeUserPasswordAfterRegistration.xhtml">
+                    <message>
+                        #{messages['gazelle.users.registration.PleaseChangePasswordAfterRegistration']}
+                    </message>
+                </redirect>
+            </rule>
+            <rule if-outcome="notFound">
+                <redirect view-id="/home.xhtml">
+                    <message>
+                        #{messages['gazelle.users.registration.InvalidActivationCodeOrAccountAlreadyActivated']}
+                    </message>
+                    <param name="message" value="InvalidActivationCode"/>
+                </redirect>
+            </rule>
+        </navigation>
+    </page>
+    <!-- Password assistance - Password change mechanism using changePasswordCode -->
+    <page view-id="/changeIHEPassword.xhtml" action="#{authenticator.changeLostPassword}">
+        <param name="changePasswordCode" value="#{authenticator.changePasswordCode}"/>
+        <navigation>
+            <rule if-outcome="changePassword">
+                <redirect view-id="/users/user/changeUserPasswordAfterRegistration.xhtml">
+                    <message>
+                        #{messages['gazelle.users.registration.ChangePasswordAllowed']}
+                    </message>
+                    <param name="message" value="ChangePasswordAllowed"/>
+                </redirect>
+            </rule>
+            <rule if-outcome="notFound">
+                <redirect view-id="/home.xhtml">
+                    <message>
+                        #{messages['gazelle.users.registration.InvalidChangePassword']}
+                    </message>
+                    <param name="message" value="InvalidChangePassword"/>
+                </redirect>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/configuration/dns.xhtml" action="#{oidsAndIPParamForSessionManager.generateDNSFile()}"/>
+    <page view-id="/configuration/hosts.xhtml" action="#{oidsAndIPParamForSessionManager.generateHostsFile()}"/>
+    <page view-id="/configuration/dcmldif.xhtml" action="#{ldifGenerator.generateLDIFFile()}"/>
+    <page view-id="/configuration/reverse.xhtml" action="#{oidsAndIPParamForSessionManager.generateReverseFile()}"/>
+    <page view-id="/testSequenceDiagram.xhtml" action="#{testSequenceManager.getSequenceDiagram()}"/>
+    <page view-id="/testInstanceSequenceDiagram.xhtml" action="#{testSequenceManager.getTISequenceDiagram()}"/>
+    <page view-id="/testDescriptionImage.xhtml" action="#{testSequenceManager.getTestDescriptionImage()}"/>
+    <page view-id="/userPhoto.xhtml" action="#{userManagerExtra.getUserPhoto()}"/>
+    <page view-id="/isSnapshot.xhtml" action="#{prManager.getIsSnapshot()}"/>
+    <page view-id="/pki.xhtml">
+        <action execute="#{facesContext.externalContext.redirect(gazelleDAO.getSelectedTestingSession().getCertificatesUrl())}"/>
+    </page>
+    <page view-id="/ping.xhtml">
+        <action execute="#{applicationManager.ping()}"/>
+    </page>
+    <page view-id="/administration/listAllSystemsPage.xhtml" action="#{systemInSessionViewer.manageAllSystemActions()}"/>
+    <page view-id="/pr/getIS.xhtml" action="#{prManager.getIsStream()}"/>
+    <page view-id="/pr/generateIS.xhtml" action="#{prManager.generatePDF()}"/>
+    <page view-id="/document/getPDFdocument.xhtml" action="#{openPDFDocument.getIsStream()}"/>
+    <page view-id="/document/documentInstance.xhtml" action="#{documentManager.redirectToShowDocumentPage()}"/>
+    <page view-id="/search/opensearchdescription.xhtml" action="#{applicationManager.getOpenSearchDescription()}"/>
+    <page view-id="/search/searchJSON.xhtml" action="#{searchGeneric.searchJSON()}"/>
+    <page view-id="/domain.xhtml" action="#{domainManager.getSpecificDomainFromKeyword()}">
+        <navigation>
+            <redirect view-id="/tf/domain/showDomain.xhtml">
+            </redirect>
+        </navigation>
+    </page>
+    <page view-id="/actor.xhtml" action="#{actorManager.getSpecificActorFromKeyword()}">
+        <navigation>
+            <redirect view-id="/tf/actor/editActor.xhtml">
+            </redirect>
+        </navigation>
+    </page>
+    <page view-id="/tf/actor/editActor.xhtml" action="#{actorManager.getEditTitle()}">
+        <navigation>
+            <rule if-outcome="getEditTitle - actor is null">
+                <redirect view-id="/home.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/testing/objects/system_object.xhtml" action="#{objectManager.initializeRedirection()}">
+        <navigation>
+            <redirect view-id="/objects/system_object.xhtml"/>
+        </navigation>
+    </page>
+    <page view-id="/systemConfigurations.xhtml"
+          action="#{viewConfigurationManager.getSpecificConfigurationsBySystemKeyword()}"/>
+    <page view-id="/oidSystems.xhtml" action="#{oidManager.getSpecifiedOIDsBySytemKeyword()}"/>
+    <page view-id="/transaction.xhtml" action="#{transactionManager.getSpecificTransactionFromKeyword()}">
+        <navigation>
+            <redirect view-id="/tf/transaction/editTransaction.xhtml">
+            </redirect>
+        </navigation>
+    </page>
+    <page view-id="/profile.xhtml" action="#{integrationProfileManager.getSpecificIntegrationProfileFromKeyword()}">
+        <navigation>
+            <redirect view-id="/tf/integrationProfile/showIntegrationProfile.xhtml">
+            </redirect>
+        </navigation>
+    </page>
+    <page view-id="/profileOption.xhtml"
+          action="#{integrationProfileOptionManager.getSpecificIntegrationProfileOptionFromKeyword()}">
+        <navigation>
+            <redirect view-id="/tf/integrationProfileOption/editIntegrationProfileOption.xhtml">
+            </redirect>
+        </navigation>
+    </page>
+    <page view-id="/systemInSession.xhtml" action="#{systemInSessionViewer.redirectToSystemInSessionPage()}"/>
+    <page view-id="/testInstance.xhtml" action="#{testInstanceManager.redirectToTestInstancePage()}">
+        <navigation>
+            <redirect view-id="/testing/test/test/TestInstance.xhtml">
+            </redirect>
+        </navigation>
+    </page>
+    <page view-id="/mesaTestInstance.xhtml" action="#{mesaTestManager.initialize()}">
+        <navigation>
+            <redirect view-id="/testing/test/mesa/logReturnForMesaTest.xhtml">
+            </redirect>
+        </navigation>
+    </page>
+    <page view-id="/aipo.xhtml">
+        <action execute="#{integrationProfileOptionManager.redirectToAIPO()}"/>
+    </page>
+    <page view-id="/systems/system/editSystemInSession.xhtml" action="#{systemInSessionEditor.canAccessThisPage()}">
+        <navigation>
+            <rule if-outcome="KO">
+                <redirect view-id="/error.xhtml">
+                    <message severity="ERROR">You have not the right to edit this system</message>
+                </redirect>
+            </rule>
+        </navigation>
+    </page>
+    <exception class="org.jboss.seam.security.NotLoggedInException" log="false">
+        <redirect view-id="/users/login/login.xhtml">
+            <message severity="ERROR">You must be logged in to perform this action</message>
+        </redirect>
+    </exception>
+    <exception class="org.jboss.seam.framework.EntityNotFoundException" log="false">
+        <redirect view-id="/error.xhtml">
+            <message severity="error">Not found</message>
+        </redirect>
+    </exception>
+    <exception class="javax.persistence.EntityNotFoundException" log="false">
+        <redirect view-id="/error.xhtml">
+            <message severity="error">Not found</message>
+        </redirect>
+    </exception>
+    <exception class="javax.persistence.EntityExistsException" log="false">
+        <end-conversation/>
+        <redirect view-id="/errorPage.xhtml">
+            <message severity="error">Item already exists. Did you try to save an item that is already present in the
+                database ?
+            </message>
+        </redirect>
+    </exception>
+    <exception class="javax.persistence.OptimisticLockException" log="false">
+        <end-conversation/>
+        <redirect view-id="/error.xhtml">
+            <message severity="warn">
+                Another user changed the same data, please try again
+            </message>
+        </redirect>
+    </exception>
+    <exception class="org.hibernate.exception.ConstraintViolationException" log="false">
+        <redirect view-id="/error.xhtml">
+            <message severity="warn">There was a constraint violation while saving this object. Did you use a keyword
+                that was already defined ?
+            </message>
+        </redirect>
+    </exception>
+    <exception class="com.sun.faces.context.FacesFileNotFoundException" log="false">
+        <redirect view-id="/error.xhtml">
+            <message severity="ERROR">Unknown url</message>
+        </redirect>
+    </exception>
+    <exception>
+        <redirect view-id="/error.xhtml">
+            <message severity="ERROR">Unexpected error, please try again</message>
+        </redirect>
+    </exception>
+</pages>

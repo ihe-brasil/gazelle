@@ -1,0 +1,282 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <h:form id="allUsersF" styleClass="form-horizontal">
+        <h:inputHidden id="filterUrlParameters" name="filterUrlParameters"
+                       value="#{userManager.filter.urlParameters}"/>
+        <script>
+            updateUrl("allUsersF:filterUrlParameters");
+            $("#allUsersF\\:filterUrlParameters").bind('change',
+                function () {
+                    updateUrl("allUsersF:filterUrlParameters");
+                });
+        </script>
+
+        <s:div rendered="#{userManager.displayListPanel}">
+            <ui:decorate id="decorationId" template="/layout/panels/_panel_filter_criteria.xhtml">
+                <div class="row">
+                    <!--  institution selection -->
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{userManager.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="institution"/>
+                            <ui:param name="filterName"
+                                      value="#{messages['gazelle.users.institution.InstitutionKeyword']}"/>
+                            <ui:param name="filterForm" value="allUsersF"/>
+                        </ui:include>
+                    </div>
+                    <div class="col-lg-6">
+                        <!--  username -->
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{userManager.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="username"/>
+                            <ui:param name="filterName" value="#{messages['gazelle.users.user.UserUsername']}"/>
+                            <ui:param name="filterForm" value="allUsersF"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <!--  firstname -->
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{userManager.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="firstname"/>
+                            <ui:param name="filterName" value="#{messages['gazelle.users.user.FirstName']}"/>
+                            <ui:param name="filterForm" value="allUsersF"/>
+                        </ui:include>
+                    </div>
+                    <div class="col-lg-6">
+                        <!--  lastname -->
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{userManager.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="lastname"/>
+                            <ui:param name="filterName" value="#{messages['gazelle.users.user.LastName']}"/>
+                            <ui:param name="filterForm" value="allUsersF"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <!--  activated -->
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{userManager.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="activated"/>
+                            <ui:param name="filterName" value="#{messages['net.ihe.gazelle.tm.IsActivated']}"/>
+                            <ui:param name="filterForm" value="allUsersF"/>
+                        </ui:include>
+                    </div>
+                    <div class="col-lg-6">
+                        <!--  activated -->
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{userManager.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="blocked"/>
+                            <ui:param name="filterName" value="#{messages['net.ihe.gazelle.tm.IsBlocked']}"/>
+                            <ui:param name="filterForm" value="allUsersF"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <!--  roles -->
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{userManager.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="role"/>
+                            <ui:param name="filterName" value="#{messages['gazelle.configuration.DICOM.Role']}"/>
+                            <ui:param name="filterForm" value="allUsersF"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <ui:define name="filter_buttons">
+                    <a4j:commandLink title="#{messages['gazelle.common.button.Refresh']}"
+                                     render="allUsersF">
+                        <span class="fa fa-refresh"></span>
+                    </a4j:commandLink>
+                    <a4j:commandLink title="#{messages['gazelle.users.reset']}"
+                                     actionListener="#{userManager.clearFilters()}"
+                                     render="allUsersF">
+                        <span class="fa fa-times-circle"></span>
+                    </a4j:commandLink>
+                </ui:define>
+            </ui:decorate>
+
+            <a4j:commandButton id="addUserButton" styleClass="gzl-btn-green"
+                               value="#{messages['gazelle.users.user.button.AddAnUser']}"
+                               actionListener="#{userManager.addNewUserButton()}" immediate="true"
+                               render="allUsersF,formToEditUser"/>
+            <br/><br/>
+
+            <rich:dataTable id="testListUserTable" var="user" rowKeyVar="rowNumber"
+                            value="#{userManager.datamodel}"
+                            rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                            rendered="#{userManager.datamodel.size()&gt;0}" first="0" render="ds">
+                <g:column sortBy="#{'institution.keyword'}" sortOrder="ascending">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.OrgaKeyword']}"/>
+                    </ui:define>
+                    <h:outputText value="#{user.institution.keyword}"/>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">#{messages['gazelle.users.user.UserUsername']}</ui:define>
+                    <h:outputText value="#{user.username}"/>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">#{messages['gazelle.users.user.UserName']}
+                        <h:panelGroup
+                                rendered="#{(s:hasRole('vendor_admin_role') || s:hasRole('admin_role')) and userManager.getNumberOfFilteredUsers() &lt; 2001}">
+                            <a href="mailto:#{userManager.getFilteredUsersEmailsToString()}"
+                               title="#{messages['net.ihe.gazelle.tm.SendEmailToFilteredUsers']}">
+                                <span class="gzl-icon-email"/>
+                            </a>
+                        </h:panelGroup>
+                        <h:panelGroup
+                                rendered="#{(s:hasRole('vendor_admin_role') || s:hasRole('admin_role')) and userManager.getNumberOfFilteredUsers() &gt; 2000}">
+                            <span class="gzl-icon-email-desactivate" title="#{messages['net.ihe.gazelle.tm.TooMuchFilteredUsers2000ToSendEmail']}"/>
+                        </h:panelGroup>
+                    </ui:define>
+                    <a href="mailto:#{user.email}" title="#{user.email}">
+                        <h:outputText value="#{user.lastname} #{user.firstname}"/>
+                    </a>
+                </g:column>
+                <g:column style="text-align:center" sortBy="#{'activated'}">
+                    <ui:define name="header">#{messages['gazelle.users.user.Activated']}</ui:define>
+                    <h:outputText id="testListUserActivatedYes"
+                                  value="#{messages['gazelle.common.yes']}" rendered="#{user.activated}"/>
+                    <h:outputText id="testListUserActivatedNo" styleClass="label label-danger"
+                                  style="font-size: 100%;"
+                                  rendered="#{not user.activated}"
+                                  title="#{messages['gazelle.users.user.help.activated']}"
+                                  value="#{messages['gazelle.users.user.NotActivated']}">
+                    </h:outputText>
+                </g:column>
+                <g:column style="text-align:center" sortBy="#{'blocked'}"
+                          rendered="#{s:hasRole('vendor_admin_role') || s:hasRole('admin_role') || s:hasRole('institutions_editor_role') || s:hasRole('project-manager_role')}">
+                    <ui:define name="header">#{messages['gazelle.users.registration.Blocked']}</ui:define>
+                    <h:outputText id="testListUserBlockedNo"
+                                  value="#{messages['gazelle.common.no']}" rendered="#{not user.blocked}"/>
+
+                    <h:outputText id="testListUserBlockedYes" value="#{messages['gazelle.common.yes']}"
+                                  styleClass="label label-danger" rendered="#{user.blocked}"
+                                  title="#{messages['gazelle.users.user.help.blocked']}"
+                                  style="font-size: 100%;">
+                    </h:outputText>
+                </g:column>
+                <g:column sortBy="#{'loginsCounter'}"
+                          style="text-align:center"
+                          rendered="#{s:hasRole('vendor_admin_role') || s:hasRole('admin_role') || s:hasRole('institutions_editor_role') || s:hasRole('project-manager_role')}">
+                    <ui:define name="header">#{messages['gazelle.users.user.NumberOfLogins']}</ui:define>
+                    <h:outputText id="testListUserLoginsCounter"
+                                  value="#{user.loginsCounter}"/>
+                </g:column>
+                <g:column sortBy="#{'lastLogin'}">
+                    <ui:define name="header">#{messages['gazelle.users.user.UserLastLogin']}</ui:define>
+                    <g:date tooltip="true" value="#{user.lastLogin}"/>
+                </g:column>
+                <g:column sortBy="#{'lastModifierId'}">
+                    <ui:define name="header">#{messages['gazelle.common.LastModifier']}</ui:define>
+                    #{user.lastModifierId}
+                </g:column>
+                <g:column>
+                    <ui:define name="header">
+                        #{messages['gazelle.users.roles']}
+                    </ui:define>
+                    <a4j:repeat var="roll" value="#{user.roles}">
+                        <h:outputText value="#{roll.name} "/>
+                        <br/>
+                    </a4j:repeat>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+                    <div class="gzl-never-wrap">
+                        <h:panelGroup rendered="#{s:hasRole('admin_role')}">
+                            <a4j:commandLink
+                                    action="#{authenticator.authenticateWithoutCheckingPassword(user)}"
+                                    execute="@this"
+                                    title="#{messages['gazelle.common.button.LogAs']} #{user.username}">
+                                <span class="gzl-icon-play"/>
+                            </a4j:commandLink>
+                        </h:panelGroup>
+
+                        <a4j:commandLink actionListener="#{userManager.viewUser(user)}"
+                                         title="#{messages['gazelle.common.button.View']}"
+                                         execute="@this"
+                                         render="allUsersF,formToViewUser,formToEditUser">
+                            <span class="gzl-icon-search"/>
+                        </a4j:commandLink>
+                        <h:panelGroup rendered="#{identity.loggedIn}">
+                            <a4j:commandLink actionListener="#{userManager.editUser(user)}"
+                                             execute="@this"
+                                             title="#{messages['gazelle.common.button.Edit']}"
+                                             render="allUsersF,formToEditUser,formToEditUser">
+                                <span class="gzl-icon-pencil"/>
+                            </a4j:commandLink>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{s:hasRole('admin_role')}">
+                            <a4j:commandLink event="click" target="edit user preferences"
+                                             action="#{userManager.editUserPreferences(user)}"
+                                             title="#{messages['net.ihe.gazelle.modules.EditUserPreferences']}"
+                                             execute="@this"
+                                             render="formToEditUser,formToEditUser">
+                                <span class="gzl-icon-preferences"/>
+                            </a4j:commandLink>
+                        </h:panelGroup>
+
+                        <h:panelGroup
+                                rendered="#{userManager.displayDelete( user) and identity.loggedIn and !user.blocked}">
+                            <a4j:commandLink event="click"
+                                             action="#{userManager.blockUser(user)}"
+                                             title="#{messages['net.ihe.gazelle.tm.DisableUserAccount']}"
+                                             execute="@this"
+                                             render="allUsersF,formToEditUser,formToEditUser">
+                                        <span class="gzl-icon-stack">
+                                          <span class="gzl-icon-user gzl-icon-stack-1x"/>
+                                          <span class="gzl-icon-ban gzl-icon-stack-1x gzl-icon-stack-bottom-right gzl-color-light-red"/>
+                                        </span>
+                            </a4j:commandLink>
+                        </h:panelGroup>
+                        <h:panelGroup
+                                rendered="#{userManager.displayDelete( user) and identity.loggedIn and user.blocked}">
+                            <a4j:commandLink event="click"
+                                             action="#{userManager.unblockUser(user)}"
+                                             title="#{messages['net.ihe.gazelle.tm.EnableUserAccount']}"
+                                             execute="@this"
+                                             render="allUsersF,formToEditUser,formToEditUser">
+                                        <span class="gzl-icon-stack">
+                                          <span class="gzl-icon-user gzl-icon-stack-1x"/>
+                                          <span class="gzl-icon-checked gzl-icon-stack-1x gzl-icon-stack-bottom-right gzl-color-light-green"/>
+                                        </span>
+                            </a4j:commandLink>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{userManager.displayDelete( user) and identity.loggedIn}">
+                            <a4j:commandLink event="click"
+                                             render="DeleteConfirmationModalPanel, :formForModalPanels"
+                                             actionListener="#{userManagerExtra.setSelectedUserForDelete( user ) }"
+                                             oncomplete="jq162('#DeleteConfirmationModalPanel').modal('show');"
+                                             title="#{messages['net.ihe.gazelle.tm.DeleteUser']}">
+                                <span class="gzl-icon-user-times"/>
+                            </a4j:commandLink>
+
+                        </h:panelGroup>
+                    </div>
+                </g:column>
+                <f:facet name="footer">
+                    <ui:include src="/util/datatableFooter.xhtml">
+                        <ui:param name="dataScrollerId" value="ds"/>
+                        <ui:param name="dataTableId" value="testListUserTable"/>
+                    </ui:include>
+                </f:facet>
+            </rich:dataTable>
+            <h:commandLink value="#{messages['gazelle.common.export.ExportAsExcel']}"
+                           action="#{gazelleExcelExporterJboss7.export('allUsersF:testListUserTable')}"/>
+
+        </s:div>
+    </h:form>
+</ui:composition>

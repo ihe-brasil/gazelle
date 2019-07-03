@@ -1,0 +1,80 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+        <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.proxy.MessageDetails']}</ui:define>
+        <h:panelGrid id="globalDiv" columns="3" width="100%"
+                     rendered="#{testInstanceManager.selectedTestStepMessage ne null}">
+            <h:panelGrid columns="2">
+                <h:outputLabel for="id" value="#{messages['net.ihe.gazelle.tm.message.ID']} :"
+                               class="gzl-never-wrap"/>
+                <h:outputText id="id" value="#{testInstanceManager.selectedTestStepMessage.id}"
+                              style="font-size:small"/>
+                <h:outputLabel for="date" value="#{messages['net.ihe.gazelle.tm.DateReceived']} :"
+                               class="gzl-never-wrap"/>
+                <h:outputText value="#{testInstanceManager.selectedTestStepMessage.lastChanged}" id="date"/>
+            </h:panelGrid>
+
+            <h:panelGrid columns="3" border="1" cellpadding="0" cellspacing="2">
+                <h:panelGrid columns="2" border="1" cellspacing="0" cellpadding="2">
+                    <f:facet name="header">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.test.instance.Initiator']}"/>
+                    </f:facet>
+                    <h:outputLabel for="initIP" value="#{messages['net.ihe.gazelle.tm.test.instance.InitiatorIP']}"
+                                   class="gzl-never-wrap"/>
+                    <h:outputText id="initIP"
+                                  value="#{testInstanceManager.selectedTestStepMessage.senderTmConfiguration.host.ip}"/>
+                    <h:outputLabel for="initPort"
+                                   value="#{messages['net.ihe.gazelle.tm.test.instance.InitiatorPort']}  "
+                                   class="gzl-never-wrap"/>
+                    <h:outputText id="initPort" value=""/>
+                    <h:outputLabel for="proxPort" value="#{messages['net.ihe.gazelle.tm.proxy.ProxyPort']}"
+                                   class="gzl-never-wrap"/>
+                    <h:outputText id="proxPort" value=""/>
+                </h:panelGrid>
+                <h:panelGrid columns="1" cellspacing="0" cellpadding="2" style="text-align:center;">
+                    <f:facet name="header">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.request.direction']}"
+                                      style="font-weight:bold;text-align:center;"/>
+                    </f:facet>
+                    <h:outputText value=" "/>
+                    <h:panelGroup>
+                        <s:span styleClass="gzl-icon-arrow-circle-o-right"
+                              rendered="#{testInstanceManager.selectedTestStepMessage.direction.name().equals('REQUEST')}"/>
+
+                        <s:span styleClass="gzl-icon-arrow-circle-o-left"
+                                rendered="#{testInstanceManager.selectedTestStepMessage.direction.name().equals('RESPONSE')}"/>
+                    </h:panelGroup>
+                    <h:outputText value=" "/>
+                </h:panelGrid>
+                <h:panelGrid columns="2" border="1" cellspacing="0" cellpadding="2">
+                    <f:facet name="header">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.test.instance.Responder']}"/>
+                    </f:facet>
+                    <h:outputLabel for="respIP" value="#{messages['net.ihe.gazelle.tm.test.instance.ResponderIP']}"
+                                   class="gzl-never-wrap"/>
+                    <h:outputText id="respIP"
+                                  value="#{testInstanceManager.selectedTestStepMessage.receiverTmConfiguration.host.ip}"/>
+                    <h:outputLabel for="respPort" value="#{messages['net.ihe.gazelle.tm.test.instance.ResponderPort']}"
+                                   class="gzl-never-wrap"/>
+                    <h:outputText id="" value=""/>
+                    <h:outputLabel for="length" value="#{messages['net.ihe.gazelle.tm.message.length']}"
+                                   class="gzl-never-wrap"/>
+                    <h:outputText id="length"
+                                  value="#{testInstanceManager.selectedTestStepMessage.messageContents.length}"/>
+                </h:panelGrid>
+            </h:panelGrid>
+        </h:panelGrid>
+    </ui:decorate>
+
+    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+        <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.proxy.MessageContent']}</ui:define>
+        <div style="font-family: monospace;">
+            <h:outputText value="#{testInstanceManager.selectedTestStepMessage.getMessageContentsAsString()}"/>
+        </div>
+    </ui:decorate>
+
+</ui:composition>

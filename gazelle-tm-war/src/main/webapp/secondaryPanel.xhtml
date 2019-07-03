@@ -1,0 +1,77 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <div class="panel panel-default">
+        <s:div styleClass="panel-heading" id="${position}secondaryHeaderDiv">
+            <c:set var="selectedHome" scope="view" value="#{homeManager.selectedHome}"/>
+            <c:set var="editSecondaryPanelHeader" scope="view" value="#{homeManager.editSecondaryPanelHeader}"/>
+            <c:set var="editSecondaryContent" scope="view" value="#{homeManager.editSecondaryContent}"/>
+            <h3 class="panel-title">
+                <h:form id="${position}secondaryHeaderForm">
+                    <s:token allowMultiplePosts="true"/>
+                    <h:outputText value="#{selectedHome.secondaryPanelHeader}"
+                                  rendered="#{not empty selectedHome.secondaryPanelHeader and not editSecondaryPanelHeader}"/>
+                    <h:outputText value="#{messages['gazelle.tm.SecondaryPanelHeader']}"
+                                  rendered="#{empty selectedHome.secondaryPanelHeader and not editSecondaryPanelHeader}"/>
+                    <h:inputText styleClass=" form-control" value="#{selectedHome.secondaryPanelHeader}" maxlength="255"
+                                 size="150"
+                                 rendered="#{editSecondaryPanelHeader}"/>
+
+                    <a4j:commandLink actionListener="#{homeManager.setEditSecondaryPanelHeader(true)}"
+                                     rendered="#{s:hasRole('admin_role') and not editSecondaryPanelHeader}"
+                                     render="${position}secondaryHeaderDiv">
+                        <span class="gzl-icon-pencil" title="#{messages['gazelle.common.button.Edit']}"/>
+                    </a4j:commandLink>
+
+                    <a4j:commandLink actionListener="#{homeManager.saveHome('secondaryHeader')}"
+                                     rendered="#{s:hasRole('admin_role') and editSecondaryPanelHeader}"
+                                     render="${position}secondaryHeaderDiv">
+                        <span class="gzl-icon-save" title="#{messages['gazelle.common.button.Save']}"/>
+                    </a4j:commandLink>
+
+                    <a4j:commandLink actionListener="#{homeManager.moveSecondaryPanel('above')}"
+                                     rendered="#{s:hasRole('admin_role') and not editSecondaryContent and selectedHome.secondaryPanelPosition.equals('below')}"
+                                     render="customisedPanels">
+                        <span class="gzl-icon-up" title="#{messages['gazelle.tm.home.moveToTop']}"/>
+                    </a4j:commandLink>
+                    <a4j:commandLink actionListener="#{homeManager.moveSecondaryPanel('below')}"
+                                     rendered="#{s:hasRole('admin_role') and not editSecondaryContent and selectedHome.secondaryPanelPosition.equals('above')}"
+                                     render="customisedPanels">
+                        <span class="gzl-icon-down" title="#{messages['gazelle.tm.home.moveToBottom']}"/>
+                    </a4j:commandLink>
+                </h:form>
+            </h3>
+        </s:div>
+        <s:div styleClass="panel-body" id="${position}secondaryPanelDiv">
+            <h:form id="${position}secondaryContentForm">
+                <s:token allowMultiplePosts="true"/>
+                <s:span rendered="#{not editSecondaryContent}">
+                    <g:safehtml value="#{selectedHome.secondaryPanelContent}"/>
+                </s:span>
+                <a4j:region id="${position}secondaryContentRegion"
+                            rendered="#{s:hasRole('admin_role') and editSecondaryContent}">
+                    <ui:decorate template="/layout/editor/_text_editor.xhtml">
+                        <ui:param name="text" value="#{selectedHome.secondaryPanelContent}"/>
+                        <ui:param name="id" value="${position}SecondaryEditor"/>
+                        <ui:param name="isFocus" value="true"/>
+                    </ui:decorate>
+                </a4j:region>
+
+                <a4j:commandButton value="#{messages['gazelle.common.button.Edit']}"
+                                   actionListener="#{homeManager.setEditSecondaryContent(true)}"
+                                   styleClass="gzl-btn-blue"
+                                   rendered="#{s:hasRole('admin_role') and not editSecondaryContent}"
+                                   render="${position}secondaryPanelDiv"/>
+                <a4j:commandButton value="#{messages['gazelle.common.button.Save']}"
+                                   styleClass="gzl-btn-green"
+                                   actionListener="#{homeManager.saveHome('secondaryContent')}"
+                                   rendered="#{s:hasRole('admin_role') and editSecondaryContent}"
+                                   render="${position}secondaryPanelDiv"/>
+
+
+            </h:form>
+        </s:div>
+    </div>
+</ui:composition>

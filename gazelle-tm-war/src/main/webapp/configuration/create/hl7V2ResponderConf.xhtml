@@ -1,0 +1,31 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <ui:include src="abstractHL7ResponderConf.xhtml"/>
+    <ui:include src="abstractHL7Conf.xhtml"/>
+    <a4j:region id="portRegion"
+                rendered="#{!systemConfigurationManager.currentConfiguration.configuration.isSecured}">
+        <s:decorate template="/layout/form/_edit.xhtml" id="portDecorate">
+            <ui:param name="id" value="isSecuredHl7V2ResponderInputText"/>
+            <ui:define name="label">#{messages['gazelle.configuration.system.Port']}</ui:define>
+            <h:inputText  styleClass=" form-control" id="isSecuredHl7V2ResponderInputText"
+                         value="#{systemConfigurationManager.currentConfiguration.port}"
+                         required="#{!systemConfigurationManager.currentConfiguration.configuration.isSecured}">
+
+            </h:inputText>
+        </s:decorate>
+    </a4j:region>
+    <a4j:region id="portSecured"
+                rendered="#{systemConfigurationManager.currentConfiguration.configuration.isSecured}">
+        <s:decorate template="/layout/form/_edit.xhtml" id="portSecuredDecorate">
+            <ui:param name="id" value="portSecuredHl7V2ResponderInputText"/>
+            <ui:define name="label">#{messages['gazelle.tm.PortSecured']}</ui:define>
+            <h:inputText  styleClass=" form-control" id="portSecuredHl7V2ResponderInputText"
+                         value="#{systemConfigurationManager.currentConfiguration.portSecured}"
+                         required="#{systemConfigurationManager.currentConfiguration.configuration.isSecured}">
+
+            </h:inputText>
+        </s:decorate>
+    </a4j:region>
+</ui:composition>

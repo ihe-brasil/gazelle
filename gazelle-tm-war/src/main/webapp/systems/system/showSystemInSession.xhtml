@@ -1,0 +1,123 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:gri="http://java.sun.com/jsf/composite/gri"
+                xmlns:a4j="http://richfaces.org/a4j" xmlns:s="http://jboss.org/schema/seam/taglib"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['net.ihe.gazelle.tm.SystemViewer']}"/>
+    <ui:define name="body">
+        <s:div id="showDiv">
+            <s:div id="headerDiv">
+                <h3>#{systemInSessionViewer.systemInSession.system.keyword} -
+                    #{systemInSessionViewer.systemInSession.system.name}
+                    <small>
+                          <span class="#{systemInSessionViewer.systemInSession.registrationStatus.cssStyle}"
+                                title="#{messages['net.ihe.gazelle.tm.RegistrationStatus']} ">
+                              <h:outputText
+                                      value="#{messages[systemInSessionViewer.systemInSession.registrationStatus.labelToDisplay]}"/>
+                          </span>
+                    </small>
+                </h3>
+            </s:div>
+            <br/>
+            <!--@formatter:off-->
+            <script type="text/javascript">
+                function setSelectedTab(new_value) {
+                    document.getElementById('showForm:hidden').value = new_value;
+                }
+            </script>
+            <!--@formatter:on-->
+
+            <div class="row">
+                <div id="showIntegrationStatementTabPanel" class="col-lg-12">
+                    <gri:tabPanel withBorder="true" activeItem="#{systemInSessionViewer.getDefaultTab()}">
+                        <gri:tab id="showSystemSummaryTab" head="#{messages['gazelle.tm.SystemSummary']}"
+                                 onclick="setSelectedTab('editSystemSummaryTab')">
+                            <div>
+                                <ui:include src="showSystemSummary.xhtml"/>
+                            </div>
+                        </gri:tab>
+                        <gri:tab id="showSysImpl" head="#{messages['gazelle.tm.ProfilesActors']}"
+                                 onclick="setSelectedTab('beforeRegistrationDeadlineEditSystemImplementationTab')">
+                            <div>
+                                <ui:include src="showSystemImplementation.xhtml">
+                                    <ui:param name="systemInSessionEditor" value="#{systemInSessionViewer}"/>
+                                </ui:include>
+                            </div>
+                        </gri:tab>
+                        <gri:tab id="showSysConfigs" head="#{messages['gazelle.configuration.Configurations']}"
+                                 rendered="#{applicationManager.isTestManagement()}"
+                                 onclick="setSelectedTab('editSystemSummaryTab')">
+                            <div>
+                                <ui:include src="/configuration/configurationsForSystem.xhtml">
+                                    <ui:param name="selectedSystemInSession"
+                                              value="#{systemInSessionViewer.systemInSession}"/>
+                                    <ui:param name="selectedActorForConfigs" value="#{null}"/>
+                                    <ui:param name="showActions" value="false"/>
+                                </ui:include>
+                            </div>
+                        </gri:tab>
+                        <gri:tab id="showSystemInSessionDetailsTab"
+                                 head="#{systemInSessionViewer.systemInSession.testingSession.description}"
+                                 onclick="setSelectedTab('editSystemInSessionDetailsTab')">
+                            <div>
+                                <ui:include src="showSystemInSessionDetails.xhtml"/>
+                            </div>
+                        </gri:tab>
+                        <gri:tab id="sbeforeRegistrationDeadlineSystemDemonstrationsTab"
+                                 head="#{messages['gazelle.tm.Demonstrations']}"
+                                 onclick="setSelectedTab('beforeRegistrationDeadlineSystemDemonstrationsTab')">
+                            <div>
+                                <ui:include id="sbeforeRegistrationDeadlineSystemDemonstrationsTab"
+                                            src="showSystemDemonstration.xhtml">
+                                    <ui:param name="panelId" value="modeView"/>
+                                    <ui:param name="systemInSessionEditor" value="#{SystemInSessionViewer}"/>
+                                </ui:include>
+                            </div>
+                        </gri:tab>
+                        <gri:tab id="showSysNotes" head="#{messages['gazelle.tm.testing.instance.comments']}"
+                                 onclick="setSelectedTab('editSystemNotesTab')">
+                            <s:div id="notes">
+                                #{systemInSessionViewer.reloadSystemInSession()}
+                                <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                                    <ui:define name="panel_title">
+                                        <h:outputText value="#{messages['net.ihe.gazelle.tm.NotesOnSystem']}"/>
+                                    </ui:define>
+                                    <div>
+                                        <ui:include src="/systems/system/showSystemNotes.xhtml">
+                                            <ui:param name="formId" value="notesFormModeShow"/>
+                                            <ui:param name="twoColumns" value="true"/>
+                                            <ui:param name="selectedSystemInSession"
+                                                      value="#{systemInSessionViewer.systemInSession}"/>
+                                            <ui:param name="explanationText"
+                                                      value="#{messages['net.ihe.gazelle.tm.TheseCommentsAboutThisTestSystemWereEnteredByTec']}"/>
+                                            <ui:param name="idToRerender" value="notes"/>
+                                        </ui:include>
+                                    </div>
+                                </ui:decorate>
+                            </s:div>
+                        </gri:tab>
+                    </gri:tabPanel>
+                </div>
+            </div>
+            <br/>
+            <div class="row">
+                <div class="col-lg-12">
+                    <h:form id="showForm">
+                        <h:inputHidden id="hidden" value="#{systemInSessionViewer.defaultTab}"/>
+                        <div id="commandButtonsDiv" align="left">
+                            <a4j:commandButton id="editCommandButton"
+                                               value="#{messages['gazelle.common.button.Edit']}"
+                                               action="#{systemInSessionViewer.editSystemInSessionActionRedirect(systemInSessionViewer.systemInSession,systemInSessionViewer.defaultTab)}"
+                                               rendered="#{systemInSessionViewer.canEditSystemInSession()}"
+                                               styleClass="gzl-btn-blue"/>
+                            <a4j:commandButton id="cancelCommandButton"
+                                               value="#{messages['gazelle.common.button.Cancel']}"
+                                               action="#{systemInSessionViewer.goToSystemList()}"
+                                               rendered="#{systemInSessionViewer.canEditSystemInSession()}"
+                                               styleClass="gzl-btn" execute="@this"/>
+                        </div>
+                    </h:form>
+                </div>
+            </div>
+        </s:div>
+    </ui:define>
+</ui:composition>

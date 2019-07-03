@@ -1,0 +1,208 @@
+<components xmlns:security="http://jboss.org/schema/seam/security"
+            xmlns:document="http://jboss.org/schema/seam/document"
+            xmlns:cache="http://jboss.org/schema/seam/cache"
+            xmlns:persistence="http://jboss.org/schema/seam/persistence" xmlns:web="http://jboss.org/schema/seam/web"
+            xmlns:core="http://jboss.org/schema/seam/core" xmlns:pdf="http://jboss.org/schema/seam/pdf"
+            xmlns:async="http://jboss.org/schema/seam/async" xmlns:mail="http://jboss.org/schema/seam/mail"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://jboss.org/schema/seam/components"
+            xmlns:international="http://jboss.org/schema/seam/international"
+            xsi:schemaLocation="http://jboss.org/schema/seam/core http://jboss.org/schema/seam/core-2.3.xsd                   http://jboss.org/schema/seam/persistence http://jboss.org/schema/seam/persistence-2.3.xsd                                      http://jboss.org/schema/seam/security http://jboss.org/schema/seam/security-2.3.xsd                  http://jboss.org/schema/seam/async http://jboss.org/schema/seam/async-2.3.xsd                  http://jboss.org/schema/seam/mail http://jboss.org/schema/seam/mail-2.3.xsd                  http://jboss.org/schema/seam/components http://jboss.org/schema/seam/components-2.3.xsd                  http://jboss.org/schema/seam/pdf http://jboss.org/schema/seam/pdf-2.3.xsd                                     http://jboss.org/schema/seam/document http://jboss.org/schema/seam/document-2.3.xsd                  http://jboss.org/schema/seam/document http://jboss.org/schema/seam/web-2.3.xsd                                     http://jboss.org/schema/seam/web http://jboss.org/schema/seam/web-2.3.xsd">
+    <!--<cache:eh-cache-provider/>-->
+    <cache:jboss-cache-provider/>
+    <security:identity authenticate-method="#{authenticator.authenticate}"/>
+    <component class="net.ihe.gazelle.tm.users.action.UserPreferencesManager"
+               jndi-name="java:app/gazelle-tm-ejb/UserPreferencesManager"/>
+    <component class="net.ihe.gazelle.tm.users.action.UserManagerExtra"
+               jndi-name="java:app/gazelle-tm-ejb/UserManagerExtra"/>
+    <component class="net.ihe.gazelle.tm.users.action.InstitutionManagerTM"
+               jndi-name="java:app/gazelle-tm-ejb/InstitutionManagerTM"/>
+    <component class="net.ihe.gazelle.tf.action.ActorIntegrationProfileManager"
+               jndi-name="java:app/gazelle-tm-ejb/ActorIntegrationProfileManager"/>
+    <component class="net.ihe.gazelle.objects.action.ObjectManager" jndi-name="java:app/gazelle-tm-ejb/ObjectManager"/>
+    <component class="net.ihe.gazelle.tf.ws.RulesWs" jndi-name="java:app/gazelle-tm-ejb/RulesWs"/>
+    <component class="net.ihe.gazelle.tf.ws.AuditMessageWs" jndi-name="java:app/gazelle-tm-ejb/AuditMessageWs"/>
+    <component class="net.ihe.gazelle.tm.systems.action.TestingTypeManager"
+               jndi-name="java:app/gazelle-tm-ejb/TestingTypeManager"/>
+    <component class="net.ihe.gazelle.tf.ws.DomainsWs" jndi-name="java:app/gazelle-tm-ejb/DomainsWs"/>
+    <component class="net.ihe.gazelle.tf.action.ActorSelector" jndi-name="java:app/gazelle-tm-ejb/ActorSelector"/>
+    <component class="net.ihe.gazelle.tm.systems.action.SystemInSessionSelector"
+               jndi-name="java:app/gazelle-tm-ejb/SystemInSessionSelector"/>
+    <component class="net.ihe.gazelle.users.action.InstitutionManager"
+               jndi-name="java:app/gazelle-tm-ejb/InstitutionManager"/>
+    <component class="net.ihe.gazelle.tm.configurations.action.ViewConfigurationManager"
+               jndi-name="java:app/gazelle-tm-ejb/ViewConfigurationManager"/>
+    <component class="net.ihe.gazelle.tm.systems.action.SystemInSessionManager"
+               jndi-name="java:app/gazelle-tm-ejb/SystemInSessionManager"/>
+    <component class="net.ihe.gazelle.tm.gazelletest.action.PathManager"
+               jndi-name="java:app/gazelle-tm-ejb/PathManager"/>
+    <component class="net.ihe.gazelle.tm.configurations.ws.ConfigurationsWS"
+               jndi-name="java:app/gazelle-tm-ejb/ConfigurationsWS"/>
+    <component class="net.ihe.gazelle.objects.action.ObjectInstanceManager"
+               jndi-name="java:app/gazelle-tm-ejb/ObjectInstanceManager"/>
+    <component class="net.ihe.gazelle.users.action.PersonManager" jndi-name="java:app/gazelle-tm-ejb/PersonManager"/>
+    <component class="net.ihe.gazelle.tm.systems.action.TestingSessionManager"
+               jndi-name="java:app/gazelle-tm-ejb/TestingSessionManager"/>
+    <component class="net.ihe.gazelle.tm.tf.action.TFExtraManager" jndi-name="java:app/gazelle-tm-ejb/TFExtraManager"/>
+    <component class="net.ihe.gazelle.tm.tee.status.TestInstanceExecutionStatusManager"
+               jndi-name="java:app/gazelle-tm-ejb/TestInstanceExecutionStatusManager"/>
+
+    <component class="net.ihe.gazelle.tm.financial.action.FinancialManager"
+               jndi-name="java:app/gazelle-tm-ejb/FinancialManager"/>
+    <component class="net.ihe.gazelle.tf.action.IntegrationProfileManager"
+               jndi-name="java:app/gazelle-tm-ejb/IntegrationProfileManager"/>
+    <component class="net.ihe.gazelle.users.action.UserManager" jndi-name="java:app/gazelle-tm-ejb/UserManager"/>
+    <component class="net.ihe.gazelle.tm.configurations.action.GenerateSystemConfiguration"
+               jndi-name="java:app/gazelle-tm-ejb/GenerateSystemConfiguration"/>
+    <component class="net.ihe.gazelle.tf.action.TFConsistencyCheckManager"
+               jndi-name="java:app/gazelle-tm-ejb/TFConsistencyCheckManager"/>
+    <component class="net.ihe.gazelle.tf.action.AipoManager" jndi-name="java:app/gazelle-tm-ejb/AipoManager"/>
+    <component class="net.ihe.gazelle.tm.systems.action.SimulatorInSessionManager"
+               jndi-name="java:app/gazelle-tm-ejb/SimulatorInSessionManager"/>
+    <component class="net.ihe.gazelle.tf.action.TransactionLinkManager"
+               jndi-name="java:app/gazelle-tm-ejb/TransactionLinkManager"/>
+    <component class="net.ihe.gazelle.users.action.EmailManager" jndi-name="java:app/gazelle-tm-ejb/EmailManager"/>
+    <component class="net.ihe.gazelle.tm.configurations.action.OidsAndIPParamForSessionManager"
+               jndi-name="java:app/gazelle-tm-ejb/OidsAndIPParamForSessionManager"/>
+    <component class="net.ihe.gazelle.tm.configurations.action.LdifGenerator"
+               jndi-name="java:app/gazelle-tm-ejb/LdifGenerator"/>
+    <component class="net.ihe.gazelle.objects.action.AnnotationManager"
+               jndi-name="java:app/gazelle-tm-ejb/AnnotationManager"/>
+    <component class="net.ihe.gazelle.tm.systems.ws.SystemInfoWs" jndi-name="java:app/gazelle-tm-ejb/SystemInfoWs"/>
+    <component class="net.ihe.gazelle.tf.ws.IHEConcepts" jndi-name="java:app/gazelle-tm-ejb/IHEConcepts"/>
+    <component class="net.ihe.gazelle.tf.ws.TransactionWs" jndi-name="java:app/gazelle-tm-ejb/TransactionWs"/>
+    <component class="net.ihe.gazelle.tf.ws.ActorWs" jndi-name="java:app/gazelle-tm-ejb/ActorWs"/>
+    <component class="net.ihe.gazelle.tm.financial.action.InvoiceManager"
+               jndi-name="java:app/gazelle-tm-ejb/InvoiceManager"/>
+    <component class="net.ihe.gazelle.ws.tf.integrationProfileOptions.IntegrationProfileOptionWs"
+               jndi-name="java:app/gazelle-tm-ejb/IntegrationProfileOptionWs"/>
+    <component class="net.ihe.gazelle.tf.action.ProfileLinksManager"
+               jndi-name="java:app/gazelle-tm-ejb/ProfileLinksManager"/>
+    <component class="net.ihe.gazelle.tf.action.Hl7MessageProfileManager"
+               jndi-name="java:app/gazelle-tm-ejb/Hl7MessageProfileManager"/>
+    <component class="net.ihe.gazelle.tf.action.TransactionManager"
+               jndi-name="java:app/gazelle-tm-ejb/TransactionManager"/>
+    <component class="net.ihe.gazelle.tm.configurations.action.NetworkConfigurationManager"
+               jndi-name="java:app/gazelle-tm-ejb/NetworkConfigurationManager"/>
+    <component class="net.ihe.gazelle.tm.configurations.action.OIDManager"
+               jndi-name="java:app/gazelle-tm-ejb/OIDManager"/>
+    <component class="net.ihe.gazelle.tf.action.DomainManager" jndi-name="java:app/gazelle-tm-ejb/DomainManager"/>
+    <component class="net.ihe.gazelle.tf.ws.TFConfigurationRequirementsWs"
+               jndi-name="java:app/gazelle-tm-ejb/TFConfigurationRequirementsWs"/>
+    <component class="net.ihe.gazelle.tm.configurations.action.GenerateConfigurationForANotDroppedSystemInSessionJob"
+               jndi-name="java:global/${finalName}/gazelle-tm-ejb/GenerateConfigurationForANotDroppedSystemInSessionJob"/>
+    <component class="net.ihe.gazelle.tm.systems.action.SystemManager"
+               jndi-name="java:app/gazelle-tm-ejb/SystemManager"/>
+    <component class="net.ihe.gazelle.tm.configurations.ws.SystemConfigurationsWs"
+               jndi-name="java:app/gazelle-tm-ejb/SystemConfigurationsWs"/>
+    <component class="net.ihe.gazelle.tm.gazelletest.test.AssertionsManager"
+               jndi-name="java:app/gazelle-tm-ejb/AssertionsManager"/>
+    <component class="net.ihe.gazelle.tf.ws.AuditMessagesTextWs"
+               jndi-name="java:app/gazelle-tm-ejb/AuditMessagesTextWs"/>
+    <component class="net.ihe.gazelle.tf.action.ProfileProfileOptionSelector"
+               jndi-name="java:app/gazelle-tm-ejb/ProfileProfileOptionSelector"/>
+    <component class="net.ihe.gazelle.form.Validate" jndi-name="java:app/gazelle-tm-ejb/Validate"/>
+    <component class="net.ihe.gazelle.tm.gazelletest.action.ConnecthatonTestingManager"
+               jndi-name="java:app/gazelle-tm-ejb/ConnecthatonTestingManager"/>
+    <component class="net.ihe.gazelle.tm.systems.action.IHEImplementationForSystemManager"
+               jndi-name="java:app/gazelle-tm-ejb/IHEImplementationForSystemManager"/>
+    <component class="net.ihe.gazelle.tm.messages.MessageWS" jndi-name="java:app/gazelle-tm-ejb/MessageWS"/>
+    <component class="net.ihe.gazelle.tm.tee.status.TestStepsInstanceExecutionStatusManager"
+               jndi-name="java:app/gazelle-tm-ejb/TestStepsInstanceExecutionStatusManager"/>
+    <component class="net.ihe.gazelle.tm.gazelletest.action.TestSequenceManager"
+               jndi-name="java:app/gazelle-tm-ejb/TestSequenceManager"/>
+    <component class="net.ihe.gazelle.tm.gazelletest.action.TestsRequirementsManager"
+               jndi-name="java:app/gazelle-tm-ejb/TestsRequirementsManager"/>
+    <component class="net.ihe.gazelle.tf.remote.IHEConceptsRemoting"
+               jndi-name="java:app/gazelle-tm-ejb/IHEConceptsRemoting"/>
+    <component class="net.ihe.gazelle.ws.tf.integrationProfiles.IntegrationProfileWs"
+               jndi-name="java:app/gazelle-tm-ejb/IntegrationProfileWs"/>
+    <component class="net.ihe.gazelle.tm.gazelletest.ws.GazelleMonitorWS"
+               jndi-name="java:app/gazelle-tm-ejb/GazelleMonitorWS"/>
+    <component class="net.ihe.gazelle.tm.gazelletest.action.ContextualInformationManager"
+               jndi-name="java:app/gazelle-tm-ejb/ContextualInformationManager"/>
+    <component class="net.ihe.gazelle.ws.tm.tests.TestsWs" jndi-name="java:app/gazelle-tm-ejb/TestsWs"/>
+    <component class="net.ihe.gazelle.tm.gazelletest.action.MonitorInSessionAdministrationManager"
+               jndi-name="java:app/gazelle-tm-ejb/MonitorInSessionAdministrationManager"/>
+    <component class="net.ihe.gazelle.tm.configurations.action.ConfigurationTypeMappingWithAIPOManager"
+               jndi-name="java:app/gazelle-tm-ejb/ConfigurationTypeMappingWithAIPOManager"/>
+    <component class="net.ihe.gazelle.ws.tf.ActorIntegrationProfileOption.ActorIntegrationProfileOptionWs"
+               jndi-name="java:app/gazelle-tm-ejb/ActorIntegrationProfileOptionWs"/>
+    <component class="net.ihe.gazelle.tf.ws.Hl7MessageProfile" jndi-name="java:app/gazelle-tm-ejb/Hl7MessageProfile"/>
+    <component class="net.ihe.gazelle.tf.action.WSTransactionUsageManager"
+               jndi-name="java:app/gazelle-tm-ejb/WSTransactionUsageManager"/>
+    <component class="net.ihe.gazelle.tf.action.IntegrationProfileOptionManager"
+               jndi-name="java:app/gazelle-tm-ejb/IntegrationProfileOptionManager"/>
+    <component class="net.ihe.gazelle.objects.admin.ObjectTypeManager"
+               jndi-name="java:app/gazelle-tm-ejb/ObjectTypeManager"/>
+    <component class="net.ihe.gazelle.users.action.AddressManager" jndi-name="java:app/gazelle-tm-ejb/AddressManager"/>
+    <component class="net.ihe.gazelle.ws.tm.testSteps.TestStepsWs" jndi-name="java:app/gazelle-tm-ejb/TestStepsWs"/>
+    <component class="net.ihe.gazelle.tm.gazelletest.action.CookiesPreset"
+               jndi-name="java:app/gazelle-tm-ejb/CookiesPreset"/>
+    <!--<component class="net.ihe.gazelle.common.fineuploader.TestInstanceUploadManager" jndi-name="java:app/gazelle-tm-ejb/TestInstanceUploadManager"/>-->
+    <component class="net.ihe.gazelle.tm.tee.execution.TEEManager" jndi-name="java:app/gazelle-tm-ejb/TEEManager"/>
+    <component class="net.ihe.gazelle.tm.gazelletest.ws.trm.GazelleTRM" jndi-name="java:app/gazelle-tm-ejb/GazelleTRM"/>
+    <component class="net.ihe.gazelle.tm.users.action.ConnectathonParticipantManager"
+               jndi-name="java:app/gazelle-tm-ejb/ConnectathonParticipantManager"/>
+    <component class="net.ihe.gazelle.tm.configurations.action.ActorDefaultPortsManager"
+               jndi-name="java:app/gazelle-tm-ejb/ActorDefaultPortsManager"/>
+    <component class="net.ihe.gazelle.tm.gazelletest.action.TMCheckListManager"
+               jndi-name="java:app/gazelle-tm-ejb/TMCheckListManager"/>
+    <component class="net.ihe.gazelle.tm.gazelletest.action.MetaTestAdministrationManager"
+               jndi-name="java:app/gazelle-tm-ejb/MetaTestAdministrationManager"/>
+    <component class="net.ihe.gazelle.tm.configurations.action.SystemConfigurationManager"
+               jndi-name="java:app/gazelle-tm-ejb/SystemConfigurationManager"/>
+    <component class="net.ihe.gazelle.tm.gazelletest.action.MesaTestManager"
+               jndi-name="java:app/gazelle-tm-ejb/MesaTestManager"/>
+    <component class="net.ihe.gazelle.tf.action.ActorManager" jndi-name="java:app/gazelle-tm-ejb/ActorManager"/>
+    <component class="net.ihe.gazelle.tf.ws.StandardWs" jndi-name="java:app/gazelle-tm-ejb/StandardWs"/>
+    <component class="net.ihe.gazelle.common.report.ReportExporterManager"
+               jndi-name="java:app/gazelle-tools-tm/ReportExporterManager"/>
+    <component class="net.ihe.gazelle.tm.report.action.ReportManager"
+               jndi-name="java:app/gazelle-tools-tm/ReportManager"/>
+    <component class="net.ihe.gazelle.common.util.DocumentFileUpload"
+               jndi-name="java:app/gazelle-tools-tm/DocumentFileUpload"/>
+    <!--<component class="org.jboss.seam.async.TimerServiceDispatcher" jndi-name="java:app/jboss-seam-2.3.1.Final/TimerServiceDispatcher"/>-->
+    <component class="org.jboss.seam.transaction.EjbSynchronizations"
+               jndi-name="java:app/jboss-seam/EjbSynchronizations"/>
+    <component class="net.ihe.version.ws.Interface.VersionProvider" jndi-name="java:app/version/VersionProvider"/>
+
+    <component class="net.ihe.gazelle.common.action.PUProvider"
+               jndi-name="java:global/${finalName}/gazelle-seam-tools-jar/PUProvider"/>
+    <security:jpa-identity-store user-class="net.ihe.gazelle.users.model.User"
+                                 role-class="net.ihe.gazelle.users.model.Role"/>
+    <!--<core:init debug="false" jndi-pattern="java:app/${finalName}/#{ejbName}"/>-->
+    <core:init debug="false" jndi-pattern="java:app/gazelle-tm/#{ejbName}"/>
+    <!-- SMM Change conversation-timeout to 60 minutes, 2 minutes is too short -->
+    <!-- EP : This is about the conversation so this is fine. If what you want to change is the session length this is not the
+            right location. Currently the session is set to 30 minutes in the web.xml file. -->
+    <core:manager concurrent-request-timeout="500" conversation-timeout="120000" conversation-id-parameter="cid"/>
+    <!-- Make sure this URL pattern is the same as that used by the Faces Servlet -->
+    <!-- <web:hot-deploy-filter url-pattern="*.seam"/> -->
+    <!--<persistence:managed-persistence-context name="entityManager" entity-manager-factory="#{entityManagerFactory}"-->
+    <!--scope="conversation" auto-create="true"/>-->
+    <!--//TODO check after jboss7 migration-->
+    <persistence:managed-persistence-context name="entityManager" entity-manager-factory="#{entityManagerFactory}"
+                                             auto-create="true"/>
+    <async:quartz-dispatcher/>
+    <!-- PDF generation -->
+    <document:document-store use-extensions="true"/>
+    <pdf:key-store-config key-store="pdf.keystore" key-store-password="storepass" key-password="keypass"
+                          key-alias="pdfKey"/>
+    <!-- Email configuration -->
+    <mail:mail-session host="${application.smtp.hostname}" port="${application.smtp.port}"
+                       username="${application.smtp.username}" password="${application.smtp.password}"
+                       tls="${application.smtp.tls}" ssl="${application.smtp.ssl}"/>
+    <!-- For use with jBPM pageflow or process management <bpm:jbpm> <bpm:pageflow-definitions> <value>pageflow.jpdl.xml</value>
+            </bpm:pageflow-definitions> </bpm:jbpm> -->
+    <web:multipart-filter create-temp-files="true" max-request-size="${maxRequestSize}" url-pattern="*.seam"
+                          disabled="true"/>
+    <component name="org.jboss.seam.transaction.facesTransactionEvents">
+        <property name="transactionFailedMessageEnabled">false</property>
+    </component>
+
+    <web:character-encoding-filter encoding="UTF-8"
+                                   override-client="true"
+                                   url-pattern="*.seam"/>
+
+    <international:locale-selector cookie-enabled="true"/>
+</components>

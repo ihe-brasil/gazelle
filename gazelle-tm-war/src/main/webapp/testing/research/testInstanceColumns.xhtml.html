@@ -1,0 +1,44 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <g:column id="testNameColumn">
+        <ui:define name="header">#{messages['gazelle.tm.monitors.TestName']}</ui:define>
+        <g:link target="_blank" value="#{ti.test}"/>
+    </g:column>
+    <g:column id="testTypeColumn">
+        <ui:define name="header">#{messages['gazelle.tm.monitors.TestType']}</ui:define>
+        <h:outputText value="#{messages[ti.test.getLabelToDisplayOfTPT()]}"/>
+    </g:column>
+    <g:column id="lastUpdateColumn" sortBy="#{'lastChanged'}"
+              sortOrder="ascending">
+        <ui:define name="header">#{messages['gazelle.tm.test.LastUpdate']}</ui:define>
+        <g:date tooltip="true" value="#{ti.lastChanged}"/>
+    </g:column>
+    <g:column>
+        <ui:define name="header">#{messages['gazelle.tm.monitors.TestParticipants']}</ui:define>
+        <a4j:repeat var="tip"
+                    value="#{gazelleDAO.getTestInstanceParticipantsListForATest(ti)}">
+            <div class="row">
+                <div class="col-md-4">
+                    <g:link target="_blank"
+                            value="#{tip.systemInSessionUser.systemInSession}"/>
+                    <h:outputText
+                            value=" (#{tip.systemInSessionUser.systemInSession.tableSession.tableKeyword})"/>
+                </div>
+                <div class="col-md-3">
+                    <h:outputText
+                            value="#{tip.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.keyword}"/>
+                </div>
+                <div class="col-md-3">
+                    <h:outputText
+                            value="#{tip.actorIntegrationProfileOption.actorIntegrationProfile.actor.keyword}"/>
+                </div>
+                <div class="col-md-2">
+                    <h:outputText
+                            value="#{tip.actorIntegrationProfileOption.integrationProfileOption.keyword}"/>
+                </div>
+            </div>
+        </a4j:repeat>
+    </g:column>
+</ui:composition>

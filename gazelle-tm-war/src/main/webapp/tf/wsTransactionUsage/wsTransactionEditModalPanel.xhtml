@@ -1,0 +1,78 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <h:form id="editForm">
+        <s:token allowMultiplePosts="true"/>
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="EditWSTransactionUsage"/>
+            <ui:param name="bodyStyleClass" value="gzl-select-modal-overflow-visible"/>
+            <ui:define name="popup_title">#{messages['gazelle.tf.EditWebserviceTransactionUsage']}</ui:define>
+            <s:decorate id="editdec" rendered="#{wsTransactionUsageManager.selectedWSTransactionUsage != null}">
+                #{wsTransactionUsageManager.initializeActorAndIP()}
+                <s:div id="selectdiv" styleClass="form-horizontal">
+                    <s:decorate id="ipdec" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                        <ui:define name="label">#{messages['gazelle.tf.table.IntegrationProfile']}</ui:define>
+                        <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text"
+                                         value="#{wsTransactionUsageManager.selectedIntegrationProfile}">
+                            <s:selectItems
+                                    value="#{wsTransactionUsageManager.getAllPossibleIntegrationProfile()}"
+                                    var="tran" noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                    label="#{wsTransactionUsageManager.truncateTextForDropDownListBoxesInSearchPage(tran)}"/>
+                            <a4j:ajax event="change" execute="@this" render="actdec,transdes"/>
+                        </h:selectOneMenu>
+                        <a4j:commandLink event="click" render="selectdiv" execute="@this"
+                                         title="#{messages['gazelle.tf.Reset']}"
+                                         actionListener="#{wsTransactionUsageManager.setSelectedIntegrationProfile(null)}">
+                            <span class="gzl-icon-times"/>
+                        </a4j:commandLink>
+                    </s:decorate>
+                    <s:decorate id="actdec" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                        <ui:define name="label">#{messages['gazelle.tf.Actor']}</ui:define>
+                        <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text"
+                                         value="#{wsTransactionUsageManager.selectedActor}">
+                            <s:selectItems value="#{wsTransactionUsageManager.getAllPossibleActors()}"
+                                           var="tran"
+                                           noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                           label="#{wsTransactionUsageManager.truncateTextForDropDownListBoxesInSearchPage(tran)}"/>
+                            <a4j:ajax event="change" execute="@this" render="ipdec,transdes"/>
+                        </h:selectOneMenu>
+                        <a4j:commandLink event="click" render="selectdiv" execute="@this"
+                                         title="#{messages['gazelle.tf.Reset']}"
+                                         actionListener="#{wsTransactionUsageManager.setSelectedActor(null)}">
+                            <span class="gzl-icon-times"/>
+                        </a4j:commandLink>
+                    </s:decorate>
+                    <s:decorate id="transdes" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                        <ui:define name="label">#{messages['gazelle.tf.table.Transaction']}</ui:define>
+                        <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text" required="true"
+                                         value="#{wsTransactionUsageManager.selectedWSTransactionUsage.transaction}">
+                            <s:selectItems value="#{wsTransactionUsageManager.getAllPossibleTransactions()}"
+                                           var="tran"
+                                           noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                           label="#{wsTransactionUsageManager.truncateTextForDropDownListBoxesInSearchPage(tran)}"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                </s:div>
+                <s:decorate id="usagdec" template="/layout/form/_edit.xhtml">
+                    <ui:param name="id" value="usageInput"/>
+                    <ui:define name="label">#{messages['gazelle.tf.Usage']}</ui:define>
+                    <h:inputText id="usageInput" styleClass=" form-control" size="50" required="true"
+                                 value="#{wsTransactionUsageManager.selectedWSTransactionUsage.usage}">
+                    </h:inputText>
+                </s:decorate>
+            </s:decorate>
+            <ui:define name="popup_footer">
+                <button type="button" class="gzl-btn" data-dismiss="modal">
+                    #{messages['gazelle.tm.Cancel']}
+                </button>
+                <a4j:commandButton value="#{messages['gazelle.tf.AddUpdate']}"
+                                   styleClass="gzl-btn-green"
+                                   actionListener="#{wsTransactionUsageManager.saveSelectedWSTransactionUsage()}"
+                                   onclick="jq162('#EditWSTransactionUsage').modal('hide');"
+                                   render="wsForm,messageDecoration"
+                                   rendered="#{wsTransactionUsageManager.selectedWSTransactionUsage != null}"/>
+            </ui:define>
+        </ui:decorate>
+    </h:form>
+</ui:composition>

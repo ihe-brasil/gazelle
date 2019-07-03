@@ -1,0 +1,45 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:h="http://java.sun.com/jsf/html">
+    <dl class="dl-horizontal">
+        <s:decorate template="/layout/display/_data_list_item.xhtml"
+                    rendered="#{ not empty addressVariable.id and s:hasRole('admin_role') }">
+            <ui:define name="label">#{messages['gazelle.users.ID']}</ui:define>
+            #{addressVariable.id}
+        </s:decorate>
+        <s:decorate template="/layout/display/_data_list_item.xhtml"
+                    rendered="#{ not empty addressVariable.address}">
+            <ui:define name="label">#{messages['gazelle.users.address.AddressAddress']}</ui:define>
+            #{addressVariable.address}
+        </s:decorate>
+        <s:decorate template="/layout/display/_data_list_item.xhtml"
+                    rendered="#{ not empty addressVariable.addressLine2}">
+            <ui:define name="label">#{messages['gazelle.users.address.AddressAddress']}
+                #{messages['net.ihe.gazelle.tm.Line2']}
+            </ui:define>
+            #{addressVariable.addressLine2}
+        </s:decorate>
+        <s:decorate template="/layout/display/_data_list_item.xhtml"
+                    rendered="#{ not empty addressVariable.city}">
+            <ui:define name="label">#{messages['gazelle.users.address.AddressCity']}</ui:define>
+            #{addressVariable.city}
+        </s:decorate>
+        <s:decorate template="/layout/display/_data_list_item.xhtml"
+                    rendered="#{not empty addressVariable.state}">
+            <ui:define name="label">#{messages['gazelle.users.address.AddressState']}</ui:define>
+            #{addressVariable.state}
+        </s:decorate>
+        <s:decorate template="/layout/display/_data_list_item.xhtml"
+                    rendered="#{not empty addressVariable.zipCode}">
+            <ui:define name="label">#{messages['gazelle.users.address.AddressZipCode']}</ui:define>
+            #{addressVariable.zipCode}
+        </s:decorate>
+        <s:decorate template="/layout/display/_data_list_item.xhtml"
+                    rendered="#{ not empty addressVariable.iso3166CountryCode}">
+            <ui:define name="label">#{messages['gazelle.users.address.AddressCountry']}</ui:define>
+            #{addressVariable.iso3166CountryCode.name}
+            <h:graphicImage library="img" width="20" height="14" name="#{addressVariable.iso3166CountryCode.flagUrl}"
+                            rendered="#{ not empty addressVariable.iso3166CountryCode.flagUrl }"/>
+        </s:decorate>
+    </dl>
+</ui:composition>

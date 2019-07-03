@@ -1,0 +1,26 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <s:div rendered="#{s:hasPermission('MasterModel', 'edit', null) and (empty ipParam.documentSection) and ( s:hasRole('admin_role') || s:hasRole('tests_editor_role'))}">
+        <a4j:commandLink event="click" execute="@this" render="formParam"
+                         title="#{messages['net.ihe.gazelle.tm.SelectASection']}"
+                         action="#{controllerParam.addSectionPage(ipParam,callerPageParam)}">
+            <span class="gzl-icon-plus"/>
+        </a4j:commandLink>
+
+    </s:div>
+    <s:span rendered="#{not empty ipParam.documentSection}">
+        <ui:include src="/tf/documents/_documentSection.xhtml">
+            <ui:param name="documentSectionParam" value="#{ipParam.documentSection}"/>
+            <ui:param name="displayedName" value="#{messages['gazelle.tf.menu.TF']}"/>
+        </ui:include>
+    </s:span>
+    <s:span style="padding-left: 10px;"
+            rendered="#{(not empty ipParam.documentSection) and s:hasPermission('MasterModel', 'edit', null) and (not empty ipParam.documentSection) and ( s:hasRole('admin_role') || s:hasRole('tests_editor_role'))}">
+        <a4j:commandLink event="click" execute="@this" render="#{formParam}"
+                         title="#{messages['net.ihe.gazelle.tm.RemoveThisSection']}"
+                         actionListener="#{controllerParam.deleteSection(ipParam)}">
+            <span class="gzl-icon-trash-o"/>
+        </a4j:commandLink>
+    </s:span>
+</ui:composition>

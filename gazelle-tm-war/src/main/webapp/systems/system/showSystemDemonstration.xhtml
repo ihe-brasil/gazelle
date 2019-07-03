@@ -1,0 +1,73 @@
+<div xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:s="http://jboss.org/schema/seam/taglib"
+     xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <!-- ==================================== -->
+    <!-- System demonstrations section		  -->
+    <!-- ==================================== -->
+    <h:form id="showDemoForm${panelId}">
+        <s:token allowMultiplePosts="true"/>
+        <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+            <ui:param name="panel_id" value="showDemoPanel${panelId}"/>
+            <ui:define name="panel_title">#{systemInSessionEditor.getSystem().name}
+                #{messages['gazelle.systems.system.DemonstrationsPerformedLabel1']}
+            </ui:define>
+
+            <p>
+                #{messages['gazelle.systems.system.EditSystemDemonstrationRegistration']}</p>
+
+            <a4j:repeat id="availableDemonstrationsTable" value="#{systemDemonstrationManager.demonstrations}"
+                        var="pairBoolDemonstration">
+                <div style="float: left; padding-right: 7px; padding-left: 7px; border-right: solid black 1px; text-align: center;">
+                    <h:panelGrid columns="9" id="demosPanelGrid${panelId}">
+                        <h:outputText value="#{pairBoolDemonstration.object2.name}"/>
+
+                        <a4j:commandLink event="click"
+                                         oncomplete="jq162('#editDemoModalPanel').modal('show');"
+                                         render="showDemoForm${panelId}, popupGroup"
+                                         title="#{messages['gazelle.common.button.View']}"
+                                         actionListener="#{demonstrationManager.showSelectedDemonstrationForUser(pairBoolDemonstration.object2)}">
+                            <span class="gzl-icon-search"/>
+                        </a4j:commandLink>
+
+                        <h:outputText value="#{messages['gazelle.common.No']}"
+                                      rendered="#{!pairBoolDemonstration.object1}"/>
+
+                        <span class="gzl-icon-circle-purple"/>
+                        <h:outputText id="demoYes${panelId}"
+                                      value="#{messages['gazelle.common.Yes']}"
+                                      rendered="#{pairBoolDemonstration.object1}"/>
+
+                    </h:panelGrid>
+                </div>
+            </a4j:repeat>
+
+            <h:panelGroup rendered="#{ empty systemDemonstrationManager.demonstrations}">
+                <ui:decorate template="/layout/panels/_panel.xhtml">
+                    <h:outputText id="noSystemLabel${panelId}"
+                                  value="#{messages['gazelle.systems.system.NoDemonstrationLabel1']}"
+                                  style="font-style:italic"/>
+                    <br/>
+                    <h:outputText id="noSystemLabel2${panelId}"
+                                  value="#{messages['gazelle.systems.system.NoDemonstrationLabel2']}"
+                                  style="font-style:italic"/>
+                </ui:decorate>
+            </h:panelGroup>
+        </ui:decorate>
+        <h:panelGroup id="popupGroup">
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="editDemoModalPanel"/>
+                <ui:define name="popup_title">#{demonstrationManager.selectedDemonstration.name}</ui:define>
+                <f:subview id="subview_4">
+                    <ui:include id="include4Show" src="../demonstration/showDemonstrationData.xhtml"/>
+                </f:subview>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                </ui:define>
+            </ui:decorate>
+        </h:panelGroup>
+    </h:form>
+    <div style="clear: both"/>
+</div>

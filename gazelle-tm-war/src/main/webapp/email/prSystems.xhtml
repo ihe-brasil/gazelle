@@ -1,0 +1,27 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <table border="1">
+        <tr>
+            <td>#{messages['net.ihe.gazelle.tm.Unmatching']}</td>
+            <td>#{messages['net.ihe.gazelle.tm.Unreachable']}</td>
+            <td>#{messages['gazelle.tm.tests.testStatus']}</td>
+            <td>#{messages['gazelle.testmanagement.object.Name']}</td>
+            <td>#{messages['gazelle.systems.system.SystemVersion']}</td>
+            <td>#{messages['net.ihe.gazelle.tm.Institution']}</td>
+            <td>#{messages['net.ihe.gazelle.tm.ISURL']}</td>
+        </tr>
+        <ui:repeat value="#{systems}" var="systemVar">
+            <tr>
+                <td>#{systemVar.prCounterCrawlerUnmatchingHashcode}</td>
+                <td>#{systemVar.prCounterCrawlerUnreachableUrl}</td>
+                <td>#{systemVar.prStatus.details}</td>
+                <td>#{systemVar.name}</td>
+                <td>#{systemVar.version}</td>
+                <td>#{systemVar.printableInstitutions}</td>
+                <td>
+                    <a href="#{systemVar.integrationStatementUrl}">#{systemVar.getIntegrationStatementDownloadLabel('Download')}</a>
+                </td>
+            </tr>
+        </ui:repeat>
+    </table>
+</ui:composition>

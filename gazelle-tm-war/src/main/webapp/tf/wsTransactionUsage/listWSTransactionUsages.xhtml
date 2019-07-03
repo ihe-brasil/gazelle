@@ -1,0 +1,85 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tf.WebserviceTransactionUsage']}"/>
+    <ui:define name="body">
+        <h:form id="addBtnForm">
+            <s:token allowMultiplePosts="true"/>
+            <a4j:commandButton styleClass="gzl-btn-green"
+                               value="#{messages['gazelle.tf.transaction.button.AddNewWSTransactionUsage']}"
+                               actionListener="#{wsTransactionUsageManager.initializeSelectedWSTransactionUsage()}"
+                               oncomplete="jq162('#EditWSTransactionUsage').modal('show');"
+                               rendered="#{s:hasPermission('MasterModel', 'edit', null)}"
+                               render="EditWSTransactionUsage, :editForm"/>
+        </h:form>
+        <div id="transactionManager">
+            <h:form id="wsForm">
+                <s:token allowMultiplePosts="true"/>
+                <a4j:queue requestDelay="300" ignoreDupResponses="true"/>
+                #{dataTableStateHolder.setAscendingOn('transaction.keyword')}
+                <rich:dataTable id="wstransactionList" var="wstran"
+                                value="#{wsTransactionUsageManager.wsTransactionUsages}"
+                                rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+
+
+                                render="ds">
+                    <g:column sortBy="#{'id'}" sortOrder="#{dataTableStateHolder.sortOrders['id']}">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                        #{wstran.id}
+                    </g:column>
+                    <g:column sortBy="#{'transaction.keyword'}"
+                              sortOrder="#{dataTableStateHolder.sortOrders['transaction.keyword']}"
+                              filterBy="#{'transaction.keyword'}" filterEvent="onkeyup">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Transaction']}</ui:define>
+                        #{wstran.transaction.keyword}
+                    </g:column>
+                    <g:column sortBy="#{'usage'}" sortOrder="#{dataTableStateHolder.sortOrders['usage']}"
+                              filterBy="#{'usage'}"
+                              filterEvent="onkeyup">
+                        <ui:define name="header">#{messages['gazelle.tf.Usage']}</ui:define>
+                        #{wstran.usage}
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.tf.table.Action']}</ui:define>
+                        <div class="gzl-never-wrap">
+
+                            <a4j:commandLink event="click"
+                                             rendered="#{s:hasPermission('MasterModel', 'edit', null)}"
+                                             title="#{messages['gazelle.common.button.Edit']}"
+                                             oncomplete="jq162('#EditWSTransactionUsage').modal('show');"
+                                             execute="@this" render="EditWSTransactionUsage, :editForm"
+                                             actionListener="#{wsTransactionUsageManager.setSelectedWSTransactionUsage(wstran)}">
+                                <span class="gzl-icon-pencil"/>
+                            </a4j:commandLink>
+
+                            <a4j:commandLink event="click"
+                                             rendered="#{s:hasPermission('MasterModel', 'edit', null)}"
+                                             title="#{messages['gazelle.common.button.Delete']}"
+                                             oncomplete="jq162('#DeleteSelectedWSTrans').modal('show');"
+                                             render="DeleteSelectedWSTrans, :deleteForm"
+                                             actionListener="#{wsTransactionUsageManager.setSelectedWSTransactionUsage(wstran)}">
+                                <span class="gzl-icon-trash-o"/>
+                            </a4j:commandLink>
+                        </div>
+
+                    </g:column>
+                    <f:facet name="footer">
+                        <ui:include src="/util/datatableFooter.xhtml">
+                            <ui:param name="dataScrollerId" value="ds"/>
+                            <ui:param name="dataTableId" value="wstransactionList"/>
+                        </ui:include>
+                    </f:facet>
+                </rich:dataTable>
+                <h:commandLink value="#{messages['gazelle.common.export.ExportAsExcel']}"
+                               action="#{gazelleExcelExporterJboss7.export('wsForm:wstransactionList')}"/>
+
+            </h:form>
+        </div>
+
+
+        <ui:include src="wsTransactionDeleteModalPanel.xhtml"/>
+        <ui:include src="wsTransactionEditModalPanel.xhtml"/>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,275 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:g="http://www.ihe.net/gazelle" xmlns:rich="http://richfaces.org/rich"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.systems.system.ListSystemsLabel1']}"/>
+    <ui:define name="body">
+        <s:div id="listDiv">
+            <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                <ui:param name="panel_id" value="listPanel"/>
+                <ui:define name="panel_title">#{messages['gazelle.systems.system.ListSystemsLabel2']}</ui:define>
+                <h:outputText value=""
+                              rendered="#{s:hasRole('admin_role') or s:hasRole('testing_session_admin_role')}"/>
+                <div id="systemManagerDiv">
+                    <h:form id="listSystemInSessionForm" styleClass="form-horizontal">
+                        <s:token allowMultiplePosts="true"/>
+                        <!-- We get the list of systems to display, depending of the user (vendor(etc...) or admin (staff...) -->
+                        #{systemInSessionListManager.getSystemsInSessionListDependingInstitution()}
+
+                        <h:panelGroup
+                                rendered="#{(testingSessionManager.isRegistrationDeadlineExpired()) and (s:hasRole('vendor_role') or s:hasRole('vendor_admin_role')) }">
+                            <p class="gzl-alert gzl-alert-orange">
+                                <span class="gzl-icon-history"/>
+                                #{messages['gazelle.systems.system.RegistrationDeadlineExpired1']}
+                                #{messages['gazelle.systems.system.RegistrationDeadlineExpired2']}
+                                #{messages['gazelle.systems.system.RegistrationDeadlineExpired3']}
+                                <a href="mailto:#{gazelleDAO.getSelectedTestingSession().contactEmail}">#{gazelleDAO.getSelectedTestingSession().contactFirstname}
+                                    #{gazelleDAO.getSelectedTestingSession().contactLastname}</a>
+                                #{messages['gazelle.systems.system.RegistrationDeadlineExpired4']}
+                            </p>
+                        </h:panelGroup>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h:panelGroup
+                                        rendered="#{(s:hasRole('admin_role') or s:hasRole('testing_session_admin_role') || s:hasRole('institutions_editor_role') || s:hasRole('project-manager_role')) and applicationManager.isTestManagement()}">
+                                    <a4j:region id="InstitutionRegion">
+                                        <s:decorate id="institutionDecoration"
+                                                    template="/layout/form/_form_field_horizontal_inline.xhtml">
+                                            <ui:param name="id" value="ListInstitution"/>
+                                            <ui:define name="label">
+                                                #{messages['gazelle.financial.invoice.InstitutionKeyword']}
+                                            </ui:define>
+                                            <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text"
+                                                             id="ListInstitution"
+                                                             value="#{systemInSessionListManager.selectedInstitution}">
+                                                <s:selectItems
+                                                        value="#{gazelleDAO.getListOfInstitutionsRegisterInSession(gazelleDAO.getSelectedTestingSession())}"
+                                                        var="institutionUsed"
+                                                        noSelectionLabel="#{messages['net.ihe.gazelle.tm.AllOrganizations']}"
+                                                        label="#{institutionUsed.keyword} - #{institutionUsed.name}"/>
+                                                <a4j:ajax event="change" execute="@this"
+                                                          render="systemManager,institutionDecoration2"/>
+                                            </h:selectOneMenu>
+
+                                            <a4j:commandLink event="click" execute="@this"
+                                                             render="systemManager,institutionDecoration,institutionDecoration2,statusDecoration"
+                                                             actionListener="#{systemInSessionListManager.setSelectedInstitution(null)}">
+                                                <span class="gzl-icon-times"/>
+                                            </a4j:commandLink>
+
+                                        </s:decorate>
+                                    </a4j:region>
+                                    <a4j:region id="StatusRegion">
+                                        <s:decorate id="statusDecoration"
+                                                    template="/layout/form/_form_field_horizontal_inline.xhtml">
+                                            <ui:param name="id" value="ListStatus"/>
+                                            <ui:define name="label">
+                                                #{messages['net.ihe.gazelle.tm.RegistrationStatus']}
+                                            </ui:define>
+                                            <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text"
+                                                             id="ListStatus"
+                                                             value="#{systemInSessionListManager.selectedRegistrationStatus}">
+                                                <s:selectItems
+                                                        value="#{systemInSessionListManager.getListOfRegistrationStatus(gazelleDAO.getSelectedTestingSession())}"
+                                                        var="statusUsed"
+                                                        noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                        label="#{messages[statusUsed.labelToDisplay]}"/>
+                                                <a4j:ajax event="change" execute="@this"
+                                                          render="systemManager,institutionDecoration2,statusDecoration"/>
+                                            </h:selectOneMenu>
+
+                                            <a4j:commandLink event="click" execute="@this"
+                                                             render="systemManager,institutionDecoration,institutionDecoration2,statusDecoration"
+                                                             actionListener="#{systemInSessionListManager.setSelectedRegistrationStatus(null)}">
+                                                <span class="gzl-icon-times"/>
+                                            </a4j:commandLink>
+
+                                        </s:decorate>
+                                    </a4j:region>
+                                </h:panelGroup>
+                            </div>
+                            <div class="col-md-6">
+                                <div id="manageSystemButtonsDiv" align="right">
+                                    <a4j:commandButton id="menuRegisterANewSystemButton" styleClass="gzl-btn-green"
+                                                       value="#{messages['gazelle.common.menu.MenuRegisterANewSystem']}"
+                                                       action="#{systemInSessionListManager.addNewSystemActionRedirect()}"
+                                                       immediate="true"
+                                                       rendered="#{s:hasRole('admin_role') or s:hasRole('testing_session_admin_role') or s:hasRole('project-manager_role') or s:hasRole('systems_editor_role') or (!testingSessionManager.isRegistrationDeadlineExpired() and (s:hasRole('vendor_role') or s:hasRole('vendor_admin_role'))) }"
+                                                       render="systemManager">
+                                    </a4j:commandButton>
+                                    <h:panelGroup
+                                            rendered="#{not testingSessionManager.reuseSystemsForThisSession() and applicationManager.isTestManagement()}">
+                                        <a4j:commandButton id="copySystemCommandButton" styleClass="gzl-btn-green"
+                                                           value="#{messages['gazelle.systems.system.button.copy.Title']}"
+                                                           action="#{systemInSessionListManager.copySystemInSession()}"
+                                                           immediate="true"
+                                                           rendered="#{s:hasRole('admin_role') or s:hasRole('testing_session_admin_role')or s:hasRole('project-manager_role') or s:hasRole('systems_editor_role') or (!testingSessionManager.isRegistrationDeadlineExpired() and (s:hasRole('vendor_role') or s:hasRole('vendor_admin_role'))) }"/>
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+                        </div>
+                        <rich:dataTable id="systemManager" var="currentSystemInSession"
+                                        value="#{systemInSessionListManager.getAllSystemsInSession()}" rowKeyVar="rowNumber"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                            <g:column
+                                    rendered="#{(s:hasRole('admin_role') or s:hasRole('testing_session_admin_role') || s:hasRole('institutions_editor_role') || s:hasRole('project-manager_role')) and applicationManager.isTestManagement()}">
+                                <ui:define name="header">#{messages['gazelle.users.institution.InstitutionName']}
+                                </ui:define>
+                                #{systemManager.displayInstitutionForSystem(currentSystemInSession.system)}
+                            </g:column>
+                            <g:column rendered="#{applicationManager.isTestManagement()}" sortBy="#{'system.keyword'}">
+                                <ui:define name="header">
+                                    #{messages['gazelle.systems.system.SystemKeyword']}
+                                </ui:define>
+                                <a4j:commandLink id="systemKeywordCommandLink"
+                                                 action="#{systemInSessionListManager.viewSystemInSession(currentSystemInSession)}"
+                                                 value="#{currentSystemInSession.system.keyword }" event="click"
+                                                 execute="@this"/>
+                            </g:column>
+                            <g:column sortBy="#{'system.name'}">
+                                <ui:define name="header">#{messages['gazelle.systems.system.SystemName']}</ui:define>
+                                #{currentSystemInSession.system.name}
+                            </g:column>
+                            <g:column rendered="#{s:hasRole('admin_role')}" sortBy="#{'system.isTool'}">
+                                <ui:define name="header">#{messages['gazelle.systems.system.IsATool']}</ui:define>
+                                #{currentSystemInSession.system.isTool}
+                            </g:column>
+                            <g:column sortBy="#{'registrationStatus'}">
+                                <ui:define name="header">#{messages['net.ihe.gazelle.tm.RegistrationStatus']}
+                                </ui:define>
+                                <h:outputText
+                                        value="#{messages[currentSystemInSession.registrationStatus.labelToDisplay]}"
+                                        styleClass="#{currentSystemInSession.registrationStatus.cssStyle}"
+                                        style="border: none; font-size: 100%;"
+                                        rendered="#{!s:hasRole('admin_role')}"/>
+                                <h:selectOneMenu value="#{currentSystemInSession.registrationStatus}"
+                                                 styleClass="form-control #{currentSystemInSession.registrationStatus.cssStyle}"
+                                                 rendered="#{s:hasRole('admin_role')}"
+                                                 style="border: none; font-size: 100%;">
+                                    <s:selectItems
+                                            value="#{systemInSessionListManager.getPossibleRegistrationStatus(currentSystemInSession)}"
+                                            var="registrationStatus"
+                                            noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                            label="#{messages[registrationStatus.labelToDisplay]}"/>
+                                    <a4j:ajax event="change" render="systemManager" execute="@this"
+                                              listener="#{systemInSessionListManager.updateSystemInSession(currentSystemInSession)}"/>
+                                </h:selectOneMenu>
+                            </g:column>
+                            <g:column sortBy="#{'system.version'}">
+                                <ui:define name="header">#{messages['gazelle.systems.system.SystemVersion']}</ui:define>
+                                #{currentSystemInSession.system.version}
+                            </g:column>
+                            <g:column sortBy="#{'system.ownerUser.username'}">
+                                <ui:define name="header">#{messages['gazelle.systems.system.SystemOwner']}
+                                </ui:define>
+                                #{currentSystemInSession.system.ownerUser.username}
+                            </g:column>
+                            <g:column rendered="#{applicationManager.isProductRegistry()}"
+                                      sortBy="#{'system.prStatus.label'}">
+                                <ui:define name="header">
+                                    <h:outputText value="#{messages['gazelle.tm.tests.testStatus']}"/>
+                                </ui:define>
+                                <h:outputText value="#{currentSystemInSession.system.prStatus.label}"/>
+                            </g:column>
+                            <g:column rendered="#{applicationManager.isProductRegistry()}"
+                                      sortBy="#{'system.prStatus.visible'}">
+                                <ui:define name="header">
+                                    <h:outputText value="#{messages['net.ihe.gazelle.Visible']}"/>
+                                </ui:define>
+                                <h:outputText value="#{currentSystemInSession.system.prStatus.visible}"/>
+                            </g:column>
+                            <g:column width="100px">
+                                <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+                                <div class="gzl-never-wrap">
+                                    <h:panelGroup rendered="#{applicationManager.isTestManagement()}">
+                                        <a4j:commandLink id="currentSystemInSession_ViewSupport" immediate="true"
+                                                         action="#{systemInSessionListManager.viewSystemInSession(currentSystemInSession)}"
+                                                         title="#{messages['gazelle.common.button.View']}">
+                                            <span class="gzl-icon-search"/>
+                                        </a4j:commandLink>
+                                    </h:panelGroup>
+                                    <h:panelGroup
+                                            rendered="#{identity.loggedIn and (s:hasRole('admin_role') or s:hasRole('testing_session_admin_role') or s:hasRole('vendor_admin_role') or systemInSessionEditor.userIsCreator(currentSystemInSession))}">
+                                        <a4j:commandLink id="currentSystemInSession_EditSupport"
+                                                         action="#{systemInSessionListManager.editSystemInSessionSummaryActionRedirect(currentSystemInSession)}"
+                                                         immediate="true"
+                                                         title="#{messages['gazelle.common.button.Edit']}">
+                                            <span class="gzl-icon-pencil"/>
+                                        </a4j:commandLink>
+                                    </h:panelGroup>
+                                    <h:panelGroup
+                                            rendered="#{(identity.loggedIn and (s:hasRole('admin_role') or s:hasRole('testing_session_admin_role'))) or (systemInSessionListManager.isDeleteSystemButtonRendered( currentSystemInSession.system) and (!testingSessionManager.isRegistrationDeadlineExpired()))}">
+                                        <a4j:commandLink id="currentSystemInSession_DeleteSupport"
+                                                         actionListener="#{systemInSessionListManager.setSelectedSystemInSession( currentSystemInSession ) }"
+                                                         immediate="true"
+                                                         title="#{messages['gazelle.common.button.Delete']}"
+                                                         oncomplete="jq162('#DeleteConfirmationModalPanel').modal('show');"
+                                                         render=" :deleteSystemInSessionForm">
+                                            <span class="gzl-icon-trash-o"/>
+                                        </a4j:commandLink>
+                                    </h:panelGroup>
+                                </div>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId" value="systemManager"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+
+
+                        <h:panelGroup id="noSystemPanel"
+                                      rendered="#{systemInSessionListManager.systemsInSession.size() == 0 and !s:hasRole('admin_role') }">
+                            <ui:decorate template="/layout/panels/_panel.xhtml">
+                                <s:span styleClass="gzl-icon-exclamation-triangle"
+                                        rendered="#{systemInSessionListManager.systemsInSession.size() == 0}"/>
+                                <p/>
+                                <h:panelGrid columns="2" id="noSystemPanelGrid"
+                                             rendered="#{systemInSessionListManager.systemsInSession.size() == 0}"
+                                             style="width: 100%; vertical-align: middle; font-size: 11px; text-align: center;">
+                                    <h:outputText id="noSystemLabel"
+                                                  value="#{messages['gazelle.systems.system.NoSystem']}"
+                                                  style="font-style:italic"/>
+                                </h:panelGrid>
+                            </ui:decorate>
+                        </h:panelGroup>
+                    </h:form>
+                </div>
+
+                <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+                <!-- Delete system confirmation Modal Panel								-->
+                <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+                <h:form id="deleteSystemInSessionForm">
+                    <s:token allowMultiplePosts="true"/>
+                    <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                        <ui:param name="popup_id" value="DeleteConfirmationModalPanel"/>
+                        <ui:define name="popup_title">#{messages['gazelle.systems.system.confirmation.delete.header']}
+                        </ui:define>
+                        <p>
+                            <h:outputText id="currentSystemInSession_DeleteLabelOutputText"
+                                          value="#{messages['gazelle.systems.system.confirmation.delete.label']} #{systemInSessionListManager.getSelectedSystemInSession().system.name} ?"/>
+                        </p>
+                        <ui:define name="popup_footer">
+                            <button type="button" class="gzl-btn" data-dismiss="modal">
+                                #{messages['gazelle.tm.Cancel']}
+                            </button>
+                            <a4j:commandButton id="deleteButtonConfirm"
+                                               value="#{messages['gazelle.common.button.Delete']}"
+                                               ignoreDupResponses="true" styleClass="gzl-btn-red"
+                                               actionListener="#{systemInSessionListManager.deleteSystemInSession()}"
+                                               onclick="jq162('#DeleteConfirmationModalPanel').modal('hide');"
+                                               render="listSystemInSessionForm,messageDecoration"/>
+                        </ui:define>
+                    </ui:decorate>
+                </h:form>
+                <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+                <!-- END : Delete system confirmation Modal Panel						-->
+                <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+            </ui:decorate>
+
+        </s:div>
+    </ui:define>
+</ui:composition>

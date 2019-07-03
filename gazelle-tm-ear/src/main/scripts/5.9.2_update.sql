@@ -1,0 +1,1 @@
+INSERT INTO cmn_application_preference (id, class_name, description, preference_name, preference_value) VALUES (nextval('cmn_application_preference_id_seq'), 'java.lang.Boolean','Send also registration email to users with the admin role', 'send_emails_to_all_admins', 'true');

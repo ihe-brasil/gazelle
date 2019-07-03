@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Gazelle" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true">
+	<property name="ireport.scriptlethandling" value="0"/>
+	<property name="ireport.encoding" value="UTF-8"/>
+	<import value="java.util.*"/>
+	<import value="net.sf.jasperreports.engine.*"/>
+	<import value="net.sf.jasperreports.engine.data.*"/>
+	<parameter name="testingSessionId" class="java.lang.Integer" isForPrompting="false">
+		<defaultValueExpression><![CDATA[new Integer(7)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["/opt/gazelle/reports"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT DISTINCT
+     tf_actor."name" AS tf_actor_name,
+     tf_domain."name" AS tf_domain_name,
+     tf_integration_profile."name" AS tf_integration_profile_name,
+     tf_integration_profile."keyword" AS tf_integration_profile_keyword,
+     tf_actor."keyword" AS tf_actor_keyword,
+     tf_actor."id" AS tf_actor_id,
+     tf_integration_profile."id" AS tf_integration_profile_id
+FROM
+     "tf_integration_profile" tf_integration_profile INNER JOIN "public"."tf_domain_profile" tf_domain_profile ON tf_integration_profile."id" = tf_domain_profile."integration_profile_id"
+     INNER JOIN "public"."tf_actor_integration_profile" tf_actor_integration_profile ON tf_integration_profile."id" = tf_actor_integration_profile."integration_profile_id"
+     INNER JOIN "public"."tf_actor" tf_actor ON tf_actor_integration_profile."actor_id" = tf_actor."id"
+     INNER JOIN "public"."tf_domain" tf_domain ON tf_domain_profile."domain_id" = tf_domain."id"
+ORDER BY
+     tf_domain_name ASC,
+     tf_integration_profile."name" ASC,
+     tf_actor."name" ASC]]>
+	</queryString>
+	<field name="tf_actor_name" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tf_domain_name" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tf_integration_profile_name" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tf_integration_profile_keyword" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tf_actor_keyword" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tf_actor_id" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tf_integration_profile_id" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<group name="tf_domain_name">
+		<groupExpression><![CDATA[$F{tf_domain_name}]]></groupExpression>
+		<groupHeader>
+			<band height="19">
+				<textField isBlankWhenNull="false" hyperlinkType="None">
+					<reportElement key="textField" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="555" height="19" isRemoveLineWhenBlank="true" forecolor="#FFFFFF" backcolor="#6666FF"/>
+					<textElement textAlignment="Center">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{tf_domain_name}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="tf_integration_profile_name" isReprintHeaderOnEachPage="true" minHeightToStartNewPage="200">
+		<groupExpression><![CDATA[$F{tf_integration_profile_name}]]></groupExpression>
+		<groupHeader>
+			<band height="19" isSplitAllowed="false">
+				<textField isBlankWhenNull="false" hyperlinkType="None">
+					<reportElement key="textField" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="555" height="19" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#9999FF"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{tf_integration_profile_name} +" ("+$F{tf_integration_profile_keyword} +")"]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="tf_actor_name" isReprintHeaderOnEachPage="true" minHeightToStartNewPage="150">
+		<groupExpression><![CDATA[$F{tf_actor_name}]]></groupExpression>
+		<groupHeader>
+			<band height="16" isSplitAllowed="false">
+				<textField isBlankWhenNull="false" hyperlinkType="None">
+					<reportElement key="textField" mode="Opaque" x="0" y="0" width="555" height="16" isRemoveLineWhenBlank="true" backcolor="#CCCCFF"/>
+					<textElement>
+						<font size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{tf_actor_name} +" ("+$F{tf_actor_keyword}+")"]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<detail>
+		<band height="24">
+			<subreport isUsingCache="false">
+				<reportElement isPrintRepeatedValues="false" x="0" y="0" width="555" height="18" isRemoveLineWhenBlank="true"/>
+				<subreportParameter name="actorId">
+					<subreportParameterExpression><![CDATA[$F{tf_actor_id}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="testingSessionId">
+					<subreportParameterExpression><![CDATA[new Integer(7)]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="integrationProfileId">
+					<subreportParameterExpression><![CDATA[$F{tf_integration_profile_id}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="java.io.File"><![CDATA[new File( $P{SUBREPORT_DIR} + File.separatorChar +"listSystemsForGivenActorIntegrationProfile.jasper")]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

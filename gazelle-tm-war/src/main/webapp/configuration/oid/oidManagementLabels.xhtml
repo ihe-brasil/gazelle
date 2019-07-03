@@ -1,0 +1,136 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['net.ihe.gazelle.tm.OIDsRootLabelDefinition']}"/>
+    <ui:define name="body">
+        <h:form id="labelForm">
+            <a4j:commandButton id="addlabelbut" value="#{messages['net.ihe.gazelle.tm.AddNewOIDRootLabel']}"
+                               styleClass="gzl-btn-green"
+                               actionListener="#{oidLabelManager.initializeOIDRootDefinitionLabel()}"
+                               oncomplete="jq162('#AddOIDRootDefinitionLabel').modal('show');"
+                               rendered="#{applicationManager.isMasterModel()}"
+                               render=" :addForm"/>
+            <rich:dataTable id="labeldatatab" var="currentOIDRootDefinitionLabel"
+                            value="#{oidLabelManager.getOIDRootsLabel()}" rowKeyVar="rowNumber"
+                            rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                <g:column sortBy="#{'id'}" sortOrder="descending">
+                    <ui:define name="header">#{messages['gazelle.productregistry.search.Id']}</ui:define>
+                    <h:outputText value="#{currentOIDRootDefinitionLabel.id}"/>
+                </g:column>
+                <g:column sortBy="#{'label'}" filterBy="#{'label'}" filterEvent="onkeyup">
+                    <ui:define name="header">#{messages['gazelle.tf.table.Label']}
+                    </ui:define>
+                    <h:outputText value="#{currentOIDRootDefinitionLabel.label}"/>
+                </g:column>
+                <g:column rendered="#{applicationManager.isMasterModel()}">
+                    <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+                    <div class="gzl-never-wrap">
+                        <a4j:commandLink event="click"
+                                         title="#{messages['net.ihe.gazelle.tm.DeleteThisOidRootLabel']}"
+                                         oncomplete="jq162('#DeleteOIDRootDefinitionLabel').modal('show');"
+                                         render=" :deleteForm"
+                                         actionListener="#{oidLabelManager.setSelectedOIDRootDefinitionLabel(currentOIDRootDefinitionLabel)}">
+                            <span class="gzl-icon-trash-o"/>
+                        </a4j:commandLink>
+
+                        <a4j:commandLink event="click"
+                                         title="#{messages['net.ihe.gazelle.tm.EditThisOidRootLabel']}"
+                                         oncomplete="jq162('#EditOIDRootDefinitionLabel').modal('show');"
+                                         render=" :editForm"
+                                         actionListener="#{oidLabelManager.setSelectedOIDRootDefinitionLabel(currentOIDRootDefinitionLabel)}">
+                            <span class="gzl-icon-pencil"/>
+                        </a4j:commandLink>
+                    </div>
+                </g:column>
+                <f:facet name="footer">
+                    <ui:include src="/util/datatableFooter.xhtml">
+                        <ui:param name="dataScrollerId" value="ds"/>
+                        <ui:param name="dataTableId" value="labeldatatab"/>
+                    </ui:include>
+                </f:facet>
+            </rich:dataTable>
+        </h:form>
+
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Add OID Root Label-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="addForm">
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="AddOIDRootDefinitionLabel"/>
+                <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.AddAOIDRequirementLabel']}</ui:define>
+                <s:decorate id="labeldec" template="/layout/form/_edit.xhtml">
+                    <ui:param name="id" value="labelInput"/>
+                    <ui:define name="label">#{messages['gazelle.tf.table.Label']}</ui:define>
+                    <h:inputText id="labelInput" styleClass=" form-control" size="50" required="true"
+                                 value="#{oidLabelManager.selectedOIDRootDefinitionLabel.label}">
+                    </h:inputText>
+                </s:decorate>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="labelbut" value="#{messages['net.ihe.gazelle.tm.SaveLabel']}"
+                                       styleClass="gzl-btn-green"
+                                       actionListener="#{oidLabelManager.saveOIDRootDefinitionLabel()}"
+                                       oncomplete="jq162('#AddOIDRootDefinitionLabel').modal('hide');"
+                                       render="labelForm"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Delete OID Root Label -->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="deleteForm">
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteOIDRootDefinitionLabel"/>
+                <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.DeleteOIDRootDefinitionLabel']}</ui:define>
+                <s:div rendered="#{oidLabelManager.canDeleteSelectedOIDRootDefinitionLabel()}">
+                    <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+                </s:div>
+                <s:div rendered="#{!oidLabelManager.canDeleteSelectedOIDRootDefinitionLabel()}">
+                    <p>#{messages['net.ihe.gazelle.tm.YouCantDeleteThisLabelBecauseItsUsed']}</p>
+                </s:div>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <s:span rendered="#{oidLabelManager.canDeleteSelectedOIDRootDefinitionLabel()}">
+                        <a4j:commandButton id="delordordbut" value="#{messages['net.ihe.gazelle.tm.DeleteOIDRootDefinitionLabel_2']}"
+                                           styleClass="gzl-btn-red"
+                                           actionListener="#{oidLabelManager.deleteOIDRootDefinitionLabel()}"
+                                           onclick="jq162('#DeleteOIDRootDefinitionLabel').modal('hide');"
+                                           render="labelForm"/>
+                    </s:span>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Edit OID Root Label -->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="editForm">
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="EditOIDRootDefinitionLabel"/>
+                <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.EditOIDRootDefinitionLabel']}</ui:define>
+                <s:decorate id="labeldec" template="/layout/form/_edit.xhtml">
+                    <ui:param name="id" value="labelInput"/>
+                    <ui:define name="label">#{messages['gazelle.tf.table.Label']}</ui:define>
+                    <h:inputText id="labelInput" styleClass=" form-control" size="50" required="true"
+                                 value="#{oidLabelManager.selectedOIDRootDefinitionLabel.label}">
+                    </h:inputText>
+                </s:decorate>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="labelbut" value="#{messages['net.ihe.gazelle.tm.SaveLabel']}"
+                                       styleClass="gzl-btn-green"
+                                       actionListener="#{oidLabelManager.saveOIDRootDefinitionLabel()}"
+                                       oncomplete="jq162('#EditOIDRootDefinitionLabel').modal('hide');"
+                                       render="labelForm"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

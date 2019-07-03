@@ -1,0 +1,60 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle"
+              value="#{messages['net.ihe.gazelle.tm.ListOfActivatedDemonstrationsForCurrentTestingSe']}"/>
+    <ui:define name="body">
+        <s:div id="globalDiv">
+            <h:form id="globalForm">
+                <s:token allowMultiplePosts="true"/>
+                  <h:panelGroup id="allDemonstrationsPanel" style="border:none;"
+                            rendered="#{demonstrationManager.displayList}">
+
+                      #{dataTableStateHolder.setAscendingOn('name')}
+                    <rich:dataTable id="demonstrationTable" var="currentDemonstration"
+                                    value="#{demonstrationManager.findAllDemonstrations(false)}"
+                                    rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                        <g:column sortBy="#{'name'}" sortOrder="#{dataTableStateHolder.sortOrders['name']}">
+                            <ui:define name="header">
+                                #{messages['gazelle.systems.demonstration.Name']}
+                            </ui:define>
+                            <a href="#{currentDemonstration.url}" target="_blank">#{currentDemonstration.name}</a>
+                        </g:column>
+                        <g:column sortBy="#{'description'}" sortOrder="#{dataTableStateHolder.sortOrders['description']}">
+                            <ui:define name="header">#{messages['gazelle.systems.demonstration.Description']}
+                            </ui:define>
+                            #{currentDemonstration.description}
+                        </g:column>
+                        <g:column sortBy="#{'beginningDemonstration'}" sortOrder="#{dataTableStateHolder.sortOrders['beginningDemonstration']}">
+                            <ui:define name="header">#{messages['gazelle.systems.session.StartDate']}</ui:define>
+                            <h:outputText value="#{currentDemonstration.beginningDemonstration}"/>
+                        </g:column>
+                        <g:column sortBy="#{'endingDemonstration'}" sortOrder="#{dataTableStateHolder.sortOrders['endingDemonstration']}">
+                            <ui:define name="header">
+                                #{messages['gazelle.productregistry.search.statistics.calendar.EndDate']}
+                            </ui:define>
+                            <h:outputText value="#{currentDemonstration.endingDemonstration}"/>
+                        </g:column>
+                        <g:column sortBy="#{'iso3166CountryCode.printableName'}"
+                                  sortOrder="#{dataTableStateHolder.sortOrders['iso3166CountryCode.printableName']}">
+                            <ui:define name="header">#{messages['gazelle.systems.demonstration.country']}</ui:define>
+                            <div class="gzl-never-wrap">
+                                <h:graphicImage library="img"
+                                                name="#{currentDemonstration.iso3166CountryCode.flagUrl}"/>
+                                #{currentDemonstration.iso3166CountryCode.printableName}
+                            </div>
+                        </g:column>
+                        <f:facet name="footer">
+                            <ui:include src="/util/datatableFooter.xhtml">
+                                <ui:param name="dataScrollerId" value="ds"/>
+                                <ui:param name="dataTableId" value="demonstrationTable"/>
+                            </ui:include>
+                        </f:facet>
+                    </rich:dataTable>
+                </h:panelGroup>
+            </h:form>
+        </s:div>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,78 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml">
+    <div>
+
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#configurations" aria-controls="configurations" role="tab"
+                                                      data-toggle="tab">#{messages['gazelle.configuration.Configurations']}</a>
+            </li>
+            <li role="presentation"><a href="#oids" aria-controls="oids" role="tab" data-toggle="tab">#{messages['net.ihe.gazelle.tm.OIDs']}</a>
+            </li>
+            <li role="presentation"><a href="#hosts" aria-controls="hosts" role="tab"
+                                       data-toggle="tab">#{messages['net.ihe.gazelle.tm.Hosts']}</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="configurations">
+                <ui:include src="/configuration/listConfigurationsForASystemInSession.xhtml">
+                    <ui:param name="systemInSessionToUse" value="#{selectedSystemInSession}"/>
+                    <ui:param name="selectedActorForConfigs" value="#{selectedActorForConfigs}"/>
+                    <ui:param name="showActions" value="false"/>
+                    <ui:param name="formId" value="showConfigsForm"/>
+                    <ui:param name="idToRerender" value="#{configurations}"/>
+                    <ui:param name="isUpdateUrl" value="false"/>
+                </ui:include>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="oids">
+                <ui:include src="/configuration/oid/listOIDsForASystemInSession.xhtml">
+                    <ui:param name="systemInSessionToUse" value="#{selectedSystemInSession}"/>
+                    <ui:param name="selectedActorForConfigs" value="#{selectedActorForConfigs}"/>
+                    <ui:param name="showActions" value="false"/>
+                </ui:include>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="hosts">
+                <h:form id="showHostsForm" styleClass="form-horizontal">
+                    <s:token allowMultiplePosts="true"/>
+                    <rich:dataTable id="hostsTable" var="currentNetworkConfiguration"
+                                    rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                                    value="#{systemInSessionViewer.getHosts()}" render="ds">
+                        <g:column sortBy="#{'hostname'}" sortOrder="ascending">
+                            <ui:define name="header">
+                                <h:outputText value="#{messages['gazelle.configuration.network.hostname']}"/>
+                            </ui:define>
+                            <h:outputText value="#{currentNetworkConfiguration.hostname}"/>
+                        </g:column>
+                        <g:column sortBy="#{'alias'}" sortOrder="ascending">
+                            <ui:define name="header">
+                                <h:outputText value="#{messages['gazelle.configuration.network.alias']}"/>
+                            </ui:define>
+                            <h:outputText value="#{currentNetworkConfiguration.alias}"/>
+                        </g:column>
+                        <g:column sortBy="#{'ip'}">
+                            <ui:define name="header">
+                                <h:outputText value="#{messages['gazelle.configuration.network.ip']}"/>
+                            </ui:define>
+                            <h:outputText value="#{currentNetworkConfiguration.ip} "/>
+                        </g:column>
+                        <g:column>
+                            <ui:define name="header">
+                                <h:outputText value="#{messages['gazelle.configuration.network.comment']}"/>
+                            </ui:define>
+                            <h:outputText value="#{currentNetworkConfiguration.comment}"/>
+                        </g:column>
+                        <f:facet name="footer">
+                            <ui:include src="/util/datatableFooter.xhtml">
+                                <ui:param name="dataScrollerId" value="ds"/>
+                                <ui:param name="dataTableId" value="hostsTable"/>
+                            </ui:include>
+                        </f:facet>
+                    </rich:dataTable>
+                </h:form>
+            </div>
+        </div>
+    </div>
+</ui:composition>

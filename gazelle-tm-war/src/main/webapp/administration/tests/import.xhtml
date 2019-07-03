@@ -1,0 +1,23 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['net.ihe.gazelle.tm.ImportTests_3']}"/>
+    <ui:define name="body">
+        <h:form>
+            <s:decorate template="/layout/form/_edit.xhtml">
+                <ui:param name="id" value="filePathInput"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.PathToXmlFileOrFolderOfXml']}</ui:define>
+                <h:inputText id="filePathInput" styleClass=" form-control" value="#{testIOManager.filePath}" required="true" size="200">
+                </h:inputText>
+            </s:decorate>
+            <s:decorate template="/layout/form/_edit.xhtml">
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.DeleteImportedFiles']}</ui:define>
+                <h:selectBooleanCheckbox  styleClass="form-control-static" value="#{testIOManager.deleteImportedFile}"/>
+            </s:decorate>
+            <h:commandButton value="#{messages['gazelle.common.button.Import']}" styleClass="gzl-btn-green"
+                             ignoreDupResponses="true"
+                             actionListener="#{testIOManager.importAction()}"/>
+        </h:form>
+    </ui:define>
+</ui:composition>

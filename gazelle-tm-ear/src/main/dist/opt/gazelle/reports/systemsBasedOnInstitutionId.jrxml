@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.1.1.final using JasperReports Library version 6.1.1  -->
+<!-- 2016-01-21T17:24:06 -->
+<jasperReport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://jasperreports.sourceforge.net/jasperreports" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="systemsBasedOnInstitutionId" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="dff43fa6-9f47-48c0-bbb9-385b4a8a5746">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="institutionId" class="java.lang.Integer"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["/opt/gazelle/2010/reports/"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="testingSessionId" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[35]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+     tm_system."id" AS tm_system_id,
+     tm_system."name" AS tm_system_name,
+     tm_system."version" AS tm_system_version,
+     tm_system."keyword" AS tm_system_keyword
+FROM
+     "public"."usr_institution" usr_institution INNER JOIN "public"."tm_institution_system" tm_institution_system ON usr_institution."id" = tm_institution_system."institution_id"
+     INNER JOIN "public"."tm_system" tm_system ON tm_institution_system."system_id" = tm_system."id"
+     INNER JOIN "public"."tm_system_in_session" tm_system_in_session ON tm_system."id" = tm_system_in_session."system_id"
+WHERE
+     usr_institution."id" = $P{institutionId}
+ AND tm_system_in_session."testing_session_id" = $P{testingSessionId}]]>
+	</queryString>
+	<field name="tm_system_id" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tm_system_name" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tm_system_version" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tm_system_keyword" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="75" splitType="Prevent">
+			<textField>
+				<reportElement x="1" y="16" width="412" height="20" uuid="34c72c38-d8e4-4858-ac51-4d881cab3d9c"/>
+				<textElement>
+					<font size="14" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_system_name} + " - " + $F{tm_system_version}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement stretchType="RelativeToTallestObject" x="0" y="36" width="555" height="39" uuid="33d24e4f-46df-41df-b984-956554dac2bf"/>
+				<box leftPadding="0" rightPadding="0"/>
+				<textElement textAlignment="Justified"/>
+				<textFieldExpression><![CDATA["This system is registered with the system name "+ $F{tm_system_name} + ", which will be used only in the context of organizing the Connectathon. Please make sure to use this system name in communicating with the IHE Technical Project Managers. "]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="43">
+			<subreport>
+				<reportElement positionType="Float" x="0" y="3" width="555" height="39" uuid="8e798623-3bae-41b3-bbd2-1e72341b3b6c"/>
+				<subreportParameter name="testingSessionId">
+					<subreportParameterExpression><![CDATA[$P{testingSessionId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="institutionId">
+					<subreportParameterExpression><![CDATA[$P{institutionId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="systemId">
+					<subreportParameterExpression><![CDATA[$F{tm_system_id}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[new File($P{SUBREPORT_DIR} + File.separatorChar + "aipoBasedOnSystemId.jasper")]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

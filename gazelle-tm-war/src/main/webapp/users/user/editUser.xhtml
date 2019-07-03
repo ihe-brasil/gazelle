@@ -1,0 +1,201 @@
+<s:div xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:h="http://java.sun.com/jsf/html"
+       xmlns:s="http://jboss.org/schema/seam/taglib"
+       xmlns="http://www.w3.org/1999/xhtml">
+    <h:panelGroup rendered="#{identity.loggedIn}">
+        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+            <ui:define name="panel_title">#{messages['gazelle.users.registration.RegisterUserInfo']}</ui:define>
+            <p>#{messages['gazelle.users.registration.RegisterLabel1']}</p>
+
+            <div id="userManager">
+
+                <ui:decorate template="/layout/panels/_panel.xhtml">
+                    <div class="form-horizontal">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <!-- InstitutionType select box -->
+                                <a4j:region id="institutionRegionForSelectionBox"
+                                            rendered="#{s:hasRole('admin_role') || s:hasRole('accounting_role')}">
+                                    <s:decorate id="institutionDecorationForSelectionBox"
+                                                template="/layout/form/_form_field_horizontal_inline.xhtml">
+                                        <ui:param name="id" value="SessionTypeListBox"/>
+                                        <ui:define name="label">#{messages['gazelle.users.institution.InstitutionName']}
+                                        </ui:define>
+                                        <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text"
+                                                         id="SessionTypeListBox"
+                                                         value="#{userManager.selectedInstitution}"
+                                                         required="true">
+                                            <s:selectItems value="#{gazelleDAO.listAllInstitutions()}"
+                                                           var="companyFromList"
+                                                           noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                           label="#{companyFromList.name}" required="true"/>
+                                            <a4j:ajax event="change" execute="@this"/>
+                                        </h:selectOneMenu>
+                                    </s:decorate>
+                                </a4j:region>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <a4j:region id="firstnameRegion">
+                                    <s:decorate id="firstnameDecoration"
+                                                template="/layout/form/_form_field_horizontal_inline.xhtml">
+                                        <ui:param name="id" value="firstname"/>
+                                        <ui:define name="label">#{messages['gazelle.users.registration.FirstName']}
+                                        </ui:define>
+                                        <h:inputText id="firstname" tabindex="1" size="30" maxlength="128"
+                                                     styleClass="form-control"
+                                                     required="true" value="#{userManager.selectedUser.firstname}">
+                                            <a4j:ajax event="blur" render="firstnameDecoration" execute="@this"/>
+                                        </h:inputText>
+                                    </s:decorate>
+                                </a4j:region>
+                                <a4j:region id="lastnameRegion">
+                                    <s:decorate id="lastnameDecoration"
+                                                template="/layout/form/_form_field_horizontal_inline.xhtml">
+                                        <ui:param name="id" value="lastname"/>
+                                        <ui:define name="label">#{messages['gazelle.users.registration.LastName']}
+                                        </ui:define>
+                                        <h:inputText id="lastname" tabindex="1" size="30" maxlength="128"
+                                                     styleClass="form-control"
+                                                     required="true" value="#{userManager.selectedUser.lastname}">
+                                            <a4j:ajax event="blur" render="lastnameDecoration" execute="@this"/>
+                                        </h:inputText>
+                                    </s:decorate>
+                                </a4j:region>
+                            </div>
+                            <div class="col-md-6">
+                                <a4j:region id="emailRegion">
+                                    <s:decorate id="emailDecoration"
+                                                template="/layout/form/_form_field_horizontal_inline.xhtml">
+                                        <ui:param name="id" value="userEmail"/>
+                                        <ui:define name="label">#{messages['gazelle.users.registration.Email']}
+                                        </ui:define>
+                                        <h:inputText id="userEmail" tabindex="2" size="30" required="true"
+                                                     styleClass="form-control"
+                                                     value="#{userManager.selectedUser.email}" maxlength="96">
+                                            <a4j:ajax event="blur" render="emailDecoration" execute="@this"
+                                                      listener="#{userManager.isUserEmailAvailable()}"/>
+                                        </h:inputText>
+                                    </s:decorate>
+                                </a4j:region>
+                                <a4j:region id="usernameRegion">
+                                    <s:decorate id="usernameDecoration"
+                                                template="/layout/form/_form_field_horizontal_inline.xhtml"
+                                                rendered="#{userManager.displayUsernameField()}">
+                                        <ui:param name="id" value="userUsername"/>
+                                        <ui:define name="label">#{messages['gazelle.users.registration.Username']}
+                                        </ui:define>
+                                        <h:inputText id="userUsername" maxlength="20" tabindex="3" size="30"
+                                                     styleClass="form-control"
+                                                     required="#{userManager.displayUsernameField()}"
+                                                     value="#{userManager.selectedUser.username}">
+                                            <a4j:ajax event="blur" render="usernameDecoration" execute="@this"
+                                                      listener="#{userManager.isUserNameAvailable()}"/>
+                                        </h:inputText>
+                                    </s:decorate>
+                                </a4j:region>
+                                <a4j:region id="usernameRegionView"
+                                            rendered="#{!userManager.displayUsernameField()}">
+                                    <s:decorate id="usernameDecorationView"
+                                                template="/layout/form/_form_field_horizontal_inline.xhtml">
+                                        <ui:param name="id" value="userUsernameView"/>
+                                        <ui:define name="label">#{messages['gazelle.users.registration.Username']}
+                                        </ui:define>
+                                        <h:outputText id="userUsernameView" size="30" required="true"
+                                                      styleClass="form-control-static"
+                                                      value="#{userManager.selectedUser.username}">
+                                        </h:outputText>
+                                    </s:decorate>
+                                </a4j:region>
+
+                            </div>
+                            <div class="col-md-6">
+                                <a4j:region id="blockedRegion"
+                                            rendered="#{(s:hasRole('admin_role') or s:hasRole('vendor_admin_role') ) and userManager.displayDelete( userManager.selectedUser)}">
+                                    <s:decorate id="blockedDecoration"
+                                                template="/layout/form/_form_field_horizontal_inline.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.users.registration.Blocked']}
+                                        </ui:define>
+                                        <ui:param name="id" value="blocked"/>
+                                        <h:selectBooleanCheckbox styleClass="form-control-static" id="blocked"
+                                                                 value="#{userManager.selectedUser.blocked}"/>
+                                    </s:decorate>
+                                </a4j:region>
+                                <a4j:region id="activatedRegion"
+                                            rendered="#{(s:hasRole('admin_role') or s:hasRole('vendor_admin_role') ) and userManager.displayDelete( userManager.selectedUser)}">
+                                    <s:decorate id="activatedDecoration"
+                                                template="/layout/form/_form_field_horizontal_inline.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.users.registration.Activated']}
+                                        </ui:define>
+                                        <ui:param name="id" value="activated"/>
+                                        <h:selectBooleanCheckbox styleClass="form-control-static" id="activated"
+                                                                 value="#{userManager.selectedUser.activated}"
+                                                                 rendered="#{!userManager.selectedUser.activated or s:hasRole('admin_role')}"/>
+                                        <h:outputText id="activatedOutputText"
+                                                      value="#{userManager.selectedUser.activated}"
+                                                      rendered="#{userManager.selectedUser.activated and s:hasRole('vendor_admin_role')}"/>
+                                    </s:decorate>
+                                </a4j:region>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <h:panelGroup rendered="#{(s:hasRole('admin_role') or s:hasRole('vendor_admin_role') )}">
+                        <ui:decorate template="/layout/panels/_panel.xhtml">
+                            <h:outputText value="#{messages['gazelle.users.RoleToAttribute']}"
+                                          style="font-weight:bold;color : #334D55;"/>
+                            <br/>
+                            <table border="0">
+                                <a4j:repeat id="currentRoleRepeat" value="#{userManager.rolesForUser}"
+                                            var="currentRole"
+                                            rowKeyVar="i">
+                                    <div class="row form-inline">
+                                        <div class="control-label col-md-2">
+                                            <h:outputText value="#{currentRole.object2.name}" style="vertical-align: middle;"/>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <h:selectBooleanCheckbox style="vertical-align: middle;"
+                                                                     styleClass="form-control-static"
+                                                                     id="currentRoleSelectBooleanCheckbox"
+                                                                     value="#{currentRole.object1}"
+                                                                     label="#{currentRole.object2.name}"/>
+                                            <span style="vertical-align: middle;" class="gzl-icon-question-circle"
+                                                  title="#{currentRole.object2.description}"/>
+                                        </div>
+                                    </div>
+                                </a4j:repeat>
+                            </table>
+                        </ui:decorate>
+                    </h:panelGroup>
+                    <div style="clear: both"><span class="required">*</span>
+                        #{messages['gazelle.common.RequiredFields']}
+                    </div>
+                </ui:decorate>
+
+                <div>
+                    <a4j:commandButton id="editUserSaveButton" styleClass="gzl-btn-green" type="submit"
+                                       value="#{messages['gazelle.common.button.Save']}"
+                                       actionListener="#{userManager.addUserByAdmin()}"
+                                       render="testListDiv,allUsersF,formToEditUser,formToViewUser, gazelle-messages"/>
+                    <a4j:commandButton id="editUserChangePasswordButton" styleClass="gzl-btn-orange"
+                                       value="#{messages['gazelle.common.button.ChangePassword']}"
+                                       action="#{userManager.displayChangePassword()}"
+                                       rendered="#{ (s:hasRole('vendor_admin_role') || s:hasRole('admin_role')) and (not empty userManager.selectedUser ) and (userManager.isNewUser() == false) }"
+                                       immediate="true"/>
+                    <a4j:commandButton id="sendResetPasswordEmailButton" styleClass="gzl-btn-blue"
+                                       value="#{messages['net.ihe.gazelle.tm.SendResetPasswordEmail']}"
+                                       action="#{userManager.sendEmailToChangePasswordAsAdmin( )}"
+                                       rendered="#{ (s:hasRole('vendor_admin_role') || s:hasRole('admin_role')) and (not empty userManager.selectedUser ) and (userManager.isNewUser() == false) }"/>
+                    <a4j:commandButton id="editUserBackButton" styleClass="gzl-btn"
+                                       value="#{messages['gazelle.common.button.Cancel']}" bypassUpdates="true"
+                                       immediate="true"
+                                       actionListener="#{userManager.closeViewOrEditPanelsAndOpenList()}"
+                                       rendered="#{s:hasRole('admin_role') or s:hasRole('vendor_admin_role') or s:hasRole('testing_session_admin_role')}"
+                                       render="testListDiv,allUsersF,formToEditUser,formToViewUser"/>
+                </div>
+            </div>
+        </ui:decorate>
+    </h:panelGroup>
+</s:div>

@@ -1,0 +1,93 @@
+<s:div xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:h="http://java.sun.com/jsf/html"
+       xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+       xmlns="http://www.w3.org/1999/xhtml">
+    <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+        <ui:param name="panel_id" value="pr"/>
+        <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.Crawler']}</ui:define>
+        <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+            <ui:define name="label">#{messages['net.ihe.gazelle.CrawlerStatus']}</ui:define>
+            <h:panelGroup id="crawlerStatus">
+                <h:outputText value="#{messages['net.ihe.gazelle.NotRunning']}"
+                              rendered="#{empty prCrawlerManager.currentCrawlerReporting}"/>
+                <h:outputText value="#{prCrawlerManager.currentCrawlerReporting.information}"
+                              rendered="#{not empty prCrawlerManager.currentCrawlerReporting}"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <a4j:commandButton styleClass="gzl-btn-green" value="#{messages['gazelle.common.button.Refresh']}"
+                                   render="crawlerStatus" execute="@this"/>
+            </h:panelGroup>
+        </s:decorate>
+        <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+            <ui:define name="label">#{messages['net.ihe.gazelle.tm.CrawlerActivated']}</ui:define>
+            <h:selectBooleanCheckbox value="#{preferencesModifier.values['pr_crawler_enabled']}"
+                                     styleClass="form-control-static"/>
+        </s:decorate>
+        <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+            <ui:define name="label">#{messages['net.ihe.gazelle.tm.CrawlerTimeStarteveryDayWhateverTheDateIs']}
+            </ui:define>
+
+            <rich:calendar value="#{preferencesModifier.values['pr_crawler_start']}" popup="true"
+                           showApplyButton="true"
+                           datePattern="#{dateDisplay.calendarPatternDateTime}"
+                           locale="#{dateDisplay.calendarLocale}"
+                           timeZone="#{dateDisplay.calendarTimeZoneDateTime}"
+                           styleClass="form-inline">
+                <a4j:ajax event="change" render="calendarOffset"/>
+            </rich:calendar>
+            <p class="help-block">
+                <h:outputText id="calendarOffset"
+                              value="#{applicationPreferenceManager.getTimeZoneOffset(dateDisplay.calendarTimeZoneDateTime, preferencesModifier.values['pr_crawler_start'])}"/>
+            </p>
+
+        </s:decorate>
+        <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+            <ui:define name="label">#{messages['net.ihe.gazelle.tm.StartTheCrawler']}</ui:define>
+            <a4j:commandButton actionListener="#{prCrawlerManager.startCrawling()}" styleClass="gzl-btn-green"
+                               value="#{messages['net.ihe.gazelle.tm.StartCrawler']}" render="crawlerStatus"
+                               execute="@this"/>
+        </s:decorate>
+        <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+            <ui:define name="label">#{messages['net.ihe.gazelle.tm.SendMailsForRealifUncheckSendTestMailsToAdmin']}
+            </ui:define>
+            <h:selectBooleanCheckbox value="#{preferencesModifier.values['crawler_send_real_mail']}"
+                                     styleClass="form-control-static"/>
+        </s:decorate>
+        <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+            <ui:define name="label">#{messages['net.ihe.gazelle.tm.NumberOfUnmatchedHitsmd5CheckBeforeSendingMail']}
+            </ui:define>
+            <div class="form-control-static">
+                <ui:param name="id" value="crawlerSpinner1"/>
+                <rich:inputNumberSpinner id="crawlerSpinner1"
+                                         value="#{preferencesModifier.values['crawler_jobs_before_email_for_unmatching_hashcode']}"
+                                         minValue="1" maxValue="20"/>
+            </div>
+        </s:decorate>
+        <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+            <ui:define name="label">#{messages['net.ihe.gazelle.tm.NumberOfUnreachableHitsBeforeSendingMail']}
+            </ui:define>
+            <ui:param name="id" value="crawlerSpinner2"/>
+            <rich:inputNumberSpinner id="crawlerSpinner2"
+                                     value="#{preferencesModifier.values['crawler_jobs_before_email_for_unreachable_url']}"
+                                     minValue="1"
+                                     maxValue="20"/>
+        </s:decorate>
+        <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+            <ui:define name="label">#{messages['net.ihe.gazelle.tm.NumberOfUnreachableHitsBeforeDeferencing']}
+            </ui:define>
+            <ui:param name="id" value="crawlerSpinner3"/>
+            <rich:inputNumberSpinner id="crawlerSpinner3"
+                                     value="#{preferencesModifier.values['crawler_jobs_before_deferencing']}"
+                                     minValue="1" maxValue="20"/>
+        </s:decorate>
+    </ui:decorate>
+
+    <!-- Pref section PR -->
+    <!--@formatter:off-->
+    <script>
+        disable_input_spinner_mouse_wheel('#{rich:clientId('crawlerSpinner1')}');
+        disable_input_spinner_mouse_wheel('#{rich:clientId('crawlerSpinner2')}');
+        disable_input_spinner_mouse_wheel('#{rich:clientId('crawlerSpinner3')}');
+    </script>
+    <!--@formatter:on-->
+</s:div>

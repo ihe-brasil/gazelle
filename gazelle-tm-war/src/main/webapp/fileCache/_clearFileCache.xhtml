@@ -1,0 +1,8 @@
+<ui:composition
+        xmlns:a4j="http://richfaces.org/a4j"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns="http://www.w3.org/1999/xhtml">
+    <a4j:commandButton id="buttonId" value="#{messages['net.ihe.gazelle.tm.ClearFileCache']}" immediate="true" rendered="#{s:hasRole('admin_role')}"
+                       actionListener="#{fileCache.clearCache()}" render="idToRender"
+                       styleClass="gzl-btn-green"/>
+</ui:composition>

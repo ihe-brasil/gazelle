@@ -1,0 +1,181 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.testmanagement.object.EditReaderSample']}"/>
+    <ui:define name="body">
+        <h:form id="form">
+            <s:token allowMultiplePosts="true"/>
+            #{objectInstanceManager.initializeForReaders()}
+            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                <ui:define name="panel_title">#{messages['gazelle.testmanagement.object.Editthecurrentsample']}
+                </ui:define>
+                <h:outputText value="#{messages['gazelle.testmanagement.object.NoFileToUpload']}"
+                              rendered="#{objectInstanceManager.objectTypeFiles==null || objectInstanceManager.objectTypeFiles.size()==0}"/>
+                <rich:dataTable id="listObjectFileWithInstanceFile" var="currentFile"
+                                value="#{objectInstanceManager.objectTypeFiles}"
+                                rendered="#{objectInstanceManager.objectTypeFiles.size()&gt;0}"
+                                rowKeyVar="rowNumber">
+                    <f:facet name="header">
+                        <rich:columnGroup>
+                            <g:column>
+                                <h:outputText value="#{messages['gazelle.tf.table.Id']}"/>
+                            </g:column>
+                            <g:column>
+                                <h:outputText
+                                        value="#{messages['gazelle.testmanagement.object.FileTypeKeyword']}"/>
+                            </g:column>
+                            <g:column>
+                                <h:outputText
+                                        value="#{messages['gazelle.testmanagement.object.FileTypedescription']}"/>
+                            </g:column>
+                            <g:column>
+                                <h:outputText
+                                        value="#{messages['gazelle.testmanagement.object.ObjectFiledescription']}"/>
+                            </g:column>
+                            <g:column>
+                                <h:outputText
+                                        value="#{messages['gazelle.testmanagement.object.minimumfiles']}"/>
+                            </g:column>
+                            <g:column>
+                                <h:outputText
+                                        value="#{messages['gazelle.testmanagement.object.maximumfiles']}"/>
+                            </g:column>
+                            <g:column>
+                                <h:outputText
+                                        value="#{messages['gazelle.testmanagement.object.Action']}"/>
+                            </g:column>
+                        </rich:columnGroup>
+                    </f:facet>
+                    <rich:collapsibleSubTable id="ObjectFileDescriptionTable" var="currentFile" value="#{currentFile}"
+                                              columnClasses="mysubTable">
+                        <g:column>
+                            <h:outputText value="#{currentFile.id}"/>
+                        </g:column>
+                        <g:column>
+                            <h:outputText value="#{currentFile.type.keyword}"/>
+                        </g:column>
+                        <g:column>
+                            <h:outputText value="#{currentFile.type.description}"/>
+                        </g:column>
+                        <g:column>
+                            <h:outputText value="#{currentFile.description}"/>
+                        </g:column>
+                        <g:column>
+                            <h:outputText value="#{currentFile.min}"/>
+                        </g:column>
+                        <g:column>
+                            <h:outputText value="#{currentFile.max}"/>
+                        </g:column>
+                        <g:column>
+                            <h:panelGroup
+                                    rendered="#{objectInstanceManager.canAddObjectInstanceToCurrentObjectFile(currentFile,objectManager.selectedSystemInSession)}">
+                                <a4j:commandLink id="ModifyActionImageSupportForObjectFile"
+                                                 actionListener="#{objectInstanceManager.setSelectedObjectFile(currentFile) }"
+                                                 oncomplete="jq162('#UploadObjectFile').modal('show');"
+                                                 render="UploadObjectFile, :uploadForm">
+                                    <span class="gzl-icon-download"/>
+                                </a4j:commandLink>
+                            </h:panelGroup>
+                        </g:column>
+                    </rich:collapsibleSubTable>
+                    <g:column colspan="7">
+                        <rich:list id="objectInstanceFileDataList" var="currentObjectInstanceFile"
+                                   value="#{objectInstanceManager.getListObjectInstanceFileForSelectedObjectInstance(currentFile,objectManager.selectedSystemInSession)}"
+                                   type="unordered">
+                            <h:outputText value="#{currentObjectInstanceFile.url}"/>
+                            <a4j:commandLink id="deleteActionImageSupportForObjectInstanceFile"
+                                             actionListener="#{objectInstanceManager.setSelectedObjectInstanceFile(currentObjectInstanceFile)}"
+                                             oncomplete="jq162('#DeleteSelectedObjectInstanceFile').modal('show');"
+                                             render="DeleteSelectedObjectInstanceFile, :deleteFormOfObjectInstanceFile">
+                                <span class="gzl-icon-trash-o"/>
+                            </a4j:commandLink>
+
+                        </rich:list>
+                    </g:column>
+                </rich:dataTable>
+                <br/><br/>
+                <a4j:commandButton styleClass="gzl-btn" id="BackButton"
+                                   value="#{messages['gazelle.testmanagement.object.Back']}"
+                                   action="#{objectManager.returnToSystemObjectPageForTheTabReader()}"
+                                   execute="@this"/>
+            </ui:decorate>
+
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- modify selected File -->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="uploadForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="UploadObjectFile"/>
+                <ui:define name="popup_title">#{messages['gazelle.testmanagement.object.Addanobjectfile']}</ui:define>
+                #{objectInstanceManager.setUploadedFile(null)}
+                #{objectInstanceManager.setRegistrationDisabled(true)}
+                #{objectInstanceManager.initializeDownloadFile()}
+                <a4j:jsFunction name="renderUploadButtons" id="renderUploadButtons" render="uploadButtons"/>
+                <h:outputText value="#{messages['gazelle.testmanagement.object.FileType']} : "/>
+                <h:outputText
+                        value="#{objectInstanceManager.selectedObjectFile.type.keyword}"/>
+
+                <s:div rendered="#{objectInstanceManager.selectedObjectFile.type.hasExtension()}">
+                    <h:outputText
+                            value="#{messages['gazelle.testmanagement.object.ExtensionOfFile']} : "/>
+                    <h:outputText
+                            value="#{objectInstanceManager.selectedObjectFile.type.extensions}"/>
+
+                </s:div>
+                <rich:fileUpload fileUploadListener="#{objectInstanceManager.listener}"
+                                 acceptedTypes="#{objectInstanceManager.selectedObjectFile.type.extensions}"
+                                 id="uploadFile" immediateUpload="true" listHeight="60px"
+                                 onuploadcomplete="renderUploadButtons()">
+                </rich:fileUpload>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <s:span id="uploadButtons">
+                        <a4j:commandButton id="updateObjectFilebuttonEnabled"
+                                           value="#{messages['gazelle.testmanagement.object.Update']}"
+                                           rendered="#{!objectInstanceManager.registrationDisabled}"
+                                           styleClass="gzl-btn-orange"
+                                           actionListener="#{objectInstanceManager.addNewObjectInstanceFile(objectManager.selectedSystemInSession)}"
+                                           onclick="jq162('#UploadObjectFile').modal('hide');"
+                                           render="listObjectFileWithInstanceFile,messageDecoration"/>
+                        <a4j:commandButton id="updateObjectFilebuttonDisabled"
+                                           value="#{messages['gazelle.testmanagement.object.Update']}"
+                                           disabled="true" styleClass="gzl-btn-orange"
+                                           rendered="#{objectInstanceManager.registrationDisabled}"
+                                           actionListener="#{objectInstanceManager.addNewObjectInstanceFile(objectManager.selectedSystemInSession)}"
+                                           onclick="jq162('#UploadObjectFile').modal('hide');"
+                                           render="listObjectFileWithInstanceFile,messageDecoration"/>
+                    </s:span>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Delete selected ObjectInstanceFile-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="deleteFormOfObjectInstanceFile">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteSelectedObjectInstanceFile"/>
+                <ui:define name="popup_title">#{messages['gazelle.testmanagement.object.Deleteanobjectinstancefile']}
+                </ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="deleteObjectInstanceFilebutton"
+                                       value="#{messages['gazelle.testmanagement.object.Deletethisobjectinstancefile']}"
+                                       styleClass="gzl-btn-red"
+                                       actionListener="#{objectInstanceManager.deleteSelectedObjectInstanceFile()}"
+                                       onclick="jq162('#DeleteSelectedObjectInstanceFile').modal('hide');"
+                                       render="listObjectFileWithInstanceFile,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

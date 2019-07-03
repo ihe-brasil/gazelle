@@ -1,0 +1,237 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml">
+    <h:outputScript library="jscript" name="disable_input_spinner_mouse_wheel.js"/>
+    <s:div id="addNewRow" style="overflow:auto;">
+        <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+            <ui:param name="panel_id" value="editroll"/>
+            <ui:define name="panel_title">
+                <h:outputText id="modeCreate"
+                              value="#{messages['gazelle.tm.AddARoleForTest']} #{roleInTestManager.selectedTest.keyword}"
+                              rendered="#{roleInTestManager.selectedTestRoles.id == null}"/>
+                <h:outputText id="modeUpdate"
+                              value="#{messages['gazelle.tm.EditingRole']} #{roleInTestManager.roleInTestKeywordTyped} #{messages['gazelle.tm.monitors.ForTest']} #{roleInTestManager.selectedTest.keyword}"
+                              rendered="#{roleInTestManager.selectedTestRoles.id != null}"/>
+            </ui:define>
+            <s:decorate template="/layout/form/_edit.xhtml">
+                <ui:param name="id" value="roleInTestKeyword"/>
+                <ui:define name="label">#{messages['gazelle.testmanagement.object.keyword']}</ui:define>
+                <h:inputText styleClass=" form-control" id="roleInTestKeyword" maxlength="250" size="40"
+                             value="#{roleInTestManager.roleInTestKeywordTyped}"
+                             disabled="#{roleInTestManager.selectedTestRoles.id != null}"/>
+                <ui:decorate template="/layout/popover/_popover_on_icon.xhtml"
+                             rendered="#{not empty sytemAIPOResultForTestingSession.htmlCountFailed}">
+                    <ui:param name="id" value="k"/>
+                    <ui:param name="placement" value="bottom"/>
+                    <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                    <ui:define name="content">
+                        <h:outputText
+                                value="#{messages['gazelle.tm.roleInTest.TypeARoleKeywordOrAnyStringAllowingToIdentifyARoleOrAParticipant']}"/>
+                    </ui:define>
+                </ui:decorate>
+            </s:decorate>
+            <s:decorate template="/layout/form/_edit.xhtml">
+                <ui:define name="label">##{messages['gazelle.tm.roleInTest.toRealize']}</ui:define>
+                <ui:param name="id" value="roleInTestNumberToRealizeInputText"/>
+                <rich:inputNumberSpinner id="roleInTestNumberToRealizeInputText"
+                                         value="#{roleInTestManager.selectedTestRoles.numberOfTestsToRealize}"
+                                         minValue="1"/>
+            </s:decorate>
+            <s:decorate template="/layout/form/_edit.xhtml">
+                <ui:define name="label">#{messages['gazelle.tm.test.CardMin']}</ui:define>
+                <ui:param name="id" value="roleInTestCardMinInputText"/>
+                <rich:inputNumberSpinner id="roleInTestCardMinInputText"
+                                         value="#{roleInTestManager.selectedTestRoles.cardMin}" minValue="0"/>
+            </s:decorate>
+            <s:decorate template="/layout/form/_edit.xhtml">
+                <ui:param name="id" value="roleInTestCardMaxInputText"/>
+                <ui:define name="label">#{messages['gazelle.tm.test.CardMax']}</ui:define>
+                <rich:inputNumberSpinner id="roleInTestCardMaxInputText"
+                                         value="#{roleInTestManager.selectedTestRoles.cardMax}" minValue="0"/>
+            </s:decorate>
+            <s:decorate template="/layout/form/_edit.xhtml">
+                <ui:param name="id" value="optionsList"/>
+                <ui:define name="label">#{messages['gazelle.tf.table.Optionality']}</ui:define>
+                <h:selectOneMenu styleClass="form-control gzl-form-control" id="optionsList"
+                                 value="#{roleInTestManager.selectedTestRoles.testOption}">
+                    <s:selectItems value="#{gazelleDAO.listTestOptions()}" var="optionFromList"
+                                   noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                   label="#{optionFromList.labelToDisplay}"/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="urlDecoration" template="/layout/form/_edit.xhtml">
+                <ui:param name="id" value="url"/>
+                <ui:define name="label">
+                    <span title="#{messages['gazelle.tm.ALinkToTheTestDescription']}">#{messages['gazelle.tm.testing.URL']}</span>
+                </ui:define>
+                <h:inputText styleClass=" form-control" id="url" maxlength="250" size="60"
+                             value="#{roleInTestManager.selectedTestRoles.url}">
+                    <a4j:ajax event="blur" execute="@this" render="urlDecoration"/>
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="urlDocumentationDecoration" template="/layout/form/_edit.xhtml">
+                <ui:param name="id" value="urlDocumentation"/>
+                <ui:define name="label">
+                    <span title="#{messages['gazelle.tm.ALinkToTheTestDocumentation']}">#{messages['gazelle.tm.URLDocumentation']}</span>
+                </ui:define>
+                <h:inputText styleClass=" form-control" id="urlDocumentation" maxlength="250" size="60"
+                             value="#{roleInTestManager.selectedTestRoles.urlDocumentation}">
+                    <a4j:ajax event="blur" execute="@this" render="urlDocumentationDecoration"/>
+                </h:inputText>
+            </s:decorate>
+            <a4j:commandButton id="addButton" value="#{messages['gazelle.tm.patient.addAuthority']}"
+                               styleClass="gzl-btn-green" actionListener="#{roleInTestManager.updateTestRoles()}"
+                               oncomplete="if (#{roleInTestManager.showRoleInTestFound}) jq162('#roleInTestFoundModalPanel').modal('show');"
+                               rendered="#{roleInTestManager.selectedTestRoles.id == null}"
+                               render="roleInTestFoundDiv,tableOfTestRolesDiv,addNewRow,globalMessageDiv,spinnerScript"/>
+            <a4j:commandButton id="updateButton" value="#{messages['gazelle.testmanagement.object.Update']}"
+                               styleClass="gzl-btn-orange" actionListener="#{roleInTestManager.updateTestRoles()}"
+                               oncomplete="if (#{roleInTestManager.showRoleInTestFound}) jq162('#roleInTestFoundModalPanel').modal('show');"
+                               rendered="#{roleInTestManager.selectedTestRoles.id != null}"
+                               render="roleInTestFoundDiv,tableOfTestRolesDiv,addNewRow,globalMessageDiv,spinnerScript"/>
+            <a4j:commandButton id="CancelEditingButton" value="#{messages['gazelle.tm.roleInTest.CancelEditing']}"
+                               styleClass="gzl-btn"
+                               actionListener="#{roleInTestManager.cancelEditingTestRoles()}"
+                               rendered="#{roleInTestManager.selectedTestRoles.id != null}"
+                               render="addNewRow,spinnerScript"
+                               execute="@this"/>
+        </ui:decorate>
+
+        <br/>
+    </s:div>
+    <br/>
+    <s:div id="deleteTestRoleDiv">
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="testRoleDeleteModalPanel"/>
+            <ui:define name="popup_title">#{messages['gazelle.tm.roleInTest.DeleteTestRole']}</ui:define>
+            <p>#{messages['gazelle.tm.roleInTest.DeleteTestRole']} #{roleInTestManager.selectedTestRoles.roleInTest.keyword} ?</p>
+            <ui:define name="popup_footer">
+                <button type="button" class="gzl-btn" data-dismiss="modal">
+                    #{messages['gazelle.tm.Cancel']}
+                </button>
+                <a4j:commandButton id="yesDeleteTR" styleClass="gzl-btn-red"
+                                   actionListener="#{roleInTestManager.deleteTestRole()}"
+                                   oncomplete="jq162('#testRoleDeleteModalPanel').modal('hide');"
+                                   value="#{messages['gazelle.common.Yes']}"
+                                   render="tableOfTestRolesDiv,addNewRow,globalMessageDiv,spinnerScript"
+                                   execute="@this"/>
+
+            </ui:define>
+        </ui:decorate>
+    </s:div>
+    <s:div id="roleInTestFoundDiv">
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="roleInTestFoundModalPanel"/>
+            <ui:define name="popup_title">#{messages['gazelle.tm.RoleInTestFoundFor']} #{roleInTestManager.roleInTestKeywordTyped}</ui:define>
+            <s:div style="background:#F5F5DC; border: solid black 1px; padding: 6px;"
+                   rendered="#{roleInTestManager.foundRoleInTests.size()!=0 }">
+                <h:outputText
+                        value="#{messages['gazelle.tm.SearchAmbiguousSeveralAnswersForThisSearch']} :  #{roleInTestManager.roleInTestKeywordTyped}"/>
+                <br/>
+                <h:outputText value="#{messages['gazelle.tm.PleaseSelectARoleToAddOr']}"/>
+                <a4j:commandLink onclick="jq162('#roleInTestFoundModalPanel').modal('hide');"
+                                 target="_blank"
+                                 action="/testing/roleInTest/listRoleInTest.xhtml"
+                                 value="#{messages['gazelle.tm.roleInTest.ClickHereToCreateANewOne']}"/>
+            </s:div>
+            <rich:dataTable id="roleInTestTable" cellpadding="0" cellspacing="0" rows="6" width="700" border="0"
+                            var="currentRoleInTest" value="#{roleInTestManager.foundRoleInTests}"
+                            rendered="#{roleInTestManager.foundRoleInTests.size()!=0 }" first="0">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <g:column rowspan="2">
+                            <h:outputText value="#{messages['gazelle.tm.roleInTest.RoleInTestKeyword']}"/>
+                        </g:column>
+                        <g:column colspan="4">
+                            <h:outputText value="#{messages['gazelle.tm.monitors.TestParticipants']}"/>
+                        </g:column>
+                        <g:column breakRowBefore="true">
+                            <h:outputText value="#{messages['gazelle.testmanagement.system.label.IP']}"/>
+                        </g:column>
+                        <g:column>
+                            <h:outputText value="#{messages['gazelle.configuration.system.actorKeyword']}"/>
+                        </g:column>
+                        <g:column>
+                            <h:outputText value="#{messages['gazelle.tests.test.option']}"/>
+                        </g:column>
+                        <g:column>
+                            <h:outputText value="#{messages['gazelle.tm.roleInTest.IsTested']}"/>
+                        </g:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <g:column colspan="5">
+                    <h:outputText value="#{currentRoleInTest.keyword}" style="font-size:small;font-weight:bold;"/>
+                </g:column>
+                <g:column breakRowBefore="true" colspan="5">
+                    <s:div style="text-align:right">
+                        <a4j:commandButton id="selectbestrit"
+                                           actionListener="#{roleInTestManager.selectRoleInTestAndUpdateKeyword(currentRoleInTest)}"
+                                           oncomplete="jq162('#roleInTestFoundModalPanel').modal('hide');"
+                                           value="#{messages['gazelle.common.Select']}"
+                                           render="roleInTestKeyword,globalMessageDiv" execute="@this"/>
+                    </s:div>
+                </g:column>
+                <rich:collapsibleSubTable var="testParticipant" value="#{currentRoleInTest.testParticipantsList}">
+                    <g:column>
+
+                        <f:facet name="footer">
+                            <h:outputText
+                                    value="#{currentRoleInTest.testParticipantsList.size} #{messages['gazelle.tm.monitors.TestParticipants']}"
+                                    style="font-size:x-small;font-style:italic;"/>
+                        </f:facet>
+                    </g:column>
+                    <g:column>
+                        <h:outputText
+                                value="#{testParticipant.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.toString()}">
+                        </h:outputText>
+                    </g:column>
+                    <g:column>
+                        <h:outputText
+                                value="#{testParticipant.actorIntegrationProfileOption.actorIntegrationProfile.actor.toString()}"/>
+                    </g:column>
+                    <g:column>
+                        <h:outputText
+                                value="#{testParticipant.actorIntegrationProfileOption.integrationProfileOption.keyword}"/>
+                    </g:column>
+                    <g:column>
+                        <h:outputText value="#{testParticipant.tested}"/>
+                    </g:column>
+                </rich:collapsibleSubTable>
+                <f:facet name="footer">
+                    <rich:dataScroller maxPages="10" renderIfSinglePage="false"/>
+                </f:facet>
+            </rich:dataTable>
+            <s:div style="background:#FFC0CB; border: solid black 1px;text-align:center;width:60%"
+                   rendered="#{roleInTestManager.foundRoleInTests.size()==0 }">
+                <h:outputText
+                        value="#{messages['gazelle.tm.NoCombinationFoundFor']} #{roleInTestManager.roleInTestKeywordTyped}"
+                        style="font-size:medium"/>
+                <br/>
+                <h:outputText value="#{messages['gazelle.tm.roleInTest.DoYouWantToCreateThisRole']}"/>
+                <br/>
+                <a4j:commandLink style="font-size:medium"
+                                 onclick="jq162('#roleInTestFoundModalPanel').modal('hide');" target="_blank"
+                                 action="/testing/roleInTest/listRoleInTest.xhtml"
+                                 value="#{messages['gazelle.common.Yes']}"/>
+                <br/>
+                <a4j:commandLink oncomplete="jq162('#roleInTestFoundModalPanel').modal('hide');"
+                                 style="font-size:medium" value="#{messages['gazelle.common.No']}"/>
+            </s:div>
+            <ui:define name="popup_footer">
+                <button type="button" class="gzl-btn" data-dismiss="modal">
+                    #{messages['gazelle.tm.Cancel']}
+                </button>
+            </ui:define>
+        </ui:decorate>
+    </s:div>
+    <!--@formatter:off-->
+    <s:span id="spinnerScript">
+        <script>
+            disable_input_spinner_mouse_wheel('#{rich:clientId('roleInTestNumberToRealizeInputText')}');
+            disable_input_spinner_mouse_wheel('#{rich:clientId('roleInTestCardMinInputText')}');
+            disable_input_spinner_mouse_wheel('#{rich:clientId('roleInTestCardMaxInputText')}');
+        </script>
+    </s:span>
+    <!--@formatter:on-->
+</ui:composition>

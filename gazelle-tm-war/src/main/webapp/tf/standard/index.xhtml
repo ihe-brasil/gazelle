@@ -1,0 +1,73 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tf.menu.Standards']}"/>
+    <ui:define name="body">
+        <h:form id="globalform" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <s:decorate template="/tf/standard/suggestFilters.xhtml">
+                <ui:param name="managedBean" value="#{standardManager}"/>
+                <ui:define name="otherButtons">
+                    <h:outputLink value="edit.seam" styleClass="gzl-btn-green"
+                                  rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.NewStandard']}"/>
+                    </h:outputLink>
+                </ui:define>
+            </s:decorate>
+            <s:decorate template="/tf/standard/standardTable.xhtml">
+                <ui:param name="standards" value="#{standardManager.standards}"/>
+                <ui:define name="actions">
+                    <div class="gzl-never-wrap">
+                        <h:outputLink value="show.seam" title="#{messages['gazelle.common.button.View']}">
+                            <f:param name="keyword" value="#{std.keyword}"/>
+                            <span class="gzl-icon-search"/>
+                        </h:outputLink>
+                        <h:outputLink title="#{messages['gazelle.tm.Edit']}" value="edit.seam"
+                                      rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}">
+                            <f:param name="keyword" value="#{std.keyword}"/>
+                            <span class="gzl-icon-pencil"/>
+                        </h:outputLink>
+                        <a4j:commandLink event="click"
+                                         oncomplete="jq162('#DeleteConfirmationModalPanel').modal('show');"
+                                         title="#{messages['gazelle.common.button.Delete']}"
+                                         rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}"
+                                         render="DeleteConfirmationModalPanel,globalform, :deleteDocumentForm"
+                                         execute="@this"
+                                         actionListener="#{standardManager.setSelectedStandard(std)}">
+                            <span class="gzl-icon-trash-o"/>
+                        </a4j:commandLink>
+                    </div>
+                </ui:define>
+            </s:decorate>
+        </h:form>
+        <h:form id="deleteDocumentForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteConfirmationModalPanel"/>
+                <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.PleaseConfirmDeleteOfTheAuditMessage']}</ui:define>
+                <p>
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.Standard']}"/>
+                </p>
+                <p>
+                    <h:outputText value=" #{standardManager.selectedStandard.name} "/>
+                </p>
+                <p>
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.WillBeDeleted']}"/>
+                </p>
+                <ui:define name="popup_footer">
+                    <a4j:commandButton id="cancelButtonConfirm" value="#{messages['gazelle.common.button.Cancel']}"
+                                       onclick="jq162('#DeleteConfirmationModalPanel').modal('hide');"
+                                       styleClass="gzl-btn"
+                                       actionListener="#{standardManager.setSelectedStandard(null)}"/>
+                    <a4j:commandButton id="deleteButtonConfirm" value="#{messages['gazelle.common.button.Delete']}"
+                                       ignoreDupResponses="true" styleClass="gzl-btn-red"
+                                       actionListener="#{standardManager.delete()}"
+                                       onclick="jq162('#DeleteConfirmationModalPanel').modal('hide');"
+                                       render="globalform"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,46 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tm.ListTestsRequirements']}"/>
+    <ui:define name="body">
+        <h:form>
+            <s:token allowMultiplePosts="true"/>
+            <h:outputText
+                    value="#{messages['gazelle.tm.roleInTest.TestIsNullPleaseUseThisFileWithCreatenewtestsxhtml']}"
+                    rendered="#{roleInTestManager.selectedTest == null}"/>
+
+            <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                <ui:param name="panel_id" value="displayRoles"/>
+                <ui:define name="panel_title">#{messages['gazelle.tm.roleInTest.Roles']}</ui:define>
+                <s:div id="tableOfTestRolesDiv">
+                    <s:div style="border:solid black 1px;padding:5px;background:#DCDCDC">
+                        <h:outputText value="#{roleInTestManager.selectedTest.toString()}"/>
+                        <br/>
+                        <h:outputText
+                                value="#{messages['gazelle.testmanagement.system.label.IP']} : #{roleInTestManager.selectedIntegrationProfile.toString()}"/>
+                        <br/>
+                        <h:outputText
+                                value="#{messages['gazelle.testmanagement.system.label.Actor']} : #{roleInTestManager.selectedActor.toString()}"/>
+                        <br/></s:div>
+
+
+                    #{roleInTestManager.listTestRolesForSelectedTestIntegrationProfileActor() }
+
+
+                    <ui:include src="AbstractTestRolesTableForTestsWithAction.xhtml"/>
+
+                </s:div>
+
+                <ui:include src="AbstractAddATestRolesTableForTests.xhtml"/>
+            </ui:decorate>
+
+            <s:div style="text-align:right">
+                <a4j:commandButton action="#{roleInTestManager.backToTestsMatrix()}"
+                                   value="#{messages['gazelle.tm.roleInTest.BackToTestsMatrix']}"
+                                   styleClass="gzl-btn" immediate="true"/>
+            </s:div>
+        </h:form>
+    </ui:define>
+</ui:composition>

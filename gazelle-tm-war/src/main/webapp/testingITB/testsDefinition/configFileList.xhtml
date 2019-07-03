@@ -1,0 +1,113 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <c:set var="popupOptions"
+           value="width=1000,height=400,location=no,menubar=yes,scrollbars=yes,status=no,resizable=yes"/>
+    <c:set var="exampleMsgPopupOptions"
+           value="width=800,height=200,location=no,menubar=yes,scrollbars=yes,status=no,resizable=yes"/>
+    <rich:togglePanel id="configFilePanel" initialState="#{initialState}" switchType="client" stateOrder="empty,first">
+        <rich:togglePanelItem name="empty">
+            <h:panelGroup id="configFilepangroup1">
+                <h:commandLink id="toggview" style="font-weight:bold;"
+                               value="#{messages['gazelle.tm.testdefinitions.ConfigFilesassociatedWTestStep']}">
+                    <rich:toggleControl targetItem="first">
+                    </rich:toggleControl>
+                </h:commandLink>
+            </h:panelGroup>
+        </rich:togglePanelItem>
+        <rich:togglePanelItem name="first">
+            <h:panelGroup>
+                <h:commandLink style="font-weight:bold;" value="#{messages['gazelle.common.button.Hide']}">
+                    <rich:toggleControl targetItem="empty">
+                    </rich:toggleControl>
+                </h:commandLink>
+                <!-- Only render table if there are actually configuration files -->
+                <ui:fragment
+                        rendered="#{(!empty currentTestStep.requestMessageProfile.validationContextFileName            or !empty currentTestStep.responseMessageProfile.validationContextFileName)            or (!empty currentTestStep.requestMessageProfile.exampleMsgFileName            or !empty currentTestStep.responseMessageProfile.exampleMsgFileName)}">
+                    <table class="rich-table" width="100%" cellpadding="5" cellspacing="0" border="1"
+                           style="bgcolor: rgb(192, 192, 192);">
+                        <thead class="rich-table-thead">
+                        <tr class="rich-table-subheader">
+                            <th class="rich-table-subheadercell" style="text-align: center;">
+                                #{messages['gazelle.tm.testdefinitions.ConfigurationFileType']}
+                            </th>
+                            <th class="rich-table-subheadercell" colspan="2" style="text-align: center;">
+                                #{messages['gazelle.tm.testdefinitions.InitiatorScenarioConfigurationFiles']}
+                            </th>
+                            <th class="rich-table-subheadercell" colspan="2" style="text-align: center;">
+                                #{messages['gazelle.tm.testdefinitions.ResponderScenarioConfigurationFiles']}
+                            </th>
+                        </tr>
+                        </thead>
+                        <tr>
+                            <c:set var="reqValidationContextUrl"
+                                   value="../test/interop/validationContext.seam?smpId=#{currentTestStep.requestMessageProfile.id}"/>
+                            <c:set var="reqValidationContextFileName"
+                                   value="#{currentTestStep.requestMessageProfile.validationContextFileName}"/>
+                            <c:set var="respValidationContextUrl"
+                                   value="../test/interop/validationContext.seam?smpId=#{currentTestStep.responseMessageProfile.id}"/>
+                            <c:set var="respValidationContextFileName"
+                                   value="#{currentTestStep.responseMessageProfile.validationContextFileName}"/>
+                            <td valign="top" align="center">
+                                <h:outputText value="#{messages['gazelle.tm.testdefinitions.ValidationContext']}"
+                                              rendered="#{!empty reqValidationContextFileName or !empty respValidationContextFileName}"/>
+                            </td>
+                            <td valign="top" align="center" colspan="2">
+                                <a style="display:#{!empty reqValidationContextFileName ? 'inline' : 'none'};"
+                                   href="${reqValidationContextUrl}"
+                                   onclick="window.open('${reqValidationContextUrl}', '#{reqValidationContextFileName}','${popupOptions}');return false;">#{reqValidationContextFileName}</a>
+                                <br/>
+                                <h:inputTextarea  styleClass=" form-control" readonly="true" cols="85" rows="3"
+                                                 rendered="#{!empty currentTestStep.requestMessageProfile.validationContextContent}"
+                                                 value="#{currentTestStep.requestMessageProfile.validationContextContent}"/>
+                            </td>
+                            <td valign="top" align="center" colspan="2">
+                                <a style="display:#{!empty respValidationContextFileName ? 'inline' : 'none'};"
+                                   href="${respValidationContextUrl}"
+                                   onclick="window.open('${respValidationContextUrl}', '#{respValidationContextFileName}','${popupOptions}');return false;">#{respValidationContextFileName}</a>
+                                <br/>
+                                <h:inputTextarea  styleClass=" form-control" readonly="true" cols="85" rows="3"
+                                                 rendered="#{!empty currentTestStep.responseMessageProfile.validationContextContent}"
+                                                 value="#{currentTestStep.responseMessageProfile.validationContextContent}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <c:set var="reqExampleMsgUrl"
+                                   value="../test/interop/exampleMessage.seam?smpId=#{currentTestStep.requestMessageProfile.id}"/>
+                            <c:set var="reqExampleMsgFileName"
+                                   value="#{currentTestStep.requestMessageProfile.exampleMsgFileName}"/>
+                            <c:set var="respExampleMsgUrl"
+                                   value="../test/interop/exampleMessage.seam?smpId=#{currentTestStep.responseMessageProfile.id}"/>
+                            <c:set var="respExampleMsgFileName"
+                                   value="#{currentTestStep.responseMessageProfile.exampleMsgFileName}"/>
+                            <td valign="top" align="center">
+                                <h:outputText value="#{messages['gazelle.tm.testdefinitions.ExampleMessage']}"
+                                              rendered="#{!empty reqExampleMsgFileName            or !empty respExampleMsgFileName}"/>
+                            </td>
+                            <td valign="top" align="center" colspan="2">
+                                <a style="display:#{!empty reqExampleMsgFileName ? 'inline' : 'none'};"
+                                   href="${reqExampleMsgUrl}"
+                                   onclick="window.open('${reqExampleMsgUrl}', '#{reqExampleMsgFileName}','${exampleMsgPopupOptions}');return false;">#{reqExampleMsgFileName}</a>
+                                <br/>
+                                <h:inputTextarea  styleClass=" form-control" readonly="true" cols="85" rows="3"
+                                                 rendered="#{!empty currentTestStep.requestMessageProfile.exampleMsgContent}"
+                                                 value="#{currentTestStep.requestMessageProfile.exampleMsgContent}"/>
+                            </td>
+                            <td valign="top" align="center" colspan="2">
+                                <a style="display:#{!empty respExampleMsgFileName ? 'inline' : 'none'};"
+                                   href="${respExampleMsgUrl}"
+                                   onclick="window.open('${respExampleMsgUrl}', '#{respExampleMsgFileName}','${exampleMsgPopupOptions}');return false;">#{respExampleMsgFileName}</a>
+                                <br/>
+                                <h:inputTextarea  styleClass=" form-control" readonly="true" cols="85" rows="3"
+                                                 rendered="#{!empty currentTestStep.responseMessageProfile.exampleMsgContent}"
+                                                 value="#{currentTestStep.responseMessageProfile.exampleMsgContent}"/>
+                            </td>
+                        </tr>
+                    </table>
+                </ui:fragment>
+            </h:panelGroup>
+        </rich:togglePanelItem>
+    </rich:togglePanel>
+</ui:composition>

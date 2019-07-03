@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="steps" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="800" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" whenResourceMissingType="Key" uuid="70f33b9b-39d9-40a2-ba15-9375552a9498">
+	<property name="ireport.zoom" value="5.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="test_id" class="java.lang.Integer" isForPrompting="false">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT DISTINCT
+     ''  AS tf_transaction_keyword,
+    get_test_steps_option_label(tm_test_steps."test_steps_option_id") AS tm_test_steps_option_label_to_display,
+     tm_test_steps."description" AS tm_test_steps_description,
+     tm_test_steps."message_type" AS tm_test_steps_message_type,
+     tm_test_steps."step_index" AS tm_test_steps_step_index,
+     tm_test_steps."secured" AS tm_test_steps_secured,
+     tm_role_in_test_A."keyword" AS tm_role_in_test_A_keyword,
+     tm_role_in_test."keyword" AS tm_role_in_test_keyword
+FROM
+     "public"."tm_test_roles" tm_test_roles INNER JOIN "public"."tm_test_steps" tm_test_steps ON tm_test_roles."id" = tm_test_steps."test_roles_initiator_id"
+     INNER JOIN "public"."tm_test_roles" tm_test_roles_A ON tm_test_steps."test_roles_responder_id" = tm_test_roles_A."id"
+     INNER JOIN "public"."tm_test_test_steps" tm_test_test_steps ON tm_test_steps."id" = tm_test_test_steps."test_steps_id"
+     INNER JOIN "public"."tm_role_in_test" tm_role_in_test_A ON tm_test_roles_A."role_in_test_id" = tm_role_in_test_A."id"
+     INNER JOIN "public"."tm_role_in_test" tm_role_in_test ON tm_test_roles."role_in_test_id" = tm_role_in_test."id"
+WHERE
+     tm_test_test_steps."test_id" = $P{test_id} and  tm_test_steps."transaction_id" is null
+
+union
+SELECT DISTINCT
+     tf_transaction."keyword"  AS tf_transaction_keyword,
+     get_test_steps_option_label(tm_test_steps."test_steps_option_id") AS tm_test_steps_option_label_to_display,
+     tm_test_steps."description" AS tm_test_steps_description,
+     tm_test_steps."message_type" AS tm_test_steps_message_type,
+     tm_test_steps."step_index" AS tm_test_steps_step_index,
+     tm_test_steps."secured" AS tm_test_steps_secured,
+     tm_role_in_test_A."keyword" AS tm_role_in_test_A_keyword,
+     tm_role_in_test."keyword" AS tm_role_in_test_keyword
+FROM
+     "public"."tm_test_roles" tm_test_roles INNER JOIN "public"."tm_test_steps" tm_test_steps ON tm_test_roles."id" = tm_test_steps."test_roles_initiator_id"
+     INNER JOIN "public"."tm_test_roles" tm_test_roles_A ON tm_test_steps."test_roles_responder_id" = tm_test_roles_A."id"
+     INNER JOIN "public"."tm_test_test_steps" tm_test_test_steps ON tm_test_steps."id" = tm_test_test_steps."test_steps_id"
+     INNER JOIN "public"."tm_role_in_test" tm_role_in_test_A ON tm_test_roles_A."role_in_test_id" = tm_role_in_test_A."id"
+     INNER JOIN "public"."tm_role_in_test" tm_role_in_test ON tm_test_roles."role_in_test_id" = tm_role_in_test."id"
+     INNER JOIN "public"."tf_transaction" tf_transaction ON tm_test_steps."transaction_id" = tf_transaction."id"
+WHERE
+     tm_test_test_steps."test_id" = $P{test_id} and  tm_test_steps."transaction_id" is not null
+
+ORDER by tm_test_steps_step_index asc]]>
+	</queryString>
+	<field name="tm_test_steps_option_label_to_display" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tm_test_steps_description" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tm_test_steps_message_type" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tm_test_steps_step_index" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tf_transaction_keyword" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tm_test_steps_secured" class="java.lang.Boolean">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tm_role_in_test_a_keyword" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tm_role_in_test_keyword" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="40">
+			<staticText>
+				<reportElement mode="Opaque" x="1" y="1" width="803" height="19" backcolor="#9999FF" uuid="f56074e3-2000-40f5-a719-f629506882e3"/>
+				<box leftPadding="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Test Steps]]></text>
+			</staticText>
+			<frame>
+				<reportElement stretchType="RelativeToBandHeight" mode="Opaque" x="1" y="20" width="803" height="19" backcolor="#CCCCF8" uuid="3f284477-256c-4f42-b3c1-52abfcb43567"/>
+				<box>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<staticText>
+					<reportElement mode="Transparent" x="42" y="0" width="105" height="19" backcolor="#FFFFFF" uuid="eeb89215-1bc3-420b-b02b-1f70f2c8f035"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Initiator]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="417" y="0" width="60" height="19" backcolor="#FFFFFF" uuid="4331a6fe-e71e-4f08-8712-a003e7b25e74"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Secured ?]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="483" y="0" width="66" height="19" backcolor="#FFFFFF" uuid="f435797c-08e4-4a50-9522-1e239bc6df80"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Option]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="555" y="0" width="248" height="19" backcolor="#FFFFFF" uuid="2c1b3732-e8d8-4b0e-8369-999568306087"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Description]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="154" y="0" width="105" height="19" backcolor="#FFFFFF" uuid="a7f2e054-1acc-4560-a805-8e3e2d1708c4"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Responder]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="264" y="0" width="65" height="19" backcolor="#FFFFFF" uuid="1001f2a5-8fb6-42d4-82f2-c44a44b84ad7"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Transaction]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="1" y="0" width="36" height="19" backcolor="#FFFFFF" uuid="dd8f692d-460c-4852-8abf-ed00658ea400"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Index]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="334" y="0" width="78" height="19" backcolor="#FFFFFF" uuid="1523816b-a81e-47b2-bf24-be99caec23a4"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Message Type]]></text>
+				</staticText>
+			</frame>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="21" splitType="Prevent">
+			<frame>
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="1" y="1" width="803" height="19" uuid="5ee79777-1f48-41da-b1d9-3d92fad0af7a"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+					<reportElement stretchType="RelativeToTallestObject" x="555" y="0" width="248" height="19" uuid="bd61675c-fd5f-4e6d-81e3-64e2680e940e"/>
+					<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5"/>
+					<textElement verticalAlignment="Top">
+						<font fontName="Arial" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{tm_test_steps_description}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement stretchType="RelativeToTallestObject" x="154" y="0" width="105" height="19" uuid="b122b7d9-ffa3-49d1-a137-bcd0a3efb6aa"/>
+					<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Center" verticalAlignment="Top">
+						<font fontName="Arial" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{tm_role_in_test_a_keyword}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement stretchType="RelativeToTallestObject" x="42" y="0" width="105" height="19" uuid="fa4a7731-f734-4ce4-accc-e7f57e7ebbc7"/>
+					<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Center" verticalAlignment="Top">
+						<font fontName="Arial" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{tm_role_in_test_keyword}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement stretchType="RelativeToTallestObject" x="483" y="0" width="66" height="19" uuid="25f31a93-6512-4bc2-8ac7-80452896d8f6"/>
+					<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Center" verticalAlignment="Top">
+						<font fontName="Arial" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{tm_test_steps_option_label_to_display}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+					<reportElement stretchType="RelativeToTallestObject" x="417" y="0" width="60" height="19" uuid="4a3c6bf2-6646-4287-a561-bfa8d7794bf8"/>
+					<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Center" verticalAlignment="Top">
+						<font fontName="Arial" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[($F{tm_test_steps_secured}.booleanValue() ? "Yes" : "No" )]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement stretchType="RelativeToTallestObject" x="264" y="0" width="65" height="19" uuid="d88362e4-96ef-4778-9fd5-6345a17220e7"/>
+					<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Center" verticalAlignment="Top">
+						<font fontName="Arial" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{tf_transaction_keyword}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement stretchType="RelativeToTallestObject" x="2" y="0" width="36" height="19" uuid="4837a487-cd1e-409c-b440-606dbf160d0d"/>
+					<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Right" verticalAlignment="Top">
+						<font fontName="Arial" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{tm_test_steps_step_index}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement stretchType="RelativeToTallestObject" x="334" y="0" width="78" height="19" uuid="989397d2-0920-4f35-86fc-8768020d4180"/>
+					<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5"/>
+					<textElement textAlignment="Center" verticalAlignment="Top">
+						<font fontName="Arial" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{tm_test_steps_message_type}]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</detail>
+</jasperReport>

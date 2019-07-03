@@ -1,0 +1,223 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.common.menu.FindSystems']}"/>
+    <ui:define name="body">
+        #{dataTableStateHolder.setDescendingOn('system.lastChanged')}
+        <h:form id="globalform" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <h:inputHidden id="filterUrlParameters" name="filterUrlParameters"
+                           value="#{prAdmin.filter.urlParameters}"/>
+            <script>
+                updateUrl("globalform:filterUrlParameters");
+                $("#globalform\\:filterUrlParameters").bind('change',
+                        function () {
+                            updateUrl("globalform:filterUrlParameters");
+                        });
+            </script>
+            <s:div id="globalDiv">
+                <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter" value="#{prAdmin.filter}"/>
+                                <ui:param name="filterWidth" value="240"/>
+                                <ui:param name="filterId" value="institution"/>
+                                <ui:param name="filterName" value="#{messages['gazelle.users.Institution']}"/>
+                                <ui:param name="filterForm" value="globalform"/>
+                            </ui:include>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter" value="#{prAdmin.filter}"/>
+                                <ui:param name="filterWidth" value="240"/>
+                                <ui:param name="filterId" value="system"/>
+                                <ui:param name="filterName"
+                                          value="#{messages['gazelle.productregistry.system.label.SystemName']}"/>
+                                <ui:param name="filterForm" value="globalform"/>
+                            </ui:include>
+                        </div>
+                    </div>
+                    <!--  AIPO selection -->
+                    <ui:include src="/testing/research/filterAIPO.xhtml">
+                        <ui:param name="filter" value="#{prAdmin.filter}"/>
+                        <ui:param name="filterForm" value="globalform"/>
+                    </ui:include>
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter" value="#{prAdmin.filter}"/>
+                                <ui:param name="filterId" value="status"/>
+                                <ui:param name="filterName"
+                                          value="#{messages['net.ihe.gazelle.tm.IntegrationStatementStatus']}"/>
+                                <ui:param name="filterForm" value="globalform"/>
+                            </ui:include>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <s:decorate template="/layout/form/_form_field_horizontal_4-8.xhtml">
+                                <ui:param name="id" value="statusMenu"/>
+                                <ui:define name="label">#{messages['net.ihe.gazelle.tm.ValidationStatus']}</ui:define>
+                                <h:selectOneMenu id="statusMenu"
+                                                 styleClass="form-control gzl-form-control gzl-select-text"
+                                                 value="#{prAdmin.status}">
+                                    <s:selectItems value="#{prAdmin.statuses}" var="selectedValue"
+                                                   noSelectionLabel="#{messages['gazelle.common.button.ShowAll']}"
+                                                   label="#{selectedValue.label}"/>
+                                    <a4j:ajax event="change" render="globalform"/>
+                                </h:selectOneMenu>
+                            </s:decorate>
+                        </div>
+                    </div>
+
+                    <ui:define name="filter_buttons">
+
+                        <a4j:commandLink actionListener="#{prAdmin.filter.clear()}"
+                                         title="#{messages['gazelle.users.reset']}" type="submit"
+                                         execute="@this"
+                                         render="globalform">
+                            <span class="fa fa-times-circle"/>
+                        </a4j:commandLink>
+
+                    </ui:define>
+                </ui:decorate>
+            </s:div>
+            <s:div style="text-align: left;" rendered="#{prAdmin.systemsInSession.size() &gt; 0}">
+                <h:outputText
+                        value="#{prAdmin.systemsInSession.size()} #{messages['gazelle.testmanagement.search.button.SystemsForThisSearch']}"/>
+            </s:div>
+            <rich:dataTable id="systemInSessionTable" var="currentSystemInSession" value="#{prAdmin.systemsInSession}"
+                            rowKeyVar="rowNumber"
+                            rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                <g:column>
+                    <ui:define name="header">
+                        <h:outputText
+                                value="#{messages['gazelle.users.institution.InstitutionKeyword']}"/>
+                    </ui:define>
+                    <h:commandLink
+                            action="#{institutionManagerTM.viewInstitutionDetailsFromDatatable (systemManager.displayInstitutionForSystem(currentSystemInSession.system))}"
+                            value="#{systemManager.displayInstitutionForSystem(currentSystemInSession.system)} "/>
+                </g:column>
+                <g:column sortBy="#{'system.name'}" sortOrder="#{datatablestateholder.sortorders['system.name']}"
+                          id="systemNameColumn">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['gazelle.systems.system.SystemName']}"/>
+                    </ui:define>
+                    <a4j:commandLink id="systemKeywordAdminCommandLink"
+                                     action="#{systemInSessionListManager.viewSystemInSession(currentSystemInSession)}"
+                                     value="#{currentSystemInSession.system.keyword }" event="click"
+                                     execute="@this"/>
+                </g:column>
+                <g:column sortBy="#{'system.version'}" sortOrder="#{datatablestateholder.sortorders['system.version']}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['gazelle.systems.system.SystemVersion']}"/>
+                    </ui:define>
+                    <h:outputText value="#{currentSystemInSession.system.version}"/>
+                </g:column>
+                <g:column sortBy="#{'system.prStatus'}"
+                          sortOrder="#{datatablestateholder.sortorders['system.prstatus']}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['gazelle.tm.tests.testStatus']}"/>
+                    </ui:define>
+                    <h:outputText value="#{currentSystemInSession.system.prStatus.details}"/>
+                </g:column>
+                <g:column sortBy="#{'system.integrationStatementDate'}"
+                          sortOrder="#{datatablestateholder.sortorders['system.integrationstatementdate']}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.ISDate']}"/>
+                    </ui:define>
+                    <g:date date="true" time="false"
+                            value="#{currentSystemInSession.system.integrationStatementDate}"/>
+                </g:column>
+                <g:column sortBy="#{'system.prDateAskForPublicationDate'}"
+                          sortOrder="#{datatablestateholder.sortorders['system.prdateaskforpublicationdate']}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.PublicationRequestDate']}"/>
+                    </ui:define>
+                    <g:date date="true" time="false"
+                            value="#{currentSystemInSession.system.prDateAskForPublicationDate}"/>
+                </g:column>
+                <g:column sortBy="#{'system.lastChanged'}"
+                          sortOrder="#{datatablestateholder.sortorders['system.lastchanged']}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['gazelle.common.LastChanged']}"/>
+                    </ui:define>
+                    <g:date tooltip="true" value="#{currentSystemInSession.system.lastChanged}"/>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.ISURL']}"/>
+                    </ui:define>
+                    <h:outputLink target="_blank" value="#{currentSystemInSession.system.integrationStatementUrl}">
+                        <h:outputText
+                                value="#{prManager.downloadISLabel(currentSystemInSession.system)}"/>
+                    </h:outputLink>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.Check']}"/>
+                    </ui:define>
+                    <a4j:commandLink action="#{prAdmin.checkSystem(currentSystemInSession.system)}">
+                        <span class="gzl-icon-checked"/>
+                    </a4j:commandLink>
+                </g:column>
+                <g:column style="text-align:center">
+                    <ui:define name="header">#{messages['gazelle.common.History']}</ui:define>
+                    <a4j:commandLink actionListener="#{prAdmin.setSelectedSystemInSession(currentSystemInSession) }"
+                                     oncomplete="jq162('#HistoryConfirmationModalPanel').modal('show');"
+                                     render=" :HistoryConfirmationForm">
+                        <span class="gzl-icon-history"/>
+                    </a4j:commandLink>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.Review']}"/>
+                    </ui:define>
+                    <a4j:commandLink action="#{prAdmin.reviewSystem(currentSystemInSession)}">
+                        <span class="gzl-icon-eye"/>
+                    </a4j:commandLink>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.ISAdminComment']}"/>
+                    </ui:define>
+                    <h:inputTextarea styleClass=" form-control" id="CommentEditorIdFC"
+                                     value="#{currentSystemInSession.system.prCommentValidatedByAdmin}" rows="3"
+                                     cols="35"/>
+                </g:column>
+                <f:facet name="footer">
+                    <ui:include src="/util/datatableFooter.xhtml">
+                        <ui:param name="dataScrollerId" value="ds"/>
+                        <ui:param name="dataTableId" value="systemInSessionTable"/>
+                    </ui:include>
+                </f:facet>
+            </rich:dataTable>
+            <h:commandLink value="#{messages['gazelle.common.export.ExportAsExcel']}"
+                           action="#{gazelleExcelExporterJboss7.export('globalform:systemInSessionTable')}"/>
+        </h:form>
+        <h:form id="HistoryConfirmationForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="HistoryConfirmationModalPanel"/>
+                <ui:param name="styleClass" value="modal-lg"/>
+                <ui:define name="popup_title">#{messages['gazelle.common.History']}</ui:define>
+                <s:div id="HistoryPanelDecoration">
+                    <ui:include src="/pr/systemEvents.xhtml">
+                        <ui:param name="system" value="#{prAdmin.selectedSystemInSession.system}"/>
+                    </ui:include>
+                </s:div>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

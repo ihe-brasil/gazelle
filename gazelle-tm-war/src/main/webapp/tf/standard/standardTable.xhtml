@@ -1,0 +1,43 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml">
+    <rich:dataTable id="standardTable" var="std" value="#{standards}"
+                    rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+        <g:column sortBy="#{'keyword'}">
+            <ui:define name="header">
+                <h:outputText value="#{messages['gazelle.testmanagement.object.keyword']}"/>
+            </ui:define>
+            <h:outputText value="#{std.keyword}"/>
+        </g:column>
+        <g:column sortBy="#{'name'}">
+            <ui:define name="header">
+                <h:outputText value="#{messages['gazelle.testmanagement.object.Name']}"/>
+            </ui:define>
+            <h:outputLink value="#{std.url}">
+                <h:outputText value="#{std.name}"/>
+            </h:outputLink>
+        </g:column>
+        <g:column sortBy="#{'version'}">
+            <ui:define name="header">
+                <h:outputText value="#{messages['gazelle.systems.system.SystemVersion']}"/>
+            </ui:define>
+            <h:outputText value="#{std.version}"/>
+        </g:column>
+        <g:column sortBy="#{'networkCommunicationType'}">
+            <ui:define name="header">
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.NetworkCommunicationType']}"/>
+            </ui:define>
+            <h:outputText value="#{std.networkCommunicationType.label}"/>
+        </g:column>
+        <g:column align="center">
+            <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+            <ui:insert name="actions"/>
+        </g:column>
+        <f:facet name="footer">
+            <ui:include src="/util/datatableFooter.xhtml">
+                <ui:param name="dataScrollerId" value="ds"/>
+                <ui:param name="dataTableId" value="standardTable"/>
+            </ui:include>
+        </f:facet>
+    </rich:dataTable>
+</ui:composition>

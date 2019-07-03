@@ -1,0 +1,466 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle"
+              value="#{messages['net.ihe.gazelle.tm.Test']} #{testDefinitionManager.getSelectedTest().keyword}"/>
+    <ui:define name="body">
+        <div class="row">
+            <div class="col-lg-10">
+                <h:form id="globalform" rendered="#{testDefinitionManager.canViewSelectedTestAsNotLoggedIn()}">
+                    <s:token allowMultiplePosts="true"/>
+                    <div style="margin: 10px;">
+                        <a4j:commandButton styleClass="gzl-btn" id="BackButton2"
+                                           value="#{messages['gazelle.tm.BackToTestList']}"
+                                           action="/testing/testsDefinition/testsList.seam" execute="@this"/>
+                        <h:commandButton styleClass="gzl-btn" value="#{messages['gazelle.tm.PrintTestAsPdf']}"
+                                         action="#{testDefinitionManager.downloadTestAsPdf(testDefinitionManager.getSelectedTest().id)}"/>
+                        <a4j:commandButton styleClass="gzl-btn-orange" id="CreateIssue"
+                                           rendered="#{identity.loggedIn and applicationManager.isJiraSetup()}"
+                                           value="#{messages['net.ihe.gazelle.tm.ReportAnIssueAboutThisTest']}"
+                                           actionListener="#{testDefinitionManager.reportJira()}" execute="@this"
+                                           render="globalform"/>
+                    </div>
+                    <ui:include src="/testing/jira/_jiraForm.xhtml">
+                        <ui:param name="currentBean" value="#{testDefinitionManager}"/>
+                        <ui:param name="idsToRender" value="globalform"/>
+                        <ui:param name="test" value="#{testDefinitionManager.getSelectedTest()}"/>
+                    </ui:include>
+                    <h:panelGroup
+                            rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel() and applicationManager.isAssertionEnabled() and assertionsManager.getTestAssertions(testDefinitionManager.getSelectedTest().id).size() gt 0 }">
+                        <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+                            <ui:param name="panel_id" value="assertions"/>
+                            <ui:define name="panel_title"> #{messages['net.ihe.gazelle.tm.Assertions']}</ui:define>
+
+                            <ui:include src="viewTestAssertions.xhtml">
+                                <ui:param name="testId" value="#{testDefinitionManager.getSelectedTest().id}"/>
+                            </ui:include>
+                        </ui:decorate>
+                    </h:panelGroup>
+
+                    <!-- ======================= -->
+                    <!-- Test summary section	 -->
+                    <!-- ======================= -->
+
+
+                    <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+                        <ui:param name="panel_id" value="summary"/>
+                        <ui:define name="panel_title">#{messages['gazelle.tm.TestSummary']}</ui:define>
+                        <dl class="dl-horizontal">
+                            <s:decorate id="idDecoration" template="/layout/display/_data_list_item.xhtml">
+                                <ui:define name="label">#{messages['gazelle.productregistry.search.Id']}</ui:define>
+                                <h:outputText id="viewId" maxlength="10" size="10"
+                                              value="#{testDefinitionManager.getSelectedTest().id}">
+                                </h:outputText>
+                            </s:decorate>
+                            <s:decorate id="viewKeywordDecoration" template="/layout/display/_data_list_item.xhtml">
+                                <ui:define name="label">#{messages['gazelle.testmanagement.object.keyword']}
+                                </ui:define>
+                                <h:outputText id="viewKeyword" maxlength="10" size="10"
+                                              value="#{testDefinitionManager.getSelectedTest().keyword}">
+                                </h:outputText>
+                            </s:decorate>
+                            <s:decorate id="viewNameDecoration" template="/layout/display/_data_list_item.xhtml">
+                                <ui:define name="label">#{messages['gazelle.testmanagement.object.Name']}
+                                </ui:define>
+                                <h:outputText id="viewName" maxlength="64" size="80"
+                                              value="#{testDefinitionManager.getSelectedTest().name}">
+                                </h:outputText>
+                            </s:decorate>
+                            <s:decorate id="viewVersionDecoration" template="/layout/display/_data_list_item.xhtml">
+                                <ui:define name="label">#{messages['gazelle.systems.system.SystemVersion']}
+                                </ui:define>
+                                <h:outputText id="viewVersion" maxlength="10" size="10"
+                                              value="#{testDefinitionManager.getSelectedTest().version}"/>
+                            </s:decorate>
+                            <s:decorate id="viewTestAuthorDecoration"
+                                        rendered="#{testDefinitionManager.getSelectedTest().author != null and not empty testDefinitionManager.getSelectedTest().author}"
+                                        template="/layout/display/_data_list_item.xhtml">
+                                <ui:define name="label">#{messages['net.ihe.gazelle.tm.TestAuthor_2']}</ui:define>
+                                <h:outputText id="viewTestAuthor"
+                                              value="#{testDefinitionManager.getSelectedTest().author}"/>
+                            </s:decorate>
+                            <s:decorate id="LastModifierDecoration" template="/layout/display/_data_list_item.xhtml">
+                                <ui:define name="label">
+                                    <h:outputText id="lastModifierOutputText"
+                                                  value="#{messages['gazelle.common.LastModifier']}"/>
+                                </ui:define>
+                                <h:outputText id="lastModifierOutputTextid"
+                                              value="#{testDefinitionManager.getSelectedTest().lastModifierId}"
+                                />
+                            </s:decorate>
+                            <s:decorate id="viewTestStatusDecoration" template="/layout/display/_data_list_item.xhtml">
+                                <ui:define name="label">#{messages['gazelle.tm.tests.testStatus']}</ui:define>
+                                <h:outputText id="viewTestStatus"
+                                              value="#{testDefinitionManager.getSelectedTest().testStatus.labelToDisplay}"/>
+                            </s:decorate>
+                            <s:decorate id="viewTestTypeDecoration" template="/layout/display/_data_list_item.xhtml">
+                                <ui:define name="label">#{messages['gazelle.systems.session.Type']}</ui:define>
+                                <h:outputText id="viewTestType"
+                                              value="#{testDefinitionManager.getSelectedTest().testType.labelToDisplay}"/>
+                            </s:decorate>
+                            <s:decorate id="viewTestOrchestrableDecoration"
+                                        template="/layout/display/_data_list_item.xhtml">
+                                <ui:define name="label">
+                                    <h:outputText id="orchestrableText"
+                                                  value="#{messages['gazelle.tm.IsOrchestrable']}"/>
+                                </ui:define>
+                                <h:selectBooleanCheckbox id="orchestrableid" disabled="true"
+                                                         value="#{testDefinitionManager.getSelectedTest().orchestrable}">
+                                </h:selectBooleanCheckbox>
+                            </s:decorate>
+                            <s:decorate id="validatedDecoration" template="/layout/display/_data_list_item.xhtml">
+                                <ui:define name="label">
+                                    <h:outputText id="validatedText"
+                                                  value="#{messages['net.ihe.gazelle.tm.IsValidated']}"/>
+                                </ui:define>
+                                <h:selectBooleanCheckbox id="validatedid" disabled="true"
+                                                         value="#{testDefinitionManager.getSelectedTest().validated}">
+                                </h:selectBooleanCheckbox>
+                            </s:decorate>
+                            <s:decorate id="viewTestDocumentationDecoration"
+                                        rendered="#{testDefinitionManager.getSelectedTest().testType.keyword == 'pre-connectathon'}"
+                                        template="/layout/display/_data_list_item.xhtml">
+                                <ui:define name="label">
+                                    #{messages['gazelle.common.application.about.Documentation']}
+                                </ui:define>
+                                <a4j:repeat
+                                        value="#{mesaTestManager.getDocumentationByTest(testDefinitionManager.getSelectedTest())}"
+                                        var="documentation">
+                                    <h:outputLink id="linkToDoc" value="#{documentation}"
+                                                  rendered="#{not empty documentation}"
+                                                  title="#{messages['gazelle.tm.testing.URLDocumentation']}"
+                                                  target="_blank">
+                                        <span class="gzl-icon-globe"/>
+                                    </h:outputLink>
+                                </a4j:repeat>
+                            </s:decorate>
+                            <s:decorate id="viewTestPeerTypeDecoration"
+                                        template="/layout/display/_data_list_item.xhtml">
+                                <ui:define name="label">#{messages['gazelle.tm.monitors.PeerType']}</ui:define>
+                                <h:outputText id="viewTestPeerType"
+                                              value="#{messages[testDefinitionManager.getSelectedTest().testPeerType.labelToDisplay]}"/>
+                            </s:decorate>
+                            <s:decorate id="viewTestValidatedByUserDecoration"
+                                        rendered="#{testDefinitionManager.getSelectedTest().lastValidatorId != null and !testDefinitionManager.getSelectedTest().lastValidatorId}"
+                                        template="/layout/display/_data_list_item.xhtml">
+                                <ui:define name="label">#{messages['net.ihe.gazelle.tm.TestValidatedBy']}
+                                </ui:define>
+                                <h:outputText id="viewTestValidatedByUser"
+                                              value="#{testDefinitionManager.getSelectedTest().lastValidatorId}"/>
+                            </s:decorate>
+                            <s:decorate id="viewTestPermalinkDecoration"
+                                        template="/layout/display/_data_list_item.xhtml">
+                                <ui:define name="label">
+                                    <h:outputText value="#{messages['gazelle.tm.testing.test.testPermalink']}"/>
+                                </ui:define>
+                                <h:outputLink id="viewTestPermalink" target="_blank"
+                                              value="#{testDefinitionManager.getTestPermalink(testDefinitionManager.getSelectedTest())}">
+                                    <h:outputText
+                                            value="#{testDefinitionManager.getTestPermalink(testDefinitionManager.getSelectedTest())}"/>
+                                </h:outputLink>
+                            </s:decorate>
+                            <s:decorate id="viewTestPermalinkDec"
+                                        rendered="#{(s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isTestManagement() and !testDefinitionManager.tmIsGmm()}"
+                                        template="/layout/display/_data_list_item.xhtml">
+                                <ui:define name="label">
+                                    <h:outputText
+                                            value="#{messages['gazelle.tm.testing.test.testPermalinkToGMM']}"/>
+                                </ui:define>
+                                <h:outputLink id="viewTestPermalink" target="_blank"
+                                              value="#{testDefinitionManager.getTestPermalinkToGMM(testDefinitionManager.getSelectedTest())}">
+                                    <h:outputText
+                                            value="#{testDefinitionManager.getTestPermalinkToGMM(testDefinitionManager.getSelectedTest())}"/>
+                                </h:outputLink>
+                            </s:decorate>
+                            <s:decorate id="viewShortDescriptionDecoration"
+                                        template="/layout/display/_data_list_item.xhtml">
+                                <ui:define name="label">#{messages['gazelle.tm.ShortDescription']}</ui:define>
+                                <h:outputText id="viewTestType"
+                                              value="#{testDefinitionManager.getSelectedTest().shortDescription}"/>
+                            </s:decorate>
+                            <s:decorate id="viewLastChangedDecoration" template="/layout/display/_data_list_item.xhtml">
+                                <ui:define name="label">#{messages['gazelle.common.LastChanged']}</ui:define>
+                                <g:date tooltip="true"
+                                        value="#{testDefinitionManager.getSelectedTest().lastChanged}"/>
+                            </s:decorate>
+                        </dl>
+
+                        <h:outputLink
+                                value="#{applicationPreferenceManager.getApplicationUrl()}testing/testsDefinition/editTestSummary.seam"
+                                styleClass="gzl-btn"
+                                rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}">
+                            <f:param name="id" value="#{testDefinitionManager.getSelectedTest().id}"/>
+                            <h:outputText value="#{messages['gazelle.common.button.Edit']}"/>
+                        </h:outputLink>
+                    </ui:decorate>
+
+
+                    <!-- ======================= -->
+                    <!-- Jira issues section-->
+                    <!-- ======================= -->
+                    <h:panelGroup rendered="#{testDefinitionManager.getSelectedTest().jiraIssues.size() gt 0}">
+                        <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+                            <ui:param name="panel_id" value="jira_issues"/>
+                            <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.JiraIssues']}</ui:define>
+                            <rich:dataTable id="viewTestIssues"
+                                            value="#{testDefinitionManager.getSelectedTest().jiraIssues}"
+                                            var="issue"
+
+                                            columnClasses="center" border="0" first="0">
+                                <g:column>
+                                    <ui:define name="header">
+                                        <h:outputText value="#{messages['net.ihe.gazelle.tm.Summary']}"/>
+                                    </ui:define>
+                                    <h:outputLink
+                                            value="#{applicationManager.getJiraUrl()}/browse/#{issue.key}"
+                                            target="_blank">
+                                        <h:outputText value="#{issue.key}: #{issue.summary} "/>
+                                    </h:outputLink>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">
+                                        <h:outputText value="#{messages['gazelle.tm.tests.testStatus']}"/>
+                                    </ui:define>
+                                    <h:outputText value="#{issue.status}"/>
+                                </g:column>
+                            </rich:dataTable>
+                            <a4j:commandButton styleClass="gzl-btn"
+                                               rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}"
+                                               value="#{messages['gazelle.common.button.Refresh']}"
+                                               action="#{jiraIssuesUpdater.updateJiraFor(testDefinitionManager.getSelectedTest().id)}"
+                                               render="globalform"/>
+                        </ui:decorate>
+                    </h:panelGroup>
+
+                    <!-- ======================= -->
+                    <!-- Test Descriptions section-->
+                    <!-- ======================= -->
+
+
+                    <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+                        <ui:param name="panel_id" value="description"/>
+                        <ui:define name="panel_title">#{messages['gazelle.tm.test.TestDescription']}
+                            #{messages['net.ihe.gazelle.tm.In']}
+                            #{testDefinitionManager.getSelectedTest().getContextualDescription().gazelleLanguage.keyword}
+                        </ui:define>
+                        <g:safehtml
+                                value="#{testDefinitionManager.getSelectedTest().getContextualDescription().description}"/>
+                        <br/>
+                        <h:outputLink
+                                value="#{applicationPreferenceManager.getApplicationUrl()}testing/testsDefinition/showTestDescriptions.seam"
+                                styleClass="gzl-btn"
+                                rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel() and !editTestDefinitionManager.noTestDescriptionExists()}">
+                            <f:param name="id" value="#{testDefinitionManager.getSelectedTest().id}"/>
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.AllLanguages']}"/>
+                        </h:outputLink>
+                        <h:outputLink
+                                value="#{applicationPreferenceManager.getApplicationUrl()}testing/testsDefinition/editTestDescription.seam"
+                                styleClass="gzl-btn"
+                                rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel() and !editTestDefinitionManager.noTestDescriptionExists()}">
+                            <f:param name="id" value="#{testDefinitionManager.getSelectedTest().id}"/>
+                            <f:param name="testDescId"
+                                     value="#{testDefinitionManager.getSelectedTest().getContextualDescription().getId()}"/>
+                            <f:param name="backToTests" value="true"/>
+                            <h:outputText value="#{messages['gazelle.common.button.Edit']}"/>
+                        </h:outputLink>
+
+                        <a4j:commandButton styleClass="gzl-btn"
+                                           rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and editTestDefinitionManager.noTestDescriptionExists()}"
+                                           value="#{messages['net.ihe.gazelle.tm.NewTestDescription']}"
+                                           action="#{editTestDefinitionManager.newTestDescription()}"
+                                           execute="@this" render="TestDescriptionsManagement"/>
+
+                    </ui:decorate>
+
+                    <!-- ======================= -->
+                    <!-- Test Roles section		 -->
+                    <!-- ======================= -->
+
+                    <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+                        <ui:param name="panel_id" value="roles"/>
+                        <ui:define name="panel_title"> #{messages['gazelle.tm.TestRoles']}</ui:define>
+                        <rich:dataTable border="0" var="currentTestRoles" rowClasses="ti-row1, ti-row2"
+                                        value="#{gazelleDAO.getTestRolesListForATest(testDefinitionManager.getSelectedTest())}">
+                            <ui:include src="../roleInTest/AbstractTestRolesTableColumnsForTests.xhtml">
+                                <ui:param name="currentTestRoles" value="#{currentTestRoles}"/>
+                            </ui:include>
+                        </rich:dataTable>
+                        <br/>
+                        <h:outputLink
+                                value="#{applicationPreferenceManager.getApplicationUrl()}testing/testsDefinition/editTestRoles.seam"
+                                styleClass="gzl-btn"
+                                rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}">
+                            <f:param name="id" value="#{testDefinitionManager.getSelectedTest().id}"/>
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.EditTestRoles']}"/>
+                        </h:outputLink>
+                    </ui:decorate>
+
+                    <!-- ======================= -->
+                    <!-- Test Steps section		 -->
+                    <!-- ======================= -->
+
+                    <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+                        <ui:param name="panel_id" value="steps"/>
+                        <ui:define name="panel_title">#{messages['gazelle.tm.TestSteps']}</ui:define>
+                        <h:graphicImage library="img"
+                                        value="#{testDefinitionManager.getSelectedTest().sequenceDiagramAsUrl}"
+                                        title="#{messages['gazelle.tm.SequenceDiagram']}"/>
+                        <br/>
+                        <rich:dataTable id="viewTestStepsTable"
+                                        rendered="#{testDefinitionManager.getTestStepsList().size()&gt;0}"
+                                        value="#{testDefinitionManager.getTestStepsList()}"
+                                        var="currentTestStep"
+                                        columnClasses="center" border="0" first="0">
+                            <g:column style="text-align:center" rowspan="2">
+                                <ui:define name="header">
+                                    <h:outputText value="#{messages['gazelle.tm.StepIndex']}"/>
+                                </ui:define>
+                                <h:outputText value="#{currentTestStep.stepIndex}"
+                                />
+                            </g:column>
+                            <g:column style="text-align:center">
+                                <ui:define name="header">
+                                    <h:outputText value="#{messages['gazelle.tm.InitiatorRole']}"/>
+                                </ui:define>
+                                <h:outputText value="#{currentTestStep.testRolesInitiator.roleInTest.keyword}"
+                                />
+                            </g:column>
+                            <g:column style="text-align:center">
+                                <ui:define name="header">
+                                    <h:outputText value="#{messages['gazelle.tm.ResponderRole']}"/>
+                                </ui:define>
+                                <h:outputText value="#{currentTestStep.testRolesResponder.roleInTest.keyword}"
+                                />
+                            </g:column>
+                            <g:column style="text-align:center">
+                                <ui:define name="header">
+                                    <h:outputText value="#{messages['gazelle.tf.Transaction']}"/>
+                                </ui:define>
+                                <h:outputText value="#{currentTestStep.transaction.keyword}"
+                                />
+                            </g:column>
+                            <g:column style="text-align:center">
+                                <ui:define name="header">
+                                    <h:outputText value="#{messages['gazelle.tm.testing.testsDefinition.secured']}"/>
+                                </ui:define>
+                                <h:selectBooleanCheckbox id="isSecured"
+                                                         value="#{currentTestStep.secured}"
+                                                         disabled="true"/>
+                            </g:column>
+                            <g:column style="text-align:center">
+                                <ui:define name="header">
+                                    <h:outputText value="#{messages['gazelle.tf.table.mptrans']}"/>
+                                </ui:define>
+                                <h:outputText value="#{currentTestStep.messageType}"
+                                />
+                            </g:column>
+                            <g:column style="text-align:center">
+                                <ui:define name="header">
+                                    <h:outputText value="#{messages['gazelle.tf.LabelOption']}"/>
+                                </ui:define>
+                                <h:outputText value="#{currentTestStep.testStepsOption.labelToDisplay}"
+                                />
+                            </g:column>
+                            <g:column style="text-align:left">
+                                <ui:define name="header">
+                                    <h:outputText value="#{messages['gazelle.tf.table.Description']}"/>
+                                </ui:define>
+                                <g:safehtml value="#{currentTestStep.description}"/>
+                            </g:column>
+                            <g:column style="text-align:left" rowspan="2"
+                                      rendered="#{applicationManager.isAssertionEnabled()}">
+                                <ui:define name="header">
+                                    <h:outputText value="#{messages['net.ihe.gazelle.tm.Assertions']}"/>
+                                </ui:define>
+                                <a4j:repeat id="companiesRepeat"
+                                            value="#{assertionsManager.getTestStepAssertions(currentTestStep.id)}"
+                                            var="testStepAssertion">
+                                    <h:outputLink value="#{testStepAssertion.getPermanentLink()}"
+                                                  target="_blank">
+                                        <h:outputText value="#{testStepAssertion.assertionId} "/>
+                                    </h:outputLink>
+                                    <br/>
+                                </a4j:repeat>
+                            </g:column>
+                            <g:column style="text-align:left;background-color:#ccddee;" colspan="7"
+                                      breakRowBefore="true">
+                                <f:subview id="subview_18">
+                                    <ui:include src="contextualInformationLists.xhtml">
+                                        <ui:param name="currentTestStep" value="#{currentTestStep}"/>
+                                    </ui:include>
+                                </f:subview>
+                            </g:column>
+                            <rich:dataScroller maxPages="10" renderIfSinglePage="false"/>
+
+                        </rich:dataTable>
+                        <br/>
+                        <h:outputLink
+                                value="#{applicationPreferenceManager.getApplicationUrl()}testing/testsDefinition/editTestSteps.seam?id=#{testDefinitionManager.getSelectedTest().id}"
+                                styleClass="gzl-btn"
+                                rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}">
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.EditTestSteps']}"/>
+                        </h:outputLink>
+                    </ui:decorate>
+                    <h:panelGroup
+                            rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}">
+
+                        <ui:decorate id="comments" template="/layout/panels/_panel_title_fixed_id.xhtml">
+                            <ui:param name="panel_id" value="comments"/>
+                            <ui:define name="panel_title">#{messages['gazelle.tm.UserComments']}</ui:define>
+                            <ui:include src="userCommentsList.xhtml">
+                                <ui:param name="containerPanelId" value="comments"/>
+                                <ui:param name="testId" value="#{testDefinitionManager.getSelectedTest().id}"/>
+                            </ui:include>
+                        </ui:decorate>
+                    </h:panelGroup>
+                    <a4j:commandButton styleClass="gzl-btn" id="BackButton3"
+                                       value="#{messages['gazelle.tm.BackToTestList']}"
+                                       action="/testing/testsDefinition/testsList.seam" execute="@this"/>
+                    <h:commandButton styleClass="gzl-btn" id="printTestAsPdf"
+                                     value="#{messages['gazelle.tm.PrintTestAsPdf']}"
+                                     action="#{testDefinitionManager.downloadTestAsPdf(testDefinitionManager.getSelectedTest().id)}"/>
+                </h:form>
+                <h:panelGroup rendered="#{!testDefinitionManager.canViewSelectedTestAsNotLoggedIn()}">
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.YouAreNotAllowedToViewThisTest']}"/>
+                </h:panelGroup>
+            </div>
+            <div class="col-lg-2 scrollspy">
+                <nav class="gzl-sidebar">
+                    <ul id="nav" class="nav hidden-xs hidden-sm affix" data-spy="affix">
+                        <li>
+                            <a href="#summary">#{messages['net.ihe.gazelle.tm.Summary']}</a>
+                        </li>
+
+                        <h:panelGroup
+                                rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel() and applicationManager.isAssertionEnabled() and assertionsManager.getTestAssertions(testDefinitionManager.getSelectedTest().id).size() gt 0 }">
+                            <li>
+                                <a href="#assertions">#{messages['net.ihe.gazelle.tm.Assertions']}</a>
+                            </li>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{testDefinitionManager.getSelectedTest().jiraIssues.size() gt 0}">
+                            <li>
+                                <a href="#jira_issues">#{messages['net.ihe.gazelle.tm.JiraIssues']}</a>
+                            </li>
+                        </h:panelGroup>
+                        <li>
+                            <a href="#description">#{messages['gazelle.tm.mesatests.Description']}</a>
+                        </li>
+                        <li>
+                            <a href="#roles">#{messages['gazelle.users.roles']}</a>
+                        </li>
+                        <li>
+                            <a href="#steps">#{messages['net.ihe.gazelle.tm.Steps']}</a>
+                        </li>
+                        <li>
+                            <a href="#comments">#{messages['gazelle.tm.testing.instance.comments']}</a>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- end of main navigation -->
+            </div>
+        </div>
+        <script type="text/javascript">jq162('body').scrollspy({target: '.scrollspy'})</script>
+    </ui:define>
+</ui:composition>

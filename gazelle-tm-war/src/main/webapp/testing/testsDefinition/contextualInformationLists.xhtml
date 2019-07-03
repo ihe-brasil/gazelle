@@ -1,0 +1,85 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <rich:togglePanel id="panel" initialState="empty" switchType="client" stateOrder="empty,first">
+        <rich:togglePanelItem name="empty">
+            <h:panelGroup id="pangroup1">
+                <h:commandLink id="toggview" style="font-weight:bold;"
+                               value="#{messages['net.ihe.gazelle.tm.InputAndOutputContextualInformation']} (#{currentTestStep.sizeOfInputCI()} - #{currentTestStep.sizeOfOutputCI()})">
+                    <rich:toggleControl targetItem="first">
+                    </rich:toggleControl>
+                </h:commandLink>
+            </h:panelGroup>
+        </rich:togglePanelItem>
+        <rich:togglePanelItem name="first">
+            <h:panelGroup>
+                <h:commandLink style="font-weight:bold;" value="#{messages['gazelle.common.button.Hide']}">
+                    <rich:toggleControl targetItem="empty">
+                    </rich:toggleControl>
+                </h:commandLink>
+                <table width="100%">
+                    <tr>
+                        <td style="width: 45%">
+                            <h:outputText value="#{messages['gazelle.tm.test.InputContextualInformations']}"/>
+                            <br/>
+                            <br/>
+                            <rich:dataTable id="CIIndt2" var="currentCI" rowKeyVar="10"
+                                            value="#{currentTestStep.inputContextualInformationList}" first="0">
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                    <h:outputText value="#{currentCI.id}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Label']}</ui:define>
+                                    <h:outputText value="#{currentCI.label}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">
+                                        #{messages['gazelle.financial.invoice.InvoicePathForArray']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentCI.path.keyword}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.tm.testing.instance.ValueURL']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentCI.value}"/>
+                                </g:column>
+                            </rich:dataTable>
+                        </td>
+                        <td style="vertical-align: middle;">
+                            <span class="gzl-icon-forward"/>
+                        </td>
+                        <td style="width: 45%">
+                            <h:outputText value="#{messages['gazelle.tm.test.OutputContextualInformations']}"/>
+                            <br/>
+                            <br/>
+                            <rich:dataTable id="CIoutdt" var="currentCI" rowKeyVar="10"
+                                            value="#{currentTestStep.outputContextualInformationList}" first="0">
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                    <h:outputText value="#{currentCI.id}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Label']}</ui:define>
+                                    <h:outputText value="#{currentCI.label}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">
+                                        #{messages['gazelle.financial.invoice.InvoicePathForArray']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentCI.path.keyword}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.tm.testing.instance.ValueURL']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentCI.value}"/>
+                                </g:column>
+                            </rich:dataTable>
+                        </td>
+                    </tr>
+                </table>
+            </h:panelGroup>
+        </rich:togglePanelItem>
+    </rich:togglePanel>
+</ui:composition>

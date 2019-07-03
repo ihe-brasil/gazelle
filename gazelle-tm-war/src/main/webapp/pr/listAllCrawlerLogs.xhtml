@@ -1,0 +1,114 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.productregistry.crawler.Title']}"/>
+    <ui:define name="body">
+        <h:form id="globalform">
+            <s:token allowMultiplePosts="true"/>
+            <rich:dataTable id="crawlerReportingsTable" var="currentCrawlerReporting"
+                            value="#{prCrawlerReportingViewer.crawlerReportings}" rowKeyVar="rowNumber"
+                            rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                <g:column sortBy="#{'id'}" sortOrder="#{dataTableStateHolder.sortOrders['id']}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['gazelle.productregistry.search.Id']}"/>
+                    </ui:define>
+                    <h:outputText value="#{currentCrawlerReporting.id}"/>
+                </g:column>
+                <g:column sortBy="#{'executionStartingDate'}"
+                          sortOrder="descending">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.ExecutionDate']}"/>
+                    </ui:define>
+                    <g:date tooltip="true" value="#{currentCrawlerReporting.executionStartingDate}"/>
+                </g:column>
+                <g:column sortBy="#{'executionElapsedTime'}"
+                          sortOrder="#{dataTableStateHolder.sortOrders['executionelapsedtime']}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.ElapsedTimems']}"/>
+                    </ui:define>
+                    <h:outputText value="#{currentCrawlerReporting.executionElapsedTime}"/>
+                </g:column>
+                <g:column sortBy="#{'numberOfCheckedIntegrationStatements'}"
+                          sortOrder="#{dataTableStateHolder.sortOrders['numberofcheckedintegrationstatements']}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.NumberOfCheckedIS']}"/>
+                    </ui:define>
+                    <h:outputText
+                            value="#{currentCrawlerReporting.numberOfCheckedIntegrationStatements}"/>
+                </g:column>
+                <g:column sortBy="#{'numberOfUnmatchingHashcodeForIntegrationStatements'}"
+                          sortOrder="#{dataTableStateHolder.sortOrders['numberofunmatchinghashcodeforintegrationstatements']}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.NumberOfUnmatchingIS']}"/>
+                    </ui:define>
+                    <a4j:commandLink
+                            value="#{currentCrawlerReporting.numberOfUnmatchingHashcodeForIntegrationStatements}"
+                            oncomplete="jq162('#listOfFoundSystemsModalPanel').modal('show');"
+                            actionListener="#{prCrawlerReportingViewer.viewUnmatchingSystems(currentCrawlerReporting)}"
+                            render=" :foundSystemsListForm"/>
+                </g:column>
+                <g:column sortBy="#{'numberOfUnreachableIntegrationStatements'}"
+                          sortOrder="#{dataTableStateHolder.sortOrders['numberofunreachableintegrationstatements']}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.NumberOfUnreachableIS']}"/>
+                    </ui:define>
+                    <a4j:commandLink value="#{currentCrawlerReporting.numberOfUnreachableIntegrationStatements}"
+                                     oncomplete="jq162('#listOfFoundSystemsModalPanel').modal('show');"
+                                     actionListener="#{prCrawlerReportingViewer.viewUnreachableSystems(currentCrawlerReporting)}"
+                                     render=" :foundSystemsListForm"/>
+                </g:column>
+                <f:facet name="footer">
+                    <ui:include src="/util/datatableFooter.xhtml">
+                        <ui:param name="dataScrollerId" value="ds"/>
+                        <ui:param name="dataTableId" value="crawlerReportingsTable"/>
+                    </ui:include>
+                </f:facet>
+            </rich:dataTable>
+            <h:commandLink value="#{messages['gazelle.common.export.ExportAsExcel']}"
+                           action="#{gazelleExcelExporterJboss7.export('globalform:crawlerReportingsTable')}"/>
+        </h:form>
+
+        <!-- **************************************************************** -->
+        <!-- Modal Panel : List of found systems for a search		   		-->
+        <!-- **************************************************************** -->
+        <h:form id="foundSystemsListForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="listOfFoundSystemsModalPanel"/>
+                <ui:define name="popup_title">
+                    #{messages['gazelle.productregistry.search.statistics.ListOfFoundSystems']}
+                </ui:define>
+                <rich:dataTable id="foundSystemsTable" var="foundSystem"
+                                value="#{prCrawlerReportingViewer.systemList}" rows="20">
+                    <g:column>
+                        <ui:define id="foundSystemNameHeader" name="header">
+                            <h:outputText value="#{messages['gazelle.configuration.system.system']}"/>
+                        </ui:define>
+                        <h:outputText value="#{foundSystem.name}"/>
+                        -
+                        <h:outputText value="#{foundSystem.version}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.ISURL']}"/>
+                        </ui:define>
+                        <h:outputLink target="_blank" value="#{foundSystem.integrationStatementUrl}">
+                            <h:outputText value="#{prManager.downloadISLabel(foundSystem)}"/>
+                        </h:outputLink>
+                    </g:column>
+                    <f:facet name="footer">
+                        <rich:dataScroller maxPages="5" renderIfSinglePage="false"/>
+                    </f:facet>
+                </rich:dataTable>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+
+    </ui:define>
+</ui:composition>

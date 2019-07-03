@@ -1,0 +1,61 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j" xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <c:if test="#{rulesManager.isList(criterion)}">
+        <div class="rules-left">
+            <div class="rules-top"></div>
+            <c:forEach items="#{criterion.aipoCriterions}" var="subCriterion" varStatus="status">
+                <c:if test="#{status.index gt 0}">
+                    <div class="rules-spacer"></div>
+                </c:if>
+                <div class="rules-block">
+                    <div class="rules-condition">
+                        <c:if test="#{status.index gt 0}">
+                            <c:if test="#{criterion['or']}">
+                                <center>#{messages['gazelle.productregistry.search.easySearch.or']}</center>
+                            </c:if>
+                            <c:if test="#{not criterion['or']}">
+                                <center>#{messages['net.ihe.gazelle.tm.And']}</center>
+                            </c:if>
+                        </c:if>
+                        <c:if test="#{status.index eq 0}">
+                            <center></center>
+                        </c:if>
+                    </div>
+                    <div class="rules-criterion">
+                        <s:decorate template="/systems/system/editSystemImplementationCriterion.xhtml">
+                            <ui:param name="criterion" value="#{subCriterion}"/>
+                        </s:decorate>
+                    </div>
+                </div>
+            </c:forEach>
+            <div class="rules-bottom"></div>
+        </div>
+    </c:if>
+    <c:if test="#{not rulesManager.isList(criterion)}">
+        <s:div style="display:block;">
+            <s:div style="display:inline-block; margin: 2px;">
+                <c:if test="#{tfDependenciesManager.validatesCriterion(criterion, system)}">
+                    <span class="gzl-icon-checked" />
+                </c:if>
+                <c:if test="#{not tfDependenciesManager.validatesCriterion(criterion, system)}">
+                      <span class="gzl-icon-times"/>
+                </c:if>
+            </s:div>
+            <s:div style="display:inline-block; margin: 2px;">
+                <h:outputText value="#{criterion.toString()}"/>
+            </s:div>
+            <s:div style="display:inline-block; margin: 2px;"
+                   rendered="#{not tfDependenciesManager.validatesCriterion(criterion, system) and display}">
+                <a4j:commandLink event="click" oncomplete="jq162('#TfDependenciesDBModalPanel').modal('hide');window.autoCloseAddImplementationPanel=true;jq162('#AddImplementationModalPanel').modal('show');"
+                                 immediate="true" render="AddImplementationModalPanel, :formSystemImplementationsSelection"
+                                 actionListener="#{aipoSelector.initUsingCriterion(criterion)}">
+                    <span class="gzl-icon-plus"/>
+                </a4j:commandLink>
+
+            </s:div>
+        </s:div>
+    </c:if>
+</ui:composition>

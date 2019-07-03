@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="cat_results" language="java" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<queryString language="SQL">
+		<![CDATA[SELECT DISTINCT
+     usr_institution."keyword" AS usr_institution_keyword,
+     tf_actor."keyword" AS tf_actor_keyword,
+     tf_integration_profile."keyword" AS tf_integration_profile_keyword
+FROM
+     "public"."tm_system_actor_profiles" tm_system_actor_profiles INNER JOIN "public"."tm_system_aipo_result_for_a_testing_session" tm_system_aipo_result_for_a_testing_session ON tm_system_actor_profiles."id" = tm_system_aipo_result_for_a_testing_session."system_actor_profile_id"
+     INNER JOIN "public"."tf_actor_integration_profile_option" tf_actor_integration_profile_option ON tm_system_actor_profiles."actor_integration_profile_option_id" = tf_actor_integration_profile_option."id"
+     INNER JOIN "public"."tm_system" tm_system ON tm_system_actor_profiles."system_id" = tm_system."id"
+     INNER JOIN "public"."tm_system_in_session" tm_system_in_session ON tm_system."id" = tm_system_in_session."system_id"
+     INNER JOIN "public"."tm_institution_system" tm_institution_system ON tm_system."id" = tm_institution_system."system_id"
+     INNER JOIN "public"."usr_institution" usr_institution ON tm_institution_system."institution_id" = usr_institution."id"
+     AND tm_system_aipo_result_for_a_testing_session."testing_session_id" = tm_system_in_session."testing_session_id"
+     INNER JOIN "public"."tf_actor_integration_profile" tf_actor_integration_profile ON tf_actor_integration_profile_option."actor_integration_profile_id" = tf_actor_integration_profile."id"
+     INNER JOIN "public"."tf_integration_profile_option" tf_integration_profile_option ON tf_actor_integration_profile_option."integration_profile_option_id" = tf_integration_profile_option."id"
+     INNER JOIN "public"."tf_actor" tf_actor ON tf_actor_integration_profile."actor_id" = tf_actor."id"
+     INNER JOIN "public"."tf_integration_profile" tf_integration_profile ON tf_actor_integration_profile."integration_profile_id" = tf_integration_profile."id"
+WHERE
+     tm_system_aipo_result_for_a_testing_session."testing_session_id" = 8
+ AND tm_system_aipo_result_for_a_testing_session."status_id" IS NULL
+ORDER BY
+     usr_institution."keyword" ASC]]>
+	</queryString>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,264 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tm.monitors.Administration']}"/>
+    <ui:define name="body">
+        <h:form id="globalForm">
+            <s:token allowMultiplePosts="true"/>
+            <a4j:queue requestDelay="300" ignoreDupResponses="true"/>
+            #{monitorInSessionAdministrationManager.initMonitorInSessionManagement()}
+            <s:div id="globalDiv">
+                <h:panelGroup id="monitorInSessionListPanel"
+                              rendered="#{monitorInSessionAdministrationManager.showMonitorInSessionListPanel}">
+
+                    <h:outputText
+                            value="#{monitorInSessionAdministrationManager.foundMonitorInSessionList.size()} "
+                            rendered="#{not empty monitorInSessionAdministrationManager.foundMonitorInSessionList}"/>
+                    <h:outputText
+                            value="#{messages['gazelle.tm.MonitorsFound']} #{messages['net.ihe.gazelle.tm.InTestingSession']} #{gazelleDAO.getSelectedTestingSession().description}"
+                            rendered="#{not empty monitorInSessionAdministrationManager.foundMonitorInSessionList}"/>
+
+                    <div style="text-align:right">
+                        <a4j:commandButton id="addmontotest"
+                                           rendered="#{(s:hasRole('admin_role')  || s:hasRole('testing_session_admin_role'))and !monitorInSessionAdministrationManager.showAddMonitorInSessionPanel   and (monitorInSessionAdministrationManager.foundMonitorInSessionList != null)}"
+                                           styleClass="gzl-btn"
+                                           value="#{messages['gazelle.tm.AssignMonitorsToTests']}"
+                                           action="/monitors/addMonitorToTest.seam"/>
+                        <a4j:commandButton id="addmon"
+                                           rendered="#{(s:hasRole('admin_role')  || s:hasRole('testing_session_admin_role')) and !monitorInSessionAdministrationManager.showAddMonitorInSessionPanel}"
+                                           styleClass="gzl-btn"
+                                           value="#{messages['gazelle.tm.AddMonitors']}"
+                                           actionListener="#{monitorInSessionAdministrationManager.showAddMonitorInSessionPanel()}"
+                                           render="buttadd,addmonpan"/>
+                    </div>
+                    #{dataTableStateHolder.setAscendingOn('user.firstname')}
+                    <rich:dataTable id="monitorInSessionListTable" cellspacing="0" width="700" border="0"
+                                    var="selectedMonitorInSession"
+                                    value="#{monitorInSessionAdministrationManager.getFoundMonitorInSessionList()}"
+                                    rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                        <g:column filterBy="#{'user.firstname'}"
+                                  filterEvent="onkeyup" sortBy="#{'user.firstname'}"
+                                  sortOrder="#{dataTableStateHolder.sortOrders['user.firstname']}">
+                            <ui:define name="header">#{messages['gazelle.users.user.UserName']}</ui:define>
+                            <a href="mailto:#{selectedMonitorInSession.user.email}">
+                                <h:outputText
+                                        value="#{selectedMonitorInSession.user.firstname} #{selectedMonitorInSession.user.lastname}"/>
+                            </a>
+                        </g:column>
+                        <g:column filterBy="#{'user.username'}"
+                                  filterEvent="onkeyup" sortBy="#{'user.username'}"
+                                  sortOrder="#{dataTableStateHolder.sortOrders['user.username']}">
+                            <ui:define name="header">#{messages['gazelle.users.user.UserUsername']}</ui:define>
+                            <h:outputText value="#{selectedMonitorInSession.user.username}"/>
+                        </g:column>
+                        <g:column
+                                filterBy="#{'user.institution.keyword'}"
+                                filterEvent="onkeyup"
+                                sortBy="#{'user.institution.keyword'}"
+                                sortOrder="#{dataTableStateHolder.sortOrders['user.institution.keyword']}">
+                            <ui:define name="header">#{messages['gazelle.financial.invoice.InstitutionKeyword']}
+                            </ui:define>
+                            #{selectedMonitorInSession.user.institution.keyword}
+                        </g:column>
+
+                        <g:column style="text-align:center"
+                                  sortBy="#{selectedMonitorInSession.testList.size()}"
+                                  sortOrder="#{dataTableStateHolder.sortOrders['user.institution.keyword']}">
+                            <ui:define name="header"># #{messages['gazelle.tests.tests']}</ui:define>
+                            <h:outputText value="#{selectedMonitorInSession.testList.size()}"/>
+                        </g:column>
+                        <g:column sortBy="#{'user.loginsCounter'}"
+                                  style="text-align:center"
+                                  sortOrder="#{dataTableStateHolder.sortOrders['user.loginsCounter']}"
+                                  rendered="#{s:hasRole('admin_role') || s:hasRole('testing_session_admin_role')}">
+                            <ui:define name="header">#{messages['gazelle.users.user.NumberOfLogins']}</ui:define>
+                            <h:outputText id="userLoginsCounter"
+                                          value="#{selectedMonitorInSession.user.loginsCounter}"/>
+                        </g:column>
+                        <g:column
+                                rendered="#{s:hasRole('admin_role') || s:hasRole('testing_session_admin_role')}"
+                                sortBy="#{'user.lastLogin'}"
+                                sortOrder="#{dataTableStateHolder.sortOrders['user.lastLogin']}">
+                            <ui:define name="header">
+                                #{messages['gazelle.users.user.UserLastLogin']}
+                            </ui:define>
+                            <g:date tooltip="true" value="#{selectedMonitorInSession.user.lastLogin}"/>
+                        </g:column>
+                        <g:column
+                                rendered="#{s:hasRole('admin_role') || s:hasRole('testing_session_admin_role')}"
+                                sortBy="#{'user.lastChanged'}"
+                                sortOrder="#{dataTableStateHolder.sortOrders['user.lastChanged']}">
+                            <ui:define name="header">
+                                #{messages['gazelle.common.LastChanged']}
+                            </ui:define>
+                            <g:date tooltip="true" value="#{selectedMonitorInSession.user.lastChanged}"/>
+                        </g:column>
+                        <g:column>
+                            <f:facet name="header">#{messages['gazelle.common.Action']}</f:facet>
+                            <div class="gzl-never-wrap">
+
+                                <a4j:commandLink event="click"
+                                                 title="#{messages['gazelle.common.button.View']}"
+                                                 render="globalDiv"
+                                                 actionListener="#{monitorInSessionAdministrationManager.viewMonitorInSession(selectedMonitorInSession)}">
+                                    <span class="gzl-icon-search"/>
+                                </a4j:commandLink>
+
+                                <h:commandLink title="#{messages['gazelle.common.button.Print']}"
+                                               actionListener="#{monitorInSessionAdministrationManager.downloadSelectedTestsAsPdf(selectedMonitorInSession)}">
+                                    <span class="gzl-icon-print"/>
+                                </h:commandLink>
+
+                                <a4j:commandLink event="click"
+                                                 title="#{messages['gazelle.common.button.Edit']}"
+                                                 rendered="#{s:hasRole('admin_role') || s:hasRole('testing_session_admin_role')}"
+                                                 render="globalDiv"
+                                                 actionListener="#{monitorInSessionAdministrationManager.editMonitorInSession(selectedMonitorInSession)}">
+                                    <span class="gzl-icon-pencil"/>
+                                </a4j:commandLink>
+
+                                <a4j:commandLink event="click"
+                                                 render="globalDiv"
+                                                 title="#{messages['gazelle.common.button.Delete']}"
+                                                 rendered="#{s:hasRole('admin_role') || s:hasRole('testing_session_admin_role')}"
+                                                 actionListener="#{monitorInSessionAdministrationManager.setSelectedMonitorInSession(selectedMonitorInSession)}"
+                                                 oncomplete="jq162('#DeleteConfirmationModalPanel').modal('show');">
+                                    <span class="gzl-icon-trash-o"/>
+                                </a4j:commandLink>
+                            </div>
+                        </g:column>
+                        <f:facet name="footer">
+                            <ui:include src="/util/datatableFooter.xhtml">
+                                <ui:param name="dataScrollerId" value="ds"/>
+                                <ui:param name="dataTableId" value="monitorInSessionListTable"/>
+                            </ui:include>
+                        </f:facet>
+                    </rich:dataTable>
+                    <h:commandLink id="DOWNASCVS"
+                                   action="#{monitorExporter.exportDataModel(monitorInSessionAdministrationManager.getFoundMonitorInSessionList())}">
+                        <h:outputText value="#{messages['gazelle.common.export.ExportAsExcel']}"/>
+                    </h:commandLink>
+
+                </h:panelGroup>
+
+                <s:div id="addmonpan">
+                    <h:panelGroup rendered="#{monitorInSessionAdministrationManager.showAddMonitorInSessionPanel}">
+
+                        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                            <ui:define name="panel_title">#{messages['gazelle.tm.MonitorSelectionList']}</ui:define>
+                            <s:decorate template="/layout/form/_edit.xhtml">
+                                <ui:define name="label">#{messages['gazelle.users.institution.help.InstitutionTypeB']}
+                                </ui:define>
+                                <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text"
+                                                 value="#{monitorInSessionAdministrationManager.selectedInstitution}">
+                                    <s:selectItems
+                                            value="#{monitorInSessionAdministrationManager.getInstitutionListForAllMonitorsInSession()}"
+                                            var="insFromList"
+                                            noSelectionLabel="#{messages['gazelle.tm.PleaseSelectAnInstitution_2']}"
+                                            label="#{insFromList.name} (#{insFromList.keyword})"/>
+                                    <a4j:ajax event="change" execute="@this"
+                                              render="addMonitorInSessionDecoration"/>
+                                </h:selectOneMenu>
+                            </s:decorate>
+                            <a4j:region id="addMonitorInSessionRegion">
+                                <s:decorate id="addMonitorInSessionDecoration" template="/layout/form/_edit.xhtml">
+                                    <ui:define name="label">#{messages['gazelle.tm.Monitors']}</ui:define>
+                                    <rich:pickList id="picklismon"
+                                                   value="#{monitorInSessionAdministrationManager.selectedMonitors}">
+                                        <s:selectItems
+                                                value="#{monitorInSessionAdministrationManager.getMonitorsList()}"
+                                                var="selectedUser"
+                                                label="#{selectedUser.firstname} #{selectedUser.lastname}"/>
+                                        <s:convertEntity></s:convertEntity>
+                                    </rich:pickList>
+                                </s:decorate>
+                            </a4j:region>
+                            <div align="right">
+                                <a4j:commandButton
+                                        rendered="#{s:hasRole('admin_role') || s:hasRole('testing_session_admin_role')}"
+                                        id="addmon2sess" styleClass="gzl-btn"
+                                        value="#{messages['gazelle.tm.AddMonitorsToActivatedSession']}"
+                                        actionListener="#{monitorInSessionAdministrationManager.addMonitorsToActivatedTestingSession()}"
+                                        render="globalDiv"/>
+                                <a4j:commandButton
+                                        rendered="#{s:hasRole('admin_role') || s:hasRole('testing_session_admin_role')}"
+                                        id="cancaddmon" styleClass="gzl-btn"
+                                        value="#{messages['gazelle.common.button.Cancel']}"
+                                        actionListener="#{monitorInSessionAdministrationManager.setShowAddMonitorInSessionPanel(false)}"
+                                        execute="@this" render="buttadd,addmonpan"/>
+                            </div>
+                        </ui:decorate>
+                    </h:panelGroup>
+                </s:div>
+
+                <s:div id="showUserDetailsDiv"
+                       rendered="#{monitorInSessionAdministrationManager.showEditMonitorInSessionPanel or monitorInSessionAdministrationManager.showViewMonitorInSessionPanel}">
+                    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                        <ui:define name="panel_title">#{messages['gazelle.users.user.DisplayUserLabel1']}</ui:define>
+                        <ui:include src="../monitors/showUserDetailsPanel.xhtml">
+                            <ui:param name="userVar"
+                                      value="#{monitorInSessionAdministrationManager.selectedMonitorInSession.user}"/>
+                        </ui:include>
+                    </ui:decorate>
+                </s:div>
+                <h:panelGroup rendered="#{monitorInSessionAdministrationManager.showEditMonitorInSessionPanel}">
+                    <ui:decorate template="/layout/panels/_panel.xhtml">
+                        <ui:include src="../monitors/editMonitorInSession.xhtml"/>
+                        <div align="left">
+                            <a4j:commandButton value="#{messages['gazelle.common.button.Delete']}"
+                                               styleClass="gzl-btn-red" immediate="true" bypassUpdates="true"
+                                               oncomplete="jq162('#DeleteConfirmationModalPanel').modal('show');"
+                                               execute="@this"
+                                               render="DeleteConfirmationModalPanel,DeleteConfirmationDiv"/>
+                            <a4j:commandButton value="#{messages['gazelle.tm.BackToMonitorList']}" id="backtolismon2"
+                                               styleClass="gzl-btn" immediate="true" bypassUpdates="true"
+                                               actionListener="#{monitorInSessionAdministrationManager.hideEditMonitorInSessionPanel()}"
+                                               execute="@this" render="globalDiv"/>
+                        </div>
+                    </ui:decorate>
+                </h:panelGroup>
+
+                <s:div id="viewMonitorInSessionPanel"
+                       rendered="#{monitorInSessionAdministrationManager.showViewMonitorInSessionPanel}">
+                    <ui:include src="../monitors/showMonitorInSession.xhtml">
+                        <ui:param name="monitorInSessionVar"
+                                  value="#{monitorInSessionAdministrationManager.selectedMonitorInSession}"/>
+                    </ui:include>
+                    <div align="left">
+                        <a4j:commandButton value="#{messages['gazelle.tm.BackToMonitorList']}" id="backtolismon"
+                                           styleClass="gzl-btn" immediate="true" bypassUpdates="true"
+                                           actionListener="#{monitorInSessionAdministrationManager.hideEditMonitorInSessionPanel()}"
+                                           execute="@this" render="globalDiv"/>
+                        <h:commandButton styleClass="gzl-btn" id="printTestAsPdf"
+                                         value="#{messages['gazelle.tm.PrintSelectedTests']}"
+                                         action="#{monitorInSessionAdministrationManager.downloadSelectedTestsAsPdf()}"/>
+                    </div>
+                </s:div>
+
+                <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                    <ui:param name="popup_id" value="DeleteConfirmationModalPanel"/>
+                    <ui:define name="popup_title">#{messages['gazelle.tm.monitors.confirmation.delete.header']}
+                    </ui:define>
+                    <s:div id="DeleteConfirmationDiv">
+                        <p>#{messages['gazelle.tm.monitors.confirmation.delete.label']}
+                            #{monitorInSessionAdministrationManager.selectedMonitorInSession.user.firstname}
+                            #{monitorInSessionAdministrationManager.selectedMonitorInSession.user.lastname}</p>
+                    </s:div>
+                    <ui:define name="popup_footer">
+                        <button type="button" class="gzl-btn" data-dismiss="modal">
+                            #{messages['gazelle.tm.Cancel']}
+                        </button>
+                        <a4j:commandButton id="deleteConfirmationPanelButton"
+                                           value="#{messages['gazelle.common.button.Delete']}"
+                                           styleClass="gzl-btn-red" ignoreDupResponses="true"
+                                           actionListener="#{monitorInSessionAdministrationManager.deleteSelectedMonitorInSession()}"
+                                           onclick="jq162('#DeleteConfirmationModalPanel').modal('hide');"
+                                           render="globalDiv"/>
+                    </ui:define>
+                </ui:decorate>
+            </s:div>
+        </h:form>
+    </ui:define>
+</ui:composition>

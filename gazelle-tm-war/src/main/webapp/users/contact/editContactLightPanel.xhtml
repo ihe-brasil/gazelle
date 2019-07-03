@@ -1,0 +1,73 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <!-- ======================= -->
+    <!-- Contact Edit section						   -->
+    <!-- ======================= -->
+    <s:fragment>
+        <a4j:region id="firstnameContactRegionEdit#{panelId}">
+            <s:decorate id="firstNameDecorationEdit#{panelId}" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="firstNameEdit#{panelId}"/>
+                <ui:define name="label">#{messages['gazelle.contacts.Firstname']}</ui:define>
+                <h:inputText  styleClass=" form-control" id="firstNameEdit#{panelId}" size="30" value="#{contactVariable.firstname}"
+                             required="#{required}">
+
+                </h:inputText>
+            </s:decorate>
+        </a4j:region>
+        <a4j:region id="lastnameContactRegionEdit#{panelId}">
+            <s:decorate id="lastNameDecorationEdit#{panelId}" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="lastNameEdit#{panelId}"/>
+                <ui:define name="label">#{messages['gazelle.contacts.Lastname']}</ui:define>
+                <h:inputText  styleClass=" form-control" id="lastNameEdit#{panelId}" size="30" value="#{contactVariable.lastname}"
+                             required="#{required}">
+                </h:inputText>
+            </s:decorate>
+        </a4j:region>
+        <a4j:region id="emailContactRegionEdit#{panelId}">
+            <s:decorate id="emailDecorationEdit#{panelId}" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="emailEdit#{panelId}"/>
+                <ui:define name="label">#{messages['gazelle.contacts.Email']}</ui:define>
+                <h:inputText  styleClass=" form-control" id="emailEdit#{panelId}" size="30" value="#{contactVariable.email}" required="#{required}">
+                </h:inputText>
+            </s:decorate>
+        </a4j:region>
+        <a4j:region id="phoneContactRegionEdit#{panelId}">
+            <s:decorate id="phoneDecorationEdit#{panelId}" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="phoneEdit#{panelId}"/>
+                <ui:define name="label">#{messages['gazelle.contacts.Phone']}</ui:define>
+                <h:inputText  styleClass=" form-control" id="phoneEdit#{panelId}" size="30" value="#{contactVariable.personalPhone}"
+                             required="#{required}">
+                </h:inputText>
+            </s:decorate>
+        </a4j:region>
+        <a4j:region id="titleContactRegionEdit#{panelId}">
+            <s:decorate id="titleDecorationEdit#{panelId}" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="titleEdit#{panelId}"/>
+                <ui:param name="required" value="false"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.Title']}</ui:define>
+                <h:inputText  styleClass=" form-control" id="titleEdit#{panelId}" size="30" value="#{contactVariable.title}">
+                </h:inputText>
+            </s:decorate>
+        </a4j:region>
+        <a4j:region id="cellphoneContactRegionEdit#{panelId}">
+            <s:decorate id="cellPhoneDecorationEdit#{panelId}" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="cellPhoneEdit#{panelId}"/>
+                <ui:param name="required" value="false"/>
+                <ui:define name="label">#{messages['gazelle.contacts.CellPhone']}</ui:define>
+                <h:inputText  styleClass=" form-control" id="cellPhoneEdit#{panelId}" size="30" value="#{contactVariable.cellPhone}">
+                </h:inputText>
+            </s:decorate>
+        </a4j:region>
+        <a4j:region id="faxContactRegionEdit#{panelId}">
+            <s:decorate id="faxDecorationEdit#{panelId}" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="faxEdit#{panelId}"/>
+                <ui:param name="required" value="false"/>
+                <ui:define name="label">#{messages['gazelle.contacts.Fax']}</ui:define>
+                <h:inputText  styleClass=" form-control" id="faxEdit#{panelId}" size="30" value="#{contactVariable.personalFax}">
+                </h:inputText>
+            </s:decorate>
+        </a4j:region>
+    </s:fragment>
+</ui:composition>

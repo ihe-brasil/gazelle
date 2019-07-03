@@ -1,0 +1,260 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.common.ApplicationPreferences']}"/>
+    <ui:define name="body">
+        <h:outputScript library="jscript" name="disable_input_spinner_mouse_wheel.js"/>
+
+        <div class="row">
+            <h:form id="preferencesForm" styleClass="form-horizontal" rendered="#{s:hasRole('admin_role')}">
+                <s:token allowMultiplePosts="true"/>
+                <div class="col-lg-10">
+
+                    <h:outputText rendered="#{not empty applicationPreferenceManager.duplicateValues}"
+                                  value="#{messages['net.ihe.gazelle.tm.DuplicateValues']} #{applicationPreferenceManager.duplicateValues}"
+                                  styleClass="errors"/>
+                    <ui:include src="/administration/preferencesSectionCommon.xhtml">
+                        <ui:param name="panelId" value="commonId"/>
+                        <ui:param name="formId" value="preferencesForm"/>
+                    </ui:include>
+                    <h:panelGroup rendered="#{applicationManager.isTestManagement()}">
+                        <ui:include src="/administration/preferencesSectionTM.xhtml">
+                            <ui:param name="panelId" value="tmPrefId"/>
+                        </ui:include>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{applicationManager.isProductRegistry()}">
+                        <ui:include src="/administration/preferencesSectionPR.xhtml">
+                            <ui:param name="panelId" value="prPrefId"/>
+                        </ui:include>
+                    </h:panelGroup>
+                    <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+                        <ui:param name="panel_id" value="folders"/>
+                        <ui:define name="panel_title">
+                            #{messages['gazelle.common.application.administration.PathsManagement']}
+                        </ui:define>
+                        <a4j:region id="gazelleHomePathRegion">
+                            <s:decorate id="gazelleHomePathDecoration"
+                                        template="/layout/form/_form_field_horizontal_inline.xhtml">
+                                <ui:param name="id" value="gazelleHomePathapplication"/>
+                                <ui:define name="label">#{messages['gazelle.common.application.PRHomePath']}</ui:define>
+                                <h:inputText id="gazelleHomePathapplication" maxlength="256" size="100"
+                                             value="#{preferencesModifier.values['gazelle_home_path']}"
+                                             styleClass=" form-control" required="false"/>
+                            </s:decorate>
+                        </a4j:region>
+                        <a4j:region id="gazelleDataPathRegion">
+                            <s:decorate id="gazelleDataPathDecoration"
+                                        template="/layout/form/_form_field_horizontal_inline.xhtml">
+                                <ui:param name="id" value="pRDataPathId"/>
+                                <ui:define name="label">#{messages['gazelle.common.application.PRDataPath']}</ui:define>
+                                <div id="pRDataPathId">
+                                    <p class="form-control-static">#{applicationPreferenceManager.gazelleDataPath}</p>
+                                </div>
+                            </s:decorate>
+                        </a4j:region>
+                        <a4j:region id="gazelleReportsPathRegion">
+                            <s:decorate id="gazelleReportsPathDecoration"
+                                        template="/layout/form/_form_field_horizontal_inline.xhtml">
+                                <ui:param name="id" value="pRReportsPathId"/>
+                                <ui:define name="label">#{messages['gazelle.common.application.PRReportsPath']}
+                                </ui:define>
+                                <div id="pRReportsPathId">
+                                    <p class="form-control-static">
+                                        #{applicationPreferenceManager.gazelleReportsPath}</p>
+                                </div>
+                            </s:decorate>
+                        </a4j:region>
+                        <a4j:region id="gazelleBinPathRegion">
+                            <s:decorate id="gazelleBinPathDecoration"
+                                        template="/layout/form/_form_field_horizontal_inline.xhtml">
+                                <ui:param name="id" value="pRBinPathId"/>
+                                <ui:define name="label">#{messages['gazelle.common.application.PRBinPath']}</ui:define>
+                                <div id="pRBinPathId">
+                                    <p class="form-control-static">
+                                        #{applicationPreferenceManager.gazelleBinPath}</p>
+                                </div>
+                            </s:decorate>
+                        </a4j:region>
+                        <a4j:region>
+                            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                                <ui:param name="id" value="integrationStatementsPathId"/>
+                                <ui:define name="label">#{messages['net.ihe.gazelle.tm.IntegrationStatementsPath']}
+                                </ui:define>
+                                <div id="integrationStatementsPathId">
+                                    <p class="form-control-static">
+                                        #{applicationPreferenceManager.gazelleIntegrationStatementsPath}</p>
+                                </div>
+                            </s:decorate>
+                        </a4j:region>
+                        <a4j:region>
+                            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                                <ui:param name="id" value="hL7ConformanceStatementsPathId"/>
+                                <ui:define name="label">#{messages['net.ihe.gazelle.tm.HL7ConformanceStatementsPath']}
+                                </ui:define>
+                                <div id="hL7ConformanceStatementsPathId">
+                                    <p class="form-control-static">
+                                        #{applicationPreferenceManager.gazelleHL7ConformanceStatementsPath}</p>
+                                </div>
+                            </s:decorate>
+                        </a4j:region>
+                        <a4j:region>
+                            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                                <ui:param name="id" value="dICOMConformanceStatementsPathId"/>
+                                <ui:define name="label">#{messages['net.ihe.gazelle.tm.DICOMConformanceStatementsPath']}
+                                </ui:define>
+                                <div id="dICOMConformanceStatementsPathId">
+                                    <p class="form-control-static">
+                                        #{applicationPreferenceManager.gazelleDicomConformanceStatementsPath}</p>
+                                </div>
+                            </s:decorate>
+                        </a4j:region>
+                    </ui:decorate>
+
+                    <a4j:commandButton id="u"
+                                       value="#{messages['gazelle.common.button.Save']}"
+                                       styleClass="gzl-btn-green" ignoreDupResponses="true"
+                                       action="#{preferencesModifier.saveValues()}"
+                                       render="preferencesForm"/>
+
+                </div>
+                <div class="col-lg-2 scrollspy">
+                    <nav class="gzl-sidebar">
+                        <ul id="nav" class="nav hidden-xs hidden-sm hidden-md">
+                            <li>
+                                <a href="#mode">#{messages['net.ihe.gazelle.tm.ApplicationMode']}</a>
+                            </li>
+
+                            <li>
+                                <a href="#settings">#{messages['net.ihe.gazelle.tm.ApplicationSettings']}</a>
+                            </li>
+                            <li>
+                                <a href="#messages">#{messages['gazelle.common.messages.Messages']}</a>
+                            </li>
+                            <li>
+                                <a href="#assertions">#{messages['net.ihe.gazelle.tm.Assertions']}</a>
+                            </li>
+                            <li>
+                                <a href="#cas">#{messages['gazelle.common.application.preferences.CASSection']}</a>
+                            </li>
+                            <li>
+                                <a href="#deploy">#{messages['net.ihe.gazelle.modules.DeploySection']}</a>
+                            </li>
+                            <li>
+                                <a href="#cache">#{messages['net.ihe.gazelle.tm.CacheSection']}</a>
+                            </li>
+                            <li>
+                                <a href="#jira">#{messages['net.ihe.gazelle.tm.Jira']}</a>
+                            </li>
+                            <li>
+                                <a href="#help">#{messages['net.ihe.gazelle.tm.Help']}</a>
+                            </li>
+                            <li>
+                                <a href="#security">#{messages['net.ihe.gazelle.tm.Security']}</a>
+                            </li>
+                            <li>
+                                <a href="#validators">#{messages['net.ihe.gazelle.tm.GazelleValidators']}</a>
+                            </li>
+                            <h:panelGroup rendered="#{applicationManager.isTestManagement()}">
+                                <li>
+                                    <a href="#mesaTest">#{messages['net.ihe.gazelle.tm.MESATests']}</a>
+                                </li>
+                                <li>
+                                    <a href="#certs">#{messages['gazelle.common.menu.Certificates']}</a>
+                                </li>
+                                <li>
+                                    <a href="#evsClient">#{messages['net.ihe.gazelle.tm.ExternalValidationServiceFrontend']}</a>
+                                </li>
+                                <li>
+                                    <a href="#gwt">#{messages['net.ihe.gazelle.tm.GazelleWebserviceTester']}</a>
+                                </li>
+                                <li>
+                                    <a href="#update">#{messages['net.ihe.gazelle.tm.AutoUpdateSection']}</a>
+                                </li>
+                                <li>
+                                    <a href="#proxy">#{messages['gazelle.tm.application.preferences.ProxySection']}</a>
+                                </li>
+                                <li>
+                                    <a href="#tls">#{messages['net.ihe.gazelle.tm.TLSSection']}</a>
+                                </li>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{applicationManager.isProductRegistry()}">
+                                <li>
+                                    <a href="#pr">#{messages['net.ihe.gazelle.tm.Crawler']}</a>
+                                </li>
+                            </h:panelGroup>
+                            <li>
+                                <a href="#folders">#{messages['gazelle.common.application.administration.PathsManagement']}</a>
+                            </li>
+                            <a4j:commandButton id="u2"
+                                               value="#{messages['gazelle.common.button.Save']}"
+                                               styleClass="gzl-btn-green" ignoreDupResponses="true"
+                                               action="#{preferencesModifier.saveValues()}"
+                                               render="preferencesForm"/>
+                        </ul>
+                        <script>
+                            $(document).ready(function () {
+                                var sidebarTop = $('ul#nav').offset().top;
+                                $(window).bind('scroll', function () {
+                                    var navHeight = sidebarTop;
+                                    if ($(window).scrollTop() > navHeight) {
+                                        $('ul#nav').addClass('gzl-affix');
+                                    }
+                                    else {
+                                        $('ul#nav').removeClass('gzl-affix');
+                                    }
+                                });
+                            });
+                        </script>
+                    </nav>
+                    <script type="text/javascript">jq162('body').scrollspy({target: '.scrollspy'})</script>
+                </div>
+            </h:form>
+            <!-- end of main navigation -->
+        </div>
+        <!-- ******************************************* -->
+        <!-- Modal Panel : testEmail		 -->
+        <!-- ******************************************* -->
+        <h:form id="testEmailModalPanelForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="testEmailModalPanel"/>
+                <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.EmailTesting']}
+                </ui:define>
+                <s:decorate template="/layout/form/_edit.xhtml">
+                    <ui:param name="id" value="userFirstName"/>
+                    <ui:define name="label">#{messages['net.ihe.gazelle.tm.UserFirstName']}</ui:define>
+                    <h:inputText id="userFirstName" maxlength="25" size="25" cols="80" rows="3"
+                                 value="#{applicationManager.firstName}" styleClass=" form-control"
+                                 required="true">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate template="/layout/form/_edit.xhtml">
+                    <ui:param name="id" value="userLastName"/>
+                    <ui:define name="label">#{messages['net.ihe.gazelle.tm.UserLastName']}</ui:define>
+                    <h:inputText id="userLastName" maxlength="25" size="25" cols="80" rows="3"
+                                 value="#{applicationManager.lastName}" styleClass=" form-control"
+                                 required="true">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate template="/layout/form/_edit.xhtml">
+                    <ui:param name="id" value="userEmail"/>
+                    <ui:define name="label">#{messages['net.ihe.gazelle.tm.UserEmail']}</ui:define>
+                    <h:inputText id="userEmail" maxlength="60" size="60" cols="80" rows="3"
+                                 value="#{applicationManager.email}" styleClass=" form-control"  required="true">
+                    </h:inputText>
+                </s:decorate>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="testEmailHelp" actionListener="#{applicationManager.testEmail()}"
+                                       styleClass="gzl-btn-green"
+                                       value="#{messages['net.ihe.gazelle.tm.SendEmail']}"
+                                       onclick="jq162('#testEmailModalPanel').modal('hide');"
+                                       render="preferencesForm"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

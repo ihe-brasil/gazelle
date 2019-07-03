@@ -1,0 +1,319 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.testmanagement.object.EditSample']}"/>
+    <ui:define name="body">
+        <h:form id="form" styleClass="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-8 col-lg-offset-2">
+                <s:token allowMultiplePosts="true"/>
+                #{objectInstanceManager.initializeForCreator()}
+
+                <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                    <ui:define name="panel_title">#{messages['gazelle.testmanagement.object.EditSampleOfType']} :
+                        #{objectInstanceManager.selectedObjectInstance.object.keyword}
+                    </ui:define>
+                    <div id="tabPanelForEditObjectInstance">
+                        <!-- Nav tabs -->
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" class="active"><a href="#globalVariablesTab"
+                                                                      aria-controls="globalVariablesTab" role="tab"
+                                                                      data-toggle="tab">#{messages['gazelle.testmanagement.object.summary']}</a>
+                            </li>
+                            <li role="presentation"><a href="#FilesTab" aria-controls="FilesTab" role="tab"
+                                                       data-toggle="tab">#{messages['gazelle.testmanagement.object.files']}</a>
+                            </li>
+                        </ul>
+                        <!-- Tab panes -->
+                        <div class="tab-content">
+                            <div role="tabpanel" class="tab-pane active" id="globalVariablesTab">
+                                <a4j:region id="ObjectInstanceNameRegion">
+                                    <s:decorate id="NameSampleDecoration" template="/layout/form/_edit.xhtml">
+                                        <ui:param name="id" value="ObjectInstanceName"/>
+                                        <ui:define name="label">#{messages['gazelle.testmanagement.object.Name']}
+                                        </ui:define>
+                                        <h:inputText styleClass=" form-control" id="ObjectInstanceName" tabindex="2"
+                                                     maxlength="250" size="100" required="false"
+                                                     value="#{objectInstanceManager.selectedObjectInstance.name}">
+                                        </h:inputText>
+                                    </s:decorate>
+                                </a4j:region>
+                                <a4j:region id="ObjectInstanceDecription">
+                                    <s:decorate id="DescriptionDecoration" template="/layout/form/_edit.xhtml">
+                                        <ui:param name="id" value="ObjectInstanceDescription"/>
+                                        <ui:define name="label">#{messages['gazelle.tm.testing.instance.description']}
+                                        </ui:define>
+                                        <ui:decorate template="/layout/editor/_text_editor.xhtml">
+                                            <ui:param name="text"
+                                                      value="#{objectInstanceManager.selectedObjectInstance.description}"/>
+                                            <ui:param name="id" value="ObjectInstanceDescription"/>
+                                            <ui:param name="isFocus" value="true"/>
+                                        </ui:decorate>
+                                    </s:decorate>
+                                </a4j:region>
+                                <a4j:region id="AttributesRegion">
+                                    <h:panelGroup rendered="#{not empty objectInstanceManager.objectTypeAttributes}">
+                                        <s:decorate id="editAttributesDecoration" template="/layout/form/_edit.xhtml">
+                                            <ui:param name="id" value="AttributesOfSamplList"/>
+                                            <ui:define name="label">
+                                                #{messages['gazelle.testmanagement.object.AttributesOfSampl']}
+                                            </ui:define>
+                                            <rich:pickList id="AttributesOfSamplList"
+                                                           value="#{objectInstanceManager.objectAttributesOfSelectedObjectInstance}">
+                                                <s:selectItems value="#{objectInstanceManager.objectTypeAttributes}"
+                                                               var="currentAttribute"
+                                                               label="#{currentAttribute.keyword}"/>
+                                                <s:convertEntity></s:convertEntity>
+                                            </rich:pickList>
+                                        </s:decorate>
+                                    </h:panelGroup>
+                                </a4j:region>
+                                <s:decorate id="ttypedec" template="/layout/form/_edit.xhtml">
+                                    <ui:param name="id" value="usageInput"/>
+                                    <ui:define name="label">#{messages['gazelle.tf.Usage']}</ui:define>
+                                    <h:selectOneMenu id="usageInput" styleClass="form-control gzl-form-control"
+                                                     value="#{objectInstanceManager.selectedObjectInstance.objectUsageType}">
+                                        <s:selectItems value="#{gazelleDAO.getTestTypeList()}" var="stt"
+                                                       noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                       label="#{stt.keyword}"/>
+                                    </h:selectOneMenu>
+                                </s:decorate>
+                                <a4j:region id="CompletedRegion">
+                                    <s:decorate id="CompletedDecoration" template="/layout/form/_edit.xhtml">
+                                        <ui:param name="id" value="checkval"/>
+                                        <ui:define name="label">
+                                            #{messages['gazelle.testmanagement.object.Sampleiscompleted']}
+                                        </ui:define>
+                                        <h:selectBooleanCheckbox styleClass="form-control-static" id="checkval"
+                                                                 value="#{objectInstanceManager.selectedObjectInstance.completed}"/>
+                                    </s:decorate>
+                                </a4j:region>
+                                <br/>
+                                <h:commandButton styleClass="gzl-btn-orange" id="UpdateButton"
+                                                 value="#{messages['gazelle.common.button.Save']}"
+                                                 actionListener="#{objectInstanceManager.updateSelectedInstance()}"
+                                                 render="messageDecoration"/>
+                            </div>
+                            <div role="tabpanel" class="tab-pane" id="FilesTab">
+                                <rich:dataTable id="listObjectFileWithInstanceFile" var="currentFile"
+                                                value="#{objectInstanceManager.objectTypeFiles}" rowKeyVar="rowNumber">
+                                    <f:facet name="header">
+                                        <rich:columnGroup>
+                                            <g:column>
+                                                <h:outputText value="#{messages['gazelle.tf.table.Id']}"/>
+                                            </g:column>
+                                            <g:column>
+                                                <h:outputText
+                                                        value="#{messages['gazelle.testmanagement.object.FileTypeKeyword']}"/>
+                                            </g:column>
+                                            <g:column>
+                                                <h:outputText
+                                                        value="#{messages['gazelle.testmanagement.object.FileTypedescription']}"/>
+                                            </g:column>
+                                            <g:column>
+                                                <h:outputText
+                                                        value="#{messages['gazelle.testmanagement.object.ObjectFiledescription']}"/>
+                                            </g:column>
+                                            <g:column>
+                                                <h:outputText
+                                                        value="#{messages['gazelle.testmanagement.object.minimumfiles']}"/>
+                                            </g:column>
+                                            <g:column>
+                                                <h:outputText
+                                                        value="#{messages['gazelle.testmanagement.object.maximumfiles']}"/>
+                                            </g:column>
+                                            <g:column>
+                                                <h:outputText
+                                                        value="#{messages['gazelle.testmanagement.object.Action']}"/>
+                                            </g:column>
+                                        </rich:columnGroup>
+                                    </f:facet>
+                                    <rich:collapsibleSubTable id="ObjectFileDescriptionTable" var="currentFile"
+                                                              value="#{currentFile}" columnClasses="mysubTable">
+                                        <g:column>
+                                            <h:outputText value="#{currentFile.id}"/>
+                                        </g:column>
+                                        <g:column>
+                                            <h:outputText value="#{currentFile.type.keyword}"/>
+                                        </g:column>
+                                        <g:column>
+                                            <h:outputText value="#{currentFile.type.description}"/>
+                                        </g:column>
+                                        <g:column>
+                                            <h:outputText value="#{currentFile.description}"/>
+                                        </g:column>
+                                        <g:column>
+                                            <h:outputText value="#{currentFile.min}"/>
+                                        </g:column>
+                                        <g:column>
+                                            <h:outputText value="#{currentFile.max}"/>
+                                        </g:column>
+                                        <g:column>
+                                            <h:panelGroup
+                                                    rendered="#{objectInstanceManager.canAddObjectInstanceToCurrentObjectFile(currentFile)}">
+                                                <a4j:commandLink id="ModifyActionImageSupportForObjectFile"
+                                                                 actionListener="#{objectInstanceManager.setSelectedObjectFile(currentFile) }"
+                                                                 oncomplete="jq162('#UploadObjectFile').modal('show');"
+                                                                 title="#{messages['net.ihe.gazelle.tm.UploadASample']}"
+                                                                 render="UploadObjectFile, :uploadForm">
+                                                    <span class="gzl-icon-plus"/>
+                                                </a4j:commandLink>
+                                            </h:panelGroup>
+                                        </g:column>
+                                    </rich:collapsibleSubTable>
+                                    <g:column colspan="7">
+                                        <rich:list id="objectInstanceFileDataList" var="currentObjectInstanceFile"
+                                                   value="#{objectInstanceManager.getListObjectInstanceFileForSelectedObjectInstance(currentFile)}"
+                                                   type="unordered">
+                                            <h:outputText value="#{currentObjectInstanceFile.url}"/>
+                                            <a4j:commandLink id="deleteActionImageSupportForObjectInstanceFile"
+                                                             actionListener="#{objectInstanceManager.setSelectedObjectInstanceFile(currentObjectInstanceFile) }"
+                                                             oncomplete="jq162('#DeleteSelectedObjectInstanceFile').modal('show');"
+                                                             title="#{messages['net.ihe.gazelle.tm.DeleteSample']}"
+                                                             render="DeleteSelectedObjectInstanceFile, :deleteFormOfObjectInstanceFile">
+                                                <span class="gzl-icon-trash-o"/>
+                                            </a4j:commandLink>
+
+                                        </rich:list>
+                                    </g:column>
+                                </rich:dataTable>
+                            </div>
+                        </div>
+                    </div>
+                </ui:decorate>
+                <s:div rendered="#{objectInstanceManager.returnPageIsSample()}">
+                    <a4j:commandButton styleClass="gzl-btn" id="BackButton1"
+                                       value="#{messages['gazelle.testmanagement.object.BackToSample']}"
+                                       action="#{objectInstanceManager.backToSamplePage()}"
+                                       execute="@this"/>
+                </s:div>
+                <s:div rendered="#{!objectInstanceManager.returnPageIsSample()}">
+                    <a4j:commandButton styleClass="gzl-btn" id="BackButton2"
+                                       value="#{messages['gazelle.testmanagement.object.BackToSample']}"
+                                       action="#{objectManager.backToListObjectInstance(objectInstanceManager.selectedObjectInstance)}"
+                                       execute="@this"/>
+                </s:div>
+            </div>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- modify selected File-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="uploadForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="UploadObjectFile"/>
+                <ui:define name="popup_title">#{messages['gazelle.testmanagement.object.Addanobjectfile']}</ui:define>
+
+                #{objectInstanceManager.setUploadedFile(null)}
+                #{objectInstanceManager.setRegistrationDisabled(true)}
+                #{objectInstanceManager.initializeDownloadFile()}
+                <a4j:jsFunction name="renderUploadButtons" id="renderUploadButtons" render="uploadButtons"/>
+                <h:outputText value="#{messages['gazelle.testmanagement.object.FileType']} : "/>
+                <h:outputText
+                        value="#{objectInstanceManager.selectedObjectFile.type.keyword}"/>
+                <s:div rendered="#{objectInstanceManager.userCanWriteContent()}">
+                    <h:selectOneRadio id="downloadorwrite" value="#{objectInstanceManager.downloadFile}"
+                                      style="font-size : 11px;">
+                        <f:selectItem id="upload"
+                                      itemLabel="#{messages['gazelle.testmanagement.object.Uploader']}"
+                                      itemValue="upload"/>
+                        <f:selectItem id="write" itemLabel="#{messages['gazelle.tm.WriteFileContent']}"
+                                      itemValue="write"/>
+                        <a4j:ajax event="change" render="groupId,uploadButtons,writteButton"/>
+                    </h:selectOneRadio>
+                </s:div>
+                <h:panelGroup id="groupId">
+                    <s:div id="downloaddivv" rendered="#{objectInstanceManager.canUploadFile()}">
+                        <s:div rendered="#{objectInstanceManager.selectedObjectFile.type.hasExtension()}">
+                            <h:outputText
+                                    value="#{messages['gazelle.testmanagement.object.ExtensionOfFile']} : "/>
+                            <h:outputText
+                                    value="#{objectInstanceManager.selectedObjectFile.type.extensions}"/>
+
+                        </s:div>
+                        <rich:fileUpload fileUploadListener="#{objectInstanceManager.listener}"
+                                         acceptedTypes="#{objectInstanceManager.selectedObjectFile.type.extensions}"
+                                         id="uploadFile" immediateUpload="true" listHeight="60px"
+                                         onuploadcomplete="renderUploadButtons()">
+                        </rich:fileUpload>
+                    </s:div>
+                    <s:div id="writedivv" rendered="#{!objectInstanceManager.canUploadFile()}">
+                        <h:outputText
+                                value="#{messages['gazelle.testmanagement.object.labelToAddContent']} : "/>
+                        <br/>
+                        <s:decorate id="namedampe" template="/layout/form/_edit.xhtml">
+                            <ui:param name="id" value="ObjectInstanceName"/>
+                            <ui:define name="label">#{messages['gazelle.testmanagement.object.FileName']}
+                            </ui:define>
+                            <h:inputText styleClass=" form-control" id="ObjectInstanceName" tabindex="2"
+                                         maxlength="250" size="50" required="false"
+                                         value="#{objectInstanceManager.sampleContentName}"/>
+                        </s:decorate>
+                        <s:decorate id="inputCont" template="/layout/form/_edit.xhtml">
+                            <ui:param name="id" value="inptareacont"/>
+                            <ui:define name="label">#{messages['gazelle.testmanagement.object.FileContent']}
+                            </ui:define>
+                            <h:inputTextarea styleClass=" form-control" id="inptareacont"
+                                             value="#{objectInstanceManager.sampleContentText}" rows="4"
+                                             cols="45"/>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGroup>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <s:span id="uploadButtons">
+                        <a4j:commandButton id="updateObjectFilebuttonEnabled"
+                                           value="#{messages['gazelle.testmanagement.object.Update']}"
+                                           styleClass="gzl-btn-orange"
+                                           rendered="#{objectInstanceManager.canUploadFile() and !objectInstanceManager.registrationDisabled}"
+                                           actionListener="#{objectInstanceManager.addNewObjectInstanceFile()}"
+                                           onclick="jq162('#UploadObjectFile').modal('hide');"
+                                           render="listObjectFileWithInstanceFile,messageDecoration"/>
+                        <a4j:commandButton id="updateObjectFilebuttonDisabled"
+                                           value="#{messages['gazelle.testmanagement.object.Update']}"
+                                           disabled="true" styleClass="gzl-btn-orange"
+                                           rendered="#{objectInstanceManager.canUploadFile() and objectInstanceManager.registrationDisabled}"
+                                           actionListener="#{objectInstanceManager.addNewObjectInstanceFile()}"
+                                           onclick="jq162('#UploadObjectFile').modal('hide');"
+                                           render="listObjectFileWithInstanceFile,messageDecoration"/>
+                    </s:span>
+                    <s:span id="writteButton">
+                        <a4j:commandButton id="addcontentsamp"
+                                           value="#{messages['gazelle.testmanagement.object.Update']}"
+                                           styleClass="gzl-btn-orange"
+                                           actionListener="#{objectInstanceManager.addNewObjectInstanceFile()}"
+                                           onclick="jq162('#UploadObjectFile').modal('hide');"
+                                           rendered="#{!objectInstanceManager.canUploadFile()}"
+                                           render="listObjectFileWithInstanceFile,messageDecoration"/>
+                    </s:span>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Delete selected ObjectInstanceFile-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="deleteFormOfObjectInstanceFile">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteSelectedObjectInstanceFile"/>
+                <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.DeleteFile']}
+                </ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="deleteObjectInstanceFilebutton"
+                                       value="#{messages['net.ihe.gazelle.tm.DeleteFile']}"
+                                       styleClass="gzl-btn-red"
+                                       actionListener="#{objectInstanceManager.deleteSelectedObjectInstanceFile()}"
+                                       onclick="jq162('#DeleteSelectedObjectInstanceFile').modal('hide');"
+                                       render="listObjectFileWithInstanceFile,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

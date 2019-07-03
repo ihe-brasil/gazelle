@@ -1,0 +1,703 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle"
+              value="#{messages['gazelle.users.connectaton.participants.ConnectathonParticipants']}"/>
+    <ui:define name="body">
+        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+            <ui:define name="panel_title">#{messages['gazelle.users.connectaton.participants.PleaseRegister']}
+                #{gazelleDAO.getSelectedTestingSession().description}
+            </ui:define>
+            <p>
+                <h:outputText value="#{messages['gazelle.users.connectaton.participants.ThePurpose']}"/>
+            </p>
+            <h:form id="_f" styleClass="form-horizontal">
+                <s:token allowMultiplePosts="true"/>
+                <a4j:queue requestDelay="300" ignoreDupResponses="true"/>
+                <s:div styleClass="row" rendered="#{!connectathonParticipantManager.renderAddPanel}">
+                    <div class="col-lg-6">
+                        <s:decorate template="/layout/panels/_panel_filter_criteria.xhtml"
+                                    rendered="#{!connectathonParticipantManager.renderAddPanel and (s:hasRole('admin_role') || s:hasRole('project-manager_role') || s:hasRole('institutions_editor_role'))}">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filterName" value="#{messages['gazelle.systems.TestingSession']}"/>
+                                <ui:param name="filterId" value="testingSession"/>
+                                <ui:param name="filter" value="#{connectathonParticipantManager.filter}"/>
+                                <ui:param name="filterForm" value="_f"/>
+                            </ui:include>
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filterName" value="#{messages['net.ihe.gazelle.tm.Institution']}"/>
+                                <ui:param name="filterId" value="institution"/>
+                                <ui:param name="filter" value="#{connectathonParticipantManager.filter}"/>
+                                <ui:param name="filterForm" value="_f"/>
+                            </ui:include>
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filterName" value="#{messages['gazelle.tm.tests.testStatus']}"/>
+                                <ui:param name="filterId" value="status"/>
+                                <ui:param name="filter" value="#{connectathonParticipantManager.filter}"/>
+                                <ui:param name="filterForm" value="_f"/>
+                            </ui:include>
+
+                            <ui:include src="connectathonParticipantsMealFilter.xhtml"/>
+
+                            <ui:define name="filter_buttons">
+                                <a4j:commandLink title="#{messages['gazelle.common.button.Refresh']}"
+                                                 render="_f">
+                                    <span class="fa fa-refresh"></span>
+                                </a4j:commandLink>
+                                <a4j:commandLink title="#{messages['gazelle.users.reset']}"
+                                                 actionListener="#{connectathonParticipantManager.resetFilter()}"
+                                                 render="_f">
+                                    <span class="fa fa-times-circle"></span>
+                                </a4j:commandLink>
+                            </ui:define>
+                        </s:decorate>
+                    </div>
+                    <div class="col-lg-6">
+                        <s:div id="mainButtons" rendered="#{!connectathonParticipantManager.renderAddPanel}">
+                            <div class="row">
+                                <div class="col-lg-3 text-center">
+                                    <a4j:commandButton id="impU" styleClass="gzl-btn"
+                                                       value="#{messages['gazelle.users.connectaton.participants.ImportFromUsers']}"
+                                                       ignoreDupResponses="true" immediate="true"
+                                                       actionListener="#{connectathonParticipantManager.initializeUsersForImportation()}"
+                                                       render="instSel, addDiv, mainButtons, _p"/>
+                                </div>
+                                <div class="col-lg-3 text-center">
+                                    <a4j:commandButton id="impC" styleClass="gzl-btn"
+                                                       value="#{messages['gazelle.users.connectaton.participants.ImportFromContacts']}"
+                                                       ignoreDupResponses="true" immediate="true"
+                                                       actionListener="#{connectathonParticipantManager.initializeContactsForImportation()}"
+                                                       render="instSel, addDiv, mainButtons, _p"/>
+                                </div>
+                                <div class="col-lg-3 text-center">
+                                    <a4j:commandButton id="addP" styleClass="gzl-btn"
+                                                       rendered="#{ s:hasRole('admin_role') || s:hasRole('project-manager_role') || s:hasRole('institutions_editor_role')}"
+                                                       value="#{messages['gazelle.users.connectaton.participants.AddParticipant']}"
+                                                       ignoreDupResponses="true" immediate="true"
+                                                       actionListener="#{connectathonParticipantManager.addParticipantAction()}"
+                                                       render="instSel, addDiv, mainButtons, _p"/>
+                                </div>
+                                <div class="col-lg-3 text-center">
+                                    <a4j:commandButton id="addM" styleClass="gzl-btn"
+                                                       rendered="#{ s:hasRole('admin_role') || s:hasRole('project-manager_role')}"
+                                                       value="#{messages['net.ihe.gazelle.tm.ImportMonitors']}"
+                                                       ignoreDupResponses="true" immediate="true"
+                                                       actionListener="#{connectathonParticipantManager.importMonitorsInSession()}"
+                                                       render="_f"/>
+                                </div>
+                            </div>
+                        </s:div>
+                    </div>
+                </s:div>
+
+                <s:div id="addDiv">
+                    <h:panelGroup rendered="#{connectathonParticipantManager.renderAddPanel}">
+                        <div class="row">
+                            <div class="col-lg-6 col-lg-offset-3">
+                                <ui:decorate template="/layout/panels/_panel_title_footer.xhtml">
+                                    <ui:define name="panel_title">
+                                        #{messages['gazelle.users.addConnectathonParticipant']}
+                                    </ui:define>
+                                    <div class="col-lg-8">
+                                        <ui:decorate template="/layout/panels/_panel.xhtml">
+                                            <s:decorate id="instName"
+                                                        template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                                <ui:param name="id" value="instSel"/>
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.users.institution.InstitutionName']}
+                                                </ui:define>
+                                                <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                                 id="instSel" required="true"
+                                                                 value="#{connectathonParticipantManager.selectedConnectathonParticipant.institution}"
+                                                                 rendered="#{ s:hasRole('admin_role') || s:hasRole('project-manager_role') || s:hasRole('institutions_editor_role')}">
+                                                    <s:selectItems
+                                                            value="#{gazelleDAO.getPossibleInstitutionsInActivatedSessionForSystemCreationByAdmin()}"
+                                                            var="companyFromList"
+                                                            noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                            label="#{companyFromList.getFilterLabel()}"/>
+                                                    <a4j:ajax event="change" render="instName" execute="@this"
+                                                              listener="#{connectathonParticipantManager.selectedConnectathonParticipant.setInstitutionName(connectathonParticipantManager.selectedConnectathonParticipant.institution.keyword)}"/>
+                                                </h:selectOneMenu>
+                                            </s:decorate>
+                                            <s:decorate id="inNa"
+                                                        template="/layout/form/_form_field_horizontal_inline.xhtml">
+                                                <ui:param name="id" value="institutionNameInput2"/>
+                                                <ui:define name="label">
+                                                    #{messages['net.ihe.gazelle.tm.InstitutionNameWhichWillBeDisplayed']}
+                                                </ui:define>
+                                                <h:inputText id="institutionNameInput2" styleClass="form-control"
+                                                             size="40"
+                                                             value="#{connectathonParticipantManager.selectedConnectathonParticipant.institutionName}"
+                                                             rendered="#{ s:hasRole('admin_role') || s:hasRole('project-manager_role') || s:hasRole('institutions_editor_role')}"/>
+                                                <h:outputText styleClass="form-control-static"
+                                                              value="#{connectathonParticipantManager.selectedConnectathonParticipant.institution.keyword}"
+                                                              style="font-weight : bold; color: grey;"
+                                                              rendered="#{!(s:hasRole('admin_role') || s:hasRole('project-manager_role') || s:hasRole('institutions_editor_role'))}"/>
+                                            </s:decorate>
+                                            <s:decorate id="firstNameDecoration"
+                                                        template="/layout/form/_form_field_horizontal_inline.xhtml">
+                                                <ui:param name="id" value="firstNameInput"/>
+                                                <ui:define name="label">#{messages['gazelle.users.user.FirstName']}
+                                                </ui:define>
+                                                <h:inputText id="firstNameInput" styleClass="form-control" size="40"
+                                                             required="true"
+                                                             value="#{connectathonParticipantManager.selectedConnectathonParticipant.firstname}">
+                                                    <a4j:ajax event="blur" render="firstNameDecoration"
+                                                              execute="@this"/>
+                                                </h:inputText>
+                                            </s:decorate>
+                                            <s:decorate id="lastnameDecoration"
+                                                        template="/layout/form/_form_field_horizontal_inline.xhtml">
+                                                <ui:param name="id" value="lastnameInput"/>
+                                                <ui:define name="label">#{messages['gazelle.users.user.LastName']}
+                                                </ui:define>
+                                                <h:inputText id="lastnameInput" styleClass="form-control"
+                                                             value="#{connectathonParticipantManager.selectedConnectathonParticipant.lastname}"
+                                                             size="40" required="true">
+                                                    <a4j:ajax event="blur" render="lastnameDecoration" execute="@this"/>
+                                                </h:inputText>
+                                            </s:decorate>
+                                            <s:decorate id="emailDecoration"
+                                                        template="/layout/form/_form_field_horizontal_inline.xhtml">
+                                                <ui:param name="id" value="emailInput"/>
+                                                <ui:define name="label">#{messages['gazelle.users.user.UserEmail']}
+                                                </ui:define>
+                                                <h:inputText id="emailInput" styleClass="form-control" size="40"
+                                                             required="true"
+                                                             value="#{connectathonParticipantManager.selectedConnectathonParticipant.email}">
+                                                    <a4j:ajax event="blur" render="emailDecoration" execute="@this"/>
+                                                </h:inputText>
+                                            </s:decorate>
+                                            <s:decorate id="participantStatusDecoration"
+                                                        template="/layout/form/_form_field_horizontal_inline.xhtml">
+                                                <ui:param name="id" value="participantStatusDecoration"/>
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.users.connectaton.participants.ParticipantStatus']}
+                                                </ui:define>
+                                                <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                                 id="statusList"
+                                                                 required="true"
+                                                                 value="#{connectathonParticipantManager.selectedConnectathonParticipant.connectathonParticipantStatus}"
+                                                                 rendered="#{ s:hasRole('admin_role') || s:hasRole('project-manager_role') || s:hasRole('institutions_editor_role')}">
+                                                    <s:selectItems value="#{gazelleDAO.getAllStatus()}" var="badgeType"
+                                                                   noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                                   label="#{badgeType.name}"/>
+                                                </h:selectOneMenu>
+                                                <h:outputText style="font-weight : bold; color: grey;"
+                                                              value="#{connectathonParticipantManager.selectedConnectathonParticipant.connectathonParticipantStatus.name}"
+                                                              rendered="#{!(s:hasRole('admin_role') || s:hasRole('project-manager_role') || s:hasRole('institutions_editor_role'))}"/>
+                                            </s:decorate>
+                                        </ui:decorate>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <ui:decorate template="/layout/panels/_panel.xhtml">
+                                            <s:decorate id="mo" template="/layout/form/_checkbox.xhtml">
+                                                <h:selectBooleanCheckbox id="moBox"
+                                                                         value="#{connectathonParticipantManager.selectedConnectathonParticipant.mondayMeal}"/>
+                                                #{messages['gazelle.common.Monday']}
+                                            </s:decorate>
+
+                                            <s:decorate id="tu" template="/layout/form/_checkbox.xhtml">
+                                                <h:selectBooleanCheckbox id="tuBox"
+                                                                         value="#{connectathonParticipantManager.selectedConnectathonParticipant.tuesdayMeal}"/>
+                                                #{messages['gazelle.common.Tuesday']}
+                                            </s:decorate>
+
+                                            <s:decorate id="we" template="/layout/form/_checkbox.xhtml">
+                                                <h:selectBooleanCheckbox id="weBox"
+                                                                         value="#{connectathonParticipantManager.selectedConnectathonParticipant.wednesdayMeal}"/>
+                                                #{messages['gazelle.common.Wednesday']}
+                                            </s:decorate>
+                                            <s:decorate id="th" template="/layout/form/_checkbox.xhtml">
+                                                <h:selectBooleanCheckbox id="thBox"
+                                                                         value="#{connectathonParticipantManager.selectedConnectathonParticipant.thursdayMeal}"/>
+                                                #{messages['gazelle.common.Thursday']}
+                                            </s:decorate>
+                                            <s:decorate id="fr" template="/layout/form/_checkbox.xhtml">
+                                                <h:selectBooleanCheckbox id="frBox"
+                                                                         value="#{connectathonParticipantManager.selectedConnectathonParticipant.fridayMeal}"/>
+                                                #{messages['gazelle.common.Friday']}
+                                            </s:decorate>
+                                            <s:decorate id="veg" template="/layout/form/_checkbox.xhtml">
+                                                <h:selectBooleanCheckbox id="vegBox"
+                                                                         value="#{connectathonParticipantManager.selectedConnectathonParticipant.vegetarianMeal}"/>
+                                                #{messages['gazelle.common.VegetarianMeal']}
+                                            </s:decorate>
+                                            <s:decorate id="so" template="/layout/form/_checkbox.xhtml">
+                                                <h:selectBooleanCheckbox id="soBox"
+                                                                         value="#{connectathonParticipantManager.selectedConnectathonParticipant.socialEvent}"/>
+                                                #{messages['gazelle.users.connectaton.participants.SocialEvent']}
+                                            </s:decorate>
+                                        </ui:decorate>
+                                    </div>
+                                    <ui:define name="panel_footer">
+                                        <a4j:commandButton id="add" styleClass="gzl-btn-green"
+                                                           value="#{messages['gazelle.common.button.Save']}"
+                                                           actionListener="#{connectathonParticipantManager.addParticipantForConnectathon()}"
+                                                           render="instSel, addDiv, mainButtons, _p"/>
+                                        <a4j:commandButton id="cancel" immediate="true" styleClass="gzl-btn"
+                                                           value="#{messages['gazelle.testmanagement.object.Back']}"
+                                                           actionListener="#{connectathonParticipantManager.setRenderAddPanel(false)}"
+                                                           render="instSel, addDiv, mainButtons, _p"/>
+                                    </ui:define>
+                                </ui:decorate>
+                            </div>
+                        </div>
+                    </h:panelGroup>
+
+                    <div class="row">
+                        <div class="col-lg-6 col-lg-offset-3">
+                            <h:panelGroup rendered="#{connectathonParticipantManager.renderImportContactPanel}">
+                                <ui:decorate template="/layout/panels/_panel_title_footer.xhtml">
+                                    <ui:define name="panel_title">
+                                        #{messages['gazelle.users.connectaton.participants.ImportFromContacts']}
+                                    </ui:define>
+
+                                    <div id="ImportContactsDiv" style="height: 470px; overflow: auto;">
+                                        <p>
+                                            <h:outputText
+                                                    value="#{messages['gazelle.users.connectaton.participants.ImportFromContactsText']} "/>
+                                        </p>
+                                        <p>
+                                            <span class="gzl-icon-exclamation-triangle"/>
+                                            <h:outputText
+                                                    value="#{messages['gazelle.tm.NoteAddContactsToImportIfThereAreNotInThisList']}"
+                                                    style="font-weight : bold; color: red; font-style:italic"/>
+                                        </p>
+                                        <div>
+                                            <h:panelGroup
+                                                    rendered="#{ s:hasRole('vendor_admin_role') || s:hasRole('admin_role') || s:hasRole('project-manager_role') || s:hasRole('monitor_role') || s:hasRole('institutions_editor_role')}">
+                                                <a4j:commandButton id="addContactsButton"
+                                                                   value="#{messages['gazelle.contacts.AddNewContact']}"
+                                                                   ignoreDupResponses="true" immediate="true"
+                                                                   styleClass="gzl-btn"
+                                                                   action="/users/contact/listContacts.xhtml"
+                                                                   execute="@this"/>
+                                            </h:panelGroup>
+                                        </div>
+                                        <rich:dataTable id="conData" var="currentContact"
+                                                        value="#{connectathonParticipantManager.getContactsForImportationDM()}">
+                                            <g:column>
+                                                <ui:define name="header">#{messages['gazelle.common.ToImport']}
+                                                </ui:define>
+                                                <h:selectBooleanCheckbox styleClass="form-control-static"
+                                                                         id="importContactBooleanCheckbox"
+                                                                         value="#{currentContact.object1}">
+                                                    <a4j:ajax event="click"/>
+                                                </h:selectBooleanCheckbox>
+                                            </g:column>
+                                            <g:column sortBy="#{'object2.firstname'}">
+                                                <ui:define name="header">#{messages['gazelle.users.user.FirstName']}
+                                                </ui:define>
+                                                #{currentContact.object2.firstname}
+                                            </g:column>
+                                            <g:column sortBy="#{'object2.lastname'}">
+                                                <ui:define name="header">#{messages['gazelle.users.user.LastName']}
+                                                </ui:define>
+                                                #{currentContact.object2.lastname}
+                                            </g:column>
+                                            <g:column sortBy="#{'object2.email'}">
+                                                <ui:define name="header">#{messages['gazelle.users.user.UserEmail']}
+                                                </ui:define>
+                                                #{currentContact.object2.email}
+                                            </g:column>
+                                        </rich:dataTable>
+                                        <ui:define name="panel_footer">
+                                            <a4j:commandButton id="imp"
+                                                               value="#{messages['gazelle.common.button.Import']}"
+                                                               styleClass="gzl-btn-green" immediate="true"
+                                                               actionListener="#{connectathonParticipantManager.importContacts()}"
+                                                               render="instSel, addDiv, mainButtons, _p"/>
+                                            <a4j:commandButton id="cancelImp"
+                                                               value="#{messages['gazelle.testmanagement.object.Back']}"
+                                                               immediate="true"
+                                                               render="instSel, addDiv, mainButtons, _p"
+                                                               actionListener="#{connectathonParticipantManager.setRenderImportContactPanel(false)}"
+                                                               styleClass="gzl-btn"/>
+                                        </ui:define>
+                                    </div>
+                                </ui:decorate>
+                            </h:panelGroup>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6 col-lg-offset-3">
+                            <h:panelGroup rendered="#{connectathonParticipantManager.renderImportUserPanel}">
+
+                                <ui:decorate template="/layout/panels/_panel_title_footer.xhtml">
+                                    <ui:define name="panel_title">
+                                        #{messages['gazelle.users.connectaton.participants.ImportFromUsersText']}
+                                    </ui:define>
+                                    <div id="ImportUsersDiv" style="height: 470px; overflow: auto;">
+                                        <s:decorate id="usrPan">
+                                            <s:div id="addUsr">
+                                                <h:panelGroup
+                                                        rendered="#{ s:hasRole('vendor_admin_role') || s:hasRole('admin_role') || s:hasRole('project-manager_role') || s:hasRole('monitor_role') || s:hasRole('institutions_editor_role')}">
+
+                                                    <a4j:commandButton id="addUsersBtn"
+                                                                       styleClass="gzl-btn-green"
+                                                                       value="#{messages['gazelle.users.user.button.AddAnUser']}"
+                                                                       ignoreDupResponses="true"
+                                                                       immediate="true"
+                                                                       action="#{userManager.listUsersAction()}"
+                                                                       execute="@this"/>
+                                                </h:panelGroup>
+                                            </s:div>
+                                            <br/>
+                                            <rich:dataTable id="usersDataTableMP" var="currentUser"
+                                                            value="#{connectathonParticipantManager.getUsersForImportationDM()}">
+                                                <g:column>
+                                                    <ui:define name="header">
+                                                        #{messages['gazelle.common.ToImport']}
+                                                    </ui:define>
+                                                    <h:selectBooleanCheckbox styleClass="form-control-static"
+                                                                             id="importUserBooleanCheckbox"
+                                                                             value="#{currentUser.object1}">
+                                                        <a4j:ajax event="click"/>
+                                                    </h:selectBooleanCheckbox>
+                                                </g:column>
+                                                <g:column
+                                                        sortBy="#{'object2.username'}">
+                                                    <ui:define name="header">
+                                                        #{messages['gazelle.users.user.UserUsername']}
+                                                    </ui:define>
+
+                                                    #{currentUser.object2.username}
+                                                </g:column>
+                                                <g:column
+                                                        sortBy="#{'object2.firstname'}">
+                                                    <ui:define name="header">
+                                                        #{messages['gazelle.users.user.FirstName']}
+                                                    </ui:define>
+
+                                                    #{currentUser.object2.firstname}
+                                                </g:column>
+                                                <g:column
+                                                        sortBy="#{'object2.lastname'}">
+                                                    <ui:define name="header">
+                                                        #{messages['gazelle.users.user.LastName']}
+                                                    </ui:define>
+
+                                                    #{currentUser.object2.lastname}
+                                                </g:column>
+                                                <g:column sortBy="#{'object2.email'}">
+                                                    <ui:define name="header">
+                                                        #{messages['gazelle.users.user.UserEmail']}
+                                                    </ui:define>
+
+                                                    #{currentUser.object2.email}
+                                                </g:column>
+                                            </rich:dataTable>
+
+                                        </s:decorate>
+                                    </div>
+                                    <ui:define name="panel_footer">
+                                        <a4j:commandButton id="impUsr" immediate="true"
+                                                           value="#{messages['gazelle.common.button.Import']}"
+                                                           styleClass="gzl-btn-green"
+                                                           actionListener="#{connectathonParticipantManager.importUsers()}"
+                                                           render="instSel, addDiv, mainButtons, _p"/>
+                                        <a4j:commandButton id="cancelUsr" immediate="true"
+                                                           value="#{messages['gazelle.common.button.Cancel']}"
+                                                           actionListener="#{connectathonParticipantManager.setRenderImportUserPanel(false)}"
+                                                           render="instSel, addDiv, mainButtons, _p"
+                                                           styleClass="gzl-btn"/>
+                                    </ui:define>
+                                </ui:decorate>
+
+                            </h:panelGroup>
+                        </div>
+                    </div>
+                </s:div>
+                <s:div id="_p">
+                    #{dataTableStateHolder.setAscendingOn('institutionName')}
+                    <rich:dataTable id="pt" var="participant" render="ds"
+                                    rendered="#{!connectathonParticipantManager.renderImportContactPanel  and !connectathonParticipantManager.renderImportUserPanel and !connectathonParticipantManager.renderAddPanel and connectathonParticipantManager.nbOfParticipants &gt; 0}"
+                                    value="#{connectathonParticipantManager.connectathonParticipantsDataModel()}"
+                                    rows="#{dataScrollerMemory.numberOfResultsPerPage}">
+                        <g:column filterBy="#{'institutionName'}" filterEvent="onkeyup"
+                                  sortBy="#{'institutionName'}" sortOrder="#{dataTableStateHolder.sortOrders['institutionName']}">
+                            <ui:define name="header">#{messages['gazelle.users.institution.InstitutionName']}
+                            </ui:define>
+                            <h:outputText value="#{participant.institutionName}"
+                                          rendered="#{not empty participant.institutionName}"/>
+                        </g:column>
+                        <g:column filterBy="#{'firstname'}" filterEvent="onkeyup"
+                                  sortBy="#{'firstname'}" sortOrder="#{dataTableStateHolder.sortOrders['firstname']}">
+                            <ui:define name="header">#{messages['gazelle.users.user.FirstName']}</ui:define>
+                            #{participant.firstname}
+                        </g:column>
+                        <g:column filterBy="#{'lastname'}" filterEvent="onkeyup"
+                                  sortBy="#{'lastname'}" sortOrder="#{dataTableStateHolder.sortOrders['lastname']}">
+                            <ui:define name="header">#{messages['gazelle.users.user.LastName']}</ui:define>
+                            #{participant.lastname}
+                        </g:column>
+                        <g:column filterBy="#{'email'}" filterEvent="onkeyup"
+                                  sortBy="#{'email'}" sortOrder="#{dataTableStateHolder.sortOrders['email']}">
+                            <ui:define name="header">#{messages['gazelle.users.user.UserEmail']}</ui:define>
+                            #{participant.email}
+                        </g:column>
+                        <g:column sortBy="#{'connectathonParticipantStatus'}"
+                                  sortOrder="#{dataTableStateHolder.sortOrders['connectathonParticipantStatus']}">
+                            <ui:define name="header">#{messages['gazelle.users.connectaton.participants.ParticipantStatus']}</ui:define>
+                            <h:selectOneMenu styleClass="form-control gzl-form-control input-sm" id="s"
+                                             value="#{participant.connectathonParticipantStatus}" required="true"
+                                             rendered="#{ s:hasRole('admin_role') || s:hasRole('project-manager_role') || s:hasRole('institutions_editor_role')}">
+                                <s:selectItems value="#{gazelleDAO.getAllStatus()}" var="badgeType"
+                                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                               label="#{badgeType.name}"/>
+                                <a4j:ajax event="change" execute="@this"
+                                          render="pt, chaPan"
+                                          listener="#{connectathonParticipantManager.saveConnectathonParticipantStatus(participant)}"/>
+                            </h:selectOneMenu>
+                            <h:outputText value="#{participant.connectathonParticipantStatus.name}"
+                                          rendered="#{!(s:hasRole('admin_role') || s:hasRole('project-manager_role') || s:hasRole('institutions_editor_role'))}"/>
+                        </g:column>
+                        <g:column sortBy="#{'mondayMeal'}" styleClass="text-center" sortOrder="#{dataTableStateHolder.sortOrders['mondayMeal']}">
+                            <ui:define name="header">
+                                <h:outputText
+                                        value="#{messages['gazelle.common.Monday']}"/>
+                            </ui:define>
+                            <h:selectBooleanCheckbox styleClass="form-control-static" id="mo"
+                                                     value="#{participant.mondayMeal}">
+                                <a4j:ajax event="click"
+                                          render="pt, chaPan" execute="@this"
+                                          listener="#{connectathonParticipantManager.saveMondayChange(participant)}"/>
+                            </h:selectBooleanCheckbox>
+
+                        </g:column>
+                        <g:column sortBy="#{'tuesdayMeal'}" styleClass="text-center" sortOrder="#{dataTableStateHolder.sortOrders['tuesdayMeal']}">
+                            <ui:define name="header">
+                                <h:outputText
+                                        value="#{messages['gazelle.common.Tuesday']}"/>
+                            </ui:define>
+                            <h:selectBooleanCheckbox styleClass="form-control-static" id="tu"
+                                                     value="#{participant.tuesdayMeal}">
+                                <a4j:ajax event="click"
+                                          render="pt, chaPan" execute="@this"
+                                          listener="#{connectathonParticipantManager.saveTuesdayChange(participant)}"/>
+                            </h:selectBooleanCheckbox>
+                        </g:column>
+                        <g:column sortBy="#{'wednesdayMeal'}" styleClass="text-center"
+                                  sortOrder="#{dataTableStateHolder.sortOrders['wednesdayMeal']}">
+                            <ui:define name="header">
+                                <h:outputText
+                                        value="#{messages['gazelle.common.Wednesday']}"/>
+                            </ui:define>
+                            <h:selectBooleanCheckbox styleClass="form-control-static" id="we"
+                                                     value="#{participant.wednesdayMeal}">
+                                <a4j:ajax event="click"
+                                          render="pt, chaPan" execute="@this"
+                                          listener="#{connectathonParticipantManager.saveWednesdayChange(participant)}"/>
+                            </h:selectBooleanCheckbox>
+                        </g:column>
+                        <g:column sortBy="#{'thursdayMeal'}" styleClass="text-center" sortOrder="#{dataTableStateHolder.sortOrders['thursdayMeal']}">
+                            <ui:define name="header">
+                                <h:outputText
+                                        value="#{messages['gazelle.common.Thursday']}"/>
+                            </ui:define>
+                            <h:selectBooleanCheckbox styleClass="form-control-static" id="th"
+                                                     value="#{participant.thursdayMeal}">
+                                <a4j:ajax event="click"
+                                          render="pt, chaPan" execute="@this"
+                                          listener="#{connectathonParticipantManager.saveThursdayChange(participant)}"/>
+                            </h:selectBooleanCheckbox>
+                        </g:column>
+                        <g:column sortBy="#{'fridayMeal'}" styleClass="text-center" sortOrder="#{dataTableStateHolder.sortOrders['fridayMeal']}">
+                            <ui:define name="header">
+                                <h:outputText
+                                        value="#{messages['gazelle.common.Friday']}"/>
+                            </ui:define>
+                            <h:selectBooleanCheckbox styleClass="form-control-static" id="fr"
+                                                     title="#{messages['gazelle.users.participant.PleaseDoNotCheckFriday']}"
+                                                     value="#{participant.fridayMeal}">
+                                <a4j:ajax event="click"
+                                          render="pt, chaPan" execute="@this"
+                                          listener="#{connectathonParticipantManager.saveFridayChange(participant)}"/>
+                            </h:selectBooleanCheckbox>
+                        </g:column>
+                        <g:column sortBy="#{'vegetarianMeal'}" styleClass="text-center"
+                                  sortOrder="#{dataTableStateHolder.sortOrders['vegetarianMeal']}">
+                            <ui:define name="header">
+                                <h:outputText
+                                        value="#{messages['gazelle.common.VegetarianMeal']}"/>
+                            </ui:define>
+                            <h:selectBooleanCheckbox styleClass="form-control-static" id="ve"
+                                                     value="#{participant.vegetarianMeal}">
+                                <a4j:ajax event="click"
+                                          render="pt" execute="@this"
+                                          listener="#{connectathonParticipantManager.saveVegetarianChange(participant)}"/>
+                            </h:selectBooleanCheckbox>
+                        </g:column>
+                        <g:column sortBy="#{'socialEvent'}" styleClass="text-center" sortOrder="#{dataTableStateHolder.sortOrders['socialEvent']}">
+                            <ui:define name="header">
+                                <h:outputText
+                                        value="#{messages['gazelle.users.connectaton.participants.SocialEvent']}"/>
+                            </ui:define>
+                            <h:selectBooleanCheckbox styleClass="form-control-static" id="so"
+                                                     value="#{participant.socialEvent}">
+                                <a4j:ajax event="click"
+                                          render="pt" execute="@this"
+                                          listener="#{connectathonParticipantManager.saveSocialEventChange(participant)}"/>
+                            </h:selectBooleanCheckbox>
+                        </g:column>
+                        <g:column>
+                            <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+                            <div class="gzl-never-wrap form-control-static">
+                                <a4j:commandLink event="click" execute="@this"
+                                                 height="22" title="#{messages['gazelle.common.button.Edit']}"
+                                                 render="addDiv, _p, mainButtons"
+                                                 actionListener="#{connectathonParticipantManager.editParticipant(participant)}">
+                                    <span class="gzl-icon-pencil"/>
+                                </a4j:commandLink>
+
+
+                                <a4j:commandLink event="click" title="#{messages['gazelle.common.button.Delete']}"
+                                                 oncomplete="jq162('#delPan').modal('show');"
+                                                 render=" :delForm" execute="@this"
+                                                 actionListener="#{connectathonParticipantManager.setSelectedConnectathonParticipant( participant ) }">
+                                    <span class="gzl-icon-trash-o"/>
+                                </a4j:commandLink>
+
+                            </div>
+                        </g:column>
+                        <f:facet name="footer">
+                            <ui:include src="/util/datatableFooter.xhtml">
+                                <ui:param name="dataScrollerId" value="ds"/>
+                                <ui:param name="dataTableId" value="pt"/>
+                            </ui:include>
+                        </f:facet>
+                    </rich:dataTable>
+                    <s:div style="text-align: left;">
+                        <h:commandLink immediate="true"
+                                       rendered="#{connectathonParticipantManager.nbOfParticipants &gt; 0}"
+                                       value="#{messages['gazelle.common.export.ExportAsExcel']}"
+                                       action="#{gazelleExcelExporterJboss7.export('_f:pt')}"/>
+                    </s:div>
+                    <div align="right">
+                        <a4j:commandButton id="del" styleClass="gzl-btn-red"
+                                           value="#{messages['gazelle.users.connectaton.participants.button.DeleteAll']}"
+                                           rendered="#{(connectathonParticipantManager.nbOfParticipants &gt; 1) and (!connectathonParticipantManager.renderAddPanel)}"
+                                           oncomplete="jq162('#delAllPan').modal('show');"
+                                           render=":resetFrom">
+                        </a4j:commandButton>
+                    </div>
+
+                    <s:div styleClass="row" rendered="#{connectathonParticipantManager.canViewFooter()}">
+                        <div class="col-lg-6 col-lg-offset-3">
+                            <h:panelGroup id="chaPan"
+                                          rendered="#{(connectathonParticipantManager.nbOfParticipants &gt; 0) and (!connectathonParticipantManager.renderAddPanel)}">
+                                <div class="well">
+                                    #{connectathonParticipantManager.getAllSystemsInSession()}
+
+                                    <h:outputText
+                                            value="#{messages['gazelle.tm.YouHaveRegistered']} #{connectathonParticipantManager.foundSystemsInSession.size()} #{messages['gazelle.tm.SystemsForThisEvent']}."/>
+                                    <br/>
+                                    <h:panelGroup
+                                            rendered="#{gazelleDAO.getSelectedTestingSession().nbParticipantsIncludedInSystemFees &gt; 0}">
+                                        <h:outputText
+                                                value="#{messages['net.ihe.gazelle.tm.YouAreEntitledTo']} #{gazelleDAO.getSelectedTestingSession().nbParticipantsIncludedInSystemFees} #{messages['net.ihe.gazelle.tm.X_2']}                                                 #{connectathonParticipantManager.foundSystemsInSession.size()}                                                 #{messages['gazelle.systems.SystemPlural']} = #{connectathonParticipantManager.getTheoricMenPerSystems()}                                                 #{messages['gazelle.tm.Participants']}."/>
+                                        <br/>
+                                    </h:panelGroup>
+                                    <h:outputText
+                                            value="#{messages['gazelle.tm.YouHaveRegistered']} #{connectathonParticipantManager.nbOfParticipants} #{messages['gazelle.tm.Participants_2']})."/>
+                                    <br/>
+
+                                    <h:panelGroup
+                                            rendered="#{connectathonParticipantManager.chargedMenPerSystems &gt;= 0}">
+                                        <div class="media">
+                                            <div class="media-left">
+                                                <span class="gzl-icon-exclamation-triangle"/>
+                                            </div>
+                                            <div class="media-body">
+                                                <h:outputText
+                                                        value="#{messages['gazelle.tm.YouWillBeChargedFor']} #{connectathonParticipantManager.nbOfParticipants} -
+                                                         #{connectathonParticipantManager.theoricMenPerSystems} =
+                                                         #{connectathonParticipantManager.chargedMenPerSystems} #{messages['gazelle.tm.Participants_2']})."/>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </div>
+                            </h:panelGroup>
+                        </div>
+                        <h:panelGroup
+                                rendered="#{!connectathonParticipantManager.renderAddPanel and (connectathonParticipantManager.nbOfParticipants==0 )}">
+                            <ui:decorate template="/layout/panels/_panel.xhtml">
+                                <div class="text-center">
+                                    <span class="gzl-icon-stack gzl-icon-4x">
+                                        <span class="gzl-icon-users gzl-icon-stack-1x"/>
+                                        <span class="gzl-icon-exclamation-triangle gzl-icon-stack-1x gzl-icon-stack-bottom-right"/>
+                                    </span>
+
+                                    <h3>
+                                        <h:outputText
+                                                value="#{messages['gazelle.users.participant.NoParticipantYetRegisteredLabel1']}"
+                                                style="font-style:italic"/>
+                                    </h3>
+                                </div>
+                            </ui:decorate>
+                        </h:panelGroup>
+                    </s:div>
+                </s:div>
+            </h:form>
+        </ui:decorate>
+
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Delete participant confirmation Modal Panel								-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="delForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="delPan"/>
+                <ui:define name="popup_title">#{messages['gazelle.users.connectaton.participants.confirmation.delete.header']}</ui:define>
+                <p>#{messages['gazelle.users.connectaton.participants.confirmation.delete.label']}
+                    #{connectathonParticipantManager.selectedConnectathonParticipant.firstname}
+                    #{connectathonParticipantManager.selectedConnectathonParticipant.lastname} ?</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="delBtn"
+                                       value="#{messages['gazelle.common.button.Delete']}"
+                                       ignoreDupResponses="true" styleClass="gzl-btn-red"
+                                       actionListener="#{connectathonParticipantManager.deleteSelectedConnectathonParticipant()}"
+                                       onclick="jq162('#delPan').modal('hide');"
+                                       render="_p"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- END : Delete system confirmation Modal Panel						-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!--  MODAL PANEL : This is the modal panel to display the delete all confirmation 		-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="resetFrom">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="delAllPan"/>
+                <ui:define name="popup_title">#{messages['gazelle.users.connectaton.participants.confirmation.deleteAll.label']}
+                    #{gazelleDAO.getSelectedTestingSession().description}
+                </ui:define>
+                <p>#{messages['gazelle.users.connectaton.participants.confirmation.deleteAll.label3']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="delAll"
+                                       value="#{messages['gazelle.common.button.Confirm']}"
+                                       styleClass="gzl-btn-red"
+                                       actionListener="#{connectathonParticipantManager.deleteAllConnectathonParticipantsForSession()}"
+                                       onclick="jq162('#delAllPan').modal('hide');"
+                                       render="_p"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!--  END - MODAL PANEL : This is the modal panel to display the delete all confirmation -->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+    </ui:define>
+</ui:composition>

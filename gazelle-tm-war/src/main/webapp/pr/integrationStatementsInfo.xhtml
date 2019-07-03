@@ -1,0 +1,85 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:decorate template="/layout/panels/_panel.xhtml">
+
+        <div class="row">
+            <div class="col-md-3 col-sm-3">
+                <div class="thumbnail">
+                    <a4j:commandLink action="#{prManager.downloadISOrRedirect(currentSystem.id)}"
+                                     target="_blank">
+                        <h:graphicImage library="img"
+                                        value="#{prManager.getIntegrationStatementSnapshotURL(currentSystem)}"/>
+                    </a4j:commandLink>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-6">
+                <div class="caption">
+                    <s:decorate id="company" template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['gazelle.productregistry.system.label.Company']}</ui:define>
+                        <h:outputLink value="#{currentSystem.uniqueInstitution.url}"
+                                      rendered="#{not empty currentSystem.uniqueInstitution.url}"
+                                      target="_blank">
+                            <h:outputText
+                                    value="#{currentSystem.uniqueInstitution.name}"/>
+                        </h:outputLink>
+                        <h:outputText value="#{currentSystem.uniqueInstitution.name}"
+                                      rendered="#{empty currentSystem.uniqueInstitution.url}"/>
+                    </s:decorate>
+
+                    <s:decorate id="systemName" template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['gazelle.systems.system.SystemName']}</ui:define>
+                        <g:link value="#{currentSystem}"
+                                rendered="#{s:hasRole('admin_role')}"/>
+                        <h:outputText value="#{currentSystem.name}"
+                                      rendered="#{not s:hasRole('admin_role')}"/>
+                    </s:decorate>
+
+                    <s:decorate id="systemVersion" template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['gazelle.systems.system.SystemVersion']}</ui:define>
+                        <h:outputText value="#{currentSystem.version}"/>
+                    </s:decorate>
+
+                    <s:decorate id="publicationDate" template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['gazelle.productregistry.search.criteria.PublicationDate']}
+                        </ui:define>
+                        <g:date date="true" time="false"
+                                value="#{currentSystem.integrationStatementDate}"/>
+                    </s:decorate>
+
+                    <s:decorate id="integrationStatement" template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['net.ihe.gazelle.tm.IntegrationStatement']}</ui:define>
+                        <a4j:commandLink
+                                value="#{messages['gazelle.testmanagement.search.button.View']}"
+                                action="#{prManager.downloadISOrRedirect(currentSystem.id)}"
+                                target="_blank"/>
+                    </s:decorate>
+
+                    <s:decorate id="similarity" template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['net.ihe.gazelle.tm.Similarity']}</ui:define>
+                        <s:span rendered="#{prSearch.showRatio}">
+                            <h:outputText
+                                    value="#{prSearch.getRatio(currentSystem)}%"/>
+
+                            <a4j:commandLink event="click"
+                                             oncomplete="jq162('#aiposModalPanel').modal('show');"
+                                             execute="@this" render=" :aiposForm"
+                                             actionListener="#{prSearch.showAIPOs(currentSystem.id)}">
+                                <span class="gzl-icon-info-circle"/>
+                            </a4j:commandLink>
+
+                            <h:outputText value=" - "/>
+                        </s:span>
+                        <a4j:commandLink
+                                value="#{messages['net.ihe.gazelle.tm.FindSimilarSystems']}"
+                                actionListener="#{prSearch.showSimilar(currentSystem.id)}"
+                                execute="@this" render="globalform"/>
+                    </s:decorate>
+                </div>
+            </div>
+        </div>
+    </ui:decorate>
+
+</ui:composition>

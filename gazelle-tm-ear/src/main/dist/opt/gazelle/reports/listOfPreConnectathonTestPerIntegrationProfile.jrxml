@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="listOfPreConnectathonTestPerIntegrationProfile" pageWidth="595" pageHeight="842" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<style name="Crosstab Data Text" isDefault="false" hAlign="Center"/>
+	<parameter name="integrationProfileId" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[new Integer(3)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="actorId" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[new Integer(23)]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT DISTINCT
+     tm_test."keyword" AS tm_test_keyword,
+     tf_actor."keyword" AS tf_actor_keyword,
+     tf_actor."name" AS tf_actor_name,
+     tm_test_option."keyword" AS tm_test_option_keyword
+FROM
+     "public"."tm_role_in_test" tm_role_in_test INNER JOIN "public"."tm_test_roles" tm_test_roles ON tm_role_in_test."id" = tm_test_roles."role_in_test_id"
+     INNER JOIN "public"."tm_test" tm_test ON tm_test_roles."test_id" = tm_test."id" and tm_test."test_type_id"=1
+     INNER JOIN "public"."tm_test_option" tm_test_option ON tm_test_roles."test_option_id" = tm_test_option."id"
+     INNER JOIN "public"."tm_role_in_test_test_participants" tm_role_in_test_test_participants ON tm_role_in_test."id" = tm_role_in_test_test_participants."role_in_test_id"
+     INNER JOIN "public"."tf_actor_integration_profile_option" tf_actor_integration_profile_option ON tm_role_in_test_test_participants."actor_integration_profile_option_id" = tf_actor_integration_profile_option."id"
+     INNER JOIN "public"."tf_actor_integration_profile" tf_actor_integration_profile ON tf_actor_integration_profile_option."actor_integration_profile_id" = tf_actor_integration_profile."id"
+     INNER JOIN "public"."tf_actor" tf_actor ON tf_actor_integration_profile."actor_id" = tf_actor."id"
+WHERE
+     tf_actor_integration_profile."integration_profile_id" = $P{integrationProfileId}]]>
+	</queryString>
+	<field name="tm_test_keyword" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tf_actor_keyword" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tf_actor_name" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tm_test_option_keyword" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<summary>
+		<band height="277">
+			<crosstab>
+				<reportElement style="Crosstab Data Text" stretchType="RelativeToTallestObject" x="0" y="0" width="595" height="274"/>
+				<crosstabHeaderCell>
+					<cellContents backcolor="#FFFFFF" mode="Transparent" style="Crosstab Data Text"/>
+				</crosstabHeaderCell>
+				<rowGroup name="tm_test_keyword" width="85" totalPosition="End">
+					<bucket>
+						<bucketExpression class="java.lang.String"><![CDATA[$F{tm_test_keyword}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents backcolor="#F0F8FF" mode="Opaque">
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="85" height="20"/>
+								<box leftPadding="5" rightPadding="5">
+									<topPen lineWidth="1.0"/>
+									<leftPen lineWidth="1.0"/>
+									<bottomPen lineWidth="1.0"/>
+									<rightPen lineWidth="1.0"/>
+								</box>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression class="java.lang.String"><![CDATA[$V{tm_test_keyword}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents backcolor="#FFFFFF" mode="Transparent"/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="tf_actor_keyword" height="90">
+					<bucket>
+						<bucketExpression class="java.lang.String"><![CDATA[$F{tf_actor_keyword}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents backcolor="#F0F8FF" mode="Opaque">
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="30" height="90"/>
+								<box>
+									<topPen lineWidth="1.0"/>
+									<leftPen lineWidth="1.0"/>
+									<bottomPen lineWidth="1.0"/>
+									<rightPen lineWidth="1.0"/>
+								</box>
+								<textElement verticalAlignment="Middle" rotation="Right">
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression class="java.lang.String"><![CDATA[$V{tf_actor_keyword}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents/>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="tm_test_option_keywordMeasure" class="java.lang.String">
+					<measureExpression><![CDATA[$F{tm_test_option_keyword}]]></measureExpression>
+				</measure>
+				<crosstabCell width="30" height="20">
+					<cellContents>
+						<textField isBlankWhenNull="true">
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="30" height="20"/>
+							<box>
+								<topPen lineWidth="1.0"/>
+								<leftPen lineWidth="1.0"/>
+								<bottomPen lineWidth="1.0"/>
+								<rightPen lineWidth="1.0"/>
+							</box>
+							<textElement verticalAlignment="Middle"/>
+							<textFieldExpression class="java.lang.String"><![CDATA[$V{tm_test_option_keywordMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="30" height="0" rowTotalGroup="tm_test_keyword">
+					<cellContents backcolor="#FFFFFF" mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="50" columnTotalGroup="tf_actor_keyword">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<textField>
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="25" height="20"/>
+							<textElement/>
+							<textFieldExpression class="java.lang.String"><![CDATA[$V{tm_test_option_keywordMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="tm_test_keyword" columnTotalGroup="tf_actor_keyword">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<textField>
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="25" height="20"/>
+							<textElement/>
+							<textFieldExpression class="java.lang.String"><![CDATA[$V{tm_test_option_keywordMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</summary>
+</jasperReport>

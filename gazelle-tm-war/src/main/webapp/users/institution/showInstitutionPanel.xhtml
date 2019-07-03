@@ -1,0 +1,37 @@
+<s:div xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:s="http://jboss.org/schema/seam/taglib"
+       xmlns="http://www.w3.org/1999/xhtml">
+    <!-- ========================= -->
+    <!-- Institution informations - Edit section   -->
+    <!-- ========================= -->
+
+    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+        <ui:define name="panel_title">#{messages['gazelle.users.institution.DisplayInstitutionLabel2']}</ui:define>
+        <s:decorate id="keyword" template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.users.institution.InstitutionKeyword']}</ui:define>
+            #{institutionVariable.keyword}
+        </s:decorate>
+        <s:decorate id="name" template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.users.institution.InstitutionName']}</ui:define>
+            #{institutionVariable.name}
+        </s:decorate>
+        <s:decorate id="type" template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.users.institution.InstitutionType']}</ui:define>
+            #{institutionVariable.institutionType.type}
+        </s:decorate>
+        <s:decorate id="url" template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.users.institution.InstitutionURL']}</ui:define>
+            <a href="#{institutionVariable.url}"> #{institutionVariable.url}
+            </a>
+        </s:decorate>
+        <s:decorate id="integrationStatementsRepositoryURL" template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.users.institution.IntegrationStatementsRepositoryURL']}
+            </ui:define>
+            <a href="#{institutionVariable.integrationStatementsRepositoryUrl}">
+                #{institutionVariable.integrationStatementsRepositoryUrl} </a>
+        </s:decorate>
+        <div style="clear: both"/>
+    </ui:decorate>
+
+    <p/>
+</s:div>

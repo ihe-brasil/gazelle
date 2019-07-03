@@ -1,0 +1,205 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tm.samples.SearchOfSamples']}"/>
+    <ui:define name="body">
+        <h:form id="globalform" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <a4j:queue requestDelay="300" ignoreDupResponses="true"/>
+            <h:inputHidden id="filterUrlParameters" name="filterUrlParameters"
+                           value="#{sampleOverview.filter.urlParameters}"/>
+            <script>
+                updateUrl("globalform:filterUrlParameters");
+                $("#globalform\\:filterUrlParameters").bind('change',
+                        function () {
+                            updateUrl("globalform:filterUrlParameters");
+                        });
+            </script>
+
+            <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+
+                <!-- testing session -->
+                <div class="row">
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{sampleOverview.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="testing_session"/>
+                            <ui:param name="filterName"
+                                      value="#{messages['gazelle.systems.testingSession']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                    <div class="col-lg-6">
+                        <!-- institution -->
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{sampleOverview.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="institution"/>
+                            <ui:param name="filterName" value="#{messages['gazelle.users.Institution']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <!--  object type -->
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{sampleOverview.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="objectType"/>
+                            <ui:param name="filterName" value="#{messages['gazelle.tm.samples.ObjectType']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                    <div class="col-lg-6">
+                        <!--  system -->
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{sampleOverview.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="system"/>
+                            <ui:param name="filterName"
+                                      value="#{messages['gazelle.configuration.system.system']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <!--  object file type -->
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{sampleOverview.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="objectFileType"/>
+                            <ui:param name="filterName"
+                                      value="#{messages['gazelle.testmanagement.object.FileType']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                    <div class="col-lg-6">
+                        <!--  object instance validation -->
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{sampleOverview.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="objectInstanceValidation"/>
+                            <ui:param name="filterName"
+                                      value="#{messages['gazelle.testmanagement.object.Validation']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <!--  object instance type -->
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{sampleOverview.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="objectInstanceType"/>
+                            <ui:param name="filterName" value="#{messages['gazelle.tf.Usage']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <ui:define name="filter_buttons">
+                    <a4j:commandLink actionListener="#{sampleOverview.resetFilter()}"
+                                     title="#{messages['gazelle.users.reset']}" type="submit"
+                                     execute="@this"
+                                     render="globalform">
+                        <span class="fa fa-times-circle"/>
+                    </a4j:commandLink>
+                </ui:define>
+            </ui:decorate>
+
+            <s:decorate id="resultsForSearchDecorateSearch">
+                <s:div id="ViewTableOfObjIns">
+                    <br/>
+                    <br/>
+                    <s:decorate template="/layout/panels/_panel_title.xhtml" id="listSampleNotEmpty" rendered="#{sampleOverview.objectInstances.size()&gt;0}">
+                        <ui:define name="panel_title">#{messages['gazelle.tm.ListOfFoundSamples']}</ui:define>
+                        <rich:dataTable id="tableOfSample" var="currentObjectInstance"
+                                        value="#{sampleOverview.objectInstances}" rowKeyVar="rowNumber"
+
+
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                            <g:column rendered="#{s:hasRole('admin_role')}" sortBy="#{'id'}"
+                                      sortOrder="#{datatablestateholder.sortorders['id']}">
+                                <ui:define name="header">
+                                    <h:outputText value="#{messages['gazelle.tf.table.Id']}"/>
+                                </ui:define>
+                                <h:outputText value="#{currentObjectInstance.id}"/>
+                            </g:column>
+                            <g:column sortBy="#{'name'}"
+                                      sortOrder="#{datatablestateholder.sortorders['name']}" filterBy="#{'name'}"
+                                      filterEvent="onkeyup">
+                                <ui:define name="header">
+                                    <h:outputText
+                                            value="#{messages['gazelle.testmanagement.object.Samplesname']}"/>
+                                </ui:define>
+                                <h:outputLink id="linkToOICreate"
+                                              value="#{sampleOverview.getPermanentLinkForCreate(currentObjectInstance)}"
+                                              target="_blank">
+                                    <h:outputText value="#{currentObjectInstance.name}"/>
+                                </h:outputLink>
+                            </g:column>
+                            <g:column sortBy="#{'object.keyword'}"
+                                      sortOrder="#{datatablestateholder.sortorders['object.keyword']}">
+                                <ui:define name="header">
+                                    <h:outputText value="#{messages['gazelle.tm.samples.ObjectType']}"/>
+                                </ui:define>
+                                <h:outputText value="#{currentObjectInstance.object.keyword}"/>
+                            </g:column>
+                            <g:column sortBy="#{'system.system.keyword'}"
+                                      sortOrder="#{datatablestateholder.sortorders['system.system.keyword']}">
+                                <ui:define name="header">
+                                    <h:outputText
+                                            value="#{messages['gazelle.configuration.system.system']}"/>
+                                </ui:define>
+                                <h:outputText value="#{currentObjectInstance.system.system.keyword}"/>
+                            </g:column>
+                            <g:column sortBy="#{'validation.value'}"
+                                      sortOrder="#{datatablestateholder.sortorders['validation.value']}">
+                                <ui:define name="header">
+                                    <h:outputText
+                                            value="#{messages['gazelle.testmanagement.object.Validation']}"/>
+                                </ui:define>
+                                <h:outputText value="#{currentObjectInstance.validation.value}"/>
+                            </g:column>
+                            <g:column sortBy="#{'objectUsageType.keyword'}"
+                                      sortOrder="#{datatablestateholder.sortorders['objectusagetype.keyword']}">
+                                <ui:define name="header">
+                                    <h:outputText value="#{messages['gazelle.tf.Usage']}"/>
+                                </ui:define>
+                                <h:outputText value="#{currentObjectInstance.objectUsageType.keyword}"/>
+                            </g:column>
+                            <g:column sortBy="#{'lastChanged'}"
+                                      sortOrder="#{datatablestateholder.sortorders['lastchanged']}">
+                                <ui:define name="header">
+                                    <h:outputText
+                                            value="#{messages['gazelle.testmanagement.object.CreationDate']}"/>
+                                </ui:define>
+                                <g:date tooltip="true" value="#{currentObjectInstance.lastChanged}"/>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId" value="tableOfSample"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+
+                        <h:commandLink value="#{messages['gazelle.common.export.ExportAsExcel']}"
+                                       action="#{gazelleExcelExporterJboss7.export('globalform:resultsForSearchDecorateSearch:listSampleNotEmpty:tableOfSample' )}"/>
+
+                    </s:decorate>
+                    <s:div id="listSampleIsEmpty" rendered="#{sampleOverview.objectInstances.size()==0}">
+                        <h:outputText
+                                value="#{messages['gazelle.testmanagement.object.NoAvailableSamples']}"
+                                styleClass="gzl-alert gzl-alert-blue"/>
+                    </s:div>
+                </s:div>
+            </s:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

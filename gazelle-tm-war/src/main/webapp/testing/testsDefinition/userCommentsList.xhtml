@@ -1,0 +1,89 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <rich:dataTable id="userCommentDataListForViewTestPage" rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                    border="0"
+                    rendered="#{testDefinitionManager.selectedTest.id!=null and testDefinitionManager.selectedTest.userCommentList.size()&gt;0}"
+                    var="userComment" value="#{testDefinitionManager.selectedTest.userCommentList}"
+
+                     render="ds">
+        <g:column styleClass="#{styleClassColumn}">
+            <ui:define name="header">
+                <h:outputText value="#{messages['gazelle.tm.search.user']}"/>
+            </ui:define>
+            <h:outputText value="#{userComment.user}"/>
+        </g:column>
+        <g:column styleClass="#{styleClassColumn}">
+            <ui:define name="header">
+                <h:outputText value="#{messages['gazelle.testmanagement.object.CreationDate']}"/>
+            </ui:define>
+            <g:date tooltip="true" value="#{userComment.creationDate}"/>
+        </g:column>
+        <g:column styleClass="#{styleClassColumn}">
+            <ui:define name="header">
+                <h:outputText id="userCommentlastModifierOutputText"
+                              value="#{messages['gazelle.common.LastModifier']}"/>
+            </ui:define>
+            <h:outputText id="userCommentLastModifierOutputText" value="#{userComment.lastModifierId}"
+                    />
+        </g:column>
+        <g:column styleClass="#{styleClassColumn}">
+            <ui:define name="header">
+                <h:outputText id="userCommentlastChangedOutputText" value="#{messages['gazelle.common.LastChanged']}"/>
+            </ui:define>
+            <g:date tooltip="true" value="#{userComment.lastChanged}"/>
+        </g:column>
+        <g:column styleClass="#{styleClassColumn}">
+            <ui:define name="header">
+                <h:outputText value="#{messages['gazelle.common.Comment']}"/>
+            </ui:define>
+            <g:safehtml value="#{userComment.commentContent}"/>
+        </g:column>
+        <g:column styleClass="#{styleClassColumn}" rendered="#{applicationManager.isMasterModel()}">
+            <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+            <div class="gzl-never-wrap">
+
+                <a4j:commandLink id="userCommentListEditActionSupport"
+                                 rendered="#{testDefinitionManager.isLoggedUserAllowedToEditComment(userComment)}"
+                                 actionListener="#{testDefinitionManager.editUserComment(userComment)}"
+                                 render="globalform">
+                    <span class="gzl-icon-pencil"/>
+                </a4j:commandLink>
+                <a4j:commandLink id="testsListColumnsDeleteActionSupport"
+                                 actionListener="#{testDefinitionManager.deleteUserComment(userComment,testId)}"
+                                 rendered="#{testDefinitionManager.isLoggedUserAllowedToEditComment(userComment)}"
+                                 render="globalform">
+                    <span class="gzl-icon-trash-o"/>
+                </a4j:commandLink>
+            </div>
+        </g:column>
+        <f:facet name="footer">
+            <ui:include src="/util/datatableFooter.xhtml">
+                <ui:param name="dataScrollerId" value="ds"/>
+                <ui:param name="dataTableId" value="userCommentDataListForViewTestPage"/>
+            </ui:include>
+        </f:facet>
+    </rich:dataTable>
+    <br/>
+
+    <div align="center">
+        <s:div rendered="#{applicationManager.isMasterModel()}">
+            <ui:decorate template="/layout/editor/_text_editor.xhtml">
+                <ui:param name="text" value="#{testDefinitionManager.userComment.commentContent}"/>
+                <ui:param name="id" value="userCommentEditorForViewTestPage"/>
+                <ui:param name="isFocus" value="false"/>
+            </ui:decorate>
+            <a4j:commandButton value="#{messages['gazelle.tm.AddComment']}"
+                               rendered="#{testDefinitionManager.userComment.id==null}" styleClass="gzl-btn-green"
+                               style="text-align:center;" actionListener="#{testDefinitionManager.addComment(testId)}"
+                               render="#{containerPanelId},userCommentDataListForViewTestPage"/>
+            <a4j:commandButton value="#{messages['gazelle.tm.UpdateComment']}"
+                               rendered="#{testDefinitionManager.userComment.id!=null}" styleClass="btn btn-warning"
+                               style="text-align:center;"
+                               actionListener="#{testDefinitionManager.updateSelectedUserComment(testId)}"
+                               render="#{containerPanelId},userCommentDataListForViewTestPage"/>
+        </s:div>
+    </div>
+</ui:composition>

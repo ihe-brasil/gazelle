@@ -1,0 +1,159 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{tlManager.getAddTitle()}"/>
+    <ui:define name="body">
+
+        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+            <ui:define name="panel_title">#{tlManager.getAddTitle()}</ui:define>
+            <div id="tlManager">
+                <!-- **********************************************************************************************
+                     * Panel for add to actor
+                     ********************************************************************************************** -->
+                <h:panelGroup rendered="#{tlManager.isCallerClass('ACTOR')}">
+                    <ui:decorate template="/layout/panels/_panel.xhtml">
+                        <s:decorate id="vaid" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Id']}</ui:define>
+                            #{dispActor.id}
+                        </s:decorate>
+                        <s:decorate id="vakeywordDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Keyword']}</ui:define>
+                            #{dispActor.keyword}
+                        </s:decorate>
+                        <s:decorate id="vanameDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Name']}</ui:define>
+                            #{dispActor.name}
+                        </s:decorate>
+                        <s:decorate id="vadescriptionDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Description']}</ui:define>
+                            #{dispActor.description}
+                        </s:decorate>
+                    </ui:decorate>
+                </h:panelGroup>
+                <!-- **********************************************************************************************
+                     * Panel for add to integration profile
+                     ********************************************************************************************** -->
+                <h:panelGroup rendered="#{tlManager.isCallerClass('TRANSACTION')}">
+                    <ui:decorate template="/layout/panels/_panel.xhtml">
+                        <s:decorate id="vipid" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Id']}</ui:define>
+                            #{tlTransaction.id}
+                        </s:decorate>
+                        <s:decorate id="viplabelDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Keyword']}</ui:define>
+                            #{tlTransaction.keyword}
+                        </s:decorate>
+                        <s:decorate id="vipnameDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Name']}</ui:define>
+                            #{tlTransaction.name}
+                        </s:decorate>
+                        <s:decorate id="vipdescriptionDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Description']}</ui:define>
+                            #{tlTransaction.description}
+                        </s:decorate>
+                    </ui:decorate>
+                </h:panelGroup>
+            </div>
+            <!-- **********************************************************************************************
+                 * lists panel
+                 **********************************************************************************************  -->
+
+            <h:form id="addtl">
+                <s:token allowMultiplePosts="true"/>
+                <h:panelGrid columns="3" columnClasses="alignTop,alignTop,alignTop">
+
+                    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                        <ui:define name="panel_title">#{messages['gazelle.tf.fromActorsTab']}</ui:define>
+                        <h:selectOneListbox size="#{fromActorSize}" style="max-width:300px"
+                                            value="#{tlManager.fromSelectedActor}" readonly="#{fromActorReadOnly}"
+                                            disabled="#{fromActorReadOnly}">
+                            <s:selectItems var="a" value="#{fromActors}"
+                                           label="#{a.keyword} - #{a.name}"/>
+                            <s:convertEntity></s:convertEntity>
+                        </h:selectOneListbox>
+                    </ui:decorate>
+
+                    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                        <ui:define name="panel_title">#{messages['gazelle.tf.TransactionsTab']}</ui:define>
+                        <h:selectManyListbox size="#{tlTransactionSize}" style="max-width:300px"
+                                             value="#{tlManager.tlSelectedTransactions}"
+                                             readonly="#{tlTransactionReadOnly}"
+                                             disabled="#{tlTransactionReadOnly}">
+                            <s:selectItems var="c" value="#{tlTransactions}"
+                                           label="#{c.keyword} - #{c.name}"/>
+                            <s:convertEntity></s:convertEntity>
+                        </h:selectManyListbox>
+                    </ui:decorate>
+
+                    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                        <ui:define name="panel_title">#{messages['gazelle.tf.toActorsTab']}</ui:define>
+                        <h:selectOneListbox size="#{toActorSize}" style="max-width:300px"
+                                            value="#{tlManager.toSelectedActor}"
+                                            readonly="#{toActorReadOnly}" disabled="#{toActorReadOnly}">
+                            <s:selectItems var="b" value="#{toActors}"
+                                           label="#{b.keyword} - #{b.name}"/>
+                            <s:convertEntity></s:convertEntity>
+                        </h:selectOneListbox>
+                    </ui:decorate>
+
+                </h:panelGrid>
+                <div>
+                    <h:commandButton id="cancel" styleClass="gzl-btn"
+                                     value="#{messages['gazelle.tf.tlDone']}"
+                                     action="#{tlManager.finished()}"/>
+                    <h:commandButton id="save" styleClass="gzl-btn-green"
+                                     render="addtl"
+                                     value="#{messages['gazelle.tf.tlCreate']}"
+                                     action="#{tlManager.createLinks()}"/>
+                </div>
+
+
+                <rich:dataTable id="actorsTransactionRelatedToIntegrationProfile" var="tl"
+                                value="#{actorManager.getTransactionLinksForActor()}"
+                                rendered="#{(tlManager.fromActorReadOnly || tlManager.toActorReadOnly) and actorManager.getTransactionLinksForActor() != null and actorManager.getTransactionLinksForActor().size() &gt; 0}">
+                    <f:facet name="header">
+                        #{messages['net.ihe.gazelle.tm.ActorsAndTransactionsAlreadyPresent']}
+                    </f:facet>
+                    <g:column sortBy="#{'fromActor.keyword'}">
+                        <ui:define name="header">#{messages['gazelle.tf.fromActorsTab']}</ui:define>
+                        <h:outputText value="#{tl.fromActor.keyword} - #{tl.fromActor.name}"/>
+                    </g:column>
+                    <g:column sortBy="#{'transaction.keyword'}">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Transaction']}</ui:define>
+                        <h:outputText value="#{tl.transaction.keyword} - #{tl.transaction.name}"/>
+                    </g:column>
+                    <g:column sortBy="#{'toActor.keyword'}">
+                        <ui:define name="header">#{messages['gazelle.tf.toActorsTab']}</ui:define>
+                        <h:outputText value="#{tl.toActor.keyword} - #{tl.toActor.name}"/>
+                    </g:column>
+                </rich:dataTable>
+
+                <rich:dataTable id="linkTransactionRelatedToIntegrationProfile" var="tl"
+                                value="#{transactionManager.getTransactionLinksForTransaction()}"
+                                rendered="#{tlManager.tlTransactionReadOnly and transactionManager.getTransactionLinksForTransaction() != null and transactionManager.getTransactionLinksForTransaction().size() &gt; 0}">
+                    <f:facet name="header">
+                        #{messages['net.ihe.gazelle.tm.ActorsAndTransactionsAlreadyPresent']}
+                    </f:facet>
+                    <g:column sortBy="#{'fromActor.keyword'}">
+                        <ui:define name="header">#{messages['gazelle.tf.fromActorsTab']}</ui:define>
+                        <h:outputText value="#{tl.fromActor.keyword} - #{tl.fromActor.name}"/>
+                    </g:column>
+                    <g:column sortBy="#{'transaction.keyword'}">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Transaction']}</ui:define>
+                        <h:outputText value="#{tl.transaction.keyword} - #{tl.transaction.name}"/>
+                    </g:column>
+                    <g:column sortBy="#{'toActor.keyword'}">
+                        <ui:define name="header">#{messages['gazelle.tf.toActorsTab']}</ui:define>
+                        <h:outputText value="#{tl.toActor.keyword} - #{tl.toActor.name}"/>
+                    </g:column>
+                </rich:dataTable>
+
+            </h:form>
+
+
+        </ui:decorate>
+
+    </ui:define>
+</ui:composition>

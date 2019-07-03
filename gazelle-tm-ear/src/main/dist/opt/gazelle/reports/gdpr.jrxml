@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 6.6.0  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="contactsBasedOnInstitutionIdAndFunctionType" pageWidth="680" pageHeight="802" whenNoDataType="AllSectionsNoDetail" columnWidth="680" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="c8316c94-35a0-43a9-a521-c252f3ea83a7">
+	<property name="ireport.zoom" value="3.0"/>
+	<property name="ireport.x" value="971"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<style name="style1" isDefault="true" fontName="Arial"/>
+	<parameter name="institutionId" class="java.lang.Integer" isForPrompting="false"/>
+	<parameter name="functionTypeId" class="java.lang.Integer" isForPrompting="false"/>
+	<queryString>
+		<![CDATA[SELECT DISTINCT
+usr_person.id,
+usr_person."email" AS usr_person_email,
+     usr_person."firstname" AS usr_person_firstname,
+     usr_person."lastname" AS usr_person_lastname,
+     usr_person."personal_fax" AS usr_person_personal_fax,
+     usr_person."personal_phone" AS usr_person_personal_phone,
+     usr_person."cell_phone" AS usr_person_cell_phone,
+     usr_address."city" AS usr_address_city,
+     usr_address."zip_code" AS usr_address_zip_code,
+     usr_address."state" AS usr_address_state,
+     usr_address."phone" AS usr_address_phone,
+     usr_address."fax" AS usr_address_fax,
+     usr_address."address" AS usr_address_address,
+     usr_address."address_line_2" AS usr_address_address_line_2,
+  usr_iso_3166_country_code."printable_name" AS usr_iso_3166_country_code_printable_name
+
+FROM
+  public.usr_person
+  inner join  public.usr_institution on usr_institution.id =  usr_person.institution_id
+  inner join usr_address on usr_address.id = usr_institution.mailing_address_id
+       INNER JOIN  usr_persons_functions on usr_persons_functions."person_id" = usr_person."id"
+  INNER JOIN "public"."usr_iso_3166_country_code" usr_iso_3166_country_code ON usr_address."country" = usr_iso_3166_country_code."iso"
+
+WHERE usr_person.address_id is null and usr_institution.id = $P{institutionId}  AND usr_persons_functions."person_function_id" = $P{functionTypeId}
+
+union
+SELECT DISTINCT
+usr_person.id,
+usr_person."email" AS usr_person_email,
+     usr_person."firstname" AS usr_person_firstname,
+     usr_person."lastname" AS usr_person_lastname,
+     usr_person."personal_fax" AS usr_person_personal_fax,
+     usr_person."personal_phone" AS usr_person_personal_phone,
+     usr_person."cell_phone" AS usr_person_cell_phone,
+     usr_address."city" AS usr_address_city,
+     usr_address."zip_code" AS usr_address_zip_code,
+     usr_address."state" AS usr_address_state,
+     usr_address."phone" AS usr_address_phone,
+     usr_address."fax" AS usr_address_fax,
+     usr_address."address" AS usr_address_address,
+     usr_address."address_line_2" AS usr_address_address_line_2,
+  usr_iso_3166_country_code."printable_name" AS usr_iso_3166_country_code_printable_name
+
+FROM
+  public.usr_person
+  inner join  public.usr_institution on usr_institution.id =  usr_person.institution_id
+  inner join usr_address on usr_address.id = usr_person.address_id
+       INNER JOIN  usr_persons_functions on usr_persons_functions."person_id" = usr_person."id"
+  INNER JOIN "public"."usr_iso_3166_country_code" usr_iso_3166_country_code ON usr_address."country" = usr_iso_3166_country_code."iso"
+
+WHERE usr_person.address_id is not null and usr_institution.id = $P{institutionId}  AND usr_persons_functions."person_function_id" = $P{functionTypeId}]]>
+	</queryString>
+	<field name="id" class="java.lang.Integer"/>
+	<field name="usr_person_email" class="java.lang.String"/>
+	<field name="usr_person_firstname" class="java.lang.String"/>
+	<field name="usr_person_lastname" class="java.lang.String"/>
+	<field name="usr_person_personal_fax" class="java.lang.String"/>
+	<field name="usr_person_personal_phone" class="java.lang.String"/>
+	<field name="usr_person_cell_phone" class="java.lang.String"/>
+	<field name="usr_address_city" class="java.lang.String"/>
+	<field name="usr_address_zip_code" class="java.lang.String"/>
+	<field name="usr_address_state" class="java.lang.String"/>
+	<field name="usr_address_phone" class="java.lang.String"/>
+	<field name="usr_address_fax" class="java.lang.String"/>
+	<field name="usr_address_address" class="java.lang.String"/>
+	<field name="usr_address_address_line_2" class="java.lang.String"/>
+	<field name="usr_iso_3166_country_code_printable_name" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="67" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="267" height="20" uuid="992eef4b-df6d-4388-a945-71978a816737"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Introduction]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="20" width="555" height="40" uuid="a66093ff-9836-49ab-ae07-8ae001a4ff8b">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[IHE is fully committed to complying with all the requirements of the General Data Protection Regulation (GDPR). With this information notice and consent form we are providing you with information about which data we would like to collect, how we will use it, and how long we will retain this information.]]></text>
+			</staticText>
+		</band>
+		<band height="115">
+			<staticText>
+				<reportElement x="0" y="0" width="267" height="20" uuid="2093e487-571d-40ff-85b2-d53a9e0f9909"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Your rights]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="20" width="555" height="90" uuid="40e97f06-ea11-4db4-ba4d-67a6420e1c1d">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[Once you have read this information notice you may provide your consent to the data collection and use described.  If you do not wish to provide consent we will not collect your data, this will mean however that we cannot provide services to you. If you change your mind you will be able to withdraw your consent at a later stage and we will stop collecting and processing your data. In addition, you have the right to access the personal data that IHE holds about you and to have them rectified where necessary. In certain cases, you also have the right to have your data blocked or erased. You also have the right of data portability; this means that IHE-Europe will provide you with a machine-readable copy of all data held about you.  To exercise any of these rights, please contact us using our contact details provided at the end of the consent form.]]></text>
+			</staticText>
+		</band>
+		<band height="227">
+			<staticText>
+				<reportElement x="0" y="20" width="555" height="200" uuid="b0b0d17f-33d7-4fc1-afb3-d065ed2369a8">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[IHE is a member organisation, which collects the following categories of information from its members and those using its services:
+	• Identifying data: first name and last name, in some cases data of birth and national ID data. In some cases T shirt size and photo
+	• Contact data: professional and/or private physical address, email, skype, telephone or other similar information
+	• Professional information: employer or professional status, skills and qualifications, salary bracket (not exact salary amount)
+	• Cookies
+Cookies are short text files stored on a user’s device (such as a computer, tablet or phone) by a website. Cookies are used for the technical functioning of a website or for gathering statistics. Cookies are also typically used to provide a more personalised experience for a user, for example, when an online service remembers your user profile without you having to login. When you visit our website, we may collect some data on your browsing experience such as your IP address, the IHE page you visited, when you visited and the website page you were redirected from. This information is used to gather aggregated and anonymous statistics with a view to improving our services and to enhance your user experience. When you visit the IHE website, we will keep the browser history of your visit for a maximum of 13 months. This information will then be deleted.  
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="267" height="20" uuid="51eb81c2-8337-41a3-b402-d5de3cad92f4"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data collected by IHE]]></text>
+			</staticText>
+		</band>
+		<band height="153" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="267" height="20" uuid="e0dc3cb0-bfbd-484e-9f59-80effc2cc9f3"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Purpose of data collection]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="20" width="555" height="60" uuid="c69b5093-9d82-4e70-9496-97a43db34be9">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[The purpose of collecting the data listed above for provision of services to you, including receipt of newsletters and event attendance. When IHE enters into service provision contracts with any party with whom it shares your data, a strict requirement of confidentiality and security of data is included in the contract.  In some cases data may be collected for another purpose, if this is the case your explicit consent will be requested and the purpose for data collection fully detailed in written form.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="80" width="267" height="20" uuid="98fb9a4d-aa8c-4bec-b4e1-89dcc1b2b53a"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data Retention]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="100" width="555" height="40" uuid="b741861f-2cab-43ab-b5fa-af226fd2d666">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[IHE will store your data for the duration of your membership and /or interaction with IHE and for up to 15 years after your relationship with IHE has ended for IHE management purposes, after this time it will be securely deleted. The period of data retention may be longer where legal rules require longer data retention, such as in the case of financial data.]]></text>
+			</staticText>
+		</band>
+		<band height="127">
+			<staticText>
+				<reportElement x="0" y="20" width="555" height="100" uuid="7739a249-2965-4a4e-b892-a3a4892b9659">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[I have read the information notice on data collection and processing.  I understand that the following specific information will be collected: 
+	• IHE-Europe will collect my contact and business information including first and last name, email address, picture, company address, and phone number.
+I understand that this data will be used for following purposes:
+	• Outreach on Connectathon 2019 week activities and future IHE-related events
+	• Inclusion in the IHE-Europe News Pulse newsletter, with the ability to opt-out upon request 
+	• Inclusion in the Gazelle system and related google groups, with the ability to opt-out upon request
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="267" height="20" uuid="5f542340-c3db-4c1f-aa9a-6425b05b27f3"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Consent Form]]></text>
+			</staticText>
+		</band>
+		<band height="176">
+			<staticText>
+				<reportElement x="0" y="0" width="555" height="170" uuid="5c207337-2761-4184-8289-c6f0d9cbc98b">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[I consent that my data may be used for the purposes listed above. This data will be stored for the duration of my membership and /or interaction with IHE and for up to 15 years after my relationship with IHE has ended, after this time it will be securely deleted. The period of data retention may be longer where legal rules require. 
+I understand that I may exercise my right to withdraw consent at any time, by notifying IHE’s designated person with data protection responsibility as provided in the information notice.
+Signed by
+[full name]
+-----------------------------------------------------------
+On
+[date]
+-----------------------------------------------------------
+At 
+[city and country]
+-----------------------------------------------------------
+]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="50"/>
+	</pageFooter>
+</jasperReport>

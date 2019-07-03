@@ -1,0 +1,172 @@
+#!/bin/bash
+
+### BEGIN INIT INFO
+# Provides:          jboss
+# Required-Start:    postgresql
+# Required-Stop:     postgresql
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: JBoss 5.1 AS
+### END INIT INFO
+. /lib/lsb/init-functions
+
+JAVA_HOME=$JAVA_HOME
+JBOSS_HOME=/usr/local/jboss
+JBOSS_SERVER=gazelle
+JBOSS_BIND=0.0.0.0
+#JBOSS_PORTS=ports-01
+JBOSS_PORTS=ports-default
+
+JBOSS_USER=jboss
+JBOSS_CONSOLE=/var/log/jboss/${JBOSS_SERVER}.log
+JBOSS_PIDFILE=/var/run/jboss_${JBOSS_SERVER}.pid
+
+
+# Increase max memory with Xmx
+#JAVA_OPTS="-server -Xms1024m -XX:MaxPermSize=1024m -Xmx2048m"
+# use better garbage collector : G1
+#JAVA_OPTS="$JAVA_OPTS -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:+DisableExplicitGC"
+
+# next line may improve garbage collector
+#JAVA_OPTS="$JAVA_OPTS -XX:NewSize=512m -XX:MaxNewSize=512m -XX:SurvivorRatio=32 -XX:+UseTLAB -XX:TLABSize=256k"
+# Optionnal garbage collector logs
+# JAVA_OPTS="$JAVA_OPTS -verbose:gc -Xloggc:/var/log/jboss/gc.log"
+
+#JAVA_OPTS="$JAVA_OPTS -Dhttp.proxyHost=proxy_ip -Dhttp.proxyPort=proxy_port"
+#JAVA_OPTS="$JAVA_OPTS -Dhttp.proxyUser=proxy_user -Dhttp.proxyPassword=proxy_password"
+
+#JAVA_OPTS="$JAVA_OPTS -Dhttps.proxyHost=proxy_ip -Dhttps.proxyPort=proxy_port"
+#JAVA_OPTS="$JAVA_OPTS -Dhttps.proxyUser=proxy_user -Dhttps.proxyPassword=proxy_password"
+
+SSL_OPTS=""
+#SSL_OPTS="-Djavax.net.ssl.keyStore=/opt/gazelle/cert/keystore.jks -Djavax.net.ssl.keyStorePassword=keystore_password"
+#SSL_OPTS="$SSL_OPTS -Djavax.net.ssl.trustStore=/opt/gazelle/cert/keystore.jks -Djavax.net.ssl.trustStorePassword=trustStore_password"
+
+
+#Host not going through the proxy, separate host with a pipe |
+#JAVA_OPTS="$JAVA_OPTS -Dhttp.nonProxyHosts=localhost|*.google.fr"
+
+# debug server
+#JAVA_OPTS="$JAVA_OPTS -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n"
+
+
+do_start(){
+
+  # if garbage collector logs
+  # cp /var/log/jboss/gc.log /var/log/jboss/gc-`date +"%Y-%m-%d-%H-%M-%S"`.log
+
+  su ${JBOSS_USER} -s /bin/sh -c "rm -rf ${JBOSS_HOME}/server/${JBOSS_SERVER}/tmp"
+  su ${JBOSS_USER} -s /bin/sh -c "mkdir ${JBOSS_HOME}/server/${JBOSS_SERVER}/tmp"
+  #	su ${JBOSS_USER} -s /bin/sh -c "rm -rf ${JBOSS_HOME}/server/${JBOSS_SERVER}/log/*"
+  su ${JBOSS_USER} -s /bin/sh -c "rm -rf ${JBOSS_HOME}/server/${JBOSS_SERVER}/work/*"
+  su ${JBOSS_USER} -s /bin/sh -c "rm -rf ${JBOSS_HOME}/server/${JBOSS_SERVER}/data/wsdl/*"
+
+  CMD="${JBOSS_HOME}/bin/run.sh"
+  OPTIONS="-c ${JBOSS_SERVER} -b ${JBOSS_BIND} -Djboss.service.binding.set=${JBOSS_PORTS}"
+
+  env JAVA_HOME=$JAVA_HOME JAVA_OPTS="${JAVA_OPTS}" SSL_OPTS="${SSL_OPTS}"\
+    start-stop-daemon --start -u "$JBOSS_USER" -c "$JBOSS_USER" --pidfile "$JBOSS_PIDFILE" --make-pidfile -d ${JBOSS_HOME} --exec $CMD -- ${OPTIONS} ${SSL_OPTS} > ${JBOSS_CONSOLE} 2>&1 &
+
+}
+start(){
+  if [ -f $JBOSS_PIDFILE ]; then
+    get_status
+    ret_value=$?
+    if [ "$ret_value" -eq 2 ] ; then
+      log_warning_msg "Clean remaining pid file"
+      rm -f $JBOSS_PIDFILE
+    else
+      log_warning_msg "Jboss server: ${JBOSS_SERVER} is already running"
+      exit 1
+    fi
+  fi
+
+  log_daemon_msg "Starting jboss server: $JBOSS_SERVER"
+  do_start
+  log_end_msg 0
+  exit 0
+}
+
+stop(){
+  SHUTDOWN_WAIT=60 #Give 60 seconds to terminate the process
+  count=0;
+
+  if [ -e $JBOSS_PIDFILE ]; then
+    log_daemon_msg "Stopping jboss server: $JBOSS_SERVER"
+    read kpid < $JBOSS_PIDFILE
+    pkill -TERM -P  $kpid
+    until [ `ps --pid $kpid 2> /dev/null | grep -c $kpid 2> /dev/null` -eq '0' ] || [ $count -gt $SHUTDOWN_WAIT ]
+    do
+      sleep 1
+      count=$((count+1));
+    done
+
+    if [ $count -gt $SHUTDOWN_WAIT ]; then
+      log_end_msg 0
+      log_warning_msg "Could not terminate jboss server: $JBOSS_SERVER"
+      log_warning_msg "You can kill it with: sudo pkill -9 -P $kpid"
+      exit 1
+    fi
+
+    rm -f $JBOSS_PIDFILE
+    log_end_msg 0
+  else
+    log_success_msg "jboss server: ${JBOSS_SERVER} is not running"
+  fi
+}
+
+get_status() {
+  if [ -f $JBOSS_PIDFILE ]; then
+    read ppid < $JBOSS_PIDFILE
+    if [ `ps --pid $ppid 2> /dev/null | grep -c $ppid 2> /dev/null` -eq '1' ]; then
+      #server is running
+      return 0
+    else
+      #server not running but pid file exists
+      return 2
+    fi
+  fi
+  #Server is not running
+  return 1
+}
+
+status() {
+
+  get_status
+  ret_value=$? 
+  if [ "$ret_value" == 0 ]; then
+    log_success_msg "jboss server: $JBOSS_SERVER is running (pid $ppid)"
+    exit 0
+  elif [ "$ret_value" == 1 ]; then
+    log_success_msg "jboss server: $JBOSS_SERVER is not running"
+    exit 1
+  else
+    log_success_msg "jboss server: $JBOSS_SERVER dead but pid file exists (${JBOSS_PIDFILE})"
+    exit 1
+  fi
+}
+
+restart(){
+  stop
+  sleep 2
+  start
+}
+
+case "$1" in
+start)
+  start
+  ;;
+stop)
+  stop
+  ;;
+restart)
+  restart
+  ;;
+status)
+  status
+  ;;
+*)
+  echo "Usage: local-jboss {start|stop|restart|status}"
+  exit 1
+esac
+exit 0

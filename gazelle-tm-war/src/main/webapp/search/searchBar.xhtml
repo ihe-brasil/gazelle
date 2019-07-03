@@ -1,0 +1,40 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <a4j:region>
+        <h:panelGrid columns="2">
+            <h:panelGrid columns="5" border="0" cellpadding="0" cellspacing="0">
+                <h:inputText styleClass=" form-control" id="searchSuggestInput" style="margin:0;width:150px;"
+                             value="#{searchGeneric.criteriaValue}"
+                             onclick="#{rich:component('searchSuggestSuggestion')}.callSuggestion(true)"/>
+                <span class="gzl-icon-caret-down gzl-icon-action"  onclick="#{rich:component('searchSuggestSuggestion')}.callSuggestion(true)"/>
+
+                <rich:hotKey key="return" onkeydown="#{rich:element('searchBarSubmit')}.click()"
+                             selector="#searchSuggestInput"/>
+                <a4j:commandButton id="searchBarSubmit" type="submit" action="#{searchGeneric.search()}"
+                                   style="display:none;"/>
+                <a4j:commandLink event="click" title="#{messages['gazelle.common.button.Search']}"
+                                 actionListener="#{searchGeneric.search()}">
+                    <span class="gzl-icon-search"/>
+                </a4j:commandLink>
+
+            </h:panelGrid>
+        </h:panelGrid>
+        <rich:autocomplete id="searchSuggestSuggestion" height="250" width="300" var="searchResult"
+                           for="searchSuggestInput" fetchValue="#{searchResult.query}"
+
+                           autocompleteMethod="#{searchGeneric.autocomplete}" mode="ajax">
+            <h:column>
+                <h:outputText value="#{searchResult.type.shortId}"/>
+            </h:column>
+            <h:column>
+                <h:outputText value="#{searchResult.valueAsString}"/>
+            </h:column>
+            <a4j:ajax event="select" execute="@this" listener="#{searchGeneric.search()}"
+                      assignTo="#{searchGeneric.criteriaValue}">
+                <a4j:param value="#{searchResult.query}"/>
+            </a4j:ajax>
+        </rich:autocomplete>
+    </a4j:region>
+</ui:composition>

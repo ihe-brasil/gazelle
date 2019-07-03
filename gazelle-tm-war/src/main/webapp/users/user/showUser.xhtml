@@ -1,0 +1,96 @@
+<s:div xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:h="http://java.sun.com/jsf/html"
+       xmlns:s="http://jboss.org/schema/seam/taglib"
+       xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <div class="row">
+        <div class="col-lg-6 col-lg-offset-3">
+            <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                <ui:param name="panel_id" value="showUserPanel"/>
+                <ui:define name="panel_title">
+                    <h:outputText
+                            value="#{messages['net.ihe.gazelle.tm.User']} #{userManager.selectedUser.firstname} #{userManager.selectedUser.lastname}"/>
+                </ui:define>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <h:graphicImage library="img"
+                                        value="#{userPreferencesManager.getPreferencesForUser(userManager.selectedUser).photoUrl}"/>
+                    </div>
+                    <div class="col-lg-6">
+                        <dl class="dl-horizontal">
+                            <s:decorate id="id" template="/layout/display/_data_list_item.xhtml">
+                                <ui:define name="label">#{messages['gazelle.users.user.UserInstitution']}</ui:define>
+                                #{userManager.selectedUser.institution.name}
+                            </s:decorate>
+                            <s:decorate id="username" template="/layout/display/_data_list_item.xhtml">
+                                <ui:define name="label">#{messages['gazelle.users.user.UserUsername']}</ui:define>
+                                #{userManager.selectedUser.username}
+                            </s:decorate>
+                            <s:decorate id="firstname" template="/layout/display/_data_list_item.xhtml">
+                                <ui:define name="label">#{messages['gazelle.users.registration.FirstName']}</ui:define>
+                                #{userManager.selectedUser.firstname}
+                            </s:decorate>
+                            <s:decorate id="lastname" template="/layout/display/_data_list_item.xhtml">
+                                <ui:define name="label">#{messages['gazelle.users.registration.LastName']}</ui:define>
+                                #{userManager.selectedUser.lastname}
+                            </s:decorate>
+                            <s:decorate id="email" template="/layout/display/_data_list_item.xhtml">
+                                <ui:define name="label">#{messages['gazelle.users.registration.Email']}</ui:define>
+                                <a href="mailto:#{userManager.selectedUser.email}">#{userManager.selectedUser.email}</a>
+                            </s:decorate>
+                            <s:decorate id="blocked" template="/layout/display/_data_list_item.xhtml">
+                                <ui:define name="label">#{messages['gazelle.users.registration.Blocked']}</ui:define>
+                                #{userManager.selectedUser.blocked}
+                            </s:decorate>
+                            <s:decorate id="activated" template="/layout/display/_data_list_item.xhtml">
+                                <ui:define name="label">#{messages['gazelle.users.registration.Activated']}</ui:define>
+                                #{userManager.selectedUser.activated}
+                            </s:decorate>
+                            <s:decorate id="rolesval" template="/layout/display/_data_list_item.xhtml"
+                                        rendered="#{s:hasRole('admin_role')}">
+                                <ui:define name="label">#{messages['gazelle.users.roles']}</ui:define>
+                                #{userManager.getListRolesForSelectedUser()}
+                            </s:decorate>
+                            <s:decorate id="managedTestingSession" template="/layout/display/_data_list_item.xhtml"
+                                        rendered="#{s:hasRole('admin_role')}">
+                                <ui:define name="label">#{messages['net.ihe.gazelle.tm.ManagedTestingSession']}
+                                </ui:define>
+                                <ul>
+                                    <a4j:repeat
+                                            value="#{testingSessionManager.getTestingSessionWhereUserIsAdmin(userManager.selectedUser)}"
+                                            var="testingSession" rowKeyVar="rowKey">
+                                        <li>
+                                            <h:outputText value="#{testingSession.description}"/>
+                                        </li>
+                                    </a4j:repeat>
+                                </ul>
+                            </s:decorate>
+                        </dl>
+
+                        <div style="clear: both"/>
+                        <div id="divButtons">
+                            <a4j:commandButton styleClass="gzl-btn-orange"
+                                               value="#{messages['gazelle.common.button.ChangePassword']}"
+                                               action="#{userManager.displayChangePasswordFromView()}"
+                                               rendered="#{ s:hasRole('vendor_admin_role') || s:hasRole('admin_role')}"
+                                               execute="@this"/>
+                            <a4j:commandButton id="sendResetPasswordEmailButton" styleClass="gzl-btn-blue"
+                                               value="#{messages['net.ihe.gazelle.tm.SendResetPasswordEmail']}"
+                                               action="#{userManager.sendEmailToChangePasswordAsAdmin( )}"
+                                               rendered="#{ (s:hasRole('vendor_admin_role') || s:hasRole('admin_role')) and (not empty userManager.selectedUser ) and (userManager.isNewUser() == false) }"/>
+                            <a4j:commandButton styleClass="gzl-btn-blue"
+                                               value="#{messages['gazelle.common.button.Edit']}"
+                                               rendered="#{ s:hasRole('admin_role')}"
+                                               actionListener="#{userManager.editUser()}"
+                                               execute="@this" render="testListDiv,formToEditUser,formToViewUser"/>
+                            <a4j:commandButton id="back" styleClass="gzl-btn"
+                                               value="#{messages['gazelle.common.button.Cancel']}"
+                                               actionListener="#{userManager.closeViewOrEditPanelsAndOpenList()}"
+                                               immediate="true"
+                                               type="submit" render="testListDiv,allUsersF,formToEditUser,formToViewUser"/>
+                        </div>
+                    </div>
+                </div>
+            </ui:decorate>
+        </div>
+    </div>
+</s:div>

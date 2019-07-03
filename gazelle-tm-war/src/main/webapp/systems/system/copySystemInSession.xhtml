@@ -1,0 +1,328 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['net.ihe.gazelle.tm.CopySystemFromAnOtherTestingSession']}"/>
+    <ui:define name="body">
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!--  Copy system Panel													-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <s:div id="copyDiv">
+            <h2>#{messages['gazelle.common.Importation']}</h2>
+            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                <ui:define name="panel_title">#{messages['gazelle.systems.system.copy.Title']}</ui:define>
+                <p>#{messages['gazelle.systems.system.copy.Title']} :</p>
+                <h:form id="formPreviousSystems">
+                    <s:decorate id="tsSelectionDecorate" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                        <ui:define name="label">#{messages['gazelle.systems.TestingSession']}</ui:define>
+                        <ui:param name="id" value="testingSessionSelection"/>
+                        <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text" id="testingSessionSelection"
+                                         value="#{testingSessionManager.testingSessionChoosenForCopy}">
+                            <s:selectItems
+                                    value="#{testingSessionManager.getPossibleTestingSessionsForCompany()}"
+                                    var="ts" noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                    label="#{ts.description}"/>
+                            <a4j:ajax event="change"
+                                      render=" :formPreviousSystems"
+                                      listener="#{systemInSessionCopier.getSystemsListToCopyFromSelectedSession(true)}"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                    <s:decorate id="tsSelectionDecorate2" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                        <ui:define name="label">#{messages['net.ihe.gazelle.tm.AllSystemsForYourInstitution']}</ui:define>
+                        <ui:param name="id" value="testingSessionSelection2"/>
+                        <h:selectBooleanCheckbox styleClass="form-control-static " id="testingSessionSelection2"
+                                                 value="#{testingSessionManager.noTestingSessionChoosen}">
+                            <a4j:ajax event="change"
+                                      render=" :formPreviousSystems"
+                                      listener="#{systemInSessionCopier.getSystemsListToCopyFromSelectedSession(false)}"/>
+                        </h:selectBooleanCheckbox>
+                    </s:decorate>
+                    <br/>
+                    <br/>
+                    <s:div id="copySystemTableDiv">
+                        <rich:dataTable id="copySystemTable"
+                                        rendered="#{(testingSessionManager.testingSessionChoosenForCopy != null)}"
+                                        var="currentPairBoolSystemInSession"
+                                        value="#{systemInSessionCopier.previousSystemsInSession}" rowKeyVar="rowNumber"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                            <g:column
+                                    rendered="#{s:hasRole('admin_role') || s:hasRole('institutions_editor_role') || s:hasRole('project-manager_role')}">
+                                <ui:define name="header">#{messages['gazelle.users.institution.InstitutionName']}
+                                </ui:define>
+                                #{systemManager.displayInstitutionForSystem(currentPairBoolSystemInSession.object2.system)}
+                            </g:column>
+                            <g:column>
+                                <ui:define name="header">#{messages['gazelle.common.Select']}</ui:define>
+                                <h:selectBooleanCheckbox styleClass="form-control-static"
+                                                         value="#{currentPairBoolSystemInSession.object1}"/>
+                            </g:column>
+                            <g:column
+                                    sortBy="#{'object2.system.keyword'}"
+                                    sortOrder="ascending">
+                                <ui:define name="header">
+                                    #{messages['gazelle.systems.system.SystemKeyword']}
+                                </ui:define>
+                                #{currentPairBoolSystemInSession.object2.system.keyword}
+                                <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                    <ui:param name="id" value="sk#{currentPairBoolSystemInSession.object2.system.id}"/>
+                                    <ui:param name="placement" value="bottom"/>
+                                    <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                                    <ui:define name="content">
+                                        <rich:dataTable var="currentIHEImp"
+                                                        value="#{iheImplementationForSystemManager.displayAllIHEImplementationsForSystem(currentPairBoolSystemInSession.object2.system)}"
+                                                        rowKeyVar="rowNumber">
+                                            <g:column>
+                                                <ui:define name="header"> #{messages['gazelle.tf.Actor']}
+                                                </ui:define>
+                                                #{currentIHEImp.actor.name}
+                                            </g:column>
+                                            <g:column>
+                                                <ui:define name="header">
+                                                    #{messages['gazelle.tf.IntegrationProfile']}
+                                                </ui:define>
+                                                #{currentIHEImp.integrationProfile.name}
+                                            </g:column>
+                                            <g:column>
+                                                <ui:define name="header"> #{messages['gazelle.tf.LabelOption']}
+                                                </ui:define>
+                                                #{currentIHEImp.integrationProfileOption.keyword}
+                                            </g:column>
+                                        </rich:dataTable>
+                                    </ui:define>
+                                </ui:decorate>
+                            </g:column>
+                            <g:column
+                                    sortBy="#{'object2.system.name'}"
+                                    sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.systems.system.SystemName']}
+                                </ui:define>
+                                #{currentPairBoolSystemInSession.object2.system.name}
+                                <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                    <ui:param name="id" value="sn#{currentPairBoolSystemInSession.object2.system.id}"/>
+                                    <ui:param name="placement" value="bottom"/>
+                                    <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                                    <ui:define name="content">
+                                        <rich:dataTable var="currentIHEImp"
+                                                        value="#{iheImplementationForSystemManager.displayAllIHEImplementationsForSystem(currentPairBoolSystemInSession.object2.system)}"
+                                                        rowKeyVar="rowNumber">
+                                            <g:column>
+                                                <ui:define name="header"> #{messages['gazelle.tf.Actor']}
+                                                </ui:define>
+                                                #{currentIHEImp.actor.name}
+                                            </g:column>
+                                            <g:column>
+                                                <ui:define name="header">
+                                                    #{messages['gazelle.tf.IntegrationProfile']}
+                                                </ui:define>
+                                                #{currentIHEImp.integrationProfile.name}
+                                            </g:column>
+                                            <g:column>
+                                                <ui:define name="header"> #{messages['gazelle.tf.LabelOption']}
+                                                </ui:define>
+                                                #{currentIHEImp.integrationProfileOption.keyword}
+                                            </g:column>
+                                        </rich:dataTable>
+                                    </ui:define>
+                                </ui:decorate>
+                            </g:column>
+                            <g:column
+                                    sortBy="#{'object2.system.version'}"
+                                    sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.systems.system.SystemVersion']}
+                                </ui:define>
+                                #{currentPairBoolSystemInSession.object2.system.version}
+                                <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                    <ui:param name="id" value="sv#{currentPairBoolSystemInSession.object2.system.id}"/>
+                                    <ui:param name="placement" value="bottom"/>
+                                    <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                                    <ui:define name="content">
+                                        <rich:dataTable var="currentIHEImp"
+                                                        value="#{iheImplementationForSystemManager.displayAllIHEImplementationsForSystem(currentPairBoolSystemInSession.object2.system)}"
+                                                        rowKeyVar="rowNumber">
+                                            <g:column>
+                                                <ui:define name="header"> #{messages['gazelle.tf.Actor']}
+                                                </ui:define>
+                                                #{currentIHEImp.actor.name}
+                                            </g:column>
+                                            <g:column>
+                                                <ui:define name="header">
+                                                    #{messages['gazelle.tf.IntegrationProfile']}
+                                                </ui:define>
+                                                #{currentIHEImp.integrationProfile.name}
+                                            </g:column>
+                                            <g:column>
+                                                <ui:define name="header">#{messages['gazelle.tf.LabelOption']}
+                                                </ui:define>
+                                                #{currentIHEImp.integrationProfileOption.keyword}
+                                            </g:column>
+                                        </rich:dataTable>
+                                    </ui:define>
+                                </ui:decorate>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId" value="copySystemTable"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                        <rich:dataTable id="copySystemTable2" var="currentPairBoolSystem"
+                                        rendered="#{(testingSessionManager.testingSessionChoosenForCopy == null)}"
+                                        value="#{systemInSessionCopier.previousSystems}" rowKeyVar="rowNumber"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds2">
+                            <g:column
+                                    rendered="#{s:hasRole('admin_role') || s:hasRole('institutions_editor_role') || s:hasRole('project-manager_role')}">
+                                <ui:define name="header">#{messages['gazelle.users.institution.InstitutionName']}
+                                </ui:define>
+                                #{systemManager.displayInstitutionForSystem(currentPairBoolSystem.object2)}
+                            </g:column>
+                            <g:column>
+                                <ui:define name="header">#{messages['gazelle.common.Select']}</ui:define>
+                                <h:selectBooleanCheckbox styleClass="form-control-static"
+                                                         value="#{currentPairBoolSystem.object1}"/>
+                            </g:column>
+                            <g:column
+                                    sortBy="#{'object2.keyword'}" sortOrder="ascending">
+                                <ui:define name="header">
+                                    #{messages['gazelle.systems.system.SystemKeyword']}
+                                </ui:define>
+                                #{currentPairBoolSystem.object2.keyword}
+                                <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                    <ui:param name="id" value="k#{currentPairBoolSystem.object2.id}"/>
+                                    <ui:param name="placement" value="bottom"/>
+                                    <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                                    <ui:define name="content">
+                                        <rich:dataTable var="currentIHEImp"
+                                                        value="#{iheImplementationForSystemManager.displayAllIHEImplementationsForSystem(currentPairBoolSystem.object2)}"
+                                                        rowKeyVar="rowNumber">
+                                            <g:column>
+                                                <ui:define name="header"> #{messages['gazelle.tf.Actor']}
+                                                </ui:define>
+                                                #{currentIHEImp.actor.name}
+                                            </g:column>
+                                            <g:column>
+                                                <ui:define name="header">
+                                                    #{messages['gazelle.tf.IntegrationProfile']}
+                                                </ui:define>
+                                                #{currentIHEImp.integrationProfile.name}
+                                            </g:column>
+                                            <g:column>
+                                                <ui:define name="header"> #{messages['gazelle.tf.LabelOption']}
+                                                </ui:define>
+                                                #{currentIHEImp.integrationProfileOption.keyword}
+                                            </g:column>
+                                        </rich:dataTable>
+                                    </ui:define>
+                                </ui:decorate>
+                            </g:column>
+                            <g:column
+                                    sortBy="#{'object2.name'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.systems.system.SystemName']}
+                                </ui:define>
+                                #{currentPairBoolSystem.object2.name}
+                                <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                    <ui:param name="id" value="n#{currentPairBoolSystem.object2.id}"/>
+                                    <ui:param name="placement" value="bottom"/>
+                                    <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                                    <ui:define name="content">
+                                        <rich:dataTable var="currentIHEImp"
+                                                        value="#{iheImplementationForSystemManager.displayAllIHEImplementationsForSystem(currentPairBoolSystem.object2)}"
+                                                        rowKeyVar="rowNumber">
+                                            <g:column>
+                                                <ui:define name="header"> #{messages['gazelle.tf.Actor']}
+                                                </ui:define>
+                                                #{currentIHEImp.actor.name}
+                                            </g:column>
+                                            <g:column>
+                                                <ui:define name="header">
+                                                    #{messages['gazelle.tf.IntegrationProfile']}
+                                                </ui:define>
+                                                #{currentIHEImp.integrationProfile.name}
+                                            </g:column>
+                                            <g:column>
+                                                <ui:define name="header"> #{messages['gazelle.tf.LabelOption']}
+                                                </ui:define>
+                                                #{currentIHEImp.integrationProfileOption.keyword}
+                                            </g:column>
+                                        </rich:dataTable>
+                                    </ui:define>
+                                </ui:decorate>
+                            </g:column>
+                            <g:column sortBy="#{'object2.version'}"
+                                      sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.systems.system.SystemVersion']}
+                                </ui:define>
+                                #{currentPairBoolSystem.object2.version}
+                                <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                    <ui:param name="id" value="v#{currentPairBoolSystem.object2.id}"/>
+                                    <ui:param name="placement" value="bottom"/>
+                                    <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                                    <ui:define name="content">
+                                        <rich:dataTable var="currentIHEImp"
+                                                        value="#{iheImplementationForSystemManager.displayAllIHEImplementationsForSystem(currentPairBoolSystem.object2)}"
+                                                        rowKeyVar="rowNumber">
+                                            <g:column>
+                                                <ui:define name="header"> #{messages['gazelle.tf.Actor']}
+                                                </ui:define>
+                                                #{currentIHEImp.actor.name}
+                                            </g:column>
+                                            <g:column>
+                                                <ui:define name="header">
+                                                    #{messages['gazelle.tf.IntegrationProfile']}
+                                                </ui:define>
+                                                #{currentIHEImp.integrationProfile.name}
+                                            </g:column>
+                                            <g:column>
+                                                <ui:define name="header">#{messages['gazelle.tf.LabelOption']}
+                                                </ui:define>
+                                                #{currentIHEImp.integrationProfileOption.keyword}
+                                            </g:column>
+                                        </rich:dataTable>
+                                    </ui:define>
+                                </ui:decorate>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds2"/>
+                                    <ui:param name="dataTableId" value="copySystemTable"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+
+                        <p/>
+                        <h:panelGroup
+                                rendered="#{(testingSessionManager.testingSessionChoosenForCopy != null) and (empty systemInSessionCopier.previousSystemsInSession)}">
+                            <ui:decorate template="/layout/panels/_panel.xhtml">
+
+                                <span class="gzl-icon-files-o"/>
+                                <br/>
+
+                                <h3>
+                                    <h:outputText id="noSystemToImportLabelContactLabel"
+                                                  value="#{messages['gazelle.systems.system.NoSystemToImportLabel1']}"
+                                                  style="font-style:italic"/>
+                                </h3>
+                            </ui:decorate>
+                        </h:panelGroup>
+                    </s:div>
+                    <p/>
+                    <a4j:commandButton id="copySYSImpo" styleClass="gzl-btn-green"
+                                       value="#{messages['gazelle.common.button.Import']}"
+                                       action="#{systemInSessionCopier.copySystemFromPreviousSession()}"
+                                       rendered="#{testingSessionManager.getPossibleTestingSessionsForCompany().size() &gt; 0}"
+                                       render="messageDecoration"/>
+                    <a4j:commandButton id="cancelimpor" styleClass="gzl-btn"
+                                       value="#{messages['gazelle.common.button.Cancel']}" immediate="true"
+                                       action="#{systemInSessionCopier.goToSystemList()}"/>
+                </h:form>
+            </ui:decorate>
+
+
+        </s:div>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!--  End - Copy system Panel											-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+    </ui:define>
+</ui:composition>

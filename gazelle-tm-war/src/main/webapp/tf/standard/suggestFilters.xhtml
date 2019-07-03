@@ -1,0 +1,57 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <h:inputHidden id="filterUrlParameters" name="filterUrlParameters" value="#{managedBean.filter.urlParameters}"/>
+    <script>
+        updateUrl("globalform:filterUrlParameters");
+        $("#globalform\\:filterUrlParameters").bind('change', function () {
+            updateUrl("globalform:filterUrlParameters");
+        });
+    </script>
+    <s:div id="filterDiv">
+        <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+            <div class="row">
+                <div class="col-lg-6">
+                    <ui:include src="/filter/filter.xhtml">
+                        <ui:param name="filter" value="#{managedBean.filter}"/>
+                        <ui:param name="filterWidth" value="240"/>
+                        <ui:param name="filterId" value="keyword"/>
+                        <ui:param name="filterName" value="#{messages['gazelle.testmanagement.object.keyword']}"/>
+                        <ui:param name="filterForm" value="globalform "/>
+                    </ui:include>
+                </div>
+                <div class="col-lg-6">
+                    <ui:include src="/filter/filter.xhtml">
+                        <ui:param name="filter" value="#{managedBean.filter}"/>
+                        <ui:param name="filterWidth" value="240"/>
+                        <ui:param name="filterId" value="name"/>
+                        <ui:param name="filterName" value="#{messages['gazelle.testmanagement.object.Name']}"/>
+                        <ui:param name="filterForm" value="globalform"/>
+                    </ui:include>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <ui:include src="/filter/filter.xhtml">
+                        <ui:param name="filter" value="#{managedBean.filter}"/>
+                        <ui:param name="filterWidth" value="240"/>
+                        <ui:param name="filterId" value="network"/>
+                        <ui:param name="filterName" value="#{messages['net.ihe.gazelle.tm.NetworkCommunicationType']}"/>
+                        <ui:param name="filterForm" value="globalform"/>
+                    </ui:include>
+                </div>
+            </div>
+
+            <ui:insert name="otherButtons"/>
+
+            <ui:define name="filter_buttons">
+                <a4j:commandLink actionListener="#{managedBean.reset()}"
+                                 title="#{messages['gazelle.users.reset']}" type="submit"
+                                 execute="@this" render="globalform">
+                    <span class="fa fa-times-circle"/>
+                </a4j:commandLink>
+            </ui:define>
+        </ui:decorate>
+    </s:div>
+</ui:composition>

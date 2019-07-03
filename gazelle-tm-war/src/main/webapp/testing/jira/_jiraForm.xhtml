@@ -1,0 +1,59 @@
+<!--
+  ~ Copyright 2016 IHE International (http://www.ihe.net)
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<ui:composition xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns="http://www.w3.org/1999/xhtml">
+
+    <h:panelGroup rendered="#{currentBean.displayJiraPanel}">
+        <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+            <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.ReportABug']}
+            </ui:define>
+            <ui:param name="panel_id" value="jiraPanelId"/>
+            <s:decorate id="summary" template="/layout/form/_edit.xhtml">
+                <ui:param name="id" value="summaryInput"/>
+                <ui:define name="label">
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.Summary']}"/>
+                </ui:define>
+                <h:inputText id="summaryInput" styleClass=" form-control"
+                             value="#{currentBean.jiraManager.issue.summary}"
+                             required="true"
+                             maxlength="64" size="64"/>
+            </s:decorate>
+            <s:decorate id="description" template="/layout/form/_edit.xhtml">
+                <ui:param name="id" value="DescriptionInput"/>
+                <ui:define name="label">
+                    <h:outputText
+                            value="#{messages['gazelle.tm.mesatests.Description']}"/>
+                </ui:define>
+                <h:inputTextarea id="DescriptionInput" styleClass="form-control" rows="4"
+                                 cols="160"
+                                 value="#{currentBean.jiraManager.issue.description}">
+                </h:inputTextarea>
+            </s:decorate>
+            <a4j:commandButton styleClass="gzl-btn" value="#{messages['gazelle.tm.cancel']}"
+                               immediate="true" limitRender="true"
+                               execute="@this"
+                               actionListener="#{currentBean.cancelJira()}"
+                               render="#{idsToRender}"/>
+            <a4j:commandButton styleClass="gzl-btn-green"
+                               value="#{messages['net.ihe.gazelle.tm.CreateIssue']}"
+                               actionListener="#{currentBean.jiraManager.createIssue(test)}"
+                               render="#{idsToRender}"/>
+        </ui:decorate>
+
+    </h:panelGroup>
+</ui:composition>

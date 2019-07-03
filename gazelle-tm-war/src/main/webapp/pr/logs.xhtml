@@ -1,0 +1,342 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.productregistry.search.statistics.Title']}"/>
+    <ui:define name="body">
+
+        <h:form id="globalform" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <s:decorate template="/layout/form/_form_field_horizontal_4-8.xhtml">
+                            <ui:param name="id" value="typeMenu"/>
+                            <ui:define name="label">#{messages['net.ihe.gazelle.tm.LookingFor']}</ui:define>
+                            <h:selectOneMenu id="typeMenu"
+                                             styleClass="form-control gzl-form-control gzl-select-text"
+                                             value="#{prLogs.type}">
+                                <s:selectItems value="#{prLogs.types}" var="selectedValue"
+                                               label="#{selectedValue.label}"/>
+                                <a4j:ajax event="change" render="globalform" execute="@this"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{prLogs.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="institution"/>
+                            <ui:param name="filterName" value="#{messages['gazelle.users.Institution']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{prLogs.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="systemName"/>
+                            <ui:param name="filterName"
+                                      value="#{messages['gazelle.productregistry.system.label.SystemName']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{prLogs.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="systemType"/>
+                            <ui:param name="filterName"
+                                      value="#{messages['gazelle.productregistry.system.label.ST']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{prLogs.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="systemSubType"/>
+                            <ui:param name="filterName"
+                                      value="#{messages['net.ihe.gazelle.tm.SystemSubType']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filterDate.xhtml">
+                            <ui:param name="filter" value="#{prLogs.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="date"/>
+                            <ui:param name="filterName" value="#{messages['gazelle.common.Date']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <s:decorate template="/layout/form/_form_field_horizontal_4-8.xhtml">
+                            <ui:param name="id" value="intervalMenu"/>
+                            <ui:define name="label">#{messages['net.ihe.gazelle.tm.GraphInterval']}</ui:define>
+                            <h:selectOneMenu id="intervalMenu"
+                                             styleClass="form-control gzl-form-control gzl-select-text"
+                                             value="#{prLogs.interval}">
+                                <s:selectItems value="#{prLogs.intervals}" var="selectedValue"
+                                               label="#{selectedValue.dateTruncParam}"/>
+                                <a4j:ajax event="change" render="globalform"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <s:decorate template="/layout/form/_form_field_horizontal_4-8.xhtml">
+                            <ui:param name="id" value="modeMenu"/>
+                            <ui:define name="label">#{messages['net.ihe.gazelle.tm.GraphMode']}</ui:define>
+                            <h:selectOneMenu id="modeMenu" styleClass="form-control gzl-form-control gzl-select-text"
+                                             value="#{prLogs.mode}">
+                                <s:selectItems value="#{prLogs.modes}" var="selectedValue"
+                                               label="#{selectedValue.label}"/>
+                                <a4j:ajax event="change" render="globalform"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </div>
+                </div>
+
+                <ui:define name="filter_buttons">
+                    <a4j:commandLink actionListener="#{prLogs.filter.clear()}"
+                                     title="#{messages['gazelle.users.reset']}" type="submit"
+                                     execute="@this"
+                                     render="globalform">
+                        <span class="fa fa-times-circle"/>
+                    </a4j:commandLink>
+                </ui:define>
+            </ui:decorate>
+
+            <s:div>
+
+                <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                    <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.SearchHistoryGraph']}</ui:define>
+                    <iframe src="/#{applicationPreferenceManager.getApplicationUrlBaseName()}/pr/logsiFrameTimeline.seam?#{prLogs.filter.urlParameters}"
+                            style="width: 1100px; height: 530px; overflow: hidden; border-width: 0px;"></iframe>
+                </ui:decorate>
+
+            </s:div>
+            <h:panelGroup rendered="#{prLogs.isSearchType()}">
+                <ui:include src="slrLogsList.xhtml"/>
+                <ui:param name="tableType" value="slr"/>
+            </h:panelGroup>
+            <h:panelGroup rendered="#{not prLogs.isSearchType()}">
+                <ui:include src="dlLogsList.xhtml"/>
+                <ui:param name="tableType" value="dl"/>
+            </h:panelGroup>
+        </h:form>
+
+        <!-- **************************************************************** -->
+        <!-- Modal Panel : List of found systems for a search		   		-->
+        <!-- **************************************************************** -->
+        <h:form id="foundSystemsListForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="listOfFoundSystemsModalPanel"/>
+                <ui:define name="popup_title">
+                    #{messages['gazelle.productregistry.search.statistics.ListOfFoundSystems']}
+                </ui:define>
+                <p></p>
+                <h:outputText id="manySystemsFoundOutputTextFoundSystemsModalPanel"
+                              value="#{messages['gazelle.productregistry.search.statistics.ManySystemsFoundText']} "/>
+                <p></p>
+                <h:outputText id="ThereAreAdminOutputTextFoundSystemModalPanel"
+                              value="#{messages['gazelle.systems.ThereAreAdmin']} "
+                              rendered="#{prLogs.searchLogReport.foundSystemsForSearchLog.size() &gt;1}"/>
+                <h:outputText id="ThereIsAdminOutputTextFoundSystemModalPanel"
+                              value="#{messages['gazelle.systems.ThereIsAdmin']} "
+                              rendered="#{prLogs.searchLogReport.foundSystemsForSearchLog.size() ==1}"/>
+                <h:outputText id="SizeListInstitutionSystemsOutputTextFoundSystemsModalPanel"
+
+                              value="#{prLogs.searchLogReport.foundSystemsForSearchLog.size()} "/>
+                <h:outputText id="WithSelectionOutputTextFoundSystemsModalPanel"
+                              value="#{messages['net.ihe.gazelle.tm.SystemsForTheSelectedSearch']}  "/>
+                <p></p>
+
+                <h2>#{messages['net.ihe.gazelle.tm.FoundSystemsList']}</h2>
+
+                <ui:decorate template="/layout/panels/_panel.xhtml">
+                    <rich:dataTable id="foundSystemsTable" var="foundSystem"
+                                    value="#{prLogs.searchLogReport.foundSystemsForSearchLog}"
+                                    rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                                    render="ds">
+                        <g:column>
+                            <ui:define id="foundSystemNameHeader" name="header">
+                                #{messages['gazelle.productregistry.system.label.SystemName']}
+                            </ui:define>
+                            <h:outputText value="#{foundSystem.name}"/>
+                        </g:column>
+                        <g:column>
+                            <ui:define id="foundSystemVersionHeader" name="header">
+                                #{messages['gazelle.productregistry.search.statistics.SystemVersion']}
+                            </ui:define>
+                            <h:outputText value="#{foundSystem.version}"/>
+                        </g:column>
+                        <f:facet name="footer">
+                            <ui:include src="/util/datatableFooter.xhtml">
+                                <ui:param name="dataScrollerId" value="ds"/>
+                                <ui:param name="dataTableId" value="foundSystemsTable"/>
+                            </ui:include>
+                        </f:facet>
+                    </rich:dataTable>
+                </ui:decorate>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!-- **************************************************************** -->
+        <!-- Modal Panel : List of downloads for a search		   		-->
+        <!-- **************************************************************** -->
+        <h:form id="downloadsListForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="listOfDownloadsModalPanel"/>
+                <ui:param name="styleClass" value="modal-lg"/>
+                <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.ListOfDownloads']}</ui:define>
+                <s:div styleClass="dr-mpnl-pnl">
+                    <rich:dataTable id="downloadsFilteredTable" var="prLog" value="#{prLogs.downloadsFiltered}"
+                                    rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                        <g:column>
+                            <ui:define id="searchDateHeader" name="header">
+                                <h:outputText
+                                        value="#{messages['gazelle.productregistry.search.Date']}"/>
+                            </ui:define>
+                            <g:date tooltip="true" value="#{prLog.date}"/>
+                        </g:column>
+                        <g:column>
+                            <ui:define id="perfHead" name="header">
+                                <h:outputText value="#{messages['gazelle.tm.users.userInfo']}"/>
+                            </ui:define>
+                            <h:outputText value="#{prLog.performerUsername}"/>
+                        </g:column>
+                        <g:column>
+                            <ui:define id="searchPerformerIpAddressHeader" name="header">
+                                <h:outputText
+                                        value="#{messages['gazelle.productregistry.search.PerformerIpAddress']}"/>
+                            </ui:define>
+                            <h:outputText value="#{prLog.performerIpAddress}"/>
+                        </g:column>
+                        <g:column>
+                            <ui:define id="searchPerformerHostnameHeader" name="header">
+                                <h:outputText
+                                        value="#{messages['gazelle.productregistry.search.PerformerHostname']}"/>
+                            </ui:define>
+                            <h:outputText value="#{prLog.performerHostname}"/>
+                        </g:column>
+                        <g:column>
+                            <ui:define id="searchPerformerBrowserHeader" name="header">
+                                <h:outputText
+                                        value="#{messages['gazelle.productregistry.search.BrowserInformation']}"/>
+                            </ui:define>
+                            <h:outputText value="#{prLogs.getBrowserInfo(prLog.browserInformation)}"/>
+                        </g:column>
+                        <g:column>
+                            <ui:define name="header">
+                                <h:outputText
+                                        value="#{messages['net.ihe.gazelle.tm.IntegrationStatement']}"/>
+                            </ui:define>
+                            <h:outputText value="#{prLog.system.name} - #{prLog.system.version}"/>
+                        </g:column>
+                        <f:facet name="footer">
+                            <ui:include src="/util/datatableFooter.xhtml">
+                                <ui:param name="dataScrollerId" value="ds"/>
+                                <ui:param name="dataTableId" value="downloadsFilteredTable"/>
+                            </ui:include>
+                        </f:facet>
+                    </rich:dataTable>
+                </s:div>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!-- **************************************************************** -->
+        <!-- End - Modal Panel : List of found systems for a search		   -->
+        <!-- **************************************************************** -->
+
+        <!-- **************************************************************** -->
+        <!-- Modal Panel : List of criteria for a search			           -->
+        <!-- **************************************************************** -->
+        <h:form id="criteriaListForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="listOfCriteriaModalPanel"/>
+                <ui:define name="popup_title">#{messages['gazelle.productregistry.search.statistics.ListOfCriteria']}
+                </ui:define>
+                <p></p>
+                <h:outputText id="manyCriteriaOutputTextCriteriaModalPanel"
+                              value="#{messages['gazelle.productregistry.search.statistics.ManyCriteriaText']} "/>
+                <p></p>
+                <h:outputText id="ThereAreAdminOutputTextCriteriaModalPanel"
+                              value="#{messages['gazelle.systems.ThereAreAdmin']} "
+                              rendered="#{prLogs.searchLogReport.searchLogCriterion.size() &gt;1}"/>
+                <h:outputText id="ThereIsAdminOutputTextCriteriaModalPanel"
+                              value="#{messages['gazelle.systems.ThereIsAdmin']} "
+                              rendered="#{prLogs.searchLogReport.searchLogCriterion.size() ==1}"/>
+                <h:outputText id="SizeListInstitutionSystemsOutputTextCriteriaModalPanel"
+                              value="#{prLogs.searchLogReport.searchLogCriterion.size()} "/>
+                <h:outputText id="WithSelectionOutputTextCriteriaModalPanel"
+                              value="#{messages['net.ihe.gazelle.tm.CriteriaForTheSelectedSearch']}  "/>
+                <p></p>
+
+                <h2>#{messages['net.ihe.gazelle.tm.CriteriaList']}</h2>
+
+                <ui:decorate template="/layout/panels/_panel.xhtml">
+                    <rich:dataTable id="criteriaTable" var="criterion"
+                                    value="#{prLogs.searchLogReport.searchLogCriterion}"
+                                    rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                        <g:column>
+                            <ui:define id="criterionTypeHeader" name="header">
+                                <h:outputText
+                                        value="#{messages['gazelle.productregistry.search.statistics.CriterionType']}"/>
+                            </ui:define>
+                            <h:outputText value="#{prLogs.getCriterionType(criterion)}"/>
+                        </g:column>
+                        <g:column>
+                            <ui:define id="criterionTextValueHeader" name="header">
+                                <h:outputText
+                                        value="#{messages['gazelle.productregistry.search.statistics.CriterionTextValue']}"/>
+                            </ui:define>
+                            <h:outputText value="#{prLogs.getCriterionName(criterion)}"/>
+                        </g:column>
+                        <f:facet name="footer">
+                            <ui:include src="/util/datatableFooter.xhtml">
+                                <ui:param name="dataScrollerId" value="ds"/>
+                                <ui:param name="dataTableId" value="criteriaTable"/>
+                            </ui:include>
+                        </f:facet>
+                    </rich:dataTable>
+                </ui:decorate>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!-- **************************************************************** -->
+        <!-- End - Modal Panel : List of criteria for a search			           -->
+        <!-- **************************************************************** -->
+
+    </ui:define>
+</ui:composition>

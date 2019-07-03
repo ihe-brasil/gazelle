@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- * Copyright 2008 IHE International (http://www.ihe.net) * * Licensed under the Apache License, Version 2.0 (the "License");
+	* you may not use this file except in compliance with the License. * You may obtain a copy of the License at * * http://www.apache.org/licenses/LICENSE-2.0
+	* * Unless required by applicable law or agreed to in writing, software * distributed under the License is distributed on
+	an "AS IS" BASIS, * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. * See the License for the specific
+	language governing permissions and * limitations under the License. -->
+<!-- File : faces-config.tpl2xml This file is a template file, used to generate faces-config.xml @author Jean-Renan Chatel
+	/ INRIA Rennes IHE development Project @see > Jchatel@irisa.fr - http://www.ihe-europe.org -->
+<faces-config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:cdk="http://jboss.org/schema/richfaces/cdk/extensions"
+              version="2.1"
+              xmlns="http://java.sun.com/xml/ns/javaee"
+              xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_1.xsd">
+    <application>
+        <locale-config>
+            <default-locale>en</default-locale>
+            <supported-locale>en</supported-locale>
+            <supported-locale>fr</supported-locale>
+            <supported-locale>ja</supported-locale>
+            <!-- <supported-locale>de</supported-locale> <supported-locale>sv</supported-locale> <supported-locale>ru</supported-locale>
+                      <supported-locale>ja</supported-locale> <supported-locale>zh</supported-locale> <supported-locale>bg</supported-locale> -->
+        </locale-config>
+    </application>
+    <!-- Font iText Component -->
+    <component>
+        <component-type>net.ihe.gazelle.common.tag.PDFFont</component-type>
+        <component-class>net.ihe.gazelle.common.tag.PDFFont</component-class>
+    </component>
+    <component>
+        <component-type>org.jboss.seam.pdf.ui.GazellePDFDocument</component-type>
+        <component-class>org.jboss.seam.pdf.ui.GazellePDFDocument</component-class>
+    </component>
+    <component>
+        <component-type>gazelle-link</component-type>
+        <component-class>net.ihe.gazelle.common.tag.LinkComponent</component-class>
+    </component>
+    <component>
+        <component-type>gazelle-imagelink</component-type>
+        <component-class>net.ihe.gazelle.common.tag.ImageLinkComponent</component-class>
+    </component>
+    <component>
+        <component-type>gazelle-date</component-type>
+        <component-class>net.ihe.gazelle.common.tag.DateComponent</component-class>
+    </component>
+    <component>
+        <component-type>gazelle-safehtml</component-type>
+        <component-class>net.ihe.gazelle.common.tag.SafeHtmlComponent</component-class>
+    </component>
+    <!-- JasperReports JSF components -->
+    <component>
+        <component-type>Report</component-type>
+        <component-class>net.ihe.gazelle.common.report.ReportComponent</component-class>
+        <property>
+            <description>Report to show.</description>
+            <property-name>report</property-name>
+            <property-class>java.lang.String</property-class>
+        </property>
+        <component-extension>
+            <component-family>Jasper</component-family>
+            <renderer-type>Report</renderer-type>
+        </component-extension>
+    </component>
+    <render-kit>
+        <renderer>
+            <description>JasperReports report renderer.</description>
+            <component-family>Jasper</component-family>
+            <renderer-type>Report</renderer-type>
+            <renderer-class>net.ihe.gazelle.common.report.ReportRenderer</renderer-class>
+        </renderer>
+        <renderer>
+            <description>Faces messages with links.</description>
+            <component-family>org.richfaces.component.RichMessages</component-family>
+            <renderer-type>org.richfaces.RichMessagesRenderer</renderer-type>
+            <renderer-class>net.ihe.gazelle.facesMessages.EscapableMessagesRenderer</renderer-class>
+        </renderer>
+        <renderer>
+            <description>PopUpPanel uses twitter bootstrap modal panel</description>
+            <component-family>org.richfaces.PopupPanel</component-family>
+            <renderer-type>org.richfaces.PopupPanelRenderer</renderer-type>
+            <renderer-class>net.ihe.gazelle.common.bootstrapComponent.ModalPanel</renderer-class>
+        </renderer>
+        <renderer>
+            <description>DataScroller uses twitter bootstrap modal panel</description>
+            <component-family>org.richfaces.DataScroller</component-family>
+            <renderer-type>org.richfaces.DataScrollerRenderer</renderer-type>
+            <renderer-class>net.ihe.gazelle.common.bootstrapComponent.DataScroller</renderer-class>
+        </renderer>
+        <renderer>
+            <description>Rich inplace input</description>
+            <component-family>org.richfaces.InplaceInput</component-family>
+            <renderer-type>org.richfaces.InplaceInputRenderer</renderer-type>
+            <renderer-class>net.ihe.gazelle.common.bootstrapComponent.InplaceInputRenderer</renderer-class>
+        </renderer>
+        <renderer>
+            <description>Rich Calendar</description>
+            <component-family>org.richfaces.Calendar</component-family>
+            <renderer-type>org.richfaces.CalendarRenderer</renderer-type>
+            <renderer-class>net.ihe.gazelle.common.bootstrapComponent.CalendarRenderer</renderer-class>
+        </renderer>
+        <renderer>
+            <description>Rich input number spinner</description>
+            <component-family>javax.faces.Input</component-family>
+            <renderer-type>org.richfaces.InputNumberSpinnerRenderer</renderer-type>
+            <renderer-class>net.ihe.gazelle.common.bootstrapComponent.InputNumberSpinnerRenderer</renderer-class>
+        </renderer>
+        <renderer>
+            <component-family>javax.faces.Messages</component-family>
+            <renderer-type>org.richfaces.MessagesRenderer</renderer-type>
+            <renderer-class>net.ihe.gazelle.common.bootstrapComponent.HtmlMessagesRenderer</renderer-class>
+            <renderer-extension>
+                <cdk:renders-children>false</cdk:renders-children>
+            </renderer-extension>
+        </renderer>
+    </render-kit>
+
+    <!-- End - JasperReports JSF components -->
+</faces-config>

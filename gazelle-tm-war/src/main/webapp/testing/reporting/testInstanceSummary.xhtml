@@ -1,0 +1,64 @@
+<!--@formatter:off-->
+
+<f:view xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://jboss.org/schema/seam/pdf" xmlns:g="http://www.ihe.net/gazelle">
+    <!-- params = testInstancesSummary -->
+    <p:table columns="5" widthPercentage="100" spacingBefore="20" spacingAfter="5">
+        <f:facet name="defaultCell">
+            <p:cell horizontalAlignment="center" verticalAlignment="middle"/>
+        </f:facet>
+        <!-- title -->
+        <ui:include src="titleCell.xhtml">
+            <ui:param name="colspan" value="5"/>
+            <ui:param name="title" value="#{messages['net.ihe.gazelle.tm.TestInstancesSummary']}"/>
+        </ui:include>
+        <!-- header -->
+        <ui:include src="headerCell.xhtml">
+            <ui:param name="title" value="#{messages['gazelle.tests.tests']}"/>
+        </ui:include>
+        <ui:include src="headerCell.xhtml">
+            <ui:param name="title" value="#{messages['net.ihe.gazelle.tm.Performed']}"/>
+        </ui:include>
+        <ui:include src="headerCell.xhtml">
+            <ui:param name="title" value="#{messages['net.ihe.gazelle.tm.Passed']}"/>
+        </ui:include>
+        <ui:include src="headerCell.xhtml">
+            <ui:param name="title" value="#{messages['gazelle.tm.testing.status.failed']}"/>
+        </ui:include>
+        <ui:include src="headerCell.xhtml">
+            <ui:param name="title" value="#{messages['gazelle.tm.testing.status.partiallyVerified']}"/>
+        </ui:include>
+        <!-- values -->
+        <ui:repeat value="#{testInstancesSummary}" var="element">
+            <p:cell colspan="1">
+                <p:paragraph paddingBottom="10"><g:pdffont size="8">#{element.counts[0]}</g:pdffont></p:paragraph>
+            </p:cell>
+            <p:cell colspan="1">
+                <p:paragraph paddingBottom="10"><g:pdffont size="8">#{element.counts[1]}</g:pdffont></p:paragraph>
+            </p:cell>
+            <p:cell colspan="1">
+                <p:paragraph paddingBottom="10"><g:pdffont size="8">#{element.counts[2]}</g:pdffont></p:paragraph>
+            </p:cell>
+            <p:cell colspan="1">
+                <p:paragraph paddingBottom="10"><g:pdffont size="8">#{element.counts[3]}</g:pdffont></p:paragraph>
+            </p:cell>
+            <p:cell colspan="1">
+                <p:paragraph paddingBottom="10"><g:pdffont size="8">#{element.counts[4]}</g:pdffont></p:paragraph>
+            </p:cell>
+        </ui:repeat>
+    </p:table>
+    <p:paragraph>
+        <g:pdffont size="6">#{messages['net.ihe.gazelle.tm.TestsTheNumberOfDifferentTestsPerformed']}</g:pdffont>
+    </p:paragraph>
+    <p:paragraph>
+        <g:pdffont size="6">#{messages['net.ihe.gazelle.tm.PerformedTheTotalNumberOfTestInstancesPerformedT']}</g:pdffont>
+    </p:paragraph>
+    <p:paragraph>
+        <g:pdffont size="6">#{messages['net.ihe.gazelle.tm.PassedFailedTheNumberOfTestInstancesVerifiedAndS']}</g:pdffont>
+    </p:paragraph>
+    <p:paragraph spacingAfter="20">
+        <g:pdffont size="6">#{messages['net.ihe.gazelle.tm.PartiallyVerifiedTheNumberOfDifferentTestIntance']}</g:pdffont>
+    </p:paragraph>
+</f:view>
+<!--@formatter:on-->
+

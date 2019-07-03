@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html" xmlns:composite="http://java.sun.com/jsf/composite"
+      xmlns:rich="http://richfaces.org/rich" xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:s="http://jboss.org/schema/seam/taglib" xmlns="http://www.w3.org/1999/xhtml">
+<composite:interface>
+    <composite:attribute name="messagesList" required="true"/>
+</composite:interface>
+<composite:implementation>
+    <rich:dataTable id="messagesList" value="#{cc.attrs.messagesList}" var="message" rows="20">
+        <f:facet name="header">
+            <rich:dataScroller id="datascrollerHead"/>
+        </f:facet>
+        <g:column>
+            <ui:define name="header">
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.proxy.message.index']}"/>
+            </ui:define>
+            <h:outputText value="#{message.id}"/>
+        </g:column>
+        <g:column>
+            <ui:define name="header">
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.request.direction']}"/>
+            </ui:define>
+            <h:outputText value="#{message.direction.name()}"/>
+        </g:column>
+        <g:column width="10%">
+            <ui:define name="header">
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.Details']}"/>
+            </ui:define>
+            <!-- 			<a4j:commandLink value="#{messages['net.ihe.gazelle.tm.proxy.MessageDetails']}" actionListener="#{testInstanceManager.setSelectedTestStepMessage(message)}"
+                            oncomplete="RichFaces.showModalPanel('testStepsInstanceMessagePopUp');return false;"
+                            reRender="testStepsInstanceMessagePopUp"/> -->
+        </g:column>
+        <g:column>
+            <ui:define name="header">
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.Date']}"/>
+            </ui:define>
+            <g:date value="#{message.lastChanged}"/>
+        </g:column>
+        <g:column width="15%">
+            <ui:define name="header">
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.From']}"/>
+            </ui:define>
+            <h:outputText value="#{message.senderTmConfiguration.host.ip}"/>
+            <h:outputText value=":"/>
+            <h:outputText value=""/>
+        </g:column>
+        <g:column width="15%">
+            <ui:define name="header">
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.To']}"/>
+            </ui:define>
+            <h:outputText value="#{message.receiverTmConfiguration.host.ip}"/>
+            <h:outputText value=":"/>
+            <h:outputText value=""/>
+        </g:column>
+        <g:column width="10%">
+            <ui:define name="header">
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.proxy.Port']}"/>
+            </ui:define>
+            <h:outputText value=""/>
+        </g:column>
+        <f:facet name="footer">
+            <rich:dataScroller id="datascroller"/>
+        </f:facet>
+    </rich:dataTable>
+    <!--<rich:popupPanel resizeable="true"  autosized="true"  id="testStepsInstanceMessagePopUp">-->
+        <!--<f:facet name="header">#{messages['net.ihe.gazelle.tm.proxy.MessageDetails']}</f:facet>-->
+         <!--&lt;!&ndash; <ui:include src="detailsOfSingleMessageForTestStepsInstance.xhtml"/> &ndash;&gt;-->
+        <!--<div align="right">-->
+            <!--<a href="javascript:#{rich:component('testStepsInstanceMessagePopUp')}.hide()">-->
+                <!--#{messages['gazelle.common.button.mp.close']} </a>-->
+        <!--</div>-->
+    <!--</rich:popupPanel>-->
+    <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+        <ui:param name="popup_id" value="testStepsInstanceMessagePopUp"/>
+        <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.proxy.MessageDetails']}</ui:define>
+        <s:div id="testStepsInstanceMessageDiv">
+            <!-- <ui:include src="detailsOfSingleMessageForTestStepsInstance.xhtml"/> -->
+        </s:div>
+        <ui:define name="popup_footer">
+            <button type="button" class="gzl-btn" data-dismiss="modal">
+                #{messages['gazelle.tm.Cancel']}
+            </button>
+        </ui:define>
+    </ui:decorate>
+</composite:implementation>
+</html>

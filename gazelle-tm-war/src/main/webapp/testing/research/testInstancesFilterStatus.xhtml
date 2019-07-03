@@ -1,0 +1,79 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <div class="row">
+        <div class="col-lg-1">
+            <!-- CRITICAL -->
+            <h:selectBooleanCheckbox value="#{testInstancesOverview.filterCriticalTests}">
+                <a4j:ajax event="change" execute="@this" render="globalform"/>
+            </h:selectBooleanCheckbox>
+
+            <h:outputText
+                    value="#{testInstancesOverview.countTests('critical')} #{messages['gazelle.tm.testing.test.filter.CriticalTests']}"/>
+        </div>
+        <!--  TO BE VERIFIED -->
+        <div class="col-lg-1">
+            <h:selectBooleanCheckbox value="#{testInstancesOverview.filterToBeVerifiedTests}">
+                <a4j:ajax event="change" execute="@this" render="globalform"/>
+            </h:selectBooleanCheckbox>
+
+            <h:outputText
+                    value="#{testInstancesOverview.countTests('completed')} #{messages['gazelle.tm.testing.test.filter.ToBeVerifiedTests']}"/>
+        </div>
+        <!--  PARTIALLY VERIFIED -->
+        <div class="col-lg-1">
+            <h:selectBooleanCheckbox value="#{testInstancesOverview.filterPartiallyVerified}">
+                <a4j:ajax event="change" execute="@this" render="globalform"/>
+            </h:selectBooleanCheckbox>
+
+            <h:outputText
+                    value="#{testInstancesOverview.countTests('partially verified')} #{messages['gazelle.tm.testing.test.filter.PartiallyVerifiedTests']}"/>
+        </div>
+        <!--  VERIFIED -->
+        <div class="col-lg-1">
+            <h:selectBooleanCheckbox value="#{testInstancesOverview.filterVerifiedTests}">
+                <a4j:ajax event="change" execute="@this" render="globalform"/>
+            </h:selectBooleanCheckbox>
+
+            <h:outputText
+                    value="#{testInstancesOverview.countTests('verified')} #{messages['gazelle.tm.testing.test.filter.VerifiedTests']}"/>
+        </div>
+        <!-- ABORTED -->
+        <div class="col-lg-1">
+            <h:selectBooleanCheckbox value="#{testInstancesOverview.filterAbortedTests}">
+                <a4j:ajax event="change" execute="@this" render="globalform"/>
+            </h:selectBooleanCheckbox>
+
+            <h:outputText
+                    value="#{testInstancesOverview.countTests('aborted')} #{messages['gazelle.tm.testing.test.filter.AbortedTests']}"/>
+        </div>
+        <!-- PAUSED -->
+        <div class="col-lg-1">
+            <h:selectBooleanCheckbox value="#{testInstancesOverview.filterPausedTests}">
+                <a4j:ajax event="change" execute="@this" render="globalform"/>
+            </h:selectBooleanCheckbox>
+
+            <h:outputText
+                    value="#{testInstancesOverview.countTests('paused')} #{messages['gazelle.tm.testing.test.filter.PausedTests']}"/>
+        </div>
+        <!-- RUNNING -->
+        <div class="col-lg-1">
+            <h:selectBooleanCheckbox value="#{testInstancesOverview.filterRunningTests}">
+                <a4j:ajax event="change" execute="@this" render="globalform"/>
+            </h:selectBooleanCheckbox>
+
+            <h:outputText
+                    value="#{testInstancesOverview.countTests('started')} #{messages['gazelle.tm.testing.test.filter.RunningTests']}"/>
+        </div>
+        <!-- FAILED -->
+        <div class="col-lg-1">
+            <h:selectBooleanCheckbox rendered="#{s:hasRole('admin_role') or s:hasRole('monitor_role')}"
+                                     value="#{testInstancesOverview.filterFailedTests}">
+                <a4j:ajax event="change" execute="@this" render="globalform"/>
+            </h:selectBooleanCheckbox>
+
+            <h:outputText rendered="#{s:hasRole('admin_role') or s:hasRole('monitor_role')}"
+                          value="#{testInstancesOverview.countTests('failed')} #{messages['gazelle.tm.testing.test.filter.FailedTests']}"/>
+        </div>
+    </div>
+</ui:composition>

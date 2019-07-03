@@ -1,0 +1,16 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets" xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:decorate template="_default_footer_template.xhtml">
+        <ui:param name="applicationName" value="#{applicationPreferenceManager.getApplicationName()}"/>
+        <ui:param name="version" value="${build.version}"/>
+        <ui:param name="buildProfiles" value="${build.maven.execution.profiles.active}"/>
+        <ui:param name="buildDate" value="${build.date.full}"/>
+        <ui:param name="buildYear" value="${build.year}"/>
+        <ui:param name="releaseNoteUrl" value="#{applicationPreferenceManager.getApplicationGazelleReleaseNotesUrl()}"/>
+        <ui:param name="documentationUrl" value="#{applicationPreferenceManager.getApplicationDocumentationUrl()}"/>
+        <ui:param name="appAdminTitle" value="#{applicationPreferenceManager.getApplicationAdminTitle()}"/>
+        <ui:param name="appAdminEmail" value="#{applicationPreferenceManager.getApplicationAdminEmail()}"/>
+        <ui:param name="appAdminName" value="#{applicationPreferenceManager.getApplicationAdminName()}"/>
+        <ui:param name="issueTrackerUrl" value="#{applicationPreferenceManager.getApplicationIssueTrackerUrl()}"/>
+    </ui:decorate>
+</ui:composition>

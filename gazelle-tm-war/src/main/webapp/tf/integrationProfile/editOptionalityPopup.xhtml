@@ -1,0 +1,36 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <h:form id="editOptionalityForm">
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="editOptionality"/>
+            <ui:param name="bodyStyleClass" value="gzl-select-modal-overflow-visible"/>
+            <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.UpdateOptionality']}</ui:define>
+            <s:decorate template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                <ui:define name="label">#{messages['gazelle.tf.table.Optionality']}</ui:define>
+                <ui:param name="id" value="optionalityInput"/>
+                <h:panelGroup rendered="#{profileLinksManager.selectedProfileLink != null}">
+                    <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text" id="optionalityInput"
+                                     value="#{profileLinksManager.selectedProfileLink.transactionOptionType}">
+                        <s:selectItems
+                                value="#{transactionOptionTypeManager.getTransactionOptionTypesList()}"
+                                var="option" noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                label="#{option.name}"/>
+                    </h:selectOneMenu>
+                </h:panelGroup>
+            </s:decorate>
+            <br/>
+            <br/>
+            <ui:define name="popup_footer">
+                <button type="button" class="gzl-btn" data-dismiss="modal">
+                    #{messages['gazelle.tm.Cancel']}
+                </button>
+                <a4j:commandButton id="deleteButtonConfirm"
+                                   value="#{messages['gazelle.common.button.Save']}" styleClass="gzl-btn-red"
+                                   actionListener="#{profileLinksManager.updateProfileLink()}"
+                                   onclick="jq162('#editOptionality').modal('hide');"
+                                   render="actorsTransactionsOptionalityTable"/>
+            </ui:define>
+        </ui:decorate>
+    </h:form>
+</ui:composition>

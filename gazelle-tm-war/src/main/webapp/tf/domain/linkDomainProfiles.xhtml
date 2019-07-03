@@ -1,0 +1,41 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle"
+              value="#{messages['gazelle.tf.domain.edit.Link']} #{domainManager.selectedDomain.name}"/>
+    <ui:define name="body">
+        <div  id="domainManager">
+            <h:form>
+                <s:token allowMultiplePosts="true"/>
+
+                <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                    <ui:define name="panel_title">#{messages['gazelle.tf.domain.link.SubTitle']}
+                        #{domainManager.selectedDomain.name}
+                    </ui:define>
+                    <rich:pickList value="#{domainManager.profilesTarget}" var="p"
+                                   sourceCaption="#{messages['gazelle.tf.domain.link.Source']}"
+                                   targetCaption="#{messages['gazelle.tf.domain.link.Target']}"
+                                   listHeight="300">
+                        <f:selectItems value="#{domainManager.getProfilesSource()}"/>
+                        <g:column>
+                            <h:outputText value="#{p.keyword}"/>
+                        </g:column>
+                        <g:column>
+                            <h:outputText value="#{p.name}"/>
+                        </g:column>
+                    </rich:pickList>
+                    <h:commandButton id="save" type="submit" styleClass="gzl-btn-green"
+                                     value="#{messages['gazelle.common.button.Save']}"
+                                     action="#{domainManager.saveDomainProfiles()}"
+                                     rendered="#{s:hasPermission('MasterModel', 'edit', null)}"/>
+                    <h:commandButton id="cancel" type="submit" styleClass="gzl-btn"
+                                     value="#{messages['gazelle.common.button.Cancel']}"
+                                     action="#{domainManager.cancelDomainProfiles()}"/>
+                </ui:decorate>
+
+            </h:form>
+        </div>
+    </ui:define>
+</ui:composition>

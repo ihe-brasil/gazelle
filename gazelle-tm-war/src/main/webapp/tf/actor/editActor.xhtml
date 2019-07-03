@@ -1,0 +1,440 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{actorManager.getEditTitle()}"/>
+    <ui:define name="body">
+
+        <div id="actorManager">
+            <h:form id="editActor">
+                <s:token allowMultiplePosts="true"/>
+                <!-- **********************************************************************************************
+                                    * Panel for edit mode
+                                    ********************************************************************************************** -->
+                <h:panelGroup rendered="#{actorManager.getEdit()}">
+                    <ui:decorate template="/layout/panels/_panel_title_footer.xhtml">
+                        <ui:define name="panel_title">#{actorManager.getEditSubTitle()}
+                            <s:span rendered="#{actorManager.selectedActor.lastChanged != null}">
+                                <h:outputText value="#{messages['gazelle.common.LastChanged']} "/>
+                                <g:date tooltip="true" value="#{actorManager.selectedActor.lastChanged}"/>
+                                <h:outputText value=" #{messages['gazelle.tm.roleInTest.by']} "/>
+                                <h:outputText
+                                        value="#{actorManager.selectedActor.getLastModifierIdFromAuditedObject()}"/>
+                            </s:span>
+                        </ui:define>
+                        <s:decorate id="editPanelId" template="/layout/form/_edit.xhtml"
+                                    rendered="#{ not empty actorManager.selectedActor.id}">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Id']}</ui:define>
+                            #{actorManager.selectedActor.id}
+                        </s:decorate>
+                        <a4j:region id="keywordRegion">
+                            <s:decorate id="keywordDecoration" template="/layout/form/_edit.xhtml">
+                                <ui:param name="id" value="keyword"/>
+                                <ui:define name="label">#{messages['gazelle.tf.table.Keyword']}</ui:define>
+                                <h:inputText styleClass=" form-control" id="keyword" size="30" required="true"
+                                             value="#{actorManager.selectedActor.keyword}">
+                                    <a4j:ajax event="blur" render="keywordDecoration" execute="@this"
+                                              listener="#{actorManager.isKeywordAvailable()}"/>
+                                </h:inputText>
+                            </s:decorate>
+                        </a4j:region>
+                        <a4j:region id="nameRegion">
+                            <s:decorate id="nameDecoration" template="/layout/form/_edit.xhtml">
+                                <ui:param name="id" value="name"/>
+                                <ui:define name="label">#{messages['gazelle.tf.table.Name']}</ui:define>
+                                <h:inputText styleClass=" form-control" id="name" size="60" required="true"
+                                             value="#{actorManager.selectedActor.name}">
+                                    <a4j:ajax event="blur" render="nameDecoration" execute="@this"
+                                              listener="#{actorManager.isNameAvailable()}"/>
+                                </h:inputText>
+                            </s:decorate>
+                        </a4j:region>
+                        <s:decorate id="descriptionDecoration"
+                                    template="/layout/form/_edit.xhtml">
+                            <ui:param name="id" value="description"/>
+                            <ui:define name="label">#{messages['gazelle.tf.table.Description']}</ui:define>
+                            <h:inputTextarea styleClass=" form-control" id="description" cols="80" rows="10"
+                                             value="#{actorManager.selectedActor.description}"/>
+                        </s:decorate>
+                        <ui:define name="panel_footer">
+                            <h:commandButton id="cancel2" styleClass="gzl-btn"
+                                             value="#{messages['gazelle.common.button.Cancel']}"
+                                             action="#{actorManager.listActors()}" immediate="true"/>
+                            <a4j:commandButton id="save2" styleClass="gzl-btn-green"
+                                               value="#{messages['gazelle.common.button.Save']}"
+                                               action="#{actorManager.addActor( )}"
+                                               rendered="#{actorManager.getEdit() and s:hasPermission('MasterModel', 'edit', null)}"/>
+                        </ui:define>
+                    </ui:decorate>
+                </h:panelGroup>
+                <!-- **********************************************************************************************
+                                    * Panel for view mode
+                                    ********************************************************************************************** -->
+                <h:panelGroup rendered="#{actorManager.getView()}">
+                    <ui:decorate template="/layout/panels/_panel_title_footer.xhtml">
+                        <ui:define name="panel_title">#{actorManager.getEditSubTitle()}
+                            <s:span rendered="#{actorManager.selectedActor.lastChanged != null}">
+                                <h:outputText value="#{messages['gazelle.common.LastChanged']} "/>
+                                <g:date tooltip="true" value="#{actorManager.selectedActor.lastChanged}"/>
+                                <h:outputText value=" #{messages['gazelle.tm.roleInTest.by']} "/>
+                                <h:outputText
+                                        value="#{actorManager.selectedActor.getLastModifierIdFromAuditedObject()}"/>
+                            </s:span>
+                        </ui:define>
+                        <s:decorate id="viewPanelId" template="/layout/form/_edit.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Id']}</ui:define>
+                            #{actorManager.selectedActor.id}
+                        </s:decorate>
+                        <s:decorate id="keyword" template="/layout/form/_edit.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Keyword']}</ui:define>
+                            #{actorManager.selectedActor.keyword}
+                        </s:decorate>
+                        <s:decorate id="name" template="/layout/form/_edit.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Name']}</ui:define>
+                            #{actorManager.selectedActor.name}
+                        </s:decorate>
+                        <s:decorate id="description" template="/layout/form/_edit.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Description']}</ui:define>
+                            #{actorManager.selectedActor.description}
+                        </s:decorate>
+                        <ui:define name="panel_footer">
+                            <h:commandButton id="cancel" styleClass="gzl-btn"
+                                             value="#{messages['gazelle.common.button.Cancel']}"
+                                             action="#{actorManager.listActors()}"/>
+                            <h:commandButton value="#{messages['gazelle.common.button.Edit']}"
+                                             action="#{actorManager.editActor(actorManager.selectedActor, true)}"
+                                             styleClass="gzl-btn-blue"
+                                             rendered="#{actorManager.getView() and s:hasPermission('MasterModel', 'edit', null)}"/>
+                        </ui:define>
+                    </ui:decorate>
+
+                </h:panelGroup>
+                <div>
+
+                </div>
+            </h:form>
+        </div>
+        <!-- **********************************************************************************************
+                    * Tab panel
+                    **********************************************************************************************  -->
+        <h:form id="tabPanelId">
+            <s:token allowMultiplePosts="true"/>
+            <div>
+
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab"
+                                                              data-toggle="tab">#{messages['gazelle.tf.selectedActor.ProfilesRelatedToActor']}</a>
+                    </li>
+                    <li role="presentation">
+                        <a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">#{messages['gazelle.tf.selectedActor.IntegrationProfile-IntegrationProfileOptionsTab']}</a>
+                    </li>
+                    <li role="presentation"><a href="#messages" aria-controls="messages" role="tab"
+                                               data-toggle="tab">#{messages['gazelle.tf.selectedActor.ProfileLinksTab']}</a>
+                    </li>
+                    <li role="presentation"><a href="#settings" aria-controls="settings" role="tab"
+                                               data-toggle="tab">#{messages['gazelle.tf.TransactionLinksForSelectedactor']}</a>
+                    </li>
+                    <li role="presentation"><a href="#settings2" aria-controls="settings2" role="tab"
+                                               data-toggle="tab">#{messages['gazelle.tf.TransactionsTab']}</a></li>
+
+                    <h:panelGroup rendered="#{applicationManager.isAssertionEnabled()}">
+                        <li role="presentation"><a href="#settings3" aria-controls="settings3" role="tab"
+                                                   data-toggle="tab">#{messages['net.ihe.gazelle.tm.Assertions']}</a>
+                        </li>
+                    </h:panelGroup>
+                </ul>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="home">
+                        <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                      rendered="#{actorManager.getIpCount()==0}"/>
+                        <rich:dataTable id="integrationProfileDataTableId" var="ip"
+                                        value="#{actorManager.integrationProfilesForActor}"
+                                        rendered="#{actorManager.getIpCount()&gt;0}">
+                            <g:column sortBy="#{'id'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                #{ip.id}
+                            </g:column>
+                            <g:column sortBy="#{'keyword'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Keyword']}</ui:define>
+                                #{ip.keyword}
+                            </g:column>
+                            <g:column sortBy="#{'name'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Name']}</ui:define>
+                                #{ip.name}
+                            </g:column>
+                            <g:column>
+                                <ui:define name="header">#{messages['gazelle.tf.table.Description']}</ui:define>
+                                #{ip.description}
+                            </g:column>
+                            <g:column sortBy="#{'integrationProfileStatusType.name'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Status']}</ui:define>
+                                #{ip.integrationProfileStatusType.name}
+                            </g:column>
+                            <g:column>
+                                <ui:define name="header">#{messages['gazelle.tf.table.Action']}</ui:define>
+                                <div class="gzl-never-wrap">
+                                    <a4j:commandLink title="#{messages['gazelle.common.button.View']}"
+                                                     action="#{integrationProfileManager.viewIntegrationProfile(ip)}"
+                                                     onRowMouseOver="this.style.cursor='pointer'">
+                                        <span class="gzl-icon-search"/>
+                                    </a4j:commandLink>
+
+                                    <a4j:commandLink
+                                            action="#{integrationProfileManager.editIntegrationProfile(ip)}"
+                                            rendered="#{s:hasPermission('MasterModel', 'edit', null)}"
+                                            title="#{messages['gazelle.common.button.Edit']}"
+                                            onRowMouseOver="this.style.cursor='pointer'">
+                                        <span class="gzl-icon-pencil"/>
+                                    </a4j:commandLink>
+
+                                </div>
+                            </g:column>
+                        </rich:dataTable>
+
+                        <h:commandButton value="#{messages['gazelle.tf.actor.profile.AddRemove']}"
+                                         styleClass="gzl-btn-blue"
+                                         action="#{actorManager.linkActorProfiles(actorManager.selectedActor)}"
+                                         rendered="#{s:hasPermission('MasterModel', 'edit', null)}"/>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="profile">
+                        <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                      rendered="#{actorManager.getIpIpoCount()==0}"/>
+                        <rich:dataTable id="linkedIpIpoDataTableId" var="ipIpo"
+                                        value="#{actorManager.integrationProfilesAndIntegrationProfileOptionsForActor}"
+                                        rendered="#{actorManager.getIpIpoCount()&gt;0}">
+                            <g:column sortBy="#{'actorIntegrationProfile.integrationProfile.keyword'}"
+                                      sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.IntegrationProfile']}
+                                </ui:define>
+                                <h:commandLink
+                                        value="#{ipIpo.actorIntegrationProfile.integrationProfile.keyword} - #{ipIpo.actorIntegrationProfile.integrationProfile.name}"
+                                        action="#{integrationProfileManager.editIntegrationProfile(ipIpo.actorIntegrationProfile.integrationProfile, false)}"/>
+                            </g:column>
+                            <g:column sortBy="#{'integrationProfileOption.keyword'}">
+                                <ui:define name="header">#{messages['gazelle.tf.IntegrationProfileOption']}
+                                </ui:define>
+                                <h:commandLink
+                                        value="#{ipIpo.integrationProfileOption.keyword} - #{ipIpo.integrationProfileOption.name}"
+                                        action="#{integrationProfileOptionManager.editIntegrationProfileOption(ipIpo.integrationProfileOption, false)}"/>
+                            </g:column>
+                            <g:column>
+                                <ui:define name="header">#{messages['gazelle.tf.table.TFReference']}</ui:define>
+                                <h:outputText
+                                        value="#{ipIpo.integrationProfileOption.reference}"/>
+                            </g:column>
+                            <g:column sortBy="#{'documentSection'}">
+                                <ui:define name="header">#{messages['net.ihe.gazelle.tm.Specification']}
+                                </ui:define>
+                                <s:div rendered="#{ipIpo.integrationProfileOption.isNotNone()}">
+                                    <ui:include
+                                            src="/tf/integrationProfileOption/_documentSectionForAipo.xhtml">
+                                        <ui:param name="aipoParam" value="#{ipIpo}"/>
+                                        <ui:param name="controllerParam"
+                                                  value="#{integrationProfileOptionManager}"/>
+                                        <ui:param name="formParam" value="tabPanelId"/>
+                                        <ui:param name="callerPageParam" value="actor"/>
+                                    </ui:include>
+                                </s:div>
+                            </g:column>
+                            <g:column rendered="#{s:hasPermission('MasterModel', 'edit', null)}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Action']}</ui:define>
+                                <div class="gzl-never-wrap">
+                                    <ui:include src="/tf/actorIntegrationProfileOption/maybeSupportive.xhtml">
+                                        <ui:param name="aipo" value="#{ipIpo}"/>
+                                    </ui:include>
+                                    <a4j:commandLink rendered="#{s:hasPermission('MasterModel', 'edit', null)}"
+                                                     title="#{messages['gazelle.tf.button.delActorIntegrationProfileOptionLink']}"
+                                                     action="#{aipoManager.delaipo(actorManager.selectedActor, ipIpo)}"
+                                                     onRowMouseOver="this.style.cursor='pointer'">
+                                        <span class="gzl-icon-trash-o"/>
+                                    </a4j:commandLink>
+                                </div>
+                            </g:column>
+                        </rich:dataTable>
+                        <h:commandButton value="#{messages['gazelle.tf.selectedActor.aipo.Add']}"
+                                         styleClass="gzl-btn-green"
+                                         action="#{aipoManager.addaipos(actorManager.selectedActor)}"
+                                         rendered="#{s:hasPermission('MasterModel', 'edit', null)}"/>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="messages">
+                        <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                      rendered="#{actorManager.getIpTransCount()==0}"/>
+                        <rich:dataTable id="linkedIpTransDataTableId" var="ipTrans"
+                                        value="#{actorManager.integrationProfilesAndTransactionsForActor}"
+                                        rendered="#{actorManager.getIpTransCount()&gt;0}">
+                            <g:column sortBy="#{'id'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                <h:outputText value="#{ipTrans.id}"/>
+                            </g:column>
+                            <g:column sortBy="#{'actorIntegrationProfile.integrationProfile.keyword'}">
+                                <ui:define name="header">#{messages['gazelle.tf.IntegrationProfile']}
+                                </ui:define>
+                                <h:commandLink
+                                        value="#{ipTrans.actorIntegrationProfile.integrationProfile.keyword} - #{ipTrans.actorIntegrationProfile.integrationProfile.name}"
+                                        action="#{integrationProfileManager.editIntegrationProfile(ipTrans.actorIntegrationProfile.integrationProfile, false)}"/>
+                            </g:column>
+                            <g:column sortBy="#{'transaction.keyword'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Transaction']}</ui:define>
+                                <h:commandLink
+                                        value="#{ipTrans.transaction.keyword} - #{ipTrans.transaction.name}"
+                                        action="#{transactionManager.editTransaction(ipTrans.transaction, false)}"/>
+                            </g:column>
+                            <g:column sortBy="#{'transactionOptionType.name'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Optionality']}</ui:define>
+                                <h:outputText value="#{ipTrans.transactionOptionType.name}"/>
+                            </g:column>
+                            <g:column width="150" sortBy="#{'transaction.documentSection'}">
+                                <ui:define name="header">#{messages['net.ihe.gazelle.tm.Specification']}
+                                </ui:define>
+                                <s:div rendered="#{not empty ipTrans.transaction.documentSection}">
+                                    <ui:include src="/tf/documents/_documentSection.xhtml">
+                                        <ui:param name="documentSectionParam"
+                                                  value="#{ipTrans.transaction.documentSection}"/>
+                                        <ui:param name="displayedName"
+                                                  value="#{messages['gazelle.tf.menu.TF']}"/>
+                                    </ui:include>
+                                </s:div>
+                            </g:column>
+                            <g:column rendered="#{s:hasPermission('MasterModel', 'edit', null)}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Action']}</ui:define>
+                                <a4j:commandLink rendered="#{s:hasPermission('MasterModel', 'edit', null)}"
+                                                 title="#{messages['gazelle.tf.button.delProfileLink']}"
+                                                 action="#{profileLinksManager.delProfileLink(actorManager.selectedActor, ipTrans)}"
+                                                 onRowMouseOver="this.style.cursor='pointer'">
+                                    <span class="gzl-icon-trash-o"/>
+                                </a4j:commandLink>
+
+                            </g:column>
+                        </rich:dataTable>
+                        <h:commandButton value="#{messages['gazelle.tf.selectedActor.profileLinks.Add']}"
+                                         styleClass="gzl-btn-green"
+                                         action="#{profileLinksManager.addProfileLinks(actorManager.selectedActor)}"
+                                         rendered="#{s:hasPermission('MasterModel', 'edit', null)}"/>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="settings">
+                        <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                      rendered="#{actorManager.tlCount==0}"/>
+                        <rich:dataTable id="transactionLinks" var="tl"
+                                        value="#{actorManager.transactionLinksForActor}"
+                                        rendered="#{actorManager.tlCount&gt;0}">
+                            <g:column sortBy="#{'id'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                <h:outputText value="#{tl.id}"/>
+                            </g:column>
+                            <g:column sortBy="#{'fromActor.keyword'}">
+                                <ui:define name="header">#{messages['gazelle.tf.fromActorsTab']}</ui:define>
+                                <h:commandLink value="#{tl.fromActor.keyword} - #{tl.fromActor.name}"
+                                               action="#{actorManager.editActor(tl.fromActor, false)}"/>
+                            </g:column>
+                            <g:column sortBy="#{'transaction.keyword'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Transaction']}</ui:define>
+                                <h:commandLink value="#{tl.transaction.keyword} - #{tl.transaction.name}"
+                                               action="#{transactionManager.editTransaction(tl.transaction, false)}"/>
+                            </g:column>
+                            <g:column sortBy="#{'toActor.keyword'}">
+                                <ui:define name="header">#{messages['gazelle.tf.toActorsTab']}</ui:define>
+                                <h:commandLink value="#{tl.toActor.keyword} - #{tl.toActor.name}"
+                                               action="#{actorManager.editActor(tl.toActor, false)}"/>
+                            </g:column>
+                            <g:column rendered="#{s:hasPermission('MasterModel', 'edit', null)}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Action']}</ui:define>
+                                <a4j:commandLink title="#{messages['gazelle.tf.button.delTransactionLink']}"
+                                                 rendered="#{s:hasPermission('MasterModel', 'edit', null)}"
+                                                 action="#{tlManager.delTransactionLink(actorManager.selectedActor, tl)}"
+                                                 onRowMouseOver="this.style.cursor='pointer'">
+                                    <span class="gzl-icon-trash-o"/>
+                                </a4j:commandLink>
+                            </g:column>
+                        </rich:dataTable>
+                        <h:commandButton value="#{messages['gazelle.tf.tlFromActor.add']}"
+                                         styleClass="gzl-btn-green"
+                                         action="#{tlManager.addTransactionLinks(actorManager.selectedActor, 'FROM_ACTOR')}"
+                                         rendered="#{s:hasPermission('MasterModel', 'edit', null)}"/>
+                        <h:commandButton value="#{messages['gazelle.tf.tlToActor.add']}"
+                                         styleClass="gzl-btn-green"
+                                         action="#{tlManager.addTransactionLinks(actorManager.selectedActor, 'TO_ACTOR')}"
+                                         rendered="#{s:hasPermission('MasterModel', 'edit', null)}"/>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="settings2">
+                        <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                      rendered="#{actorManager.getAllTransactionCount()==0}"/>
+                        <rich:dataTable id="allTransactionsDataTableId" var="trans"
+                                        value="#{actorManager.allTransactionsForActor}"
+                                        rendered="#{actorManager.getAllTransactionCount()&gt;0}">
+                            <g:column sortBy="#{'id'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                #{trans.id}
+                            </g:column>
+                            <g:column sortBy="#{'keyword'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Keyword']}</ui:define>
+                                #{trans.keyword}
+                            </g:column>
+                            <g:column sortBy="#{'name'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Name']}</ui:define>
+                                #{trans.name}
+                            </g:column>
+                            <g:column>
+                                <ui:define name="header">#{messages['gazelle.tf.table.Description']}</ui:define>
+                                #{trans.description}
+                            </g:column>
+                            <g:column>
+                                <ui:define name="header">#{messages['gazelle.tf.table.TFReference']}</ui:define>
+                                #{trans.reference}
+                            </g:column>
+                            <g:column sortBy="#{'transactionStatusType.name'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Status']}</ui:define>
+                                #{trans.transactionStatusType.name}
+                            </g:column>
+                            <g:column width="150" sortBy="#{'documentSection'}">
+                                <ui:define name="header">#{messages['net.ihe.gazelle.tm.Specification']}
+                                </ui:define>
+                                <s:div rendered="#{not empty trans.documentSection}">
+                                    <ui:include src="/tf/documents/_documentSection.xhtml">
+                                        <ui:param name="documentSectionParam"
+                                                  value="#{trans.documentSection}"/>
+                                        <ui:param name="displayedName"
+                                                  value="#{messages['gazelle.tf.menu.TF']}"/>
+                                    </ui:include>
+                                </s:div>
+                            </g:column>
+                            <g:column>
+                                <ui:define name="header">#{messages['gazelle.tf.table.Action']}</ui:define>
+                                <div class="gzl-never-wrap">
+                                    <a4j:commandLink title="#{messages['gazelle.common.button.View']}"
+                                                     action="#{transactionManager.editTransaction(trans, false)}"
+                                                     onRowMouseOver="this.style.cursor='pointer'">
+                                        <span class="gzl-icon-search"/>
+                                    </a4j:commandLink>
+
+                                    <a4j:commandLink
+                                            action="#{transactionManager.editTransaction(trans, true)}"
+                                            rendered="#{s:hasPermission('MasterModel', 'edit', null)}"
+                                            title="#{messages['gazelle.common.button.Edit']}"
+                                            onRowMouseOver="this.style.cursor='pointer'">
+                                        <span class="gzl-icon-pencil"/>
+                                    </a4j:commandLink>
+                                </div>
+
+                            </g:column>
+                        </rich:dataTable>
+                    </div>
+                    <h:panelGroup rendered="#{applicationManager.isAssertionEnabled()}">
+                        <div role="tabpanel" class="tab-pane" id="settings3">
+                            <ui:include src="/assertions/viewAssertions.xhtml">
+                                <ui:param name="assertions"
+                                          value="#{assertionsManager.getActorAssertions(actorManager.selectedActor.keyword)}"/>
+                            </ui:include>
+                        </div>
+                    </h:panelGroup>
+                </div>
+
+            </div>
+
+        </h:form>
+
+
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,56 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tm.TestsInstancePerSystem']}"/>
+    <ui:define name="body">
+        #{dataTableStateHolder.setDescendingOn('id')}
+        #{testInstancesOverview.setInteroperabilityTestsOnly(true)}
+        #{testInstancesOverview.setMonitorWorkList(false)}
+
+        <h:form id="globalform" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <h:inputHidden id="filterUrlParameters" name="filterUrlParameters"
+                           value="#{testInstancesOverview.filter.urlParameters}"/>
+            <script>
+                updateUrl("globalform:filterUrlParameters");
+                $("#globalform\\:filterUrlParameters").bind('change',
+                        function () {
+                            updateUrl("globalform:filterUrlParameters");
+                        });
+            </script>
+
+            <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+
+                <h:panelGrid columns="4">
+                    <ui:include src="/testing/research/testInstancesCommonFilter.xhtml"/>
+                </h:panelGrid>
+                 <ui:define name="filter_buttons">
+                    <a4j:commandLink   actionListener="#{testInstancesOverview.filter.modified()}"
+                                      title="#{messages['gazelle.common.button.Refresh']}"
+                                      render="globalform">
+                        <span class="fa fa-refresh"/>
+                    </a4j:commandLink>
+
+                    <a4j:commandLink actionListener="#{testInstancesOverview.resetFilter()}"
+                                     title="#{messages['gazelle.users.reset']}" type="submit"
+                                     execute="@this" render="globalform">
+                        <span class="fa fa-times-circle"/>
+                    </a4j:commandLink>
+                </ui:define>
+            </ui:decorate>
+            <s:div id="ViewTableOfTestVal"><!--  ALL -->
+                <s:div id="allTestInstancePanel" rendered="#{testInstancesOverview.tests.size()&gt;0}">
+                    <ui:include src="testInstancesListPanel.xhtml">
+                        <ui:param name="dataTableHeader" value="#{messages['gazelle.tests.tests']}"/>
+                        <ui:param name="varList" value="#{testInstancesOverview.tests}"/>
+                        <ui:param name="varTableId" value="allTestInstanceDataTable"/>
+                        <ui:param name="subHeader" value="#{messages['gazelle.tm.Tests']}."/>
+                        <ui:param name="varColor" value="ti-row1,ti-row2"/>
+                    </ui:include>
+                    <br/></s:div>
+            </s:div>
+        </h:form>
+
+    </ui:define>
+</ui:composition>

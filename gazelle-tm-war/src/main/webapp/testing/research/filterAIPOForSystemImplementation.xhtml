@@ -1,0 +1,50 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <div class="row">
+        <div class="col-lg-6">
+            <div>
+                <!--Domain-->
+                <ui:include src="/filter/filter.xhtml">
+                    <ui:param name="filter" value="#{filter}"/>
+                    <ui:param name="filterWidth" value="240"/>
+                    <ui:param name="filterId" value="domain"/>
+                    <ui:param name="filterName" value="#{messages['gazelle.tf.Domain']}"/>
+                    <ui:param name="filterForm" value="#{filterForm}"/>
+                </ui:include>
+            </div>
+            <div>
+                <!-- Profile -->
+                <ui:include src="/filter/filter.xhtml">
+                    <ui:param name="filter" value="#{filter}"/>
+                    <ui:param name="filterWidth" value="240"/>
+                    <ui:param name="filterId" value="integrationProfile"/>
+                    <ui:param name="filterName" value="#{messages['gazelle.tf.integrationProfile']}"/>
+                    <ui:param name="filterForm" value="#{filterForm}"/>
+                </ui:include>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div>
+                <!-- actor -->
+                <ui:include src="/filter/filter.xhtml">
+                    <ui:param name="filter" value="#{filter}"/>
+                    <ui:param name="filterWidth" value="240"/>
+                    <ui:param name="filterId" value="actor"/>
+                    <ui:param name="filterName" value="#{messages['gazelle.testmanagement.object.Actor']}"/>
+                    <ui:param name="filterForm" value="#{filterForm}"/>
+                </ui:include>
+            </div>
+            <div>
+                <!-- integrationProfileOption -->
+                <ui:include src="/filter/filter.xhtml">
+                    <ui:param name="filter" value="#{filter}"/>
+                    <ui:param name="filterWidth" value="240"/>
+                    <ui:param name="filterId" value="integrationProfileOption"/>
+                    <ui:param name="filterName" value="#{messages['gazelle.tests.test.integrationProfileOption']}"/>
+                    <ui:param name="filterForm" value="#{filterForm}"/>
+                </ui:include>
+            </div>
+        </div>
+    </div>
+</ui:composition>

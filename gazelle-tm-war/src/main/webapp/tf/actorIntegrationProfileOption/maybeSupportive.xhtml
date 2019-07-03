@@ -1,0 +1,17 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <s:span rendered="#{s:hasPermission('MasterModel', 'edit', null)}">
+        <h:selectBooleanCheckbox  styleClass="form-control-static" id="maybeSupportive" value="#{aipo.maybeSupportive}">
+            <a4j:ajax event="click" execute="@this" render="systemsDiv"
+                      listener="#{aipoManager.saveMaybeSupportive(aipo)}"/>
+        </h:selectBooleanCheckbox>
+        <h:outputLabel for="maybeSupportive" value="#{messages['net.ihe.gazelle.tm.MayBeSupportive']}"/>
+    </s:span>
+    <s:span rendered="#{!s:hasPermission('MasterModel', 'edit', null)}">
+        <h:outputText value="#{messages['net.ihe.gazelle.tm.MayBeSupportive']}" rendered="#{aipo.maybeSupportive}"/>
+        <h:outputText value="#{messages['net.ihe.gazelle.tm.CannotBeSupportive']}"
+                      rendered="#{not aipo.maybeSupportive}"/>
+    </s:span>
+</ui:composition>

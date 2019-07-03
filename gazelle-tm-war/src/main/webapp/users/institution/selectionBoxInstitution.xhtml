@@ -1,0 +1,17 @@
+<div xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:s="http://jboss.org/schema/seam/taglib"
+     xmlns="http://www.w3.org/1999/xhtml">
+    <a4j:region id="institutionRegionForSelectionBox"
+                rendered="#{s:hasRole('admin_role') || s:hasRole('accounting_role')}">
+        <s:decorate id="institutionDecorationForSelectionBox" template="/layout/form/_edit.xhtml">
+            <ui:define name="label">#{messages['gazelle.users.institution.InstitutionKeyword']}</ui:define>
+            <h:selectOneMenu styleClass="form-control gzl-form-control" id="SessionTypeListBox" value="#{institutionManager.choosenInstitutionForAdmin}">
+                <s:selectItems value="#{gazelleDAO.listAllInstitutionsOrderByKeyword()}" var="companyFromList"
+                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                               label="#{companyFromList.keyword}"/>
+                <a4j:ajax event="change" execute="@this"/>
+            </h:selectOneMenu>
+        </s:decorate>
+    </a4j:region>
+</div>

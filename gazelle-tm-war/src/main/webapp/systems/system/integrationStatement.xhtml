@@ -1,0 +1,200 @@
+<!--
+ * Copyright 2008 IHE International (http://www.ihe.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ -->
+<p:document xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://java.sun.com/jsf/core"
+            xmlns:p="http://jboss.org/schema/seam/pdf" xmlns:g="http://www.ihe.net/gazelle" pageSize="A4"
+            creationDate="#{integrationStatementManager.selectedSystemInSession.system.integrationStatementDate}"
+            orientation="portrait" creator="IHE Product Registry">
+    <!-- 6 + 6 -->
+    <p:table columns="3" widthPercentage="100" headerRows="12" footerRows="6">
+        <f:facet name="defaultCell">
+            <p:cell horizontalAlignment="center" verticalAlignment="middle" paddingBottom="6"/>
+        </f:facet>
+        <!-- Header -->
+        <!-- 1 -->
+        <p:cell colspan="3" borderWidth="0">
+            <p:table columns="2" widthPercentage="100" widths="1 2">
+                <p:cell borderWidth="0">
+                    <p:image value="/img/ihe_logo.png"/>
+                </p:cell>
+                <p:cell borderWidth="0">
+                    <p:paragraph/>
+                </p:cell>
+            </p:table>
+        </p:cell>
+        <!-- 2 -->
+        <p:cell colspan="3" backgroundColor="#EEEEEE" horizontalAlignment="center">
+            <p:paragraph alignment="center">
+                <g:pdffont size="12" style="bold">#{messages['gazelle.systems.is.pdf.ISIHE']}</g:pdffont>
+            </p:paragraph>
+        </p:cell>
+        <!-- 3 -->
+        <p:cell colspan="3" borderWidth="0" padding="0">
+            <p:table columns="4" widthPercentage="100" widths="2 2 1 1">
+                <f:facet name="defaultCell">
+                    <p:cell horizontalAlignment="center" verticalAlignment="middle" paddingBottom="6"/>
+                </f:facet>
+                <p:cell backgroundColor="#EEEEEE">
+                    <p:paragraph>
+                        <g:pdffont style="bold" size="10">#{messages['gazelle.systems.is.pdf.ISVendor']}</g:pdffont>
+                    </p:paragraph>
+                </p:cell>
+                <p:cell backgroundColor="#EEEEEE">
+                    <p:paragraph>
+                        <g:pdffont style="bold" size="10">#{messages['gazelle.systems.is.pdf.SystemName']}</g:pdffont>
+                    </p:paragraph>
+                </p:cell>
+                <p:cell backgroundColor="#EEEEEE">
+                    <p:paragraph>
+                        <g:pdffont style="bold" size="10">#{messages['gazelle.systems.is.pdf.SystemVersion']}
+                        </g:pdffont>
+                    </p:paragraph>
+                </p:cell>
+                <p:cell backgroundColor="#EEEEEE">
+                    <p:paragraph>
+                        <g:pdffont style="bold" size="10">#{messages['gazelle.systems.is.pdf.ISDateShort']}</g:pdffont>
+                    </p:paragraph>
+                </p:cell>
+                <p:cell>
+                    <p:paragraph>
+                        <g:pdffont size="10">#{integrationStatementManager.getInstitutionsNameForSystem()}</g:pdffont>
+                    </p:paragraph>
+                </p:cell>
+                <p:cell>
+                    <p:paragraph>
+                        <g:pdffont size="10">#{integrationStatementManager.selectedSystemInSession.system.name}
+                        </g:pdffont>
+                    </p:paragraph>
+                </p:cell>
+                <p:cell>
+                    <p:paragraph>
+                        <g:pdffont size="10">#{integrationStatementManager.selectedSystemInSession.system.version}
+                        </g:pdffont>
+                    </p:paragraph>
+                </p:cell>
+                <p:cell>
+                    <p:paragraph>
+                        <g:pdffont size="10">
+                            #{dateDisplay.displayDate(integrationStatementManager.selectedSystemInSession.system.integrationStatementDate)}
+                        </g:pdffont>
+                    </p:paragraph>
+                </p:cell>
+            </p:table>
+        </p:cell>
+        <!-- 4 -->
+        <p:cell colspan="3" paddingBottom="5" borderWidth="0">
+            <p:paragraph/>
+        </p:cell>
+        <!-- 5 -->
+        <p:cell colspan="3" horizontalAlignment="left">
+            <p:paragraph>
+                <g:pdffont size="10">#{messages['gazelle.systems.is.pdf.ISLabel1']}</g:pdffont>
+            </p:paragraph>
+        </p:cell>
+        <!-- 6 -->
+        <p:cell backgroundColor="#EEEEEE">
+            <p:paragraph>
+                <g:pdffont size="10" style="bold">#{messages['gazelle.systems.is.pdf.ISIntegrationProfile']}</g:pdffont>
+            </p:paragraph>
+        </p:cell>
+        <p:cell backgroundColor="#EEEEEE">
+            <p:paragraph>
+                <g:pdffont size="10" style="bold">#{messages['gazelle.systems.is.pdf.ISActor']}</g:pdffont>
+            </p:paragraph>
+        </p:cell>
+        <p:cell backgroundColor="#EEEEEE">
+            <p:paragraph>
+                <g:pdffont size="10" style="bold">#{messages['gazelle.systems.is.pdf.ISIntegrationProfileOption']}
+                </g:pdffont>
+            </p:paragraph>
+        </p:cell>
+        <!-- Footer -->
+        <!-- 7 -->
+        <p:cell colspan="3" paddingBottom="5" borderWidth="0">
+            <p:paragraph/>
+        </p:cell>
+        <!-- 8 -->
+        <p:cell colspan="3" backgroundColor="#EEEEEE">
+            <p:paragraph>
+                <g:pdffont size="10">#{messages['gazelle.systems.is.pdf.ISVendorWebsite']}</g:pdffont>
+                <p:anchor
+                        reference="#{integrationStatementManager.getIntegrationStatementsRepositoryURLForSystem(integrationStatementManager.selectedSystemInSession.system)}">
+                    <g:pdffont style="UNDERLINE" color="blue" size="10">
+                        #{integrationStatementManager.getIntegrationStatementsRepositoryURLForSystem(integrationStatementManager.selectedSystemInSession.system)}
+                    </g:pdffont>
+                </p:anchor>
+            </p:paragraph>
+        </p:cell>
+        <!-- 9 -->
+        <p:cell colspan="3" backgroundColor="#EEEEEE">
+            <p:paragraph>
+                <g:pdffont size="10">#{messages['gazelle.systems.is.pdf.ISStandardsConformance']}</g:pdffont>
+            </p:paragraph>
+        </p:cell>
+        <!-- 10 -->
+        <p:cell>
+            <p:paragraph>
+                <g:pdffont size="10" style="bold">#{messages['gazelle.systems.is.pdf.ISHL7']}</g:pdffont>
+            </p:paragraph>
+        </p:cell>
+        <p:cell colspan="2">
+            <p:paragraph>
+                <p:anchor
+                        reference="#{integrationStatementManager.selectedSystemInSession.system.HL7ConformanceStatementUrl}">
+                    <g:pdffont style="UNDERLINE" color="blue" size="10">
+                        #{integrationStatementManager.selectedSystemInSession.system.HL7ConformanceStatementUrl}
+                    </g:pdffont>
+                </p:anchor>
+            </p:paragraph>
+        </p:cell>
+        <!-- 11 -->
+        <p:cell>
+            <p:paragraph>
+                <g:pdffont size="10" style="bold">#{messages['gazelle.systems.is.pdf.ISDicom']}</g:pdffont>
+            </p:paragraph>
+        </p:cell>
+        <p:cell colspan="2">
+            <p:paragraph>
+                <p:anchor
+                        reference="#{integrationStatementManager.selectedSystemInSession.system.dicomConformanceStatementUrl}">
+                    <g:pdffont style="UNDERLINE" color="blue" size="10">
+                        #{integrationStatementManager.selectedSystemInSession.system.dicomConformanceStatementUrl}
+                    </g:pdffont>
+                </p:anchor>
+            </p:paragraph>
+        </p:cell>
+        <!-- 12 -->
+        <p:cell colspan="3" backgroundColor="#EEEEEE">
+            <p:paragraph>
+                <g:pdffont size="10">#{messages['gazelle.systems.is.pdf.ISLinksGeneralInformations']}</g:pdffont>
+                <p:anchor reference="http://www.ihe.net">
+                    <g:pdffont style="UNDERLINE" color="blue" size="10">#{messages['gazelle.common.Wwwihenet']}
+                    </g:pdffont>
+                </p:anchor>
+            </p:paragraph>
+        </p:cell>
+        <ui:repeat value="#{integrationStatementManager.getIheImplementationsToDisplay()}" var="iheImplementation">
+            <p:cell paddingBottom="6">
+                <g:pdffont size="10">#{iheImplementation.integrationProfile.name}</g:pdffont>
+            </p:cell>
+            <p:cell paddingBottom="6">
+                <g:pdffont size="10">#{iheImplementation.actor.name}</g:pdffont>
+            </p:cell>
+            <p:cell paddingBottom="6">
+                <g:pdffont size="10">#{iheImplementation.integrationProfileOption.getName()}</g:pdffont>
+            </p:cell>
+        </ui:repeat>
+    </p:table>
+</p:document>

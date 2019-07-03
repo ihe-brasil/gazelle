@@ -1,0 +1,1 @@
+ALTER TABLE tm_profiles_in_testing_sessions ADD CONSTRAINT uc_integration_profile_per_testing_session UNIQUE (testing_session_id,integration_profile_id);

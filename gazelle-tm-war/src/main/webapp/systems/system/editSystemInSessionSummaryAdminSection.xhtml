@@ -1,0 +1,77 @@
+<div xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:s="http://jboss.org/schema/seam/taglib"
+     xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <!-- ======================= 	-->
+    <!-- System summary section		-->
+    <!-- ======================= 	-->
+    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+        <ui:define name="panel_title">#{messages['gazelle.systems.system.DisplaySystemLabel1']}</ui:define>
+        <p id="editSystemLabelParagraph">#{messages['gazelle.systems.system.EditSystemLabel2']}
+            #{messages['gazelle.systems.system.EditSystemLabel3']}</p>
+
+        <div id="systemManager">
+            <h:form id="systemSummaryForm">
+                <s:token allowMultiplePosts="true"/>
+                <p/>
+                <!-- ******************************************************************** -->
+                <!-- Panel only for IHE admin -->
+                <!-- ******************************************************************** -->
+                <h:panelGroup rendered="#{s:hasRole('admin_role')}">
+                    <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                        <ui:param name="panel_id" value="adminForSystemPanel"/>
+                        <ui:define name="panel_title">
+                            #{messages['gazelle.systems.system.admin.SummaryManagementForIHEAdmin']}
+                        </ui:define>
+                        #{messages['gazelle.tm.system.AdminPleaseUseForm']}
+
+                        <s:decorate id="idAdminDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.common.SystemId']}</ui:define>
+                            <h:outputText style="color: blue;font-weight: bold;"
+                                          value="#{systemInSessionEditor.getSystem().id}"/>
+                        </s:decorate>
+
+                        <s:decorate id="instAdminDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.users.institution.InstitutionName']}</ui:define>
+                            <h:outputText style="color: blue;font-weight: bold;"
+                                          value="#{systemManager.displayInstitutionForSystem( systemInSessionEditor.getSystem() )}"/>
+                        </s:decorate>
+
+                        <s:decorate id="systAdminDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.systems.system.SystemName']}
+                                (#{messages['gazelle.systems.system.SystemVersion']})
+                            </ui:define>
+                            <h:outputText style="font-weight: bold;"
+                                          value="#{systemInSessionEditor.getSystem().name} (#{systemInSessionEditor.getSystem().version})"/>
+                        </s:decorate>
+                        <p class="form-horizontal">
+                            <s:decorate id="publicationRequestAdminDecoration" template="/layout/form/_checkbox.xhtml">
+                                <h:selectBooleanCheckbox id="waitingForAdminValidationAdminBox"
+                                                         value="#{systemInSessionEditor.getSystem().isTool}">
+                                    <a4j:ajax event="click"
+                                              render="historyAdminDecoration" execute="@this"
+                                              listener="#{systemInSessionEditor.saveAsIsTool(systemInSessionEditor.getSystem())}"/>
+                                </h:selectBooleanCheckbox>
+                                <ui:define name="label">
+                                    #{messages['gazelle.systems.system.IsATool']}
+                                </ui:define>
+                            </s:decorate>
+                        </p>
+                        <s:decorate id="historyAdminDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.common.History']}</ui:define>
+                        </s:decorate>
+                    </ui:decorate>
+                </h:panelGroup>
+            </h:form>
+            <div id="editSystemSummarySaveSystemDiv">
+                <h:form id="editSystemButtonsForm">
+                    <a4j:commandButton id="cancelEdit" styleClass="gzl-btn"
+                                       value="#{messages['gazelle.common.button.Cancel']}" immediate="true"
+                                       action="#{systemInSessionEditor.viewSystemInSession(systemInSessionEditor.systemInSession,systemInSessionEditor.defaultTab)}"
+                                       execute="@this" onclick="processFormHidden();"/>
+                </h:form>
+            </div>
+        </div>
+    </ui:decorate>
+
+</div>

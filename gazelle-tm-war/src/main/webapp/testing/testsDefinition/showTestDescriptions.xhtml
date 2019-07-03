@@ -1,0 +1,98 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle"
+              value="#{messages['net.ihe.gazelle.tm.EditTestDefinitionsOf']} #{editTestDefinitionManager.editedTest.name}"/>
+    <!-- ======================= -->
+    <!-- Test Descriptions section-->
+    <!-- ======================= -->
+    <ui:define name="body">
+        <s:div id="TestDescriptionsManagement"
+               rendered="#{editTestDefinitionManager.editedTest.id != null and s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}">
+            <!-- View test descriptions -->
+            <h:form>
+                <a4j:commandButton styleClass="gzl-btn" immediate="true"
+                                   value="#{messages['net.ihe.gazelle.tm.BackToTest']}"
+                                   action="#{editTestDefinitionManager.backTo(editTestDefinitionManager.editedTest.id)}"
+                                   execute="@this"/>
+            </h:form>
+            <a4j:repeat value="#{editTestDefinitionManager.editedTest.testDescription}" var="selectedDescription">
+                <h:panelGroup rendered="#{selectedDescription != null}">
+                    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                        <ui:define name="panel_title">#{selectedDescription.gazelleLanguage.keyword}</ui:define>
+                        <s:div id="testDescriptionForTogglePanel" style="overflow:auto;background-color:white;">
+                            <g:safehtml value="#{selectedDescription.description}"/>
+                        </s:div>
+                        <h:form>
+                            <h:outputLink
+                                    value="#{applicationPreferenceManager.getApplicationUrl()}testing/testsDefinition/editTestDescription.seam"
+                                    styleClass="gzl-btn"
+                                    rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}">
+                                <f:param name="id" value="#{editTestDefinitionManager.getEditedTest().id}"/>
+                                <f:param name="testDescId"
+                                         value="#{selectedDescription.getId()}"/>
+                                <h:outputText value="#{messages['gazelle.common.button.Edit']}"/>
+                            </h:outputLink>
+
+                            <h:outputLink
+                                    value="#{applicationPreferenceManager.getApplicationUrl()}testing/testsDefinition/translateDescription.seam"
+                                    styleClass="gzl-btn"
+                                    rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel() and editTestDefinitionManager.displayTranslateButton()}">
+                                <f:param name="id" value="#{editTestDefinitionManager.getEditedTest().id}"/>
+                                <f:param name="translatedTestDescriptionId" value="#{selectedDescription.id}"/>
+                                <h:outputText value="#{messages['gazelle.common.button.Translate']}"/>
+                            </h:outputLink>
+
+                            <a4j:commandButton
+                                    styleClass="gzl-btn-red"
+                                    oncomplete="jq162('#DescriptionDeleteConfirmationModalPanel').modal('show');"
+                                    actionListener="#{editTestDefinitionManager.setEditedTestDescriptionId(selectedDescription.id)}"
+                                    immediate="true"
+                                    value="#{messages['gazelle.common.button.Delete']}"
+                                    render=" :DescriptionDeleteConfirmationForm"/>
+
+                        </h:form>
+                    </ui:decorate>
+                </h:panelGroup>
+                <br/>
+            </a4j:repeat>
+            <h:form rendered="#{editTestDefinitionManager.noTestDescriptionExists()}">
+                <a4j:commandButton styleClass="gzl-btn"
+                                   value="#{messages['net.ihe.gazelle.tm.NewTestDescription']}"
+                                   action="#{editTestDefinitionManager.newTestDescription()}"
+                                   execute="@this" render="TestDescriptionsManagement"/>
+            </h:form>
+
+            <h:outputLink
+                    value="#{applicationPreferenceManager.getApplicationUrl()}testing/testsDefinition/editTestRoles.seam"
+                    styleClass="gzl-btn"
+                    rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}">
+                <f:param name="id" value="#{editTestDefinitionManager.editedTest.id}"/>
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.NextEditTestRoles']}"/>
+            </h:outputLink>
+
+            <!-- Delete Description Confirmation ModalPanel -->
+            <h:form id="DescriptionDeleteConfirmationForm">
+                <s:token allowMultiplePosts="true"/>
+                <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                    <ui:param name="popup_id" value="DescriptionDeleteConfirmationModalPanel"/>
+                    <ui:define name="popup_title">#{messages['gazelle.tm.DeleteDescription']}</ui:define>
+                    <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+                    <ui:define name="popup_footer">
+                        <button type="button" class="gzl-btn" data-dismiss="modal">
+                            #{messages['gazelle.tm.Cancel']}
+                        </button>
+                        <a4j:commandButton id="DescriptionDeleteConfirmationPanelButton"
+                                           value="#{messages['gazelle.common.button.Delete']}"
+                                           styleClass="gzl-btn-red" ignoreDupResponses="true"
+                                           actionListener="#{editTestDefinitionManager.deleteSelectedDescription()}"
+                                           onclick="jq162('#DescriptionDeleteConfirmationModalPanel').modal('hide');"
+                                           render="TestDescriptionsManagement"/>
+                    </ui:define>
+                </ui:decorate>
+            </h:form>
+        </s:div>
+    </ui:define>
+</ui:composition>

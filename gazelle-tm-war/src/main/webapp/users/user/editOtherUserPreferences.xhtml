@@ -1,0 +1,20 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.users.common.MyAccount']}"/>
+    <ui:define name="body">
+        <h:outputScript library="jscript" name="jsf_updated.js" target="head"/>
+        #{userPreferencesManager.initializeOther()}
+
+        <s:div id="globalDiv">
+            <f:subview id="subview_23">
+                <ui:include id="include4Edit" src="editUserPreferences.xhtml"/>
+            </f:subview>
+            <f:subview id="subview_24">
+                <ui:include id="include4View" src="viewUserPreferences.xhtml"/>
+            </f:subview>
+        </s:div>
+    </ui:define>
+</ui:composition>

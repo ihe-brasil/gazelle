@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.1.1.final using JasperReports Library version 6.1.1  -->
+<!-- 2016-01-12T10:57:30 -->
+<jasperReport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://jasperreports.sourceforge.net/jasperreports" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="aipoBasedOnSystemId" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="84dbf2b5-7187-4550-a32b-616a23c9b194">
+	<property name="ireport.zoom" value="3.0"/>
+	<property name="ireport.x" value="440"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="systemId" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[new Integer(104)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["/opt/gazelle/2010/reports/"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+     tf_actor."keyword" AS tf_actor_keyword,
+     tf_actor."name" AS tf_actor_name,
+     tf_integration_profile."keyword" AS tf_integration_profile_keyword,
+     tf_integration_profile."name" AS tf_integration_profile_name,
+     tf_integration_profile_option."keyword" AS tf_integration_profile_option_keyword,
+     tf_integration_profile_option."name" AS tf_integration_profile_option_name
+FROM
+     "public"."tf_actor" tf_actor INNER JOIN "public"."tf_actor_integration_profile" tf_actor_integration_profile ON tf_actor."id" = tf_actor_integration_profile."actor_id"
+     INNER JOIN "public"."tf_actor_integration_profile_option" tf_actor_integration_profile_option ON tf_actor_integration_profile."id" = tf_actor_integration_profile_option."actor_integration_profile_id"
+     INNER JOIN "public"."tf_integration_profile" tf_integration_profile ON tf_actor_integration_profile."integration_profile_id" = tf_integration_profile."id"
+     INNER JOIN "public"."tf_integration_profile_option" tf_integration_profile_option ON tf_actor_integration_profile_option."integration_profile_option_id" = tf_integration_profile_option."id"
+     INNER JOIN "public"."tm_system_actor_profiles" tm_system_actor_profiles ON tf_actor_integration_profile_option."id" = tm_system_actor_profiles."actor_integration_profile_option_id"
+WHERE
+     tm_system_actor_profiles."system_id" = $P{systemId}
+ORDER BY
+     tf_integration_profile."name" ASC,
+     tf_actor."name" ASC]]>
+	</queryString>
+	<field name="tf_actor_keyword" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tf_actor_name" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tf_integration_profile_keyword" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tf_integration_profile_name" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tf_integration_profile_option_keyword" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tf_integration_profile_option_name" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<pageHeader>
+		<band/>
+	</pageHeader>
+	<columnHeader>
+		<band height="32">
+			<staticText>
+				<reportElement positionType="Float" mode="Opaque" x="1" y="0" width="208" height="32" backcolor="#CCCCCC" uuid="6c2ff908-1123-47d5-a271-d047054c88ba"/>
+				<box leftPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ Profiles Implemented]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" mode="Opaque" x="209" y="0" width="211" height="32" backcolor="#CCCCCC" uuid="47983eb1-4313-4dbd-9c4e-e62f788fb2f2"/>
+				<box leftPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ Actors Implemented]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" mode="Opaque" x="420" y="0" width="140" height="32" backcolor="#CCCCCC" uuid="b8627033-7a2b-4be0-8c1d-796a294ce43c"/>
+				<box leftPadding="5">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ Options Implemented]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="26" splitType="Prevent">
+			<textField isStretchWithOverflow="true">
+				<reportElement x="1" y="0" width="208" height="25" uuid="12e95d80-d293-48f8-8ad9-cbd4367dc9a4"/>
+				<box leftPadding="5" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="0.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{tf_integration_profile_name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="209" y="0" width="211" height="25" uuid="6e0d53ab-f84b-482a-88c0-3d1a24a59989"/>
+				<box leftPadding="5" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{tf_actor_name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="420" y="0" width="140" height="25" uuid="28ba427a-c866-4022-ab09-01316d86952f"/>
+				<box leftPadding="5" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{tf_integration_profile_option_name}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band/>
+	</summary>
+</jasperReport>

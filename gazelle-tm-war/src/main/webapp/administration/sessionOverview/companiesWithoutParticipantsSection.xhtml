@@ -1,0 +1,85 @@
+<s:div xmlns:h="http://java.sun.com/jsf/html"
+       xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:a4j="http://richfaces.org/a4j"
+       xmlns:s="http://jboss.org/schema/seam/taglib"
+       xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml"><br/>
+
+
+    <h:form id="companiesWithoutParticipantsForm"
+            rendered="#{s:hasRole('admin_role') || s:hasRole('institutions_editor_role') || s:hasRole('project-manager_role')}"><!--<s:token allowMultiplePosts="true"/>-->
+        <p>
+            <h:outputText id="ThereAreAdminOutputTextcompaniesWithoutParticipants"
+                          value="#{messages['gazelle.systems.ThereAreAdmin']} "
+                          rendered="#{connectathonParticipantManager.companiesWithoutParticipants.size() &gt;1}"/>
+            <h:outputText id="ThereIsAdminOutputTextcompaniesWithoutParticipants"
+                          value="#{messages['gazelle.systems.ThereIsAdmin']} "
+                          rendered="#{connectathonParticipantManager.companiesWithoutParticipants.size() ==1}"/>
+            <h:outputText style="color: blue;font-weight: bold;"
+                          id="SizeListInstitutionSystemsOutputTextcompaniesWithoutParticipants"
+                          value="#{connectathonParticipantManager.companiesWithoutParticipants.size()}"/>
+            <h:outputText id="WithSelectionOutputTextcompaniesWithoutParticipants"
+                          value="#{messages['gazelle.testmanagement.session.CompaniesWichHaveNoneParticipants']} "/>
+        </p>
+
+        <a4j:repeat id="companiesRepeat" value="#{connectathonParticipantManager.companiesWithoutParticipants}"
+                    var="institutionUsed" rowKeyVar="i">
+            <div>
+                <h:commandLink value="#{institutionUsed.keyword}"
+                               action="#{institutionManagerTM.viewInstitutionForTM(institutionUsed)}"
+                               immediate="true"/>
+
+                <h:panelGroup rendered="#{s:hasRole('admin_role')|| s:hasRole('accounting_role')}">
+                    <a href="#{institutionUsed.url}" style="color: white;" target="_blank"
+                       title="#{messages['gazelle.tm.GoTo']} : #{institutionUsed.url}">
+                        <span class="gzl-icon-globe"/>
+                    </a>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{s:hasRole('admin_role') }">
+                    <a4j:commandLink id="usersSupport" title="#{messages['gazelle.common.button.Users']}"
+                                     action="#{userManager.displayUsersForCompany(  institutionUsed  )}"
+                                     immediate="true" onRowMouseOver="this.style.cursor='pointer'">
+                        <span class="gzl-icon-user"/>
+                    </a4j:commandLink>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{s:hasRole('admin_role')|| s:hasRole('accounting_role')}">
+                    <a4j:commandLink id="contactsSupport" title="#{messages['gazelle.common.button.Contacts']}"
+                                     action="#{personManager.displayContactsForCompany(  institutionUsed  )}"
+                                     immediate="true" onRowMouseOver="this.style.cursor='pointer'">
+                        <span class="gzl-icon-users"/>
+                    </a4j:commandLink>
+                </h:panelGroup>
+
+                <a4j:commandLink id="invoiceSupport" title="#{messages['gazelle.users.Invoice']}"
+                                 action="#{financialManager.editInvoiceForCurrentSession(  institutionUsed  )}"
+                                 immediate="true" onRowMouseOver="this.style.cursor='pointer'">
+                      <span class="gzl-icon-stack">
+                          <span class="gzl-icon-file-o gzl-icon-stack-1x"/>
+                          <span class="gzl-icon-usd gzl-icon-stack-1x"/>
+                      </span>
+                </a4j:commandLink>
+                <a4j:commandLink id="participantsSupport" title="#{messages['gazelle.tm.ManageParticipants']}"
+                                 actionListener="#{institutionManager.setChoosenInstitutionForAdmin(institutionUsed)}"
+                                 action="#{connectathonParticipantManager.manageCompany( institutionUsed )}"
+                                 immediate="true" onRowMouseOver="this.style.cursor='pointer'">
+                                   <span class="gzl-icon-stack">
+                                      <span class="gzl-icon-users gzl-icon-stack-1x"/>
+                                      <span class="gzl-icon-exclamation-triangle gzl-icon-stack-1x gzl-icon-stack-bottom-right"/>
+                                    </span>
+                </a4j:commandLink>
+            </div>
+        </a4j:repeat>
+    </h:form>
+
+    <h:panelGroup
+            rendered="#{empty connectathonParticipantManager.companiesWithoutParticipants or connectathonParticipantManager.companiesWithoutParticipants.size()==0 }">
+        <ui:decorate template="/layout/panels/_panel.xhtml">
+            <span class="gzl-icon-checked"/>
+
+            <h3>
+                <h:outputText id="noContactLabel"
+                              value="#{messages['gazelle.testmanagement.session.AllCompaniesHaveParticipants']}"
+                              style="font-style:italic"/>
+            </h3>
+        </ui:decorate>
+    </h:panelGroup>
+</s:div>

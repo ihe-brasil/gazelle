@@ -1,0 +1,227 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <s:div id="descpanel" rendered="#{managedBean.selectedObjectInstance != null}">
+        <s:div rendered="#{!managedBean.selectedObjectInstanceExistsOnDisc}">
+            <h:outputText value="#{messages['net.ihe.gazelle.tm.TheActualSampleHasMissingFilesOnTheServerThankYo']}"
+                          styleClass="gzl-alert gzl-alert-red"/>
+        </s:div>
+        <s:decorate template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.tf.table.Id']}</ui:define>
+            <h:outputText value="#{managedBean.selectedObjectInstance.id}"/>
+        </s:decorate>
+        <s:decorate template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.testmanagement.object.SampleName']}</ui:define>
+            <h:outputText value="#{managedBean.selectedObjectInstance.name}"/>
+        </s:decorate>
+        <s:decorate template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.testmanagement.object.SampleType']}</ui:define>
+            <h:outputText value="#{managedBean.selectedObjectInstance.object.keyword}"/>
+        </s:decorate>
+        <s:decorate template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.testmanagement.object.SystemInSessionCreator']}</ui:define>
+            <h:outputText value="#{managedBean.selectedObjectInstance.system.system.keyword}"/>
+        </s:decorate>
+        <s:decorate template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.users.user.UserInstitution']}</ui:define>
+            <h:outputText value="#{managedBean.getInstitution(managedBean.selectedObjectInstance)}"/>
+        </s:decorate>
+        <s:decorate template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.testmanagement.object.CreationDate']}</ui:define>
+            <g:date tooltip="true" value="#{managedBean.selectedObjectInstance.lastChanged}"/>
+        </s:decorate>
+        <s:decorate template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.tf.Usage']}</ui:define>
+            <h:outputText value="#{managedBean.selectedObjectInstance.objectUsageType.keyword}"/>
+        </s:decorate>
+        <s:decorate template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.tm.patient.PermanentLink']}</ui:define>
+            <h:outputLink value="#{managedBean.getPermanentLink()}">
+                <h:outputText value="#{managedBean.getPermanentLink()}"/>
+            </h:outputLink>
+        </s:decorate>
+        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+            <ui:define name="panel_title">#{messages['gazelle.tm.testing.instance.description']}
+            </ui:define>
+            <g:safehtml value="#{managedBean.selectedObjectInstance.description}"/>
+        </ui:decorate>
+        <div class="row">
+            <div class="col-lg-8">
+                <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                    <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.FilesUploadedByTheCreatorOfTheSample']}
+                    </ui:define>
+                    <ui:include src="/objects/fileTable.xhtml"/>
+                    <rich:list var="currentObjectInstanceFile"
+                               rendered="#{!managedBean.selectedObjectInstanceExistsOnDisc}"
+                               value="#{managedBean.getListInstanceFileFromObjectInstance(managedBean.selectedObjectInstance)}"
+                               type="unordered">
+                        <h:outputText value="#{currentObjectInstanceFile.file.type.keyword} : "/>
+                        <h:outputText value="#{currentObjectInstanceFile.url}"/>
+                    </rich:list>
+
+                </ui:decorate>
+            </div>
+            <div class="col-lg-4">
+                <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                    <ui:define name="panel_title">
+                        #{messages['net.ihe.gazelle.tm.SnapshotsUploadedByTheCreatorOfTheSample']}
+                    </ui:define>
+                    <h:form id="currentObjectInstanceFileForm">
+                        <s:token allowMultiplePosts="true"/>
+                        <a4j:repeat id="listOfSnapshotForCreator" var="currentObjectInstanceFile"
+                                    rendered="#{managedBean.selectedObjectInstanceExistsOnDisc}"
+                                    value="#{managedBean.getListObjectInstanceFileWhichAreSnapshot(managedBean.selectedObjectInstance)}">
+                            <a4j:region>
+                                <h:outputLink value="#{managedBean.getLink(currentObjectInstanceFile)}"
+                                              styleClass="img-thumbnail"
+                                              title="#{currentObjectInstanceFile.url}"
+                                              target="_blank">
+                                    <img src="#{managedBean.getThumbnailLink(currentObjectInstanceFile)}"/>
+                                </h:outputLink>
+                            </a4j:region>
+
+                        </a4j:repeat>
+                    </h:form>
+                </ui:decorate>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                    <ui:define name="panel_title">#{messages['gazelle.testmanagement.object.ListOfAttriute']}
+                    </ui:define>
+                    <rich:list id="listOfAttribute" var="currentInstanceAttribute"
+                               value="#{managedBean.getListInstanceAttributeFromObjectInstance(managedBean.selectedObjectInstance)}"
+                               type="unordered">
+                        <h:outputText value="#{currentInstanceAttribute.attribute.keyword}"/>
+                    </rich:list>
+                </ui:decorate>
+            </div>
+            <div class="col-lg-6">
+                <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                    <ui:define name="panel_title">#{messages['gazelle.testmanagement.object.ListFilesUploadedReaders']}
+                    </ui:define>
+                    <ui:insert name="treeOfFilesUploadedByReaders"/>
+                </ui:decorate>
+            </div>
+        </div>
+        <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+            <ui:param name="panel_id" value="commentsPanel"/>
+            <ui:define name="panel_title">#{messages['gazelle.tm.testing.instance.comments']}
+            </ui:define>
+            <s:div id="helloword">
+                <s:div style="width:100%;" id="helloword1"
+                       rendered="#{managedBean.getReadersDescriptionsOnCreate().size() &gt; 0}">
+                    <h:form id="annotationForReaderOnCreateForm">
+                        <s:token allowMultiplePosts="true"/>
+                        <rich:dataTable id="AnnotationForReaderOnCreate" var="currentAnnotation"
+                                        value="#{managedBean.getReadersDescriptionsOnCreate()}" rowKeyVar="rowNumber"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" width="600" render="ds">
+                            <g:column width="25%">
+                                <ui:define name="header">
+                                    <a4j:commandLink actionListener="#{managedBean.sortReadersDescriptionsByDate()}"
+                                                     render="annotationForReaderOnCreateForm">
+                                        #{messages['gazelle.testmanagement.object.CreationDate']}
+                                    </a4j:commandLink>
+                                </ui:define>
+                                <g:date tooltip="true" value="#{currentAnnotation.lastChanged}"/>
+                            </g:column>
+                            <g:column width="25%">
+                                <ui:define name="header">#{messages['gazelle.tm.search.user']}</ui:define>
+                                <h:outputText value="#{currentAnnotation.lastModifierId}"/>
+                            </g:column>
+                            <g:column style="width:40%;">
+                                <ui:define name="header">#{messages['gazelle.testmanagement.object.Note']}</ui:define>
+                                <h:outputText value="#{currentAnnotation.value}"/>
+                            </g:column>
+                            <g:column style="width:10%;">
+                                <ui:define name="header">#{messages['gazelle.testmanagement.object.Action']}</ui:define>
+                                <a4j:commandLink event="click"
+                                                 height="15" title="#{messages['gazelle.tm.Edit']}"
+                                                 rendered="#{managedBean.viewDeleteImg(currentAnnotation)}"
+                                                 oncomplete="jq162('#EditSelectedAnnotation').modal('show');"
+                                                 execute="@this"
+                                                 render="annotationForReaderOnCreateForm,EditSelectedAnnotation, :CommsdfrmFC"
+                                                 actionListener="#{managedBean.setSelectedAnnotation(currentAnnotation) }">
+                                    <span class="gzl-icon-pencil"/>
+                                </a4j:commandLink>
+                                <a4j:commandLink id="DeleteCommentOfUserRead" event="click"
+                                                 title="#{messages['gazelle.testmanagement.object.DeleteAnnotation']}"
+                                                 rendered="#{managedBean.viewDeleteImg(currentAnnotation)}"
+                                                 actionListener="#{managedBean.setSelectedAnnotation(currentAnnotation)}"
+                                                 oncomplete="jq162('#DeleteAnnotationPanel').modal('show');"
+                                                 immediate="true" execute="@this"
+                                                 render="annotationForReaderOnCreateForm,DeleteAnnotationPanel, :deleteAnnForm,helloword">
+                                    <span class="gzl-icon-trash-o"/>
+                                </a4j:commandLink>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId" value="AnnotationForReaderOnCreate"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </h:form>
+                </s:div>
+                <s:div rendered="#{managedBean.getReadersDescriptionsOnCreate().size() == 0}">
+                    <h:outputText id="emptyAnnotationOnCreate"
+                                  value="#{messages['gazelle.tm.ThereAreNoCommentsFromUsersOfThisSample']}."/>
+                </s:div>
+            </s:div>
+
+            <h:outputText value="#{messages['gazelle.testmanagement.object.SampleReady']}"
+                          rendered="#{managedBean.selectedObjectInstance.completed}"/>
+            <h:outputText value="#{messages['gazelle.testmanagement.object.SampleNotReady']}"
+                          rendered="#{!managedBean.selectedObjectInstance.completed}" style="color:#aa0000;"/>
+
+        </ui:decorate>
+        <h:form id="validationDecorationForm">
+            <s:decorate template="/layout/panels/_panel.xhtml"
+                        rendered="#{s:hasRole('admin_role')|| s:hasRole('monitor_role')}">
+                <s:decorate id="ValidationDecoration" template="/layout/form/_edit.xhtml">
+                    <ui:define name="label">#{messages['gazelle.testmanagement.object.Validation']}</ui:define>
+                    <h:selectOneMenu styleClass="form-control gzl-form-control" id="ValidationBox"
+                                     value="#{managedBean.selectedObjectInstance.validation}"
+                                     style="font-weight:bold;text-align:center;">
+                        <s:selectItems id="ListValidationOptions" value="#{managedBean.possibleValidationOptions}"
+                                       var="validationOption"
+                                       noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                       label="#{validationOption.value}"/>
+                        <a4j:ajax event="change"
+                                  render="messageDecoration,richTabForSamples, :CreatorsForm, :ReadersForm, :annotationForReaderOnCreateForm,helloword"
+                                  execute="@this"
+                                  listener="#{managedBean.mergeTheNewValidationOfSample(managedBean.selectedObjectInstance)}"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+            </s:decorate>
+        </h:form>
+    </s:div>
+    <s:div id="descpanelNull" rendered="#{managedBean.selectedObjectInstance == null}">
+        <h:outputText value="#{messages['gazelle.testmanagement.object.ProblemIdNotGoodFormat']}"
+                      style="color:#DD0000;"/>
+    </s:div>
+    <s:div id="editbutdiv">
+        <h:form id="editbutForm">
+            <s:token allowMultiplePosts="true"/>
+            <a4j:commandButton styleClass="gzl-btn-blue" id="EditObjectInstanceButton"
+                               value="#{messages['gazelle.testmanagement.object.EditSample']}"
+                               actionListener="#{objectInstanceManager.initializeObjectInstanceAndReturnToSample(managedBean.selectedObjectInstance,sampleReturn)}"
+                               action="/objects/EditSample.xhtml" rendered="#{managedBean.currentUserCanEditSample()}"
+                               immediate="true"
+                               render="TreeOfSample4Creator,TreeOfSampleForReading,objectInstanceCreatorPage"
+                               execute="@this"/>
+            <a4j:commandButton value="#{messages['net.ihe.gazelle.tm.CommentSample']}" id="AddCommmentByCreator"
+                               oncomplete="jq162('#CommentSampleModal').modal('show');"
+                               rendered="#{managedBean.currentUserCanAddCommentSample()}" immediate="true"
+                               styleClass="gzl-btn" execute="@this"
+                               render="CommentSampleModal, :CommentSampleForm, annotationForReaderOnCreateForm"/>
+            <ui:insert name="moreButtons"/>
+        </h:form>
+    </s:div>
+    <ui:include src="/objects/modalPanel_editAnnotation.xhtml"/>
+    <ui:include src="/objects/modalPanel_deleteAnnotation.xhtml"/>
+    <ui:include src="/objects/modalPanel_commentSample.xhtml"/>
+</ui:composition>

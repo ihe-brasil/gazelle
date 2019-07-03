@@ -1,0 +1,532 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle"
+              value="#{messages['gazelle.financial.invoice.EditInvoiceDetails']} : #{financialManager.invoiceSelected.institution.name} (#{financialManager.invoiceSelected.institution.keyword})"/>
+    <ui:define name="body">
+        <h:outputScript library="jscript" name="disable_input_spinner_mouse_wheel.js"/>
+        <div class="col-lg-8 col-lg-offset-2">
+            <h:panelGroup
+                    rendered="#{s:hasRole('admin_role') ||  s:hasRole('accounting_role') || s:hasRole('testing_session_admin_role')}">
+
+                <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                    <ui:define name="panel_title">#{messages['gazelle.financial.invoice.EditInvoiceDetails']} :
+                        #{financialManager.invoiceSelected.institution.name}
+                        (#{financialManager.invoiceSelected.institution.keyword})
+                    </ui:define>
+                    <div id="invoiceDetailsDiv">
+                        <h:form id="editInvoiceDetails">
+                            <ui:decorate template="/layout/panels/_panel.xhtml">
+                                <s:fragment>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <s:decorate id="institutionDecorationView"
+                                                        template="/layout/display/_display.xhtml">
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.financial.invoice.InstitutionName']}
+                                                </ui:define>
+                                                <a4j:commandLink
+                                                        action="#{institutionManagerTM.viewInstitutionForTM(financialManager.invoiceSelected.institution)}"
+                                                        value="#{financialManager.invoiceSelected.institution.name} (#{financialManager.invoiceSelected.institution.keyword}) "/>
+                                            </s:decorate>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <s:decorate id="testingSessionecorationView"
+                                                        template="/layout/display/_display.xhtml">
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.financial.invoice.TestingSession']}
+                                                </ui:define>
+                                                #{financialManager.invoiceSelected.testingSession.description}
+                                            </s:decorate>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <s:decorate id="purchaseOrderDecoration"
+                                                        template="/layout/form/_edit.xhtml">
+                                                <ui:param name="id" value="PurchaseOrderInput"/>
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.financial.invoice.PurchaseOrder']}
+                                                </ui:define>
+                                                <h:inputText id="PurchaseOrderInput" styleClass=" form-control"
+                                                             value="#{financialManager.invoiceSelected.purchaseOrder}"/>
+                                            </s:decorate>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <a4j:region id="contractReceptionRegion">
+                                                <ui:decorate id="contractReceivedDateDecoration"
+                                                             template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                                    <ui:param name="id" value="calendar"/>
+                                                    <ui:define name="label">
+                                                        #{messages['gazelle.financial.invoice.ContractReceivedDate']}
+                                                    </ui:define>
+                                                    <a4j:outputPanel id="calendar" layout="block">
+                                                        <rich:calendar
+                                                                value="#{financialManager.invoiceSelected.contractReceivedDate}"
+                                                                popup="true" showApplyButton="false" cellWidth="24px"
+                                                                datePattern="#{dateDisplay.calendarPatternDate}"
+                                                                locale="#{dateDisplay.calendarLocale}"
+                                                                timeZone="#{dateDisplay.calendarTimeZoneDate}"
+                                                                cellHeight="22px"
+                                                                styleClass="form-inline">
+                                                        </rich:calendar>
+                                                    </a4j:outputPanel>
+                                                </ui:decorate>
+                                            </a4j:region>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <s:decorate template="/layout/form/_edit.xhtml"
+                                                        rendered="#{financialManager.invoiceSelected.testingSession.allowParticipantRegistration == true}">
+                                                <ui:param name="id" value="SystemsInvoicedInput"/>
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.tm.invoice.SystemsInvoiced']}
+                                                </ui:define>
+                                                <rich:inputNumberSpinner id="SystemsInvoicedInput"
+                                                                         value="#{financialManager.invoiceSelected.numberSystem}"/>
+                                            </s:decorate>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <s:decorate template="/layout/display/_display.xhtml"
+                                                        rendered="#{financialManager.invoiceSelected.testingSession.allowParticipantRegistration == false}">
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.tm.invoice.SystemsInvoiced']}
+                                                </ui:define>
+                                                <h:outputText
+                                                        value="#{financialManager.invoiceSelected.numberSystem}"/>
+                                            </s:decorate>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <s:decorate template="/layout/form/_edit.xhtml"
+                                                        rendered="#{financialManager.invoiceSelected.testingSession.allowParticipantRegistration == true}">
+                                                <ui:param name="id" value="PaticipantsInvoicedInput"/>
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.tm.invoice.PaticipantsInvoiced']}
+                                                </ui:define>
+                                                <rich:inputNumberSpinner id="PaticipantsInvoicedInput"
+                                                                         value="#{financialManager.invoiceSelected.numberParticipant}"/>
+                                                <h:outputText
+                                                        value=" (#{financialManager.invoiceSelected.numberExtraParticipant} #{messages['gazelle.tm.ExtraParticipants']})"/>
+                                            </s:decorate>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <s:decorate template="/layout/display/_display.xhtml"
+                                                        rendered="#{financialManager.invoiceSelected.testingSession.allowParticipantRegistration == false}">
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.tm.invoice.PaticipantsInvoiced']}
+                                                </ui:define>
+                                                <h:outputText
+                                                        value="#{financialManager.invoiceSelected.numberParticipant}"/>
+                                                <h:outputText
+                                                        value=" (#{financialManager.invoiceSelected.numberExtraParticipant} #{messages['gazelle.tm.ExtraParticipants']})"/>
+                                            </s:decorate>
+                                        </div>
+                                    </div>
+                                    <div style="border:thin solid black; padding:1em;">
+                                        <s:div id="feesDiv" styleClass="row">
+                                            <div class="col-md-2">
+                                                <h:outputText value="#{messages['gazelle.financial.invoice.FeesAmount']}"/>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <h:outputText value="+ #{messages['gazelle.financial.invoice.VatAmount']}"/>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <h:outputText value=" - #{messages['gazelle.financial.invoice.FeesPaid']} "/>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <h:outputText value=" - #{messages['gazelle.financial.invoice.FeesDiscount']}"
+                                                              rendered="#{financialManager.invoiceSelected.feesDiscount &gt;= 0}"/>
+                                                <h:outputText value=" + #{messages['net.ihe.gazelle.tm.AdditionalFees']}"
+                                                              rendered="#{financialManager.invoiceSelected.feesDiscount &lt; 0}"/>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <h:outputText value=" = #{messages['gazelle.financial.invoice.FeesDue']}"/>
+                                            </div>
+                                        </s:div>
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <h:outputText value="#{financialManager.invoiceSelected.feesAmount}"/>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <h:outputText id="vatId" value="+ #{financialManager.invoiceSelected.vatAmount}"/>
+                                            </div>
+                                            <div class="col-md-3 form-inline">
+                                                <a4j:region id="feesPaidRegion">
+                                                    <h:outputText value="-"/>
+                                                    <h:inputText styleClass=" form-control"
+                                                                 value="#{financialManager.invoiceSelected.feesPaid}"
+                                                                 size="10"
+                                                                 maxlength="10">
+                                                        <a4j:ajax event="keyup"
+                                                                  render="feesDiv,sumId,vatId"
+                                                                  listener="#{financialManager.updateFeesDue()}"/>
+                                                    </h:inputText>
+                                                </a4j:region>
+                                            </div>
+                                            <div class="col-md-3 form-inline">
+                                                <a4j:region id="feesDiscountRegion">
+                                                    <h:outputText value="-"/>
+                                                    <h:inputText styleClass=" form-control"
+                                                                 value="#{financialManager.invoiceSelected.feesDiscount}"
+                                                                 size="8" maxlength="8">
+                                                        <a4j:ajax event="keyup"
+                                                                  render="feesDiv,sumId,vatId,reasonsForDiscountDecoration"
+                                                                  listener="#{financialManager.updateFeesDue()}"/>
+                                                    </h:inputText>
+                                                </a4j:region>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <h:outputText id="sumId"
+                                                              value="= #{financialManager.invoiceSelected.feesDue} #{financialManager.invoiceSelected.testingSession.currency.keyword}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <a4j:region id="reasonsForDiscountRegion">
+                                        <s:decorate id="reasonsForDiscountDecoration"
+                                                    template="/layout/form/_edit.xhtml">
+                                            <ui:param name="id" value="ReasonsForDiscountInput"/>
+                                            <ui:define name="label">
+                                                <h:outputText rendered="#{financialManager.invoiceSelected.feesDiscount &gt;= 0}"
+                                                              value="#{messages['gazelle.financial.invoice.ReasonsForDiscount']}"/>
+                                                <h:outputText value="#{messages['net.ihe.gazelle.tm.ReasonForAdditionFees']}"
+                                                              rendered="#{financialManager.invoiceSelected.feesDiscount &lt; 0}"/>
+                                            </ui:define>
+                                            <h:inputText id="ReasonsForDiscountInput"
+                                                         styleClass=" form-control"
+                                                         maxlength="200" size="100"
+                                                         value="#{financialManager.invoiceSelected.reasonsForDiscount}"/>
+                                        </s:decorate>
+                                    </a4j:region>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+
+                                            <s:decorate id="vatDueDecoration" template="/layout/display/_display.xhtml">
+                                                <ui:define name="label">#{messages['gazelle.financial.invoice.VatDue']}
+                                                </ui:define>
+                                                <h:selectBooleanCheckbox disabled="true"
+                                                                         value="#{financialManager.invoiceSelected.vatDue}"/>
+                                            </s:decorate>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <a4j:region id="vatNumberRegion">
+                                                <s:decorate id="memberStateDecoration"
+                                                            template="/layout/display/_display.xhtml">
+                                                    #{financialManager.validateVATCountryFromFinancialContact(financialManager.invoiceSelected)}
+                                                    <ui:define name="label">
+                                                        #{messages['gazelle.users.institution.MemberState']}
+                                                    </ui:define>
+
+                                                    <h:panelGrid columns="2">
+                                                        <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                                         id="vatCountryListBox"
+                                                                         value="#{financialManager.invoiceSelected.vatCountry}"
+                                                                         required="false">
+                                                            <s:selectItems
+                                                                    value="#{gazelleDAO.getPossibleVATCountries()}"
+                                                                    var="vatCountryFromList"
+                                                                    noSelectionLabel="-------"
+                                                                    label="#{vatCountryFromList.iso} - #{vatCountryFromList.printableName}"/>
+                                                            <a4j:ajax event="change"
+                                                                      render="vatNumberDecoration,memberStateDecoration"
+                                                                      listener="#{financialManager.validateVATNumber()}"/>
+                                                        </h:selectOneMenu>
+
+                                                        <s:span styleClass="gzl-icon-circle-green"
+                                                                rendered="#{financialManager.invoiceSelected.validVATCountryFromFinancialContact}"
+                                                                title="#{messages['gazelle.tm.invoice.TheVatCountryMatchWellWithTheFinancialAddress']}"/>
+
+                                                        <s:span styleClass="gzl-icon-exclamation-triangle"
+                                                                title="#{messages['gazelle.tm.invoice.TheVatCountryDontMatchWithTheFinancialAddress']}"
+                                                                rendered="#{!financialManager.invoiceSelected.validVATCountryFromFinancialContact}"/>
+
+                                                    </h:panelGrid>
+                                                </s:decorate>
+                                                <s:decorate id="vatNumberDecoration"
+                                                            template="/layout/form/_edit.xhtml">
+                                                    <ui:param name="id" value="vatNumberInput"/>
+                                                    <ui:define name="label">
+                                                        #{messages['gazelle.users.institution.vatNumber']}
+                                                    </ui:define>
+                                                    <h:panelGrid columns="3">
+                                                        <h:outputText id="vatCountryOutput" size="4"
+                                                                      value="#{financialManager.invoiceSelected.vatCountry.iso} - "
+                                                        />
+                                                        <h:inputText styleClass=" form-control" id="vatNumberInput"
+                                                                     maxlength="32" size="18"
+                                                                     value="#{financialManager.invoiceSelected.vatNumber}"
+                                                                     required="false">
+                                                            <a4j:ajax event="blur" render="vatNumberDecoration"
+                                                                      listener="#{financialManager.validateVATNumber()}"/>
+                                                        </h:inputText>
+
+                                                        <s:span styleClass="gzl-icon-circle-green"
+                                                                rendered="#{financialManager.invoiceSelected.vatValidity != null and financialManager.invoiceSelected.vatValidity}"
+                                                                title="#{messages['gazelle.tm.invoice.ValidVatNumberAndCountry']}"/>
+
+                                                        <s:span styleClass="gzl-icon-exclamation-triangle"
+                                                                rendered="#{financialManager.invoiceSelected.vatValidity == null or not financialManager.invoiceSelected.vatValidity}"
+                                                                title="#{messages['gazelle.tm.invoice.InvalidVatNumberForCountrySpecified']}"/>
+                                                    </h:panelGrid>
+                                                </s:decorate>
+                                            </a4j:region>
+                                        </div>
+                                    </div>
+
+
+                                    <a4j:region>
+                                        <s:decorate template="/layout/form/_edit.xhtml">
+                                            <ui:param name="id" value="PrepareInvoiceInput"/>
+                                            <ui:define name="label">#{messages['net.ihe.gazelle.tm.PrepareInvoice']}
+                                            </ui:define>
+                                            <h:inputTextarea id="PrepareInvoiceInput" styleClass=" form-control"
+                                                             rows="4"
+                                                             cols="100"
+                                                             value="#{financialManager.invoiceSelected.adminInvoiceNotes}"/>
+                                        </s:decorate>
+                                    </a4j:region>
+                                    <a4j:region>
+                                        <s:decorate template="/layout/form/_edit.xhtml">
+                                            <ui:param name="id" value="SpecialInstructionsInput"/>
+                                            <ui:define name="label">
+                                                #{messages['net.ihe.gazelle.tm.SpecialInstructions']}
+                                            </ui:define>
+                                            <h:outputText style="font-weight:bold; color:red;"
+                                                          id="SpecialInstructionsInput"
+                                                          value="#{financialManager.invoiceSelected.specialInstructions}"/>
+                                        </s:decorate>
+                                    </a4j:region>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <a4j:region id="invoiceSentRegion">
+                                                <s:decorate id="invoiceSentDecoration"
+                                                            template="/layout/display/_display.xhtml">
+                                                    <ui:define name="label">
+                                                        #{messages['gazelle.financial.invoice.InvoiceSent']}
+                                                    </ui:define>
+                                                    <h:selectBooleanCheckbox id="invoiceSentBool"
+                                                                             value="#{financialManager.invoiceSelected.invoiceSent}"/>
+                                                </s:decorate>
+                                            </a4j:region>
+                                        </div>
+                                        <div class="col-md-6">
+
+                                            <a4j:region id="invoiceSentDateRegion">
+                                                <ui:decorate id="invoiceSentDateDecoration"
+                                                             template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                                    <ui:param name="id" value="calendar2"/>
+                                                    <ui:define name="label">
+                                                        #{messages['gazelle.financial.invoice.InvoiceSentDate']}
+                                                    </ui:define>
+                                                    <a4j:outputPanel id="calendar2" layout="block">
+                                                        <rich:calendar
+                                                                value="#{financialManager.invoiceSelected.invoiceSentDate}"
+                                                                popup="true" showApplyButton="false" cellWidth="24px"
+                                                                onchanged="document.getElementById('editInvoiceDetails:invoiceSentDecoration:invoiceSentBool').checked=true;"
+                                                                datePattern="#{dateDisplay.calendarPatternDate}"
+                                                                locale="#{dateDisplay.calendarLocale}"
+                                                                timeZone="#{dateDisplay.calendarTimeZoneDate}"
+                                                                cellHeight="22px" styleClass="form-inline">
+                                                        </rich:calendar>
+                                                    </a4j:outputPanel>
+                                                </ui:decorate>
+                                            </a4j:region>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+
+                                            <a4j:region id="invoicePaidRegion">
+                                                <s:decorate id="invoicePaidDecoration"
+                                                            template="/layout/display/_display.xhtml">
+                                                    <ui:define name="label">
+                                                        #{messages['gazelle.financial.invoice.InvoicePaid']}
+                                                    </ui:define>
+                                                    <h:selectBooleanCheckbox id="invoicePaidBool"
+                                                                             value="#{financialManager.invoiceSelected.invoicePaid}"/>
+                                                </s:decorate>
+                                            </a4j:region>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <a4j:region id="invoicePaymentDateRegion">
+                                                <ui:decorate id="invoicePaymentDateDecoration"
+                                                             template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                                    <ui:param name="id" value="invoicePaymentCalendar"/>
+                                                    <ui:define name="label">
+                                                        #{messages['gazelle.financial.invoice.InvoicePaymentDate']}
+                                                    </ui:define>
+                                                    <a4j:outputPanel layout="block">
+                                                        <rich:calendar id="invoicePaymentCalendar"
+                                                                       value="#{financialManager.invoiceSelected.invoicePaymentDate}"
+                                                                       popup="true" showApplyButton="false"
+                                                                       cellWidth="24px"
+                                                                       onchanged="document.getElementById('editInvoiceDetails:invoicePaidDecoration:invoicePaidBool').checked=true;"
+                                                                       datePattern="#{dateDisplay.calendarPatternDate}"
+                                                                       locale="#{dateDisplay.calendarLocale}"
+                                                                       timeZone="#{dateDisplay.calendarTimeZoneDate}"
+                                                                       cellHeight="22px" styleClass="form-inline">
+                                                        </rich:calendar>
+                                                    </a4j:outputPanel>
+                                                </ui:decorate>
+                                            </a4j:region>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <s:div id="invoicePathPanel">
+                                                <a4j:region id="invoicePathRegion">
+                                                    <s:decorate id="invoicePathDecoration"
+                                                                template="/layout/display/_display.xhtml">
+                                                        <ui:define name="label">
+                                                            #{messages['gazelle.financial.invoice.InvoicePath']}
+                                                        </ui:define>
+                                                        <h:outputText
+                                                                value="#{financialManager.invoiceSelected.invoiceRelativePath}"/>
+                                                        <a href="mailto:#{financialManager.emailAddressFirstBillingContact}?cc=office@ihe-europe.net&amp;subject=Your invoice for connectathon&amp;attachment=file:///Users/epoiseau/Downloads/invoice-#{financialManager.invoiceSelected.getInstitution().getKeyword()}-#{financialManager.invoiceSelected.getTestingSession().getYear()}.pdf">
+                                                            <span class="gzl-icon-email"/>
+                                                        </a>
+                                                        <h:panelGroup
+                                                                rendered="#{financialManager.invoiceSelected.invoiceRelativePath != null}">
+                                                            <h:commandLink
+                                                                    action="#{financialManager.displayInvoice(financialManager.invoiceSelected)}"
+                                                                    title="#{messages['net.ihe.gazelle.tm.Download_2']}">
+                                                                <span class="gzl-icon-download"/>
+                                                            </h:commandLink>
+                                                        </h:panelGroup>
+                                                    </s:decorate>
+                                                </a4j:region>
+                                            </s:div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <s:div id="generationDatePanel">
+                                                <a4j:region id="generationDateRegion">
+                                                    <s:decorate id="generationDateDecoration"
+                                                                template="/layout/display/_display.xhtml">
+                                                        <ui:define name="label">
+                                                            #{messages['gazelle.financial.invoice.GenerationDate']}
+                                                        </ui:define>
+                                                        <g:date tooltip="true"
+                                                                value="#{financialManager.invoiceSelected.invoiceGenerationDate}"/>
+                                                    </s:decorate>
+                                                </a4j:region>
+                                            </s:div>
+                                        </div>
+                                    </div>
+                                    <s:div style="border:0;" id="invoiceNumberPanel">
+                                        <a4j:region id="invoiceNumberRegion">
+                                            <s:decorate id="invoiceNumberDecoration"
+                                                        template="/layout/display/_display.xhtml">
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.financial.invoice.InvoiceNumber']}
+                                                </ui:define>
+                                                <h:outputText
+                                                        value="#{financialManager.invoiceSelected.invoiceNumber}"/>
+                                                <a4j:commandLink
+                                                        actionListener="#{financialManager.regenerateInvoice()}"
+                                                        onRowMouseOver="this.style.cursor='pointer'"
+                                                        title="#{messages['net.ihe.gazelle.tm.GetNextInvoiceNumber']}"
+                                                        render="invoiceNumberPanel,invoicePathPanel">
+                                                    <span class="gzl-icon-refresh"/>
+                                                </a4j:commandLink>
+
+                                            </s:decorate>
+                                        </a4j:region>
+                                    </s:div>
+
+                                    <h:commandButton id="generateInvoice" styleClass="gzl-btn-orange"
+                                                     value="#{messages['gazelle.financial.invoice.generateInvoice']}"
+                                                     actionListener="#{financialManager.generateInvoice()}"
+                                                     render="invoicePathPanel,generationDatePanel,invoiceNumberPanel,messageDecoration,spinnerScript"/>
+                                    <a4j:commandButton id="reloadInvoic" styleClass="gzl-btn-blue"
+                                                       value="#{messages['gazelle.tm.invoice.ReloadInvoice']}"
+                                                       oncomplete="jq162('#ReloadInvoice').modal('show');"
+                                                       render="formreload,spinnerScript"/>
+                                    <a4j:commandButton id="reloadInvfromdata" styleClass="gzl-btn-blue"
+                                                       value="#{messages['net.ihe.gazelle.tm.RecalculateFeesAndSave']}"
+                                                       oncomplete="jq162('#RecalculateFee').modal('show');"
+                                                       render="formrecl,spinnerScript"/>
+
+
+                                </s:fragment>
+                            </ui:decorate>
+
+                            <div>
+                                <a4j:commandButton id="updateInvoice" styleClass="gzl-btn-green"
+                                                   value="#{messages['gazelle.common.button.Save']}"
+                                                   actionListener="#{financialManager.saveInvoice()}"
+                                                   render="feesGrid,messageDecoration,spinnerScript"/>
+                                <h:commandButton id="cancel" styleClass="gzl-btn"
+                                                 value="#{messages['gazelle.common.button.Cancel']}"
+                                                 action="/administration/listInvoices.seam" immediate="true"
+                                                 execute="@this"/>
+                                <h:commandButton id="backlistinv" styleClass="gzl-btn"
+                                                 value="#{messages['gazelle.tm.invoice.BackToListInvoices']}"
+                                                 action="/administration/listInvoices.seam" immediate="true"
+                                                 execute="@this"/>
+                            </div>
+                        </h:form>
+                    </div>
+                </ui:decorate>
+            </h:panelGroup>
+        </div>
+        <h:form id="formrecl">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="RecalculateFee"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.invoice.RecalculateFees1']}</ui:define>
+                <p>#{messages['gazelle.tm.invoice.ExplainRecalculateFees']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton value="#{messages['gazelle.tm.invoice.RecalculateFees1']}"
+                                       styleClass="gzl-btn-blue"
+                                       actionListener="#{financialManager.recalculateFees()}"
+                                       onclick="jq162('#RecalculateFee').modal('hide');"
+                                       render="editInvoiceDetails,messageDecoration,spinnerScript"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <h:form id="formreload">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="ReloadInvoice"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.invoice.ReloadInvoice1']}</ui:define>
+                <p>
+                    <h:outputText value="#{messages['gazelle.tm.invoice.ExplainReloadInvoice1']}"/>
+                    <h:outputText value="#{messages['gazelle.tm.invoice.ExplainReloadInvoice2']}"/>
+                </p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton value="#{messages['gazelle.tm.invoice.ReloadInvoice1']}"
+                                       styleClass="gzl-btn-blue"
+                                       actionListener="#{financialManager.reloadInvoice()}"
+                                       onclick="jq162('#ReloadInvoice').modal('hide');"
+                                       render="editInvoiceDetails,messageDecoration,spinnerScript"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+
+        <!--@formatter:off-->
+        <s:span id="spinnerScript">
+            <script>
+                disable_input_spinner_mouse_wheel('#{rich:clientId('SystemsInvoicedInput')}');
+                disable_input_spinner_mouse_wheel('#{rich:clientId('PaticipantsInvoicedInput')}');
+            </script>
+        </s:span>
+        <!--@formatter:on-->
+    </ui:define>
+</ui:composition>

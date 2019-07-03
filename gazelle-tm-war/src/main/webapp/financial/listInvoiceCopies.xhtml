@@ -1,0 +1,54 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tm.invoice.InvoicesGenerated']}"/>
+    <ui:define name="body">
+        <h:form id="globform">
+            <s:token allowMultiplePosts="true"/>
+            <a4j:queue requestDelay="300" ignoreDupResponses="true"/>
+            #{invoiceManager.initListInvoiceCopies()}
+
+            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                <ui:define name="panel_title">#{messages['gazelle.tm.invoice.InvoicesGenerated']}</ui:define>
+                <rich:dataTable id="invoicesTable" var="currentInvoiceCopy" value="#{invoiceManager.invoiceCopies}"
+
+
+                                rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                    <g:column sortBy="#{'number'}" sortOrder="ascending"
+                              filterBy="#{'number'}" filterEvent="onkeyup">
+                        <ui:define name="header">#{messages['gazelle.tm.invoice.Number']}</ui:define>
+                        <h:outputText value="#{currentInvoiceCopy.number}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.tm.invoice.Invoice']}</ui:define>
+                        <h:commandLink action="#{invoiceManager.displaySelectedInvoiceCopie(currentInvoiceCopy)}"
+                                       value="#{currentInvoiceCopy.pathName}"/>
+                    </g:column>
+                    <g:column sortBy="#{'institution.name'}" sortOrder="ascending"
+                              filterBy="#{'institution.name'}" filterEvent="onkeyup">
+                        <ui:define name="header">#{messages['gazelle.users.Institution']}</ui:define>
+                        <h:outputText value="#{currentInvoiceCopy.institution.name}"/>
+                    </g:column>
+                    <g:column sortBy="#{'year'}" sortOrder="ascending"
+                              filterBy="#{'year'}" filterEvent="onkeyup">
+                        <ui:define name="header">#{messages['gazelle.systems.session.Year']}</ui:define>
+                        <h:outputText value="#{currentInvoiceCopy.year}"/>
+                    </g:column>
+                    <g:column sortBy="#{'dateGeneration'}" sortOrder="ascending">
+                        <ui:define name="header">#{messages['gazelle.common.Date']}</ui:define>
+                        <g:date tooltip="true" value="#{currentInvoiceCopy.dateGeneration}"/>
+                    </g:column>
+                    <f:facet name="footer">
+                        <ui:include src="/util/datatableFooter.xhtml">
+                            <ui:param name="dataScrollerId" value="ds"/>
+                            <ui:param name="dataTableId" value="invoicesTable"/>
+                        </ui:include>
+                    </f:facet>
+                </rich:dataTable>
+
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

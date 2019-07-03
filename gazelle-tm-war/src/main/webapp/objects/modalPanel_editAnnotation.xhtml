@@ -1,0 +1,38 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+    <!-- Edit selected annotation -->
+    <!-- ui:param name="managedbean" value="a bean name (extends AbstractSampleManager)"-->
+    <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+    <h:form id="CommsdfrmFC">
+        <s:token allowMultiplePosts="true"/>
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="EditSelectedAnnotation"/>
+            <ui:define name="popup_title">#{messages['gazelle.testmanagement.object.EditAnnotation']}</ui:define>
+            <s:div id="CommentValDecorationFC" template="/layout/form/_edit.xhtml"
+                   rendered="#{managedBean.selectedAnnotation != null}">
+                <ui:param name="id" value="CommentEditorIdFC"/>
+                <h:outputText value="#{messages['gazelle.testmanagement.object.Comment']} : "
+                              style="font-weight:bold;"/>
+                <br/>
+                <center>
+                    <h:inputTextarea  styleClass=" form-control" id="CommentEditorIdFC" value="#{managedBean.selectedAnnotation.value}"
+                                      rows="3" cols="35">
+                    </h:inputTextarea>
+                </center>
+            </s:div>
+            <ui:define name="popup_footer">
+                <button type="button" class="gzl-btn" data-dismiss="modal">
+                    #{messages['gazelle.tm.Cancel']}
+                </button>
+                <a4j:commandButton id="saveCommentbuttonFC" value="#{messages['gazelle.common.button.Save']}"
+                                   styleClass="gzl-btn-green"
+                                   actionListener="#{managedBean.saveModificationsForSelectedAnnotation()}"
+                                   onclick="jq162('#EditSelectedAnnotation').modal('hide');"
+                                   render="annotationForReaderOnCreateForm,helloword,messageDecoration"/>
+            </ui:define>
+        </ui:decorate>
+    </h:form>
+</ui:composition>

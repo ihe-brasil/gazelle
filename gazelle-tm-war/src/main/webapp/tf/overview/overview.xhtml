@@ -1,0 +1,47 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tf.menu.overview']}"/>
+    <ui:define name="body">
+        <h:body onload="loadOverview();">
+
+            <!--Id and height are used by load.js-->
+            <div id="displayOverview" style="height:600px;">
+                <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                    <ui:define name="panel_title">#{messages['gazelle.tf.TFOverview']}</ui:define>
+                    <div>
+                        <s:remote include="IHEConceptsRemoteService"/>
+                        <h:outputStylesheet library="stylesheet" name="overview_tf.css"/>
+                        <script language="javascript" type="text/javascript" src="../jscript/ajax.js"></script>
+                        <script language="javascript" type="text/javascript" src="../jscript/event.js"></script>
+                        <script language="javascript" type="text/javascript" src="../jscript/timer.js"></script>
+                        <script language="javascript" type="text/javascript" src="../jscript/load.js"></script>
+                        <script language="javascript" type="text/javascript" src="../jscript/treegraph.js"></script>
+                    </div>
+                    <!-- breadcrumb -->
+                    <div id="breadcrumb" style="position: absolute; left: 20px; height: 20px; padding: 4px;"></div>
+                    <!-- frame -->
+                    <div id="frame" style="height: 400px; top: 30px; left: 10px;">
+                    </div>
+
+                    <div id="gloss"></div>
+
+                    <div id="datascroller" style="visibility: hidden;">
+                        <table id="ds_table" class="rich-dtascroller-table" cellspacing="1" cellpadding="0" border="0"
+                               style="margin: auto;">
+                            <tr>
+                                <td id="first" class="rich-datascr-button-dsbld rich-datascr-button">««</td>
+                                <td id="previous" class="rich-datascr-button-dsbld rich-datascr-button">«</td>
+                                <td class="rich-datascr-button-dsbld rich-datascr-button"></td>
+                                <td class="rich-datascr-button-dsbld rich-datascr-button"></td>
+                                <td id="next" class="rich-datascr-button-dsbld rich-datascr-button">»</td>
+                                <td id="last" class="rich-datascr-button-dsbld rich-datascr-button">»»</td>
+                            </tr>
+                        </table>
+                    </div>
+                </ui:decorate>
+            </div>
+        </h:body>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,54 @@
+<!--
+ * Copyright 2008 IHE International (http://www.ihe.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ -->
+<!--  Do not add a doctype it will cause a failure for some browsers as this file is included
+	@author abderrazek boufahja
+-->
+<e:workbook xmlns:e="http://jboss.com/products/seam/excel" xmlns:f="http://java.sun.com/jsf/core"
+>
+    <e:worksheet name="integrationProfileOptionsSummary" startColumn="0" startRow="0"
+                 value="#{integrationProfileOptionManager.integrationProfileOptions}" var="option">
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.tf.table.Id']}"/>
+            </f:facet>
+            <e:cell value="#{option.id}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.tf.table.Keyword']}"/>
+            </f:facet>
+            <e:cell value="#{option.keyword}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.common.Name']}"/>
+            </f:facet>
+            <e:cell value="#{option.name}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.tf.table.Description']}"/>
+            </f:facet>
+            <e:cell value="#{option.description}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.tf.table.TFReference']}"/>
+            </f:facet>
+            <e:cell value="#{option.reference}"/>
+        </e:column>
+    </e:worksheet>
+</e:workbook>

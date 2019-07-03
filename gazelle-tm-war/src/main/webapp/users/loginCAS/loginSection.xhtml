@@ -1,0 +1,40 @@
+<div
+        xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+        xmlns="http://www.w3.org/1999/xhtml">
+    <!-- ========================= -->
+    <!-- Login Input Section   -->
+    <!-- ========================= -->
+    <p>#{messages['gazelle.users.registration.LoginLabel1']}</p>
+
+    <div id="loginSectionDialogDiv" class="dialog">
+        <h:panelGrid columns="2" rowClasses="prop" columnClasses="name,value">
+            <h:outputLabel for="username">#{messages['gazelle.users.registration.Username']}</h:outputLabel>
+            <h:inputText  styleClass=" form-control" id="username" value="#{identity.username}"/>
+        </h:panelGrid>
+        <h:panelGrid columns="2" rowClasses="prop" columnClasses="name,value">
+            <h:outputLabel for="password">#{messages['gazelle.users.registration.Password']}</h:outputLabel>
+            <h:inputSecret id="passwordNotHashed" value="">
+            </h:inputSecret>
+        </h:panelGrid>
+        <h:inputHidden id="password" name="password" value="#{identity.password}"/>
+        <br/>
+        <h:panelGrid columns="30">
+
+            <a4j:commandButton id="submit" type="submit" styleClass="gzl-btn-green"
+                               value="#{messages['gazelle.users.registration.Login']}"
+                               onclick="hashGazelleAuthentication()" action="#{identity.login}"
+                               rendered="#{!identity.loggedIn}"/>
+
+            <a4j:commandLink actionListener="#{userManager.intializeSelectedUser()}"
+                             value="#{messages['gazelle.users.registration.ForgotPassword']}"
+                             oncomplete="jq162('#passwordAssistance').modal('show');"
+                             execute="@this"
+                             render=" :passwordAssistanceForm"/>
+        </h:panelGrid>
+        <h:panelGrid columns="2" rowClasses="prop" columnClasses="name,value">
+            <h:outputLabel for="rememberMe">#{messages['gazelle.users.registration.RememberMe']}</h:outputLabel>
+            <h:selectBooleanCheckbox  styleClass="form-control-static" id="rememberMe" value="#{identity.rememberMe}"/>
+        </h:panelGrid>
+    </div>
+    <p/>
+</div>

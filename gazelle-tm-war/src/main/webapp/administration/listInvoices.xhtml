@@ -1,0 +1,205 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.financial.invoice.ListInvoices']}"/>
+    <ui:define name="body">
+        <h:form id="selectInstitutionForm" styleClass="form-horizontal"
+                rendered="#{s:hasRole('admin_role') or s:hasRole('accounting_role') or s:hasRole('testing_session_admin_role')}">
+            <a4j:queue requestDelay="300" ignoreDupResponses="true"/>
+            <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                #{testingSessionManager.initializeTestingSessionChoosen()}
+                <div class="row">
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter"
+                                      value="#{financialManager.listOfInvoices.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="testingSession"/>
+                            <ui:param name="filterName"
+                                      value="#{messages['gazelle.systems.TestingSession']}"/>
+                            <ui:param name="filterForm" value="selectInstitutionForm"/>
+                        </ui:include>
+                    </div>
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter"
+                                      value="#{financialManager.listOfInvoices.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="institution"/>
+                            <ui:param name="filterName"
+                                      value="#{messages['gazelle.testmanagement.object.Institution']}"/>
+                            <ui:param name="filterForm" value="selectInstitutionForm"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <ui:define name="filter_buttons">
+                    <a4j:commandLink title="#{messages['gazelle.common.button.Refresh']}"
+                                     render="selectInstitutionForm">
+                        <span class="fa fa-refresh"></span>
+                    </a4j:commandLink>
+                    <a4j:commandLink title="#{messages['gazelle.users.reset']}"
+                                     actionListener="#{financialManager.listOfInvoices.clearFilters()}"
+                                     render="selectInstitutionForm">
+                        <span class="fa fa-times-circle"></span>
+                    </a4j:commandLink>
+                </ui:define>
+            </ui:decorate>
+            <h:panelGroup id="invoicesPanel" style="border:none;">
+                <rich:dataTable id="invoicesTable" var="currentInvoice"
+                                value="#{financialManager.listOfInvoices}"
+                                rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                    <g:column sortBy="#{'institution.keyword'}" sortOrder="ascending"
+                              filterBy="#{'institution.keyword'}" filterEvent="onkeyup"
+                              filterValue="#{dataTableStateHolder.columnFilterValues['institution.keyword']}">
+                        <ui:define name="header">#{messages['gazelle.financial.invoice.InstitutionKeyword']}
+                        </ui:define>
+                        <h:commandLink
+                                action="#{institutionManagerTM.viewInstitutionForTM(currentInvoice.institution)}"
+                                value="#{currentInvoice.institution.keyword}"/>
+                    </g:column>
+                    <g:column sortBy="#{'purchaseOrder'}">
+                        <ui:define name="header">#{messages['gazelle.financial.invoice.PurchaseOrderForArray']}
+                        </ui:define>
+                        #{currentInvoice.purchaseOrder}
+                    </g:column>
+                    <g:column sortBy="#{'invoicePaid'}">
+                        <ui:define name="header">#{messages['gazelle.financial.invoice.InvoicePaidForArray']}
+                        </ui:define>
+                        <s:span styleClass="gzl-icon-circle-red" rendered="#{!currentInvoice.invoicePaid}"/>
+                        <s:span styleClass="gzl-icon-circle-green" rendered="#{currentInvoice.invoicePaid}"/>
+                    </g:column>
+                    <g:column sortBy="#{'invoiceRelativePath'}">
+                        <ui:define name="header">#{messages['gazelle.financial.invoice.InvoicePathForArray']}
+                        </ui:define>
+                        <h:panelGroup rendered="#{currentInvoice.invoiceRelativePath != null}">
+                            <h:commandLink title="#{currentInvoice.invoiceRelativePath}"
+                                           actionListener="#{financialManager.displayInvoice( currentInvoice )}">
+                                <span class="gzl-icon-pdf"/>
+                            </h:commandLink>
+                        </h:panelGroup>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.financial.invoice.VatNumberForArray']}
+                        </ui:define>
+                        <h:outputText value="#{currentInvoice.vatCountry.iso}-#{currentInvoice.vatNumber}"
+                                      style="color: green;" rendered="#{currentInvoice.vatValidity}"/>
+                        <h:outputText value="#{currentInvoice.vatCountry.iso}-#{currentInvoice.vatNumber} "
+                                      style="color: red;"
+                                      rendered="#{currentInvoice.vatValidity == null or !currentInvoice.vatValidity}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">
+                            #{messages['gazelle.financial.invoice.FeesAmountForArray']}(#{messages['gazelle.financial.invoice.VatAmountForArray']})
+                        </ui:define>
+                        #{currentInvoice.feesAmount}
+                        <h:outputText value="(#{currentInvoice.vatAmount})"
+                                      rendered="#{currentInvoice.vatDue}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">
+                            #{messages['gazelle.financial.invoice.FeesPaidForArray']}(#{messages['gazelle.financial.invoice.FeesDueForArray']})
+                        </ui:define>
+                        #{currentInvoice.feesPaid}
+                        <h:outputText value="(#{currentInvoice.feesDue})"
+                                      rendered="#{currentInvoice.feesDue != null}"/>
+                    </g:column>
+                    <g:column sortBy="#{'contractReceivedDate'}">
+                        <ui:define name="header">
+                            #{messages['gazelle.financial.invoice.ContractReceivedDateForArray']}
+                        </ui:define>
+                        <g:date date="true" time="false" value="#{currentInvoice.contractReceivedDate}"/>
+                    </g:column>
+                    <g:column sortBy="#{'invoiceSent'}">
+                        <ui:define name="header">#{messages['gazelle.financial.invoice.InvoiceSentForArray']}
+                        </ui:define>
+
+                        <s:span styleClass="gzl-icon-circle-red" rendered="#{!currentInvoice.invoiceSent}"/>
+                        <s:span styleClass="gzl-icon-circle-green" rendered="#{currentInvoice.invoiceSent}"/>
+                        <s:span rendered="#{currentInvoice.invoiceSentDate != null}">
+                            (
+                            <g:date date="true" time="false" value="#{currentInvoice.invoiceSentDate}"/>
+                            )
+                        </s:span>
+                    </g:column>
+                    <g:column sortBy="#{'invoicePaymentDate'}">
+                        <ui:define name="header">
+                            #{messages['gazelle.financial.invoice.InvoicePaymentDateForArray']}
+                        </ui:define>
+                        <g:date date="true" time="false" value="#{currentInvoice.invoicePaymentDate}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+                        <div class="gzl-never-wrap">
+                            <h:commandLink id="commview" title="#{messages['gazelle.common.button.View']}"
+                                           action="#{financialManager.showInvoice(currentInvoice)}">
+                                <span class="gzl-icon-search"/>
+                            </h:commandLink>
+
+                            <h:commandLink id="commedit" title="#{messages['gazelle.common.button.Edit']}"
+                                           action="#{financialManager.editInvoice(currentInvoice)}">
+                                <span class="gzl-icon-pencil"/>
+                            </h:commandLink>
+
+                            <a4j:commandLink event="click"
+                                             title="#{messages['gazelle.common.button.Delete']}"
+                                             oncomplete="jq162('#DeleteSelectedInvoice').modal('show');"
+                                             execute="@this"
+                                             actionListener="#{financialManager.setInvoiceSelected(currentInvoice)}"
+                                             render=" :deleteForm">
+                                <span class="gzl-icon-trash-o"/>
+                            </a4j:commandLink>
+
+                        </div>
+                    </g:column>
+                    <f:facet name="footer">
+                        <ui:include src="/util/datatableFooter.xhtml">
+                            <ui:param name="dataScrollerId" value="ds"/>
+                            <ui:param name="dataTableId" value="invoicesTable"/>
+                        </ui:include>
+                    </f:facet>
+                </rich:dataTable>
+
+                <h:commandLink action="/financial/PaymentTrackingReport.xhtml" style="font-size: 12;">
+                    <h:outputText
+                            value="#{messages['net.ihe.gazelle.tm.ExportAsExcelFileTheDocumentProposedPaymentTrack']}"/>
+                </h:commandLink>
+                <br/>
+                <h:commandLink action="/financial/GazelleExtractInvoiceReport.xhtml" style="font-size: 12;">
+                    <h:outputText
+                            value="#{messages['net.ihe.gazelle.tm.ExportAsExcelFileTheDocumentGazelleExtractInvoic']}"/>
+                </h:commandLink>
+                <br/>
+
+                <h:commandButton styleClass="gzl-btn-green"
+                                 action="#{financialManager.generateFeeStatusSummary()}"
+                                 value="#{messages['gazelle.financial.invoice.createFeesStatusReport']}"/>
+                <a4j:commandButton styleClass="gzl-btn" action="/financial/listInvoiceCopies.seam"
+                                   rendered="#{s:hasRole('admin_role') or s:hasRole('accounting_role') or s:hasRole('testing_session_admin_role')}"
+                                   value="#{messages['gazelle.financial.invoice.ListInvoiceGenerated']}"/>
+
+            </h:panelGroup>
+        </h:form>
+
+        <h:form id="deleteForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteSelectedInvoice"/>
+                <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.InvoiceDeletion']}
+                </ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDeleteInvoiceFor']} #{financialManager.invoiceSelected.institution.name} ?</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="deleteInvbut" value="#{messages['gazelle.tm.DeleteThisInvoice']}"
+                                       styleClass="gzl-btn-red"
+                                       actionListener="#{financialManager.deleteInvoiceSelected()}"
+                                       oncomplete="jq162('#DeleteSelectedInvoice').modal('hide');"
+                                       render="invoicesPanel,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

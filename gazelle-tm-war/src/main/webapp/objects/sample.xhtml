@@ -1,0 +1,69 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.testmanagement.object.SampleDescription']}"/>
+    <ui:define name="body">
+        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+            <ui:define name="panel_title">#{messages['gazelle.testmanagement.object.DescriptionOfASample']}</ui:define>
+            <s:decorate template="/objects/sampleDescription.xhtml">
+                <ui:param name="managedBean" value="#{sampleDisplayManager}"/>
+                <ui:define name="treeOfFilesUploadedByReaders">
+                    <h:form>
+                        <s:token allowMultiplePosts="true"/>
+                        <rich:tree id="TreeOfSampleOfReader"
+                                   rendered="#{sampleDisplayManager.getTreeNodeOfReaderInstanceFile(sampleDisplayManager.selectedObjectInstance)!=null}"
+                                   value="#{sampleDisplayManager.getTreeNodeOfReaderInstanceFile(sampleDisplayManager.selectedObjectInstance)}"
+                                   var="node" style="vertical-align:top" nodeType="#{node.data.class.simpleName}"
+                                   toggleType="client">
+                            <rich:treeNode type="SystemInSession" width="15"
+                                           height="15" iconClass="gzl-icon-system">
+
+
+                                <h:outputText value="#{node.data.system.keyword}"/>
+
+                                <a4j:commandLink id="EditObjectInstanceButtonOnR"
+                                                 actionListener="#{objectInstanceManager.setSelectedObjectInstance(sampleDisplayManager.selectedObjectInstance)}"
+                                                 action="/objects/editReaderSample.xhtml"
+                                                 title="#{messages['gazelle.testmanagement.object.AddFilestosample']}"
+                                                 rendered="#{sampleDisplayManager.isUserAllowedToEditSystemFileReaderOfSample(node.data)}"
+                                                 immediate="true" render="EditSelectedObjectInstance"
+                                                 execute="@this">
+                                    <span class="gzl-icon-plus"/>
+                                </a4j:commandLink>
+                            </rich:treeNode>
+                            <rich:treeNode type="ObjectInstanceFile" width="15" height="15" iconClass="gzl-icon-save">
+
+                                <a4j:region>
+                                    <h:commandLink id="downloadCommandLinkOnR"
+                                                   value="#{node.data.file.type.keyword} : #{node.data.url}"
+                                                   action="#{sampleDisplayManager.displayFileOnScreen(node.data,false)}"
+                                                   target="_blank">
+                                    </h:commandLink>
+
+                                    <h:commandLink id="NonDicomFileCommandLinkOnR"
+                                                   title="#{messages['gazelle.testmanagement.object.Download']}"
+                                                   action="#{sampleDisplayManager.displayFileOnScreen(node.data,true)}"
+                                                   target="_blank">
+                                        <span class="gzl-icon-download"/>
+                                    </h:commandLink>
+
+                                    <h:commandLink id="DeleteObjectInstanceButtonOnR2"
+                                                   actionListener="#{objectInstanceManager.setSelectedObjectInstance(sampleDisplayManager.selectedObjectInstance)}"
+                                                   action="/objects/editReaderSample.xhtml"
+                                                   title="#{messages['gazelle.testmanagement.object.DeleteFilesAdded']}"
+                                                   rendered="#{sampleDisplayManager.isUserAllowedToEditSystemFileReaderOfSample(node.data.system)}"
+                                                   immediate="true" render="EditSelectedObjectInstance"
+                                                   execute="@this">
+                                        <span class="gzl-icon-trash-o"/>
+                                    </h:commandLink>
+                                </a4j:region>
+                            </rich:treeNode>
+                        </rich:tree>
+                    </h:form>
+                </ui:define>
+            </s:decorate>
+        </ui:decorate>
+
+    </ui:define>
+</ui:composition>

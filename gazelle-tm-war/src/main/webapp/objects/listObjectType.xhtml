@@ -1,0 +1,299 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle"
+              value="#{messages['gazelle.testmanagement.object.ConnecthathonObjectAdmin']}"/>
+    <ui:define name="body">
+        <script type="text/javascript">
+
+            function colorListSampleTypeTable() {
+                if (#{applicationManager.isTestManagement()})
+                    statusColumn = 6;
+                else
+                    statusColumn = 4;
+                colorRowsOfTable("form:ObjectTypeTable", statusColumn);
+            }
+
+            function colorRowsOfTable(idTable, resultColumnNumber) {
+                var rows = document.getElementById(idTable + ':tb').getElementsByTagName('tr');
+                if (rows != null) {
+                    var numberOfRows = rows.length;
+                    var stringStatus = "";
+
+                    for (var i = 0; i &lt; numberOfRows; i++) {
+                        var row = rows[i];
+                        var subrow = row.getElementsByTagName('tr');
+                        if (subrow.length != 0) {
+                            colorRow(row, resultColumnNumber);
+                        }
+                    }
+
+                }
+
+
+            }
+
+            //resultColumnNumber is the number of the column to parse
+            function colorRow(idRow, resultColumnNumber) {
+                var currentRow = idRow;
+
+                var tdToUse = currentRow.cells[resultColumnNumber - 1];
+
+                if (tdToUse != null) {
+                    var selectToUse = tdToUse.firstChild;
+                    if (selectToUse != null) {
+                        if (selectToUse.innerHTML == "ready") // ready
+                            currentRow.style.background = "#CCFFCC";
+                        else if (selectToUse.innerHTML == "deprecated")     // deprecated
+                            currentRow.style.background = "#FF1200";
+                        else if (selectToUse.innerHTML == "to be completed")     // to be completed
+                            currentRow.style.background = "#FFCCCC";
+                        else if (selectToUse.innerHTML == "storage/subtitute")    // storage/subtitute
+                            currentRow.style.background = "#FFCC33";
+                        else if (selectToUse.innerHTML == "Kudu import")    // storage/subtitute
+                            currentRow.style.backgroundColor = "#FFAACC";
+                        else
+                            currentRow.style.backgroundColor = "#E0E0E0";
+
+
+                    }
+                }
+            }
+
+
+        </script>
+        <h:form id="form">
+            <s:token allowMultiplePosts="true"/>
+            <a4j:queue requestDelay="300" ignoreDupResponses="true"/>
+            <div id="tabpanadm">
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#summpbjtab" aria-controls="summpbjtab" role="tab"
+                                                              data-toggle="tab">#{messages['gazelle.testmanagement.object.OTSum']}</a>
+                    </li>
+                    <li role="presentation"><a href="#richoft" aria-controls="richoft" role="tab" data-toggle="tab">#{messages['gazelle.testmanagement.object.OFTSum']}</a>
+                    </li>
+                </ul>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="summpbjtab">
+                        <s:div>
+                            <s:decorate id="sampleStatusDec" template="/layout/form/_edit.xhtml">
+                                <ui:define name="label">#{messages['gazelle.testmanagement.object.SampleStatus']}
+                                </ui:define>
+                                <h:selectOneMenu styleClass="form-control gzl-form-control" id="StatusListBox"
+                                                 value="#{objectTypeManager.selectedObjectTypeStatus}">
+                                    <s:selectItems id="ListStatusSelectItems"
+                                                   value="#{objectTypeManager.possibleObjectTypeStatus}"
+                                                   var="selectedStatus"
+                                                   noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                   label="#{selectedStatus.labelToDisplay}"/>
+                                    <a4j:ajax event="change" render="tablecol" execute="@this"/>
+                                </h:selectOneMenu>
+                            </s:decorate>
+                        </s:div>
+                        <h:outputText id="textOfTable"
+                                      value="#{messages['gazelle.testmanagement.object.ObjectTypes']} :"
+                                      styleClass="tooltipData"/>
+                        <s:div id="listobjtypetab">
+                            <br/>
+                            <ui:include src="/objects/table_object_type.xhtml"/>
+                        </s:div>
+                        <br/>
+                        <br/>
+                        <s:div id="addObjectTypeDiv" style="align:right;"
+                               rendered="#{(s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}">
+                            <a4j:commandButton id="addObjectTypeCommandButon" styleClass="gzl-btn-green"
+                                               style="align:right;"
+                                               value="#{messages['gazelle.testmanagement.object.NewObjectType']}"
+                                               actionListener="#{objectTypeManager.inisializeSelectedObjectType()}"
+                                               oncomplete="jq162('#DescribeNewObjectType').modal('show');"
+                                               rendered="#{s:hasRole('admin_role') || s:hasRole('tests_editor_role') and applicationManager.isMasterModel()}"
+                                               immediate="true" onRowMouseOver="this.style.cursor='pointer'"
+                                               render="DescribeNewObjectType, :createOTForm" execute="@this"/>
+                        </s:div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="richoft">
+                        <ui:include src="/objects/listObjectFileType.xhtml"/>
+                    </div>
+                </div>
+            </div>
+
+            <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+            <!-- View selected object type-->
+            <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+            <ui:include src="/objects/view_object_type.xhtml"/>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Delete selected object type-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="deleteForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteSelectedObjectType"/>
+                <ui:define name="popup_title">#{messages['gazelle.testmanagement.object.Deleteanobjecttype']}
+                </ui:define>
+                <s:decorate id="confirmationDeleteObjectType" style="width:550px; height:180px;"
+                            rendered="#{objectTypeManager.selectedObjectType != null}">
+                    <s:div id="DeleteObjectType" style="width:550px; height:130px;"
+                           rendered="#{objectTypeManager.getListObjectInstanceForSelectedObjectType() != null}">
+                        <h:outputText value="#{messages['gazelle.testmanagement.object.listOInsToDeleteWith']}"
+                                      rendered="#{objectTypeManager.getListObjectInstanceForSelectedObjectType().size()&gt;0}"/>
+                        <h:outputText value="#{messages['gazelle.testmanagement.object.PossibleToDelete']}"
+                                      rendered="#{objectTypeManager.getListObjectInstanceForSelectedObjectType().size()==0}"/>
+                        <div id="listObjectInstaneTodeleteDiv" style="width: 550px; height: 100px; overflow: auto;">
+                            <rich:list id="listOIToDelete" var="ObjInstance"
+                                       value="#{objectTypeManager.getListObjectInstanceForSelectedObjectType()}"
+                                       type="unordered">
+                                <h:outputText value="#{ObjInstance.system.system.name} : #{ObjInstance.name}"
+                                              style="color:#aa0000;"/>
+                            </rich:list>
+                        </div>
+                    </s:div>
+                </s:decorate>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="deleteOTbutton"
+                                       value="#{messages['gazelle.testmanagement.object.DeleteThisObjectType']}"
+                                       styleClass="gzl-btn-red"
+                                       actionListener="#{objectTypeManager.deleteSelectedObjectTypeFromDataBaseForSelectedObjectType()}"
+                                       onclick="jq162('#DeleteSelectedObjectType').modal('hide');"
+                                       render="ObjectTypeTable,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Describe new object type-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="createOTForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DescribeNewObjectType"/>
+                <ui:define name="popup_title">#{messages['gazelle.testmanagement.object.Createnewobjecttype']}
+                </ui:define>
+                <a4j:region id="KeywordOTRegion">
+                    <s:decorate id="KeywordOTDecoration" template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="inputTextForOTKeyword"/>
+                        <ui:define name="label">
+                            #{messages['gazelle.testmanagement.object.KeywordofObjectType']}
+                        </ui:define>
+                        <h:inputText styleClass=" form-control" id="inputTextForOTKeyword"
+                                     value="#{objectTypeManager.selectedObjectType.keyword}"
+                                     size="50" required="true"
+                                     maxlength="250"/>
+                    </s:decorate>
+                </a4j:region>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="keywordOTbutton"
+                                       value="#{messages['gazelle.common.button.Confirm']}"
+                                       styleClass="gzl-btn-green"
+                                       actionListener="#{objectTypeManager.mergeSelectedObjectType()}"
+                                       onclick="jq162('#DescribeNewObjectType').modal('hide');"
+                                       action="/objects/editObjectType.xhtml"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Describe new object file type-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!--<rich:popupPYel>-->
+        <h:form id="createOFTForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DescribeNewObjectFileType"/>
+                <ui:define name="popup_title">#{messages['gazelle.testmanagement.object.CreateNewObjectFileType']}
+                </ui:define>
+                <s:decorate id="oftkeyword" template="/layout/form/_edit.xhtml">
+                    <ui:param name="id" value="keywordInput"/>
+                    <ui:define name="label">#{messages['gazelle.testmanagement.object.keyword']}</ui:define>
+                    <h:inputText id="keywordInput" styleClass=" form-control"
+                                 value="#{objectTypeManager.selectedObjectFileType.keyword}" size="25"
+                                 required="true" maxlength="250"/>
+                </s:decorate>
+                <s:decorate id="oftdesc" template="/layout/form/_edit.xhtml">
+                    <ui:param name="id" value="descriptionInput"/>
+                    <ui:define name="label">#{messages['gazelle.tf.table.Description']}</ui:define>
+                    <h:inputText id="descriptionInput" styleClass=" form-control"
+                                 value="#{objectTypeManager.selectedObjectFileType.description}" size="45"
+                                 maxlength="250"/>
+                </s:decorate>
+                <s:decorate id="oftextens" template="/layout/form/_edit.xhtml">
+                    <ui:param name="id" value="extensionsInput"/>
+                    <ui:define name="label">#{messages['gazelle.tm.Extensions']}</ui:define>
+                    <h:panelGrid id="pangridForeded" columns="5">
+                        <h:inputText id="extensionsInput" styleClass=" form-control"
+                                     value="#{objectTypeManager.selectedObjectFileType.extensions}" size="45"
+                                     maxlength="250"/>
+                        <s:span styleClass="gzl-icon-question-circle"
+                                title="#{messages['gazelle.testmanagement.object.HelpToUnderstandExtensions']}. #{messages['gazelle.testmanagement.object.HelpToUnderstandExtensions2']}"/>
+                    </h:panelGrid>
+                </s:decorate>
+                <s:decorate id="oftkeywrit" template="/layout/form/_edit.xhtml">
+                    <ui:param name="id" value="wirtboo"/>
+                    <ui:define name="label">#{messages['gazelle.tm.Writable']}</ui:define>
+                    <h:panelGrid id="pangridForNRR" columns="5">
+                        <h:selectBooleanCheckbox id="wirtboo"
+                                                 value="#{objectTypeManager.selectedObjectFileType.writable}"/>
+                        <s:span styleClass="gzl-icon-question-circle"
+                                title="#{messages['gazelle.testmanagement.object.HelpToUnderstandWritable']}"/>
+                    </h:panelGrid>
+                </s:decorate>
+                <s:decorate id="editValidate" template="/layout/form/_edit.xhtml">
+                    <ui:define name="label">#{messages['net.ihe.gazelle.tm.ValidateWithEVSClient']}</ui:define>
+                    <h:panelGrid columns="5">
+                        <h:selectBooleanCheckbox value="#{objectTypeManager.selectedObjectFileType.validate}"/>
+                        <s:span styleClass="gzl-icon-question-circle"
+                                title="#{messages['net.ihe.gazelle.tm.IsEVSClientAbleToValidateThisTypeOfFile']}"/>
+
+                    </h:panelGrid>
+                </s:decorate>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="saveoft" value="#{messages['gazelle.common.button.Save']}"
+                                       styleClass="gzl-btn-green"
+                                       actionListener="#{objectTypeManager.mergeSelectedObjectFileType()}"
+                                       onclick="jq162('#DescribeNewObjectFileType').modal('hide');"
+                                       render="objfttable,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Delete selected object file type-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="deleteFormoft">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteSelectedObjectFileType"/>
+                <ui:define name="popup_title">#{messages['gazelle.testmanagement.object.DeleteanObjAttr']}</ui:define>
+                <s:div id="DeleteOFT"
+                       style="width: 350px; height: 160px; overflow: auto;"
+                       rendered="#{objectTypeManager.messageForDeleteOFT != null}">
+                    #{objectTypeManager.generateMessageForDeleteObjectFileType()}
+                    <h:outputText
+                            value="#{messages['gazelle.testmanagement.object.labelToCanNotDeleteOFT']} : "/>
+                    <br/>
+                    <g:safehtml value="#{objectTypeManager.messageForDeleteOFT}"/>
+                </s:div>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="deleteOTbutton"
+                                       value="#{messages['gazelle.testmanagement.object.DeleteThisObjectFiletType']}"
+                                       styleClass="gzl-btn-red"
+                                       actionListener="#{objectTypeManager.deleteSelectedObjectFileType()}"
+                                       onclick="jq162('#DeleteSelectedObjectFileType').modal('hide');"
+                                       render="objfttable,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

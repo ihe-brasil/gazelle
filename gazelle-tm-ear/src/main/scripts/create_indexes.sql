@@ -1,0 +1,67 @@
+CREATE INDEX tm_test_instance_participants_role_in_test_id_idx ON tm_test_instance_participants (role_in_test_id);
+CREATE INDEX tm_test_instance_participants_status_id_idx ON tm_test_instance_participants (status_id) ;
+CREATE INDEX tm_test_instance_participants_system_in_session_user_id_idx ON tm_test_instance_participants (system_in_session_user_id);
+CREATE INDEX tm_test_instance_participants_test_instance_id_idx ON tm_test_instance_participants (test_instance_id);
+CREATE INDEX tm_test_instance_participants_actor_integration_profile_opt_idx ON tm_test_instance_participants (actor_integration_profile_option_id);
+
+CREATE INDEX tm_oid_system_assignment_system_in_session_id_idx ON tm_oid_system_assignment (system_in_session_id);
+CREATE INDEX tm_oid_system_assignment_oid_idx ON tm_oid_system_assignment (oid);
+CREATE INDEX tm_oid_system_assignment_oid_value_idx ON tm_oid_system_assignment (oid_value);
+
+CREATE INDEX usr_messages_usr_message_parameters_usr_messages_id_idx ON usr_messages_usr_message_parameters (usr_messages_id);
+CREATE INDEX usr_messages_usr_message_parameters_messageparameters_id_idx ON usr_messages_usr_message_parameters (messageparameters_id);
+
+CREATE INDEX tm_test_steps_instance_system_in_session_initiator_id_idx ON tm_test_steps_instance (system_in_session_initiator_id);
+CREATE INDEX tm_test_steps_instance_system_in_session_reponder_id_idx ON tm_test_steps_instance (system_in_session_reponder_id);
+CREATE INDEX tm_test_steps_instance_test_steps_id_idx ON tm_test_steps_instance (test_steps_id);
+CREATE INDEX tm_test_steps_instance_test_steps_instance_status_id_idx ON tm_test_steps_instance (test_steps_instance_status_id);
+CREATE INDEX tm_test_steps_instance_test_steps_version_idx ON tm_test_steps_instance (test_steps_version);
+CREATE INDEX tm_test_steps_instance_status_id_idx ON tm_test_steps_instance (status_id);
+CREATE INDEX tm_test_steps_instance_execution_status_id_idx ON tm_test_steps_instance (execution_status_id);
+
+CREATE INDEX tm_configuration_approved_idx ON tm_configuration (approved);
+CREATE INDEX tm_configuration_is_secured_idx ON tm_configuration (is_secured);
+CREATE INDEX tm_configuration_actor_id_idx ON tm_configuration (actor_id);
+
+CREATE INDEX tm_configuration_configurationtype_id_idx ON tm_configuration (configurationtype_id);
+CREATE INDEX tm_configuration_host_id_idx ON tm_configuration (host_id);
+CREATE INDEX tm_configuration_system_in_session_id_idx ON tm_configuration (system_in_session_id);
+
+CREATE INDEX tm_host_hostname_idx ON tm_host (hostname);
+CREATE INDEX tm_host_system_in_session_id_idx ON tm_host (system_in_session_id);
+
+
+CREATE INDEX tm_test_instance_test_status_test_instance_id_idx ON tm_test_instance_test_status (test_instance_id);
+
+CREATE INDEX tm_connectathon_participant_email_idx ON tm_connectathon_participant (email);
+CREATE INDEX tm_connectathon_participant_institution_id_idx ON tm_connectathon_participant (institution_id);
+CREATE INDEX tm_connectathon_participant_institution_name_idx ON tm_connectathon_participant (institution_name);
+CREATE INDEX tm_connectathon_participant_lastname_idx ON tm_connectathon_participant (lastname);
+CREATE INDEX tm_connectathon_participant_status_id_idx ON tm_connectathon_participant (status_id);
+CREATE INDEX tm_connectathon_participant_testing_session_id_idx ON tm_connectathon_participant (testing_session_id);
+CREATE INDEX tm_connectathon_participant_institution_ok_id_idx ON tm_connectathon_participant (institution_ok_id);
+
+CREATE INDEX tm_object_instance_object_id_idx ON tm_object_instance (object_id);
+CREATE INDEX tm_object_instance_system_in_session_id_idx ON tm_object_instance (system_in_session_id);
+CREATE INDEX tm_object_instance_name_idx ON tm_object_instance (name);
+CREATE INDEX tm_object_instance_completed_idx ON tm_object_instance (completed);
+CREATE INDEX tm_object_instance_validation_id_idx ON tm_object_instance (validation_id);
+CREATE INDEX tm_object_instance_test_type_id_idx ON tm_object_instance (test_type_id);
+
+
+CREATE INDEX tm_system_actor_profiles_actor_integration_profile_option_i_idx ON tm_system_actor_profiles (actor_integration_profile_option_id);
+CREATE INDEX tm_system_actor_profiles_system_id_idx ON tm_system_actor_profiles (system_id);
+CREATE INDEX tm_system_actor_profiles_testing_type_id_idx ON tm_system_actor_profiles (testing_type_id);
+CREATE INDEX tm_system_actor_profiles_wanted_testing_type_id_idx ON tm_system_actor_profiles (wanted_testing_type_id);
+CREATE INDEX tm_system_actor_profiles_testing_type_reviewed_idx ON tm_system_actor_profiles (testing_type_reviewed);
+
+
+CREATE INDEX usr_users_activated_idx ON usr_users (activated);
+CREATE INDEX usr_users_blocked_idx ON usr_users (blocked);
+CREATE INDEX usr_users_firstname_idx ON usr_users (firstname);
+CREATE INDEX usr_users_institution_id_idx ON usr_users (lastname);
+CREATE INDEX usr_users_lastname_idx ON usr_users (institution_id);
+
+CREATE INDEX tm_system_events_tm_system_id_idx ON tm_system_events (tm_system_id);
+
+CREATE INDEX tm_test_instance_test_steps_instance_test_instance_id_idx on tm_test_instance_test_steps_instance (test_instance_id);

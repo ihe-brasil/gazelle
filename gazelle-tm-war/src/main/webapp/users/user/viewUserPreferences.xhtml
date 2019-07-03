@@ -1,0 +1,112 @@
+<s:div xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:h="http://java.sun.com/jsf/html"
+       xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+       xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <h:panelGroup rendered="#{userPreferencesManager.viewUser}">
+        <h:form id="g" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2">
+                    <div class="row">
+                        <ui:decorate template="/layout/panels/_panel.xhtml">
+                            <div class="col-lg-9">
+                                <dl class="dl-horizontal">
+                                    <s:decorate id="usernameDecorationView"
+                                                template="/layout/display/_data_list_item.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.users.user.UserUsername']}
+                                        </ui:define>
+                                        #{userPreferencesManager.selectedUser.username}
+                                    </s:decorate>
+                                    <s:decorate id="firstnameDecorationView"
+                                                template="/layout/display/_data_list_item.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.users.registration.FirstName']}
+                                        </ui:define>
+                                        #{userPreferencesManager.selectedUser.firstname}
+                                    </s:decorate>
+                                    <s:decorate id="lastnameDecorationView"
+                                                template="/layout/display/_data_list_item.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.users.registration.LastName']}
+                                        </ui:define>
+                                        #{userPreferencesManager.selectedUser.lastname}
+                                    </s:decorate>
+                                    <s:decorate id="emailDecorationView"
+                                                template="/layout/display/_data_list_item.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.users.registration.Email']}
+                                        </ui:define>
+                                        #{userPreferencesManager.selectedUser.email}
+                                    </s:decorate>
+                                    <s:decorate id="institutionDecorationView"
+                                                template="/layout/display/_data_list_item.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.users.user.UserInstitution']}
+                                        </ui:define>
+                                        #{userPreferencesManager.selectedUser.institution.name}
+                                    </s:decorate>
+                                    <s:decorate id="skypeDecorationView"
+                                                template="/layout/display/_data_list_item.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.tm.users.SkypeAccount']}</ui:define>
+                                        #{userPreferencesManager.userPreferences.skype}
+                                    </s:decorate>
+                                    <s:decorate id="tableDecorationView"
+                                                template="/layout/display/_data_list_item.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.tm.users.TableLabel']}</ui:define>
+                                        #{userPreferencesManager.userPreferences.connectathonTable}
+                                    </s:decorate>
+                                    <s:decorate id="langDecorate"
+                                                template="/layout/display/_data_list_item.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.tm.users.SpokenLanguages']}
+                                        </ui:define>
+                                        <rich:list value="#{userPreferencesManager.spokenLanguages}"
+                                                   rendered="#{not empty userPreferencesManager.spokenLanguages}"
+                                                   var="v"
+                                                   type="unordered">
+                                            <h:outputText value="#{v}"/>
+                                        </rich:list>
+                                    </s:decorate>
+                                    <s:decorate id="displaySequenceDiagramView"
+                                                template="/layout/display/_data_list_item.xhtml">
+                                        <ui:define name="label">
+                                            #{messages['gazelle.tm.users.DisplaySequenceDiagramInfo']}
+                                        </ui:define>
+                                        <h:outputText id="sequenceDiagramTrue"
+                                                      rendered="#{userPreferencesManager.userPreferences.showSequenceDiagram}"
+                                                      value="#{messages['gazelle.tm.users.diagramSequenceShown']}"/>
+                                        <h:outputText id="sequenceDiagramFalse"
+                                                      rendered="#{not userPreferencesManager.userPreferences.showSequenceDiagram}"
+                                                      value="#{messages['gazelle.tm.users.diagramSequenceHidden']}"/>
+                                    </s:decorate>
+                                    <s:decorate id="displayEmailView"
+                                                template="/layout/display/_data_list_item.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.tm.users.EmailOption']}</ui:define>
+                                        <h:outputText id="EmailTrue"
+                                                      rendered="#{userPreferencesManager.userPreferences.displayEmail}"
+                                                      value="#{messages['gazelle.tm.users.DisplayEmailYes']}"/>
+                                        <h:outputText id="EmailFalse"
+                                                      rendered="#{not userPreferencesManager.userPreferences.displayEmail}"
+                                                      value="#{messages['gazelle.tm.users.DisplayEmailNo']}"/>
+                                    </s:decorate>
+                                    <s:decorate id="NumberOfResultsPerPage"
+                                                template="/layout/display/_data_list_item.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.common.ResultsPerPage']}</ui:define>
+
+                                        #{userPreferencesManager.userPreferences.numberOfResultsPerPage}
+                                    </s:decorate>
+                                </dl>
+                            </div>
+                            <div class="col-lg-3">
+                                <h:graphicImage library="img" style="max-width:100%;max-height:100%;"
+                                                value="#{userPreferencesManager.userPreferences.photoUrlNoCache}"
+                                                id="monitorPhoto"/>
+                            </div>
+                        </ui:decorate>
+                    </div>
+                    <a4j:commandButton styleClass="gzl-btn-blue" value="#{messages['gazelle.common.button.Edit']}"
+                                       actionListener="#{userPreferencesManager.editPreferences()}"
+                                       render="globalDiv"/>
+                    <a4j:commandButton styleClass="gzl-btn" value="#{messages['gazelle.users.user.ChangePassword']}"
+                                       action="#{userPreferencesManager.changePasswordAction()}" immediate="true"
+                                       execute="@this"/>
+                </div>
+            </div>
+        </h:form>
+    </h:panelGroup>
+</s:div>

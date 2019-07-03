@@ -1,0 +1,44 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{transactionManager.getLinkTitle()} #{transaction.name}"/>
+    <ui:define name="body">
+        <div  id="domainManager">
+            <h:form>
+                <s:token allowMultiplePosts="true"/>
+
+                <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                    <ui:define name="panel_title">#{transactionManager.getLinkSubTitle()} #{transaction.name}
+                    </ui:define>
+                    <rich:pickList sourceValue="#{transactionManager.source}"
+                                   targetValue="#{transactionManager.target}" var="p"
+                                   sourceCaptionLabel="#{transactionManager.getLinkSourceHeader()}"
+                                   sourceListWidth="450"
+                                   targetCaptionLabel="#{transactionManager.getLinkTargetHeader()}"
+                                   targetListWidth="450" listsHeight="400" fastOrderControlsVisible="false"
+                                   fastMoveControlsVisible="false" orderControlsVisible="false"
+                                   removeControlLabel="#{transactionManager.getLinkSubOne()}"
+                                   copyControlLabel="#{transactionManager.getLinkAddOne()}">
+                        <s:convertEntity></s:convertEntity>
+                        <g:column>
+                            <h:outputText value="#{p.keyword}"/>
+                        </g:column>
+                        <g:column>
+                            <h:outputText value="#{p.name}"/>
+                        </g:column>
+                    </rich:pickList>
+                    <div>
+                        <h:commandButton id="cancel" styleClass="gzl-btn"
+                                         value="#{messages['gazelle.common.button.Cancel']}"
+                                         action="#{transactionManager.cancelLinks()}"/>
+                        <h:commandButton id="save" type="submit" styleClass="gzl-btn-green"
+                                         value="#{messages['gazelle.common.button.Save']}"
+                                         action="#{transactionManager.saveLinks()}"/>
+                    </div>
+                </ui:decorate>
+
+            </h:form>
+        </div>
+    </ui:define>
+</ui:composition>

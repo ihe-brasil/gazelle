@@ -1,0 +1,263 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.session.Administration']}"/>
+    <ui:define name="body">
+        <h:form id="testingSessionForm" class="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <a4j:region id="sessionRegion">
+                <p>#{messages['gazelle.systems.session.SessionLabel']}</p>
+
+                <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                    <div class="row">
+                        <div class="col-md-6 col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filterName" value="#{messages['gazelle.systems.session.Zone']}"/>
+                                <ui:param name="filterId" value="zone"/>
+                                <ui:param name="filter" value="#{testingSessionManager.filter}"/>
+                                <ui:param name="filterForm" value="testingSessionForm"/>
+                            </ui:include>
+                        </div>
+                        <div class="col-md-6 col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filterName" value="#{messages['net.ihe.gazelle.tm.SessionType']}"/>
+                                <ui:param name="filterId" value="type"/>
+                                <ui:param name="filter" value="#{testingSessionManager.filter}"/>
+                                <ui:param name="filterForm" value="testingSessionForm"/>
+                            </ui:include>
+                        </div>
+                    </div>
+                    <div class="form-inline">
+                        <s:decorate template="/layout/form/_checkbox.xhtml">
+                            <h:selectBooleanCheckbox value="#{testingSessionManager.displayAll}">
+                                <a4j:ajax event="change" render="testingSessionForm"/>
+                            </h:selectBooleanCheckbox>
+                            <ui:define name="label">
+                                <h:outputText
+                                        value="#{messages['net.ihe.gazelle.tm.DisplayAllevenHiddenTestingSessions']})"/>
+                            </ui:define>
+                        </s:decorate>
+                    </div>
+                    <ui:define name="filter_buttons">
+                        <a4j:commandLink title="#{messages['gazelle.common.button.Refresh']}"
+                                         render="testingSessionForm">
+                            <span class="fa fa-refresh"/>
+                        </a4j:commandLink>
+                        <a4j:commandLink title="#{messages['net.ihe.gazelle.atna.ResetCriteria']}"
+                                         actionListener="#{testingSessionManager.filter.clear()}"
+                                         render="testingSessionForm">
+                            <span class="fa fa-times-circle"/>
+                        </a4j:commandLink>
+                    </ui:define>
+                </ui:decorate>
+
+
+                <div id="registerANewTestingSessionDiv" align="right">
+                    <h:commandButton id="registerANewTestingSessionButton" styleClass="gzl-btn-blue"
+                                     value="#{messages['gazelle.systems.session.RegisterANewTestingSession']}"
+                                     action="#{testingSessionManager.addNewTestingSessionButton()}"
+                                     rendered="#{s:hasRole('admin_role') || s:hasRole('project-manager_role')}"/>
+                </div>
+                #{dataTableStateHolder.setAscendingOn('orderInGUI')}
+                <rich:dataTable id="testingSessionDatatable" style="word-break:break-all;word-wrap:break-word;"
+                                var="currentTestingSession"
+                                value="#{testingSessionManager.getTestingSessions()}"
+                                rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                                rendered="#{s:hasRole('admin_role') || s:hasRole('project-manager_role') || s:hasRole('testing_session_admin_role')}"
+                                render="ds">
+                    <g:column sortBy="#{'id'}" sortOrder="#{dataTableStateHolder.sortOrders['id']}" id="idColumn">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                        <h:outputText value="#{currentTestingSession.id}"/>
+                    </g:column>
+
+                    <g:column sortBy="#{'year'}" sortOrder="#{dataTableStateHolder.sortOrders['year']}" id="yearColumn">
+                        <ui:define name="header">#{messages['gazelle.systems.session.Year']}</ui:define>
+                        <h:outputText value="#{currentTestingSession.year}"/>
+                    </g:column>
+                    <g:column sortBy="#{'zone'}" sortOrder="#{dataTableStateHolder.sortOrders['zone']}" id="zoneColumn">
+                        <ui:define name="header">#{messages['gazelle.systems.session.Zone']}</ui:define>
+                        <h:outputText value="#{currentTestingSession.zone}"/>
+                    </g:column>
+                    <g:column sortBy="#{'type'}" sortOrder="#{dataTableStateHolder.sortOrders['type']}" id="typeColumn">
+                        <ui:define name="header">#{messages['gazelle.systems.session.Type']}</ui:define>
+                        <h:outputText value="#{currentTestingSession.type}"/>
+                    </g:column>
+                    <g:column sortBy="#{'description'}" sortOrder="#{dataTableStateHolder.sortOrders['description']}"
+                              id="descriptionColumn">
+                        <ui:define name="header">#{messages['gazelle.systems.session.Description']}</ui:define>
+                        <h:outputText value="#{currentTestingSession.description}" style="font-weight:bold;"
+                                      rendered="#{userManagerExtra.selectedTestingSession.id == currentTestingSession.id}"/>
+                        <h:outputText value="#{currentTestingSession.description}"
+                                      rendered="#{userManagerExtra.selectedTestingSession.id != currentTestingSession.id}"/>
+                        <h:outputText value=" (#{messages['net.ihe.gazelle.tm.Default_2']})"
+                                      style="font-weight:bold;"
+                                      rendered="#{currentTestingSession.defaultTestingSession}"/>
+                    </g:column>
+
+                    <g:column sortBy="#{'orderInGUI'}" sortOrder="#{dataTableStateHolder.sortOrders['orderInGUI']}"
+                              id="orderGuiColumn">
+                        <ui:define name="header">#{messages['net.ihe.gazelle.tm.GUIOrder']}</ui:define>
+                        <h:outputText value="#{currentTestingSession.orderInGUI}"/>
+                    </g:column>
+                    <g:column sortBy="#{'beginningSession'}"
+                              sortOrder="#{dataTableStateHolder.sortOrders['beginningSession.time']}"
+                              id="startDateColumn">
+                        <ui:define name="header">#{messages['gazelle.systems.session.StartDate']}</ui:define>
+                        <g:date tooltip="true" value="#{currentTestingSession.beginningSession}"/>
+                    </g:column>
+                    <g:column sortBy="#{'endingSession'}"
+                              sortOrder="#{dataTableStateHolder.sortOrders['endingSession.time']}"
+                              id="endDateColumn">
+                        <ui:define name="header">#{messages['gazelle.systems.session.EndDate']}</ui:define>
+                        <g:date tooltip="true" value="#{currentTestingSession.endingSession}"/>
+                    </g:column>
+                    <g:column sortBy="#{'registrationDeadlineDate'}"
+                              sortOrder="#{dataTableStateHolder.sortOrders['registrationDeadlineDate.time']}"
+                              id="registrationDeadlineColumn">
+                        <ui:define name="header">#{messages['gazelle.systems.session.RegistrationDeadlineDate']}
+                        </ui:define>
+                        <g:date tooltip="true" value="#{currentTestingSession.registrationDeadlineDate}"/>
+                    </g:column>
+                    <g:column sortBy="#{'activeSession'}"
+                              sortOrder="#{dataTableStateHolder.sortOrders['activeSession']}" id="activationColumn">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.systems.session.ActivatedForRegistration']}"/>
+                        </ui:define>
+                        <h:panelGroup
+                                rendered="#{s:hasRole('admin_role') || testingSessionManager.isUserAdminOfCurrentTestingSession(currentTestingSession)}">
+                            <h:panelGroup rendered="#{not currentTestingSession.activeSession}">
+                                <a4j:commandLink id="act"
+                                                 action="#{testingSessionManager.activateSession(currentTestingSession)}"
+                                                 onRowMouseOver="this.style.cursor='pointer'" immediate="true"
+                                                 title="#{messages['net.ihe.gazelle.tm.Activate']}"
+                                                 render="testingSessionDatatable">
+                                    <span class="gzl-icon-circle-red"/>
+                                </a4j:commandLink>
+
+                                <h:outputText
+                                        value="#{messages['net.ihe.gazelle.tm.NotActivated']}"
+                                        style="font-style:italic"/>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{currentTestingSession.activeSession}">
+
+                                <a4j:commandLink id="desAct"
+                                                 action="#{testingSessionManager.activateSession(currentTestingSession)}"
+                                                 onRowMouseOver="this.style.cursor='pointer'" immediate="true"
+                                                 title="#{messages['net.ihe.gazelle.tm.Deactivate']}"
+                                                 render="testingSessionDatatable">
+                                    <span class="gzl-icon-circle-green"/>
+                                </a4j:commandLink>
+                                <h:outputText id="userActivatedYes"
+                                              value="#{messages['gazelle.systems.session.Activated']}"
+                                              style="font-style:italic"/>
+                            </h:panelGroup>
+                        </h:panelGroup>
+                        <h:panelGroup
+                                rendered="#{!s:hasRole('admin_role') and !testingSessionManager.isUserAdminOfCurrentTestingSession(currentTestingSession)}">
+                            <h:panelGroup rendered="#{not currentTestingSession.activeSession}">
+                                <span class="gzl-icon-circle-red"/>
+                                <h:outputText
+                                        value="#{messages['net.ihe.gazelle.tm.NotActivated']}"
+                                        style="font-style:italic"/>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{currentTestingSession.activeSession}">
+                                <span class="gzl-icon-circle-green"/>
+                                <h:outputText value="#{messages['gazelle.systems.session.Activated']}"
+                                              style="font-style:italic"/>
+                            </h:panelGroup>
+                        </h:panelGroup>
+
+                    </g:column>
+                    <g:column width="100px" style="text-align:right" id="actionColumn">
+                        <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+                        <div class="gzl-never-wrap">
+
+                            <a4j:commandLink id="markDefaultSupport"
+                                             title="#{messages['net.ihe.gazelle.tm.MarkAsDefault']}"
+                                             action="#{testingSessionManager.markAsDefaultTestingSession(currentTestingSession)}"
+                                             onRowMouseOver="this.style.cursor='pointer'" immediate="true"
+                                             rendered="#{(s:hasRole('admin_role') || s:hasRole('project-manager_role')) and !currentTestingSession.defaultTestingSession and currentTestingSession.activeSession}"
+                                             render="testingSessionForm">
+
+                                <span class="gzl-icon-checked"/>
+                            </a4j:commandLink>
+                            <h:panelGroup
+                                    rendered="#{currentTestingSession.defaultTestingSession}">
+                                <span class="gzl-icon-circle-green"
+                                      title="#{messages['net.ihe.gazelle.tm.DefaultTestingSession']}"/>
+
+                            </h:panelGroup>
+
+                            <a4j:commandLink title="#{messages['net.ihe.gazelle.tm.MoveUp']}"
+                                             render="testingSessionDatatable"
+                                             rendered="#{currentTestingSession.orderInGUI gt 1 or currentTestingSession.orderInGUI == null}"
+                                             actionListener="#{testingSessionManager.moveOrderUp(currentTestingSession.id)}">
+                                <s:span styleClass="gzl-icon-up gzl-text-blue"/>
+                            </a4j:commandLink>
+                            <a4j:commandLink title="#{messages['net.ihe.gazelle.tm.MoveDown']}"
+                                             render="testingSessionDatatable"
+                                             rendered="#{currentTestingSession.orderInGUI lt testingSessionManager.getTestingSessions().size()-1}"
+                                             actionListener="#{testingSessionManager.moveOrderDown(currentTestingSession.id)}">
+                                <s:span styleClass="gzl-icon-down gzl-text-blue"/>
+                            </a4j:commandLink>
+
+                            <a4j:commandLink id="currentTestingSession_EditSupport"
+                                             action="#{testingSessionManager.editTestingSessionActionLink(currentTestingSession)}"
+                                             onRowMouseOver="this.style.cursor='pointer'" immediate="true"
+                                             title="#{messages['gazelle.common.button.Edit']}"
+                                             render="listDiv, editDiv,  pageName"
+                                             rendered="#{s:hasRole('admin_role') || testingSessionManager.isUserAdminOfCurrentTestingSession(currentTestingSession)}">
+                                <span class="gzl-icon-pencil"/>
+                            </a4j:commandLink>
+                            <a4j:commandLink id="deleteSessionSupport"
+                                             title="#{messages['gazelle.common.button.Delete']}"
+                                             actionListener="#{testingSessionManager.setSelectedTestingSession( currentTestingSession ) }"
+                                             onRowMouseOver="this.style.cursor='pointer'" immediate="true"
+                                             rendered="#{s:hasRole('admin_role') || s:hasRole('project-manager_role')}"
+                                             oncomplete="jq162('#DeleteConfirmationModalPanel').modal('show');"
+                                             render="deleteTestingSessionForm">
+                                <span class="gzl-icon-trash-o"/>
+                            </a4j:commandLink>
+                        </div>
+                    </g:column>
+                    <f:facet name="footer">
+                        <ui:include src="/util/datatableFooter.xhtml">
+                            <ui:param name="dataScrollerId" value="ds"/>
+                            <ui:param name="dataTableId" value="testingSessionDatatable"/>
+                        </ui:include>
+                    </f:facet>
+                </rich:dataTable>
+            </a4j:region>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Delete testing session confirmation Modal Panel					-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="deleteTestingSessionForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteConfirmationModalPanel"/>
+                <ui:define name="popup_title">#{messages['gazelle.users.institution.confirmation.delete.label']}
+                </ui:define>
+                <s:div id="DeleteConfirmationDiv">
+                    <p>#{messages['gazelle.systems.session.confirmation.delete.label']} :
+                        #{testingSessionManager.getSelectedTestingSession().year} -
+                        #{testingSessionManager.getSelectedTestingSession().zone} -
+                        #{testingSessionManager.getSelectedTestingSession().type}?</p>
+                </s:div>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="deleteButtonConfirm"
+                                       value="#{messages['gazelle.common.button.Delete']}"
+                                       ignoreDupResponses="true" styleClass="gzl-btn-red"
+                                       actionListener="#{testingSessionManager.deleteTestingSession()}"
+                                       onclick="jq162('#DeleteConfirmationModalPanel').modal('hide');"
+                                       render=" :testingSessionForm"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

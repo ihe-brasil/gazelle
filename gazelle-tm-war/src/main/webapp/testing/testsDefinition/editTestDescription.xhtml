@@ -1,0 +1,21 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle"
+              value="#{messages['net.ihe.gazelle.tm.EditTestDefinitionsOf']} #{editTestDefinitionManager.editedTest.name}"/>
+    <!-- ======================= -->
+    <!-- Test Descriptions section-->
+    <!-- ======================= -->
+    <ui:define name="body">
+        <s:div id="TestDescriptionsManagement"
+               rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}">
+
+            <ui:include src="_editTestDescription.xhtml">
+                <ui:param name="testId"
+                          value="#{editTestDefinitionManager.editedTest.id}"/>
+                <ui:param name="editedTestDescription"
+                          value="#{editTestDefinitionManager.editedTestDescription}"/>
+            </ui:include>
+        </s:div>
+    </ui:define>
+</ui:composition>

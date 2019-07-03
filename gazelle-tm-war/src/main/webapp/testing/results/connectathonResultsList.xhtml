@@ -1,0 +1,295 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <h:commandButton id="systemsCoverageId" value="#{messages['net.ihe.gazelle.tm.ExportResults']}"
+                     action="#{connectathonResult.listResultSummary()}" styleClass="gzl-btn-green"
+                     rendered="#{(s:hasRole('admin_role') || s:hasRole('monitor_role') || s:hasRole('testing_session_admin_role'))}"
+                     title="#{messages['net.ihe.gazelle.tm.ExportResultsAsDisplayBelowAsCSV']}">
+    </h:commandButton>
+
+    <s:div id="depId">
+        <h:panelGroup rendered="#{connectathonResult.isSystemSelected()}">
+            #{tfDependenciesManager.validateTFDependencies(connectathonResult.datamodel)}
+            <h:panelGroup rendered="#{tfDependenciesManager.missingTfDependencies}">
+                <a4j:commandButton id="checkDepId"
+                                   value="#{messages['gazelle.systems.system.CheckTFdependencies.Header']}"
+                                   styleClass="gzl-btn-orange"
+                                   render="missingRulesDiv,TfDependenciesDBModalPanel, :validateTFDependenciesDBSelectedSystemForm"
+                                   oncomplete="jq162('#TfDependenciesDBModalPanel').modal('show');">
+                </a4j:commandButton>
+            </h:panelGroup>
+            <h:panelGroup rendered="#{not tfDependenciesManager.missingTfDependencies}">
+                <span class="btn gzl-btn-invisible">
+                    <h:outputText value="#{messages['gazelle.systems.system.CheckTFdependencies.NoMissing']}"/>
+                </span>
+            </h:panelGroup>
+        </h:panelGroup>
+    </s:div>
+
+    <rich:dataTable id="iheImplementationResultsTable" var="sytemAIPOResultForTestingSession" rowKeyVar="rowNumber"
+                    rows="#{dataScrollerMemory.numberOfResultsPerPage}" value="#{connectathonResult.getDatamodel()}"
+                    onRowMouseOut="colorRowsOfTable('globalform:iheImplementationResultsTable');"
+                    columnClasses="center" render="ds">
+        <g:column rendered="#{not connectathonResult.isSystemSelected()}"
+                  sortBy="#{'systemActorProfile.system.keyword'}"
+                  sortOrder="#{datatablestateholder.sortorders['systemactorprofile.system.keyword']}">
+            <ui:define name="header">
+                <h:outputText id="systemCompanyOutputText" value="#{messages['gazelle.tm.Sys']}"/>
+            </ui:define>
+            <g:link value="#{sytemAIPOResultForTestingSession.systemActorProfile.system}" target="_blank"/>
+        </g:column>
+        <g:column
+                sortBy="#{'systemActorProfile.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.keyword'}"
+                sortOrder="#{datatablestateholder.sortorders['systemactorprofile.actorintegrationprofileoption.actorintegrationprofile.integrationprofile.keyword']}">
+            <ui:define name="header">
+                <h:outputText id="integrationProfileOutputText"
+                              value="#{messages['gazelle.testmanagement.object.Profile']}"/>
+            </ui:define>
+            <g:link value="#{sytemAIPOResultForTestingSession.systemActorProfile.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile}"
+                    target="_blank"/>
+        </g:column>
+        <g:column sortBy="#{'systemActorProfile.actorIntegrationProfileOption.actorIntegrationProfile.actor.keyword'}"
+                  sortOrder="#{datatablestateholder.sortorders['systemactorprofile.actorintegrationprofileoption.actorintegrationprofile.actor.keyword']}">
+            <ui:define name="header">
+                <h:outputText id="actorOutputText" value="#{messages['gazelle.tf.Actor']}"/>
+            </ui:define>
+            <g:link value="#{sytemAIPOResultForTestingSession.systemActorProfile.actorIntegrationProfileOption.actorIntegrationProfile.actor}"
+                    target="_blank"/>
+        </g:column>
+        <g:column sortBy="#{'systemActorProfile.actorIntegrationProfileOption.integrationProfileOption.keyword'}"
+                  sortOrder="#{datatablestateholder.sortorders['systemactorprofile.actorintegrationprofileoption.integrationprofileoption.keyword']}">
+            <ui:define name="header">
+                <h:outputText id="integrationProfileOptionOutputText"
+                              value="#{messages['gazelle.tf.LabelOption']}"/>
+            </ui:define>
+            <g:link value="#{sytemAIPOResultForTestingSession.systemActorProfile.actorIntegrationProfileOption.integrationProfileOption}"
+                    target="_blank"/>
+        </g:column>
+        <g:column>
+            <ui:define name="header">
+                <h:outputText id="testingTypeOutputText"
+                              value="#{messages['gazelle.systems.session.Type']}"/>
+            </ui:define>
+
+            <h:outputText
+                    value="#{sytemAIPOResultForTestingSession.systemActorProfile.testingType.keyword}"/>
+
+        </g:column>
+        <g:column sortBy="#{'testRolesCountR'}" sortOrder="#{datatablestateholder.sortorders['testrolescountr']}">
+            <ui:define name="header">
+                <s:span>
+          <span title="#{messages['gazelle.tm.RequiredOptional']}">
+            <h:outputText value="#{messages['gazelle.tm.RO']}" id="roTextId"/>
+          </span>
+                </s:span>
+            </ui:define>
+            <h:outputText value="#{sytemAIPOResultForTestingSession.testRolesCountR}"/>
+            <h:outputText value="/"/>
+            <h:outputText value="#{sytemAIPOResultForTestingSession.testRolesCountO}"/>
+        </g:column>
+        <g:column sortBy="#{'indicatorVerified'}" sortOrder="#{datatablestateholder.sortorders['indicatorverified']}"
+                  styleClass="gzl-never-wrap">
+            <ui:define name="header">
+                <s:span>
+          <span title="#{messages['net.ihe.gazelle.tm.OfRequiredTestCompleted']}">
+            <h:outputText value="#{messages['gazelle.tm.V']}" id="vTextId2"/>
+          </span>
+                </s:span>
+            </ui:define>
+            <h:outputText value="#{sytemAIPOResultForTestingSession.getIndicatorVerified()}"/>
+            <ui:decorate template="/layout/popover/_popover_on_icon.xhtml"
+                         rendered="#{not empty sytemAIPOResultForTestingSession.htmlCountVerified}">
+                <ui:param name="id" value="v#{sytemAIPOResultForTestingSession.id}"/>
+                <ui:param name="placement" value="bottom"/>
+                <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                <ui:define name="content">
+                    <g:safehtml value="#{sytemAIPOResultForTestingSession.htmlCountVerified}"/>
+                </ui:define>
+            </ui:decorate>
+        </g:column>
+        <g:column sortBy="#{'indicatorWaiting'}" sortOrder="#{datatablestateholder.sortorders['indicatorwaiting']}"
+                  styleClass="gzl-never-wrap">
+            <ui:define name="header">
+                <s:span>
+          <span title="#{messages['gazelle.tm.WaitingForValidation']}">
+            <h:outputText value="#{messages['gazelle.tm.W']}" id="wTextId"/>
+          </span>
+                </s:span>
+            </ui:define>
+            <h:outputText value="#{sytemAIPOResultForTestingSession.getIndicatorWaiting()}"/>
+
+            <ui:decorate template="/layout/popover/_popover_on_icon.xhtml"
+                         rendered="#{not empty sytemAIPOResultForTestingSession.htmlCountWaiting}">
+                <ui:param name="id" value="w#{sytemAIPOResultForTestingSession.id}"/>
+                <ui:param name="placement" value="bottom"/>
+                <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                <ui:define name="content">
+                    <g:safehtml value="#{sytemAIPOResultForTestingSession.htmlCountWaiting}"/>
+                </ui:define>
+            </ui:decorate>
+        </g:column>
+        <g:column sortBy="#{'indicatorProgress'}" sortOrder="#{datatablestateholder.sortorders['indicatorprogress']}"
+                  styleClass="gzl-never-wrap">
+            <ui:define name="header">
+                <s:span>
+          <span title="#{messages['gazelle.tm.Progress']}">
+            <h:outputText value="#{messages['gazelle.tm.P']}" id="pTextId"/>
+          </span>
+                </s:span>
+            </ui:define>
+            <h:outputText value="#{sytemAIPOResultForTestingSession.getIndicatorProgress()}"/>
+
+            <ui:decorate template="/layout/popover/_popover_on_icon.xhtml"
+                         rendered="#{not empty sytemAIPOResultForTestingSession.htmlCountProgress}">
+                <ui:param name="id" value="p#{sytemAIPOResultForTestingSession.id}"/>
+                <ui:param name="placement" value="bottom"/>
+                <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                <ui:define name="content">
+                    <g:safehtml value="#{sytemAIPOResultForTestingSession.htmlCountProgress}"/>
+                </ui:define>
+            </ui:decorate>
+        </g:column>
+        <g:column sortBy="#{'indicatorFailed'}" sortOrder="#{datatablestateholder.sortorders['indicatorfailed']}"
+                  styleClass="gzl-never-wrap">
+            <ui:define name="header">
+                <s:span>
+          <span title="#{messages['gazelle.tm.test.Failed']}">
+            <h:outputText value="#{messages['gazelle.tm.F']}" id="fTextId"/>
+          </span>
+                </s:span>
+            </ui:define>
+            <h:outputText value="#{sytemAIPOResultForTestingSession.getIndicatorFailed()}"/>
+
+            <ui:decorate template="/layout/popover/_popover_on_icon.xhtml"
+                         rendered="#{not empty sytemAIPOResultForTestingSession.htmlCountFailed}">
+                <ui:param name="id" value="f#{sytemAIPOResultForTestingSession.id}"/>
+                <ui:param name="placement" value="bottom"/>
+                <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                <ui:define name="content">
+                    <g:safehtml value="#{sytemAIPOResultForTestingSession.htmlCountFailed}"/>
+                </ui:define>
+            </ui:decorate>
+        </g:column>
+        <g:column>
+            <ui:define name="header">
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.Partners']}"/>
+            </ui:define>
+            <ui:include src="/testing/partnersList.xhtml">
+                <ui:param name="partners"
+                          value="#{connectathonResult.getPartners(sytemAIPOResultForTestingSession)}"/>
+            </ui:include>
+        </g:column>
+        <g:column>
+            <ui:define name="header">
+                <h:outputText id="testsOutputText" value="#{messages['gazelle.tests.tests']}"/>
+            </ui:define>
+            <s:div id="ViewDiv">
+                <a4j:commandLink id="onRowClick"
+                                 title="#{messages['net.ihe.gazelle.tm.ShowTestsForThisActorProfile']}"
+                                 actionListener="#{connectathonResult.showTestsFor(sytemAIPOResultForTestingSession)}"
+                                 immediate="true" render="testsInstancesDetails">
+                    <span class="gzl-icon-search"/>
+                </a4j:commandLink>
+            </s:div>
+        </g:column>
+        <g:column sortBy="#{'status.keyword'}" sortOrder="#{datatablestateholder.sortorders['status.keyword']}">
+            <ui:define name="header">
+                <h:outputText id="resultStatusOutputText"
+                              value="#{messages['gazelle.tm.testing.results.resultStatus']}"/>
+            </ui:define>
+            <s:div id="statusDiv">
+                <h:inputHidden value="#{sytemAIPOResultForTestingSession.status.id}"
+                               rendered="#{not empty sytemAIPOResultForTestingSession.status}"/>
+                <h:inputHidden value="0" rendered="#{empty sytemAIPOResultForTestingSession.status}"/>
+                <h:selectOneMenu styleClass="form-control gzl-form-control" id="StatusListBox"
+                                 value="#{sytemAIPOResultForTestingSession.status}"
+                                 style="font-weight:bold;"
+                                 rendered="#{s:hasPermission('ConnectathonResultManager', 'manageSystemAIPOResultsForAdmin'  )}">
+                    <s:selectItems value="#{connectathonResult.listStatusResults}" var="statusFromList"
+                                   noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                   label="#{messages[statusFromList.labelToDisplay]}"/>
+                    <a4j:ajax event="change" execute="@this"
+                              render="depId , iheImplementationResultsTable"
+                              listener="#{connectathonResult.mergeResult(sytemAIPOResultForTestingSession)}"
+                              oncomplete="colorRowsOfTable('globalform:iheImplementationResultsTable');"/>
+                </h:selectOneMenu>
+                <h:panelGroup
+                        rendered="#{!s:hasPermission('ConnectathonResultManager', 'manageSystemAIPOResultsForAdmin') and s:hasPermission('ConnectathonResultManager', 'manageSystemAIPOResultsForNonAdmin')}">
+
+                    <s:span styleClass="gzl-icon-circle-green"
+                            rendered="#{sytemAIPOResultForTestingSession.status.keyword.equals('passed')}"/>
+
+                    <s:span styleClass="gzl-icon-times"
+                            rendered="#{sytemAIPOResultForTestingSession.status.keyword.equals('failed')}"/>
+
+                    <s:span styleClass="gzl-icon-exclamation-triangle"
+                            rendered="#{sytemAIPOResultForTestingSession.status.keyword.equals('atrisk')}"/>
+
+                    <s:span styleClass="gzl-icon-stack"
+                            rendered="#{sytemAIPOResultForTestingSession.status.keyword.equals('nopeer')}">
+                        <span class="gzl-icon-user gzl-icon-stack-1x"/>
+                        <span class="gzl-icon-ban gzl-icon-stack-1x gzl-color-light-red gzl-icon-stack-bottom-right"/>
+                    </s:span>
+
+                    <s:span styleClass="gzl-icon-forward"
+                            rendered="#{sytemAIPOResultForTestingSession.status.keyword.equals('nograding')}"/>
+
+                    <h:outputText value="#{messages[sytemAIPOResultForTestingSession.status.labelToDisplay]}"
+                                  rendered="#{sytemAIPOResultForTestingSession.status !=null}"/>
+
+                </h:panelGroup>
+
+                <s:div id="missingIcon">
+                    <h:panelGroup rendered="#{sytemAIPOResultForTestingSession.isDependencyMissing()}">
+                        <a4j:commandLink title="#{messages['net.ihe.gazelle.tm.PassIsProvisionalClickIconToFindMissingDependenc']}"
+                                         render="missingRulesDiv,TfDependenciesDBModalPanel, :validateTFDependenciesDBSelectedSystemForm"
+                                         oncomplete="jq162('#TfDependenciesDBModalPanel').modal('show');">
+                            <s:span styleClass="gzl-icon-exclamation-triangle"/>
+                        </a4j:commandLink>
+                    </h:panelGroup>
+                </s:div>
+
+
+            </s:div>
+        </g:column>
+        <g:column>
+            <ui:define name="header">
+                <h:outputText id="commentOutputText"
+                              value="#{messages['gazelle.tm.testing.results.comment']}"/>
+            </ui:define>
+            <h:inputTextarea styleClass=" form-control" value="#{sytemAIPOResultForTestingSession.comment}" rows="2"
+                             cols="20"
+                             rendered="#{s:hasPermission('ConnectathonResultManager', 'manageSystemAIPOResultsForAdmin'  )}">
+                <a4j:ajax event="blur" execute="@this"
+                          listener="#{connectathonResult.mergeResult(sytemAIPOResultForTestingSession)}"/>
+            </h:inputTextarea>
+            <s:div
+                    rendered="#{ !s:hasPermission('ConnectathonResultManager', 'manageSystemAIPOResultsForAdmin'  ) and s:hasPermission('ConnectathonResultManager', 'manageSystemAIPOResultsForNonAdmin'  ) }">
+        <pre style="border: 0px; padding: 0px; background: none;">
+          <h:outputText style="background : none ;"
+                        value="#{sytemAIPOResultForTestingSession.getWordWrappedComment()}"/>
+        </pre>
+            </s:div>
+        </g:column>
+        <g:column colspan="#{connectathonResult.getColumnCount()}" breakRowBefore="true">
+            <a4j:outputPanel id="testsInstancesDetails">
+                <s:div style="border : 0px; padding : 0px;"
+                       rendered="#{connectathonResult.isShowingTestsFor(sytemAIPOResultForTestingSession)}">
+                    <ui:include src="connectathonResultsDetails.xhtml">
+                        <ui:param name="details"
+                                  value="#{connectathonResult.getDetails(sytemAIPOResultForTestingSession)}"/>
+                    </ui:include>
+                </s:div>
+            </a4j:outputPanel>
+        </g:column>
+        <f:facet name="footer">
+            <ui:include src="/util/datatableFooter.xhtml">
+                <ui:param name="dataScrollerId" value="ds"/>
+                <ui:param name="dataTableId" value="iheImplementationResultsTable"/>
+            </ui:include>
+        </f:facet>
+    </rich:dataTable>
+</ui:composition>

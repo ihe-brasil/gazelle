@@ -1,0 +1,631 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml">
+    <h:outputStylesheet library="stylesheet" name="spectrum.css"/>
+    <h:outputScript library="jscript" name="spectrum.js"/>
+    <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+        <ui:param name="panel_id" value="mode"/>
+        <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.ApplicationMode']}</ui:define>
+        <a4j:region>
+
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="box1"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.MasterModeleditTests']}</ui:define>
+                <h:selectBooleanCheckbox id="box1" value="#{preferencesModifier.values['is_master_model']}"
+                                         styleClass="form-control-static"/>
+            </s:decorate>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml"
+                        rendered="#{applicationManager.isMasterModel()}">
+                <ui:param name="id" value="gmm"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.AuthoriseDeletionOnGMM']}</ui:define>
+                <h:selectBooleanCheckbox id="gmm" value="#{preferencesModifier.values['delete_on_gmm']}"
+                                         styleClass="form-control-static"/>
+            </s:decorate>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="testmenu"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.DisplayTestMenuEntryAsNotLoggedIn']}</ui:define>
+                <h:selectBooleanCheckbox id="testmenu" value="#{preferencesModifier.values['is_tests_display_as_not_logged_in']}"
+                                         styleClass="form-control-static"/>
+            </s:decorate>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="box2"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.TestManagementforAConnectathon']}</ui:define>
+                <h:selectBooleanCheckbox id="box2" value="#{preferencesModifier.values['is_test_management']}"
+                                         styleClass="form-control-static"/>
+            </s:decorate>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="box3"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.ProductRegistrystoreIntegrationStatements']}
+                </ui:define>
+                <h:selectBooleanCheckbox id="box3" value="#{preferencesModifier.values['is_product_registry']}"
+                                         styleClass="form-control-static"/>
+            </s:decorate>
+        </a4j:region>
+    </ui:decorate>
+    <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+        <ui:param name="panel_id" value="settings"/>
+        <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.ApplicationSettings']}</ui:define>
+        <a4j:region id="urlRegion">
+            <s:decorate id="urlDecoration" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="urlApplication"/>
+                <ui:define name="label">#{messages['gazelle.common.application.ApplicationURL']}</ui:define>
+                <h:inputText size="100" id="urlApplication" maxlength="128"
+                             value="#{preferencesModifier.values['application_url']}" styleClass=" form-control"
+                             required="true"/>
+                <span class="gzl-icon-question-circle"
+                      title="#{messages['net.ihe.gazelle.tm.HttpsgazelleihenetEUCAT']}/"/>
+            </s:decorate>
+        </a4j:region>
+        <a4j:region id="oidRegion">
+            <s:decorate id="oidDecoration" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="oidApplication"/>
+                <ui:define name="label">#{messages['gazelle.common.application.ApplicationOID']}</ui:define>
+                <h:inputText size="100" id="oidApplication" value="#{preferencesModifier.values['app_instance_oid']}"
+                             styleClass=" form-control" required="true">
+
+                </h:inputText>
+
+            </s:decorate>
+        </a4j:region>
+        <a4j:region id="urlBaseNameRegion">
+            <s:decorate id="urlBaseNameDecoration" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="urlApplication"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.ApplicationURLBasename']}</ui:define>
+                <h:outputText id="urlApplication"
+                              value="#{applicationPreferenceManager.getStringValue('application_url_basename')}"
+                              styleClass="form-control-static"/>
+
+            </s:decorate>
+        </a4j:region>
+        <a4j:region id="nameRegion">
+            <s:decorate id="nameDecoration" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="nameApplication"/>
+                <ui:define name="label">#{messages['gazelle.common.application.ApplicationName']}</ui:define>
+                <h:inputText size="100" id="nameApplication" maxlength="128"
+                             value="#{preferencesModifier.values['application_name']}" styleClass=" form-control"
+                             required="true">
+
+                </h:inputText>
+
+            </s:decorate>
+        </a4j:region>
+        <a4j:region id="adminNameRegion">
+            <s:decorate id="adminNameDecoration" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="adminNameApplication"/>
+                <ui:define name="label">#{messages['gazelle.common.application.ApplicationAdminName']}</ui:define>
+                <h:inputText size="100" id="adminNameApplication" maxlength="128"
+                             value="#{preferencesModifier.values['application_admin_name']}" styleClass=" form-control"
+                             required="true">
+                </h:inputText>
+
+            </s:decorate>
+        </a4j:region>
+        <a4j:region>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="adminTtitleApp"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.modules.AdminTitle']}</ui:define>
+                <h:inputText id="adminTtitleApp" size="100" maxlength="256"
+                             value="#{preferencesModifier.values['application_admin_title']}" styleClass=" form-control"
+                             required="true">
+                </h:inputText>
+
+            </s:decorate>
+        </a4j:region>
+        <a4j:region id="noReplyEmailRegion">
+            <s:decorate id="noReplyEmailDecoration" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="noReplyEmailpplication"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.NoReplyEmailforEmailSendByThisApplication']})</ui:define>
+                <h:inputText size="100" id="noReplyEmailpplication" maxlength="128"
+                             value="#{preferencesModifier.values['application_no_reply_email']}" styleClass=" form-control"
+                             required="true">
+                </h:inputText>
+            </s:decorate>
+        </a4j:region>
+        <a4j:region id="adminEmailRegion">
+            <s:decorate id="adminEmailDecoration" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="adminEmailpplication"/>
+                <ui:define name="label">#{messages['gazelle.common.application.ApplicationAdminEmail']}</ui:define>
+                <h:inputText size="100" id="adminEmailpplication" maxlength="128"
+                             value="#{preferencesModifier.values['application_admin_email']}" styleClass=" form-control"
+                             required="true">
+                </h:inputText>
+
+                <a4j:commandLink oncomplete="jq162('#testEmailModalPanel').modal('show');"
+                                 onRowMouseOver="this.style.cursor='pointer'" immediate="true"
+                                 title="#{messages['net.ihe.gazelle.tm.TestEmail']}"
+                                 render=" :testEmailModalPanel"
+                                 execute="@this">
+                    <span class="gzl-icon-email"/>
+                </a4j:commandLink>
+            </s:decorate>
+        </a4j:region>
+        <a4j:region>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.SendAlsoRegistrationEmailToUsersWithTheAdminRole']}</ui:define>
+                <ui:param name="id" value="enableMailsForAllAdmins"/>
+                <h:selectBooleanCheckbox id="enableMailsForAllAdmins" value="#{preferencesModifier.values['send_emails_to_all_admins']}"
+                                         styleClass="form-control-static"/>
+            </s:decorate>
+        </a4j:region>
+        <a4j:region id="historyEmailRegion">
+            <s:decorate id="historyEmailDecoration" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="historyEmailapplication"/>
+                <ui:define name="label">#{messages['gazelle.common.application.ApplicationHistoryEmail']}</ui:define>
+                <h:inputText size="100" id="historyEmailapplication" maxlength="128"
+                             value="#{preferencesModifier.values['application_email_account_for_history']}"
+                             styleClass=" form-control" required="true">
+
+                </h:inputText>
+
+            </s:decorate>
+        </a4j:region>
+        <a4j:region>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="docUrl"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.DocumentationURL']}</ui:define>
+                <h:inputText id="docUrl" size="100" maxlength="128"
+                             value="#{preferencesModifier.values['application_gazelle_documentation_url']}"
+                             styleClass=" form-control" required="true">
+                </h:inputText>
+
+            </s:decorate>
+        </a4j:region>
+        <a4j:region id="issueTrackerUrlRegion">
+            <s:decorate id="issueTrackerUrlDecoration" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="issueTrackerUrlapplication"/>
+                <ui:define name="label">#{messages['gazelle.common.application.IssueTrackerURL']}</ui:define>
+                <h:inputText size="100" id="issueTrackerUrlapplication" maxlength="128"
+                             value="#{preferencesModifier.values['application_issue_tracker_url']}"
+                             styleClass=" form-control" required="true">
+                </h:inputText>
+
+            </s:decorate>
+        </a4j:region>
+        <a4j:region id="releaseNotesUrlRegion">
+            <s:decorate id="releaseNotesUrlDecoration" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="releaseNotesUrlapplication"/>
+                <ui:define name="label">#{messages['gazelle.common.application.ReleaseNotesURL']}</ui:define>
+                <h:inputText size="100" id="releaseNotesUrlapplication" maxlength="128"
+                             value="#{preferencesModifier.values['application_gazelle_release_notes_url']}"
+                             styleClass=" form-control" required="true">
+                </h:inputText>
+
+            </s:decorate>
+        </a4j:region>
+        <a4j:region id="applicationZoneRegion">
+            <s:decorate id="applicationZoneDecoration" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="applicationZoneapplication"/>
+                <ui:define name="label">#{messages['gazelle.common.application.Zone']}</ui:define>
+                <h:inputText size="100" id="applicationZoneapplication" maxlength="128"
+                             value="#{preferencesModifier.values['application_zone']}" styleClass=" form-control"
+                             required="true">
+                </h:inputText>
+
+            </s:decorate>
+        </a4j:region>
+        <a4j:region id="googleAnalyticsRegion">
+            <s:decorate id="googleAnalyticsDecoration" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="googleAnalyticsapplication"/>
+                <ui:define name="label">#{messages['gazelle.common.application.GoogleAnalyticsCode']}</ui:define>
+                <h:inputText size="100" id="googleAnalyticsapplication" maxlength="128"
+                             value="#{preferencesModifier.values['google_analytics_code']}" styleClass=" form-control"
+                             required="false">
+                </h:inputText>
+
+            </s:decorate>
+        </a4j:region>
+        <a4j:region id="apilayerAccessKeyRegion">
+            <s:decorate id="apilayerAccessKeyDecoration" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="apilayerAccessKey"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.ApilayerAccessKey']}</ui:define>
+                <h:inputText size="100" id="apilayerAccessKey" maxlength="128"
+                             value="#{preferencesModifier.values['api_layer_access_key']}" styleClass=" form-control"
+                             required="false">
+                </h:inputText>
+                <a href="https://vatlayer.com/" target="_blank"><span class="gzl-icon-question-circle"/></a>
+            </s:decorate>
+        </a4j:region>
+        <a4j:region id="defaultLanguageRegion">
+            <s:decorate id="defaultLanguageDecoration" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="languageApp"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.DefaultTestLanguage']}</ui:define>
+                <h:selectOneMenu id="languageApp" styleClass="form-control gzl-form-control"
+                                 value="#{preferencesModifier.values['default_gazelle_language']}">
+                    <f:selectItems value="#{applicationPreferenceManager.languages}"
+                                   noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"/>
+                </h:selectOneMenu>
+            </s:decorate>
+        </a4j:region>
+        <a4j:region>
+            <s:decorate id="colorSelection" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="colorPicker"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.DefaultColor']}</ui:define>
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.DefaultIs4A75B5']}"/>
+                <h:inputText id='colorPicker' value="#{preferencesModifier.values['default_color']}"/>
+                <script>
+                    $("#preferencesForm\\:colorSelection\\:colorPicker").spectrum({
+                        preferredFormat: "hex",
+                        color: "#{preferencesModifier.values['default_color']}"
+                    });
+                </script>
+            </s:decorate>
+        </a4j:region>
+        <a4j:region>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="inputSpinnerTimeout"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.SessionTimeout']}</ui:define>
+                <div class="form-control-static">
+                    <rich:inputNumberSpinner id="inputSpinnerTimeout"
+                                             value="#{preferencesModifier.values['use_messages_session_timeout']}"
+                                             minValue="1" maxValue="1440"/>
+                </div>
+            </s:decorate>
+        </a4j:region>
+        <a4j:region>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.EnablePing']}</ui:define>
+                <ui:param name="id" value="enablePing"/>
+                <h:selectBooleanCheckbox id="enablePing" value="#{preferencesModifier.values['ping_enabled']}"
+                                         styleClass="form-control-static"/>
+            </s:decorate>
+        </a4j:region>
+        <a4j:region>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="inputSpinnerPing"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.PingFrequencys']})</ui:define>
+                <div class="form-control-static">
+                    <rich:inputNumberSpinner id="inputSpinnerPing" value="#{preferencesModifier.values['ping_time']}"
+                                             minValue="10"
+                                             maxValue="180"/>
+                </div>
+            </s:decorate>
+        </a4j:region>
+    </ui:decorate>
+    <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+        <ui:param name="panel_id" value="messages"/>
+        <ui:define name="panel_title">#{messages['gazelle.common.messages.Messages']}</ui:define>
+        <a4j:region>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="useMessagesBox"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.UseMessages']}</ui:define>
+                <h:selectBooleanCheckbox id="useMessagesBox" value="#{preferencesModifier.values['use_messages']}"
+                                         styleClass="form-control-static"/>
+            </s:decorate>
+        </a4j:region>
+    </ui:decorate>
+    <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+        <ui:param name="panel_id" value="assertions"/>
+        <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.Assertions']}</ui:define>
+        <a4j:region>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="useAssertionsBox"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.UseAssertions']}</ui:define>
+                <h:selectBooleanCheckbox id="useAssertionsBox" value="#{preferencesModifier.values['use_assertions']}"
+                                         styleClass="form-control-static"/>
+            </s:decorate>
+            <s:decorate id="assertionRestApiDeco" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="assertionRestApi"/>
+                <ui:define name="label">#{messages['gazelle.common.application.AssertionManagerRestApiUrl']}</ui:define>
+                <h:inputText size="100" id="assertionRestApi" maxlength="128"
+                             value="#{preferencesModifier.values['assertions_manager_rest_api']}"
+                             styleClass=" form-control" required="false">
+                    <a4j:ajax event="blur" render="assertionRestApiDeco"
+                              listener="#{validate.url(preferencesModifier.values['assertions_manager_rest_api'])}"/>
+                </h:inputText>
+
+            </s:decorate>
+        </a4j:region>
+    </ui:decorate>
+    <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+        <ui:param name="panel_id" value="cas"/>
+        <ui:define name="panel_title">#{messages['gazelle.common.application.preferences.CASSection']}</ui:define>
+        <a4j:region id="casEnabledRegion">
+            <s:decorate id="casEnabledDecoration" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="casEnabled"/>
+                <ui:define name="label">#{messages['gazelle.common.application.CASEnabled']}</ui:define>
+                <h:selectBooleanCheckbox id="casEnabled" value="#{preferencesModifier.values['cas_enabled']}"
+                                         styleClass="form-control-static"/>
+
+            </s:decorate>
+        </a4j:region>
+    </ui:decorate>
+    <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+        <ui:param name="panel_id" value="deploy"/>
+        <ui:define name="panel_title">#{messages['net.ihe.gazelle.modules.DeploySection']}</ui:define>
+        <a4j:region>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="autoDeployScheduledBox"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.modules.AutoDeployScheduled']}</ui:define>
+                <h:selectBooleanCheckbox id="autoDeployScheduledBox"
+                                         value="#{preferencesModifier.values['deploy_scheduled']}"
+                                         styleClass="form-control-static"/>
+            </s:decorate>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="deploySource"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.modules.DeploySource']}</ui:define>
+                <h:inputText id="deploySource" size="100" value="#{preferencesModifier.values['deploy_source']}"
+                             styleClass="form-control"/>
+            </s:decorate>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="deployTarget"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.modules.DeployTarget']}</ui:define>
+                <h:inputText id="deployTarget" size="100" value="#{preferencesModifier.values['deploy_target']}"
+                             styleClass="form-control"/>
+            </s:decorate>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="nextDeployCal"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.modules.NextDeploy']}</ui:define>
+
+                <rich:calendar id="nextDeployCal" value="#{preferencesModifier.values['deploy_time']}" popup="true"
+                               showApplyButton="true"
+                               datePattern="#{dateDisplay.calendarPatternDateTime}"
+                               locale="#{dateDisplay.calendarLocale}"
+                               styleClass="form-inline"
+                               timeZone="#{dateDisplay.calendarTimeZoneDateTime}">
+                    <a4j:ajax event="change" render="calendarOffset"/>
+                </rich:calendar>
+                <p class="help-block">
+                    <h:outputText id="calendarOffset"
+                                  value="#{applicationPreferenceManager.getTimeZoneOffset(dateDisplay.calendarTimeZoneDateTime, preferencesModifier.values['deploy_time'])}"/>
+                </p>
+
+            </s:decorate>
+        </a4j:region>
+    </ui:decorate>
+    <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+        <ui:param name="panel_id" value="cache"/>
+        <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.CacheSection']}</ui:define>
+        <a4j:region>
+            <s:div id="cache">
+                <ui:repeat value="#{applicationCacheManager.getCaches()}" var="cache">
+                    <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                        <ui:param name="id" value="cacheOutput"/>
+                        <ui:define name="label">#{cache.getCacheKeyword()}</ui:define>
+
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.Enabled']}" styleClass="gzl-label gzl-label-green"
+                                      rendered="#{applicationCacheManager.isCacheEnabled(cache.getCache())}"/>
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.Disabled']}" styleClass="gzl-label gzl-label-blue"
+                                      rendered="#{!applicationCacheManager.isCacheEnabled(cache.getCache())}"/>
+
+
+                        <a4j:commandButton
+                                actionListener="#{applicationCacheManager.disableCache(cache.getCache())}"
+                                styleClass="gzl-btn input-sm"
+                                rendered="#{applicationCacheManager.isCacheEnabled(cache.getCache())}"
+                                value="#{messages['net.ihe.gazelle.tm.Disable']}"
+                                render="cache"/>
+                        <a4j:commandButton
+                                actionListener="#{applicationCacheManager.enableCache(cache.getCache())}"
+                                styleClass="gzl-btn-green input-sm"
+                                rendered="#{!applicationCacheManager.isCacheEnabled(cache.getCache())}"
+                                value="#{messages['net.ihe.gazelle.tm.Enable']}"
+                                render="cache"/>
+                        <a4j:commandButton
+                                actionListener="#{applicationCacheManager.clearCache(cache.getCache())}"
+                                styleClass="gzl-btn input-sm"
+                                rendered="#{applicationCacheManager.isCacheEnabled(cache.getCache())}"
+                                value="#{messages['net.ihe.gazelle.tm.Clear']}"
+                                render="cache"/>
+                        <h:outputText id="cacheOutput" value="( #{cache.getSize()} #{messages['net.ihe.gazelle.tm.Elements']})"/>
+                    </s:decorate>
+                </ui:repeat>
+                <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                    <ui:define name="label">#{messages['net.ihe.gazelle.tm.AllCaches']}</ui:define>
+                    <ui:param name="id" value="allCacheOutput"/>
+                    <a4j:commandButton id="allCacheOutput"
+                                       actionListener="#{applicationCacheManager.disableCaches()}"
+                                       styleClass="gzl-btn input-sm"
+                                       value="#{messages['net.ihe.gazelle.tm.DisableAll']}"
+                                       render="cache"/>
+                    <a4j:commandButton
+                            actionListener="#{applicationCacheManager.enableCaches()}"
+                            styleClass="gzl-btn-green input-sm"
+                            value="#{messages['net.ihe.gazelle.tm.EnableAll']}"
+                            render="cache"/>
+                    <a4j:commandButton
+                            actionListener="#{applicationCacheManager.clearCaches()}"
+                            styleClass="gzl-btn input-sm"
+                            value="#{messages['net.ihe.gazelle.tm.ClearAll']}"
+                            render="cache"/>
+                </s:decorate>
+
+                <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                    <ui:define name="label">#{messages['net.ihe.gazelle.tm.FileCaches']}</ui:define>
+                    <ui:param name="id" value="clearCacheOutput"/>
+                    <ui:include src="/fileCache/_clearFileCache.xhtml">
+                        <ui:param name="idToRender" value="cache"/>
+                        <ui:param name="buttonId" value="clearCacheOutput"/>
+                    </ui:include>
+                </s:decorate>
+            </s:div>
+        </a4j:region>
+    </ui:decorate>
+    <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+        <ui:param name="panel_id" value="jira"/>
+        <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.Jira']}</ui:define>
+        <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+            <ui:define name="label">#{messages['net.ihe.gazelle.tm.DisplayJiraIssuesRelatedToTest']}</ui:define>
+            <ui:param name="id" value="displayJiraIssuesRelatedToTestBox"/>
+            <h:selectBooleanCheckbox id="displayJiraIssuesRelatedToTestBox"
+                                     value="#{preferencesModifier.values['use_jira_test_issues']}"
+                                     styleClass="form-control-static"/>
+        </s:decorate>
+        <s:decorate id="jiraRestApiDeco" template="/layout/form/_form_field_horizontal_inline.xhtml">
+            <ui:param name="id" value="jiraRestApi"/>
+            <ui:define name="label">#{messages['net.ihe.gazelle.tm.JiraBaseUrl']}</ui:define>
+            <h:inputText size="100" id="jiraRestApi" maxlength="128"
+                         value="#{preferencesModifier.values['jira_base_url']}" styleClass=" form-control"
+                         required="false">
+                <a4j:ajax event="blur" render="jiraRestApiDeco"
+                          listener="#{validate.url(preferencesModifier.values['jira_base_url'])}"/>
+            </h:inputText>
+
+        </s:decorate>
+        <s:decorate id="jiraProjetsDeco" template="/layout/form/_form_field_horizontal_inline.xhtml">
+            <ui:param name="id" value="jiraProjets"/>
+            <ui:define name="label">#{messages['net.ihe.gazelle.tm.JiraProjectsKeysToFetchIssuesFrom']}</ui:define>
+            <h:inputText size="100" id="jiraProjets" maxlength="128"
+                         value="#{preferencesModifier.values['jira_test_issue_project']}" styleClass=" form-control"
+                         required="false">
+            </h:inputText>
+            <span class="gzl-icon-question-circle"
+                  title="#{messages['net.ihe.gazelle.tm.ListOfProjectKeyscommaSeparatedThatStoreTestIssu']}"/>
+        </s:decorate>
+        <s:decorate id="jiraProjetDeco" template="/layout/form/_form_field_horizontal_inline.xhtml">
+            <ui:param name="id" value="jiraProjet"/>
+            <ui:define name="label">#{messages['net.ihe.gazelle.tm.JiraProjectKeyToReportIssues']}</ui:define>
+            <h:inputText size="100" id="jiraProjet" maxlength="128"
+                         value="#{preferencesModifier.values['jira_report_test_issue_project']}"
+                         styleClass=" form-control" required="false">
+            </h:inputText>
+            <span class="gzl-icon-question-circle"
+                  title="#{messages['net.ihe.gazelle.tm.TestIssuesWillBeReportedInThisProject']}"/>
+        </s:decorate>
+        <a4j:region rendered="#{applicationManager.isMasterModel()}">
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <a4j:commandButton actionListener="#{jiraIssuesUpdater.updateAll()}"
+                                   styleClass="gzl-btn-green form-control-static"
+                                   value="#{messages['net.ihe.gazelle.tm.SynchronizeJira']}"
+                                   render="jiraMessageDecoration"/>
+            </s:decorate>
+        </a4j:region>
+    </ui:decorate>
+    <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+        <ui:param name="panel_id" value="help"/>
+        <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.Help']}</ui:define>
+        <a4j:region>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.EnableHelpLink']}</ui:define>
+                <ui:param name="id" value="enableHelpLinkBox"/>
+                <h:selectBooleanCheckbox id="enableHelpLinkBox" value="#{preferencesModifier.values['help_show']}"
+                                         styleClass="form-control-static"/>
+            </s:decorate>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.HelpBaseURL']}</ui:define>
+                <ui:param name="id" value="helpBaseURLinput"/>
+                <h:inputText size="100" id="helpBaseURLinput" value="#{preferencesModifier.values['help_url']}"
+                             styleClass="form-control"/>
+            </s:decorate>
+        </a4j:region>
+    </ui:decorate>
+    <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+        <ui:param name="panel_id" value="security"/>
+        <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.Security']}</ui:define>
+        <h2>#{messages['net.ihe.gazelle.tm.HttpHeaders']}</h2>
+        <a4j:region id="http_headers">
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.EnableSecurityFeatures_2']}</ui:define>
+                <ui:param name="id" value="enableSecurityFeatures_2Box"/>
+                <h:selectBooleanCheckbox id="enableSecurityFeatures_2Box"
+                                         value="#{preferencesModifier.values['security-policies']}"
+                                         styleClass="form-control-static"/>
+            </s:decorate>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="xframeoptions"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.XFrameOptions']} <a
+                        href="https://developer.mozilla.org/en-US/docs/HTTP/X-Frame-Options">
+                    #{messages['net.ihe.gazelle.tm.Info']}</a>
+                </ui:define>
+
+                <h:inputText size="100" id="xframeoptions" value="#{preferencesModifier.values['X-Frame-Options']}"
+                             styleClass="form-control"/>
+
+            </s:decorate>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="cacheControl"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.CacheControl']} <a
+                        href="https://developer.mozilla.org/en-US/docs/HTTP_Caching_FAQ">
+                    #{messages['net.ihe.gazelle.tm.Info']}</a>
+                </ui:define>
+
+                <h:inputText size="100" id="cacheControl" value="#{preferencesModifier.values['Cache-Control']}"
+                             styleClass="form-control"/>
+
+            </s:decorate>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="csp"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.ContentSecurityPolicy']} <a
+                        href="https://developer.mozilla.org/en-US/docs/Security/CSP/Using_Content_Security_Policy">
+                    #{messages['net.ihe.gazelle.tm.Info']}</a>
+                </ui:define>
+
+                <h:inputText size="100" id="csp" value="#{preferencesModifier.values['X-Content-Security-Policy']}"
+                             styleClass="form-control"/>
+
+            </s:decorate>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="cspr"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.ContentSecurityPolicyReportOnly']}<a
+                        href="https://developer.mozilla.org/en-US/docs/Security/CSP/Using_Content_Security_Policy">
+                    #{messages['net.ihe.gazelle.tm.Info']}</a>
+                </ui:define>
+
+                <h:inputText size="100" id="cspr"
+                             value="#{preferencesModifier.values['X-Content-Security-Policy-Report-Only']}"
+                             styleClass="form-control"/>
+
+            </s:decorate>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="sts"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.Stricttransportsecurity']}<a
+                        href="https://developer.mozilla.org/en-US/docs/Security/HTTP_Strict_Transport_Security">
+                    #{messages['net.ihe.gazelle.tm.Info']}</a>
+                </ui:define>
+
+                <h:inputText size="100" id="sts" value="#{preferencesModifier.values['Strict-Transport-Security']}"
+                             styleClass="form-control"/>
+
+            </s:decorate>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.ResetHttpHeaders']}</ui:define>
+                <ui:param name="id" value="reset_http_headers"/>
+                <a4j:commandButton id="reset_http_headers" value="#{messages['net.ihe.gazelle.tm.SetDefaultValues']}"
+                                   styleClass="gzl-btn-orange form-control-static" ignoreDupResponses="true"
+                                   action="#{preferencesModifier.resetHttpHeaders()}" render="#{formId}"/>
+            </s:decorate>
+        </a4j:region>
+        <br/>
+
+        <h2>#{messages['net.ihe.gazelle.tm.SqlInjection']}</h2>
+        <a4j:region id="SQLinjectionEnable">
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.SQLInjectionFilter']}</ui:define>
+                <ui:param name="id" value="sQLInjectionFilterBox"/>
+                <h:selectBooleanCheckbox id="sQLInjectionFilterBox"
+                                         value="#{preferencesModifier.values['sql_injection_filter_switch']}"
+                                         styleClass="form-control-static"/>
+            </s:decorate>
+        </a4j:region>
+    </ui:decorate>
+
+    <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+        <ui:param name="panel_id" value="validators"/>
+        <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.GazelleValidators']}</ui:define>
+        <h:outputText
+                value="#{messages['net.ihe.gazelle.tm.ThoseURLsAreUsedToRedirectTheUsersToTheHL7Messag']}"/>
+        <a4j:region>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="hl7val"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.GazelleHL7Validator']}</ui:define>
+                <h:inputText id="hl7val" size="100" value="#{preferencesModifier.values['gazelle_hl7_validator_url']}"
+                             styleClass="form-control"/>
+            </s:decorate>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="auditMessage"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.AuditMessageSpecification']}</ui:define>
+                <h:inputText id="auditMessage" size="100"
+                             value="#{preferencesModifier.values['atna_msg_specification_url']}"
+                             styleClass="form-control"/>
+            </s:decorate>
+        </a4j:region>
+    </ui:decorate>
+
+    <!-- Pref section common -->
+    <!--@formatter:off-->
+    <script>
+        disable_input_spinner_mouse_wheel('#{rich:clientId('inputSpinnerTimeout')}');
+        disable_input_spinner_mouse_wheel('#{rich:clientId('inputSpinnerPing')}');
+    </script>
+    <!--@formatter:on-->
+</ui:composition>

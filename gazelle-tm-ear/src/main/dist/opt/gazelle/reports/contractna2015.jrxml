@@ -1,0 +1,925 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.3.final using JasperReports Library version 6.0.3  -->
+<!-- 2015-03-16T19:20:39 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="50" bottomMargin="20" uuid="2f749568-196e-4a71-a032-8366196c11c7">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="1841"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Postgresql"/>
+	<style name="Arial" isDefault="true" fontName="Arial" fontSize="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="CP1252" isPdfEmbedded="false"/>
+	<style name="contentText" hTextAlign="Justified" markup="styled" fontName="Arial" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="CP1252" isPdfEmbedded="false"/>
+	<style name="ChapterTitle" hTextAlign="Left" hImageAlign="Left" fontName="Arial" fontSize="14" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="CP1252" isPdfEmbedded="false"/>
+	<style name="ChapterSubTitle" hTextAlign="Left" hImageAlign="Left" fontName="Arial" fontSize="12" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="CP1252" isPdfEmbedded="false"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#908181">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#FFE6E6">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="dataset1" uuid="1a4c0192-8d5b-40f7-9c3f-46a7f66d882e"/>
+	<subDataset name="Table1" uuid="7c92496a-eeff-458f-9847-eb5185619dde"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String">
+		<defaultValueExpression><![CDATA["/opt/gazelle/2010/reports/"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="institutionId" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[37]]></defaultValueExpression>
+	</parameter>
+	<parameter name="testingSessionId" class="java.lang.Integer" isForPrompting="false">
+		<defaultValueExpression><![CDATA[32]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT DISTINCT
+   usr_institution."name" AS usr_institution_name,
+   usr_institution."id" AS usr_institution_id,
+   usr_address."address" AS usr_address_address,
+   usr_address."address_line_2" AS usr_address_address_line_2,
+   usr_address."city" AS usr_address_city,
+   usr_address."state" AS usr_address_state,
+   usr_address."zip_code" AS usr_address_zip_code,
+   usr_iso_3166_country_code."printable_name" AS usr_iso_3166_country_code_printable_name,
+   usr_institution."url" AS usr_institution_url,
+   usr_institution."integration_statements_repository_url" AS usr_institution_integration_statements_repository_url,
+   usr_currency."keyword" AS usr_currency_keyword,
+   tm_invoice."fees_amount" AS tm_invoice_fees_amount,
+   tm_invoice."fees_discount" AS tm_invoice_fees_discount,
+   tm_invoice."reasons_for_discount" AS tm_reasons_for_discount,
+   tm_invoice."number_participant" AS tm_number_participant,
+   tm_invoice."number_system" AS tm_number_system,
+   tm_invoice."number_extra_participant" AS tm_number_extra_participant
+FROM
+   "public"."usr_address" usr_address INNER JOIN "public"."usr_institution" usr_institution ON usr_address."id" = usr_institution."mailing_address_id"
+   INNER JOIN "public"."usr_institution_address" usr_institution_address ON usr_address."id" = usr_institution_address."address_id"
+   AND usr_institution."id" = usr_institution_address."institution_id"
+   INNER JOIN "public"."tm_institution_system" tm_institution_system ON usr_institution."id" = tm_institution_system."institution_id"
+   INNER JOIN "public"."tm_invoice" tm_invoice ON usr_institution."id" = tm_invoice."institution_id"
+   INNER JOIN "public"."tm_testing_session" tm_testing_session ON tm_invoice."testing_session_id" = tm_testing_session."id"
+   INNER JOIN "public"."tm_system_in_session" tm_system_in_session ON tm_testing_session."id" = tm_system_in_session."testing_session_id"
+   INNER JOIN "public"."usr_currency" usr_currency ON tm_testing_session."currency_id" = usr_currency."keyword"
+   AND tm_institution_system."system_id" = tm_system_in_session."system_id"
+   INNER JOIN "public"."usr_iso_3166_country_code" usr_iso_3166_country_code ON usr_address."country" = usr_iso_3166_country_code."iso"
+WHERE
+   usr_institution."id" = $P{institutionId}
+ AND tm_system_in_session."testing_session_id" = $P{testingSessionId}]]>
+	</queryString>
+	<field name="usr_institution_name" class="java.lang.String"/>
+	<field name="usr_institution_id" class="java.lang.Integer"/>
+	<field name="usr_address_address" class="java.lang.String"/>
+	<field name="usr_address_address_line_2" class="java.lang.String"/>
+	<field name="usr_address_city" class="java.lang.String"/>
+	<field name="usr_address_state" class="java.lang.String"/>
+	<field name="usr_address_zip_code" class="java.lang.String"/>
+	<field name="usr_iso_3166_country_code_printable_name" class="java.lang.String"/>
+	<field name="usr_institution_url" class="java.lang.String"/>
+	<field name="usr_institution_integration_statements_repository_url" class="java.lang.String"/>
+	<field name="usr_currency_keyword" class="java.lang.String"/>
+	<field name="tm_invoice_fees_amount" class="java.math.BigDecimal"/>
+	<field name="tm_invoice_fees_discount" class="java.math.BigDecimal"/>
+	<field name="tm_reasons_for_discount" class="java.lang.String"/>
+	<field name="tm_number_participant" class="java.lang.Integer"/>
+	<field name="tm_number_system" class="java.lang.Integer"/>
+	<field name="tm_number_extra_participant" class="java.lang.Integer"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="122" splitType="Stretch">
+			<staticText>
+				<reportElement key="staticText" mode="Transparent" x="57" y="0" width="498" height="40" forecolor="#660099" uuid="6a748b66-5959-40fb-91f9-dca8db81b9d4"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[IHE North American Connectathon 2015 Contract]]></text>
+			</staticText>
+			<line>
+				<reportElement key="line" x="1" y="0" width="555" height="1" uuid="99002243-14b0-41cd-82a7-445d79f958b7"/>
+			</line>
+			<image scaleImage="RetainShape">
+				<reportElement mode="Transparent" x="1" y="2" width="56" height="41" uuid="d7d7623e-9106-42de-971b-42590f582494"/>
+				<imageExpression><![CDATA["ihe-usa.png"]]></imageExpression>
+			</image>
+			<line>
+				<reportElement key="line" positionType="FixRelativeToBottom" x="1" y="44" width="555" height="1" uuid="17571edb-9448-4555-8776-6d67cb4fb5f7"/>
+			</line>
+			<staticText>
+				<reportElement style="contentText" x="0" y="50" width="556" height="72" uuid="fd5e6fb1-f2d7-4910-95d5-a326289a230e"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[This contract is for organizations ("Participants") participating in the Connectathon ("Connectathon") at the IHE North American (NA) Connectathon 2015 sponsored by IHE USA to be held January 26 - 30, 2015 in Cleveland, OH. Testing services described in this contract include IHE Integration Profile/Actor combinations and Consolidated CDA® (C-CDA).  Please carefully review the terms of participation and the Connectathon Policies and Guidelines on IHE USA's website (http://www.iheusa.org/docs/NA-Connectathon-Policies-and-Guidelines-2015.pdf) before completing and signing the contract.]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="26">
+			<printWhenExpression><![CDATA[$V{PAGE_NUMBER} > 1]]></printWhenExpression>
+			<staticText>
+				<reportElement x="1" y="0" width="553" height="14" uuid="8d3f2504-294a-4842-b86e-7add0fa6c9c2"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[IHE North American Connectathon 2015]]></text>
+			</staticText>
+			<line>
+				<reportElement key="line" positionType="FixRelativeToBottom" x="0" y="15" width="555" height="1" uuid="33529a07-43b9-4fc9-a215-e62c0ea77306"/>
+			</line>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="301" splitType="Immediate">
+			<rectangle radius="10">
+				<reportElement x="3" y="122" width="555" height="120" backcolor="#CCCCCC" uuid="22ee0a2b-227c-4d6c-b992-59b7691909d2"/>
+				<graphicElement>
+					<pen lineColor="#CCCCCC"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle radius="10">
+				<reportElement x="0" y="119" width="555" height="120" backcolor="#FAFAFA" uuid="bc6a8d58-2ca2-4c4a-a418-e6cf6670eb59"/>
+			</rectangle>
+			<staticText>
+				<reportElement style="ChapterTitle" x="0" y="44" width="182" height="20" uuid="62d6ad17-6189-4f02-960e-cfacc92171c4"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Company Information]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" x="0" y="65" width="555" height="43" uuid="14241cd0-1504-443e-9b59-8e33ee8ecf93"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[This section contains information about the organization contracting to test its system(s) at the IHE NA Connectathon 2015 as it will appear in IHE publications and promotional materials.  Please review this section for accuracy and, if necessary, use Gazelle, (http://ihe.wustl.edu/gazelle-na) IHE's online registration tool, to modify your entry and generate a revised contract.]]></text>
+			</staticText>
+			<textField hyperlinkType="Reference">
+				<reportElement x="88" y="119" width="467" height="20" uuid="f9dc0c52-5a39-4b2a-961f-92fe0d3d26de"/>
+				<box leftPadding="5">
+					<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{usr_institution_name}]]></textFieldExpression>
+				<hyperlinkReferenceExpression><![CDATA[$F{usr_institution_name}]]></hyperlinkReferenceExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="139" width="89" height="20" uuid="a2679266-266f-4a2a-8c0c-4504a2571ff6"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Address :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="119" width="89" height="20" uuid="51d3e6ed-ac7e-44fe-874d-6a4f3d1934bd"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Company Name :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="159" width="89" height="20" uuid="18814328-c5a9-4b50-8ab5-9c52dea3abba"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[City :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="179" width="89" height="20" uuid="fbe60340-80ee-4acf-bbc7-43e51b7c2e86"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[State :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="179" width="49" height="20" uuid="9fbd7f09-54bf-4f06-bedd-cf99d61dfa5a"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[ZipCode :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="333" y="179" width="47" height="20" uuid="94482017-29a4-4230-8640-b63b06b62068"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Country :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="199" width="89" height="20" uuid="6b6f5a5b-9123-40f1-a08b-eb36ba46f2d8"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[URL :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="88" y="139" width="467" height="20" uuid="18784918-a2e4-4570-a4da-e9f473ee9bac"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{usr_address_address}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="88" y="149" width="467" height="20" uuid="2350b684-1e18-4de3-84c6-1baf2f17b743"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{usr_address_address_line_2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="88" y="159" width="467" height="20" uuid="abf39be1-fd7e-41b5-9a3a-fbcc370de0b8"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{usr_address_city}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="88" y="179" width="112" height="20" uuid="a18d48e5-6d09-42c0-8193-5b09f63f6ebf"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{usr_address_state}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="249" y="179" width="84" height="20" uuid="a237c1c7-e420-4c70-9f8e-8d24b902c7f5"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{usr_address_zip_code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="380" y="179" width="175" height="20" uuid="44a3088a-58ca-4bad-ae99-1b6156ae3b2a"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{usr_iso_3166_country_code_printable_name}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="Reference">
+				<reportElement x="88" y="199" width="467" height="20" uuid="9d4d8468-4f33-4a86-87bb-40e531de9b77"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{usr_institution_url}]]></textFieldExpression>
+				<hyperlinkReferenceExpression><![CDATA[$F{usr_institution_url}]]></hyperlinkReferenceExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="219" width="89" height="20" uuid="775f606a-34b5-4a63-9068-df57c961b0f5"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Int. Stat. URL :]]></text>
+			</staticText>
+			<textField hyperlinkType="Reference">
+				<reportElement x="88" y="219" width="467" height="20" uuid="65fc9825-72ec-4b9b-a288-996f78a15d9b"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{usr_institution_integration_statements_repository_url}]]></textFieldExpression>
+				<hyperlinkReferenceExpression><![CDATA[$F{usr_institution_integration_statements_repository_url}]]></hyperlinkReferenceExpression>
+			</textField>
+			<staticText>
+				<reportElement style="ChapterTitle" x="0" y="251" width="182" height="20" uuid="dd0dbf0a-abc2-4bcd-aef8-1eff3dfb7d7a"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Contact Information]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" x="0" y="271" width="555" height="26" uuid="215e1f99-8e04-41b6-b54c-157829b4db79"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[List the primary Participant contacts to receive information regarding the administrative, marketing and technical aspects of participation. ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="ChapterTitle" x="0" y="0" width="182" height="20" uuid="7ceb99b9-e2ee-4762-a3b5-4d0e0b863c77"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Important Dates]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" x="0" y="18" width="555" height="26" uuid="7a3b12c9-dcd8-4be9-942f-165c2d77ccf3"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[Signed contract is due October 3, 2014 and payment due November 17, 2014. Review contract and system payment process for instructions. ]]></text>
+			</staticText>
+		</band>
+		<band height="63" splitType="Immediate">
+			<staticText>
+				<reportElement style="ChapterSubTitle" x="0" y="4" width="267" height="20" uuid="7bff9155-6a9e-4ae7-911f-b696cafb1caa"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Primary Financial contact]]></text>
+			</staticText>
+			<subreport>
+				<reportElement positionType="Float" mode="Opaque" x="1" y="24" width="555" height="37" uuid="5762cee2-ced4-4fe1-8aa8-e1faf052a6a5"/>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="institutionId">
+					<subreportParameterExpression><![CDATA[$P{institutionId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="functionTypeId">
+					<subreportParameterExpression><![CDATA[998]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[new File($P{SUBREPORT_DIR} + File.separatorChar + "contactsBasedOnInstitutionIdAndFunctionType.jasper")]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="60" splitType="Immediate">
+			<staticText>
+				<reportElement style="ChapterSubTitle" positionType="Float" x="0" y="0" width="267" height="20" uuid="dd0318c7-b7dc-4d47-8374-e6b210c3d9f0"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Primary Marketing Contact]]></text>
+			</staticText>
+			<subreport>
+				<reportElement positionType="Float" x="0" y="20" width="555" height="37" uuid="90dda090-8986-4603-a940-5209e5f9bbcc"/>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="institutionId">
+					<subreportParameterExpression><![CDATA[$P{institutionId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="functionTypeId">
+					<subreportParameterExpression><![CDATA[1]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[new File($P{SUBREPORT_DIR} + File.separatorChar + "contactsBasedOnInstitutionIdAndFunctionTypeNoAddress.jasper")]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="60" splitType="Immediate">
+			<staticText>
+				<reportElement style="ChapterSubTitle" positionType="Float" x="0" y="0" width="267" height="20" uuid="1ca0e498-d34e-4251-ab3e-d993ea0fc796"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Primary IHE Technical Contact]]></text>
+			</staticText>
+			<subreport>
+				<reportElement positionType="Float" x="0" y="20" width="555" height="37" uuid="eb329e06-b706-4e1b-a073-5a3165be984d"/>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="institutionId">
+					<subreportParameterExpression><![CDATA[$P{institutionId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="functionTypeId">
+					<subreportParameterExpression><![CDATA[2]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[new File($P{SUBREPORT_DIR} + File.separatorChar + "contactsBasedOnInstitutionIdAndFunctionTypeNoAddress.jasper")]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="521" splitType="Immediate">
+			<staticText>
+				<reportElement style="ChapterTitle" positionType="Float" x="0" y="0" width="182" height="20" uuid="fc0ee883-98c3-4ed1-96d7-70c758d17f35"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Terms of Participation]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="20" width="555" height="130" uuid="2107cb54-f918-4f59-ac04-f2c9b893016a"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[<style isBold="true">INDEMNIFICATION:</style> Participant shall defend, indemnify, protect, save, and hold IHE USA and its officers, directors, and all agents and employees thereof, forever harmless from any damages, liabilities, claims, demands, or actions arising out of the actions or inactions of Participant, its servants, employees, contractors, or agents. This indemnification shall extend to claims for actual or alleged (a) injury to any person, (b) damage to any property, (c) economic loss, (d) business and/or production loss, (e) product or service deficiencies or damage, or (f) other violation of any statute, law, ordinance, or regulation, including but not limited to claims, as well as claims arising from the alleged action, inaction, or negligence of Participant. Participant shall at all times defend, protect, indemnify, save, and hold harmless the Indemnities against and from any and all losses, costs, damages, liability, or expenses (including attorney's fees) arising from or out of or by reason of any accident or bodily injury or other occurrences to any property, person or persons, including Participant, its agents, employees, and business invitees which arise from or out of or by reason of said Participant's occupancy and use of the facilities, or any part thereof.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="159" width="555" height="81" uuid="aa241c04-63e6-4fd3-8b50-1f1cfa479f7e"/>
+				<textElement textAlignment="Justified">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[<style isBold="true">FORCE MAJEURE:</style> In the event that the performance by IHE USA or the Facility or any part of the exhibit area thereof is unavailable whether for the entire event, or a portion of the event, as a result of fire, flood, tempest, inclement weather, or other such cause or as a result of governmental intervention, malicious damage, acts of God, war, strike, lock-out, labor dispute, riot, terrorist acts, curtailment of transportation, or other cause or agency over which IHE USA has no control, or should IHE USA decide that because of any such cause that it is necessary to cancel, postpone or re-site the event, or reduce the move-in and installation time, show time, or move-out time, IHE USA shall not be liable to refund, indemnify, or reimburse the Participant in respect of any fees paid, damage or loss, direct or indirect, arising as a result thereof.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" x="0" y="249" width="555" height="70" uuid="94ec55d3-2355-4041-9cf1-e39045deb144"/>
+				<textElement textAlignment="Justified" markup="styled"/>
+				<text><![CDATA[<style isBold="true">INTELLECTUAL PROPERTY:</style> Participant represents and warrants that it shall not violate any copyright, trademark, or other similar intellectual property laws and that it shall comply with all copyright restrictions including, but not limited to, any license IHE USA may obtain or any other laws and restrictions with respect to the use or performance of music. Participant further represents and warrants that it shall obtain any additional license or grant of authority required of Participant under the copyright laws and present IHE USA with a copy of such license or grant no less than thirty (30) days prior to the start of the exposition. ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" x="0" y="329" width="555" height="27" uuid="876f52b6-ae26-4f25-b8b7-0ed22d81e0bd"/>
+				<textElement textAlignment="Justified" markup="styled"/>
+				<text><![CDATA[<style isBold="true">COMPLAINTS:</style> Complaints of any violation of the Contract Terms and Conditions are to be made promptly to IHE USA and its representatives. Participants and their personnel agree to abide by the decisions of IHE USA.
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" x="0" y="365" width="555" height="72" uuid="924aafbd-eabf-415f-9f06-4648125efe0b"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[<style isBold="true">AMENDMENTS:</style> Any and all matters not specifically covered herein and in the Policy and Guidelines are subject to the decision of IHE USA. IHE USA shall have the full and exclusive power to interpret, amend, and enforce these Contract Terms and Conditions, provided any amendments, when made, are brought to the notice of Participants. Each Participant, for itself and its employees, agrees to abide by the foregoing Contract Terms and Conditions and by any amendments or additions thereto in conformance with the preceding sentence.  Violation of the Contract Terms and Conditions is grounds for dismissal from the exhibit hall and forfeiture of all associated monies.
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" x="0" y="446" width="555" height="63" uuid="67a7c9a0-a88f-4a0f-987a-493772cc1978"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[<style isBold="true">LAW APPLICABLE:</style> This agreement shall be governed in accordance with the laws of the State of Illinois.  Any and all litigation arising from, or as a result of this Agreement will be conducted in Chicago, Illinois and shall be governed in accordance with the laws of the State of Illinois.  This application does not represent a joint venture between IHE USA and the Participant; each shall retain the status of independent contractor and shall not have the authority to bind or represent the other.  The agreement may not be assigned to another entity without prior written consent from IHE USA.
+]]></text>
+			</staticText>
+		</band>
+		<band height="160">
+			<staticText>
+				<reportElement style="contentText" positionType="Float" x="0" y="20" width="555" height="99" uuid="e67f753c-923c-4382-bc46-5f65143d9999"/>
+				<textElement textAlignment="Justified" markup="styled"/>
+				<text><![CDATA[The list below represents system names entered by the Participant in Gazelle for the purpose of system registration for the IHE North American Connectathon 2015. The IHE USA reserves the right to refuse testing for Participants with systems containing combinations of IHE Profile/Actors and C-CDA document types it deems to be inappropriate or not reflective of practical systems architecture. IHE USA will make this determination in consultation with the Project Management Team. Participants may be asked to revise their registration to limit the number of IHE Profile/Actors and C-CDA document types included in a single system. Decisions made by IHE USA are final.
+Please review the list for accuracy. If necessary, use the Gazelle online registration system to modify your entry and generate a revised contract.
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="ChapterTitle" positionType="Float" x="0" y="1" width="348" height="20" uuid="a9a6b734-6a74-45b1-8458-8ea4f39bb45f"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Connectathon System Information]]></text>
+			</staticText>
+			<subreport>
+				<reportElement positionType="Float" x="0" y="119" width="555" height="37" uuid="97332714-b003-49de-b896-5dba53cf7e24"/>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="testingSessionId">
+					<subreportParameterExpression><![CDATA[$P{testingSessionId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="institutionId">
+					<subreportParameterExpression><![CDATA[$P{institutionId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[new File($P{SUBREPORT_DIR} + File.separatorChar + "systemsListBasedOnInstitutionId.jasper")]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="464">
+			<staticText>
+				<reportElement style="ChapterTitle" positionType="Float" x="0" y="0" width="555" height="20" uuid="7ef8b059-1fb7-4c9a-95ce-4b11b4a2c53f"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Connectathon Participant Fees:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" x="0" y="20" width="555" height="79" uuid="fe37a63c-ebb8-419e-8c17-483654643abe"/>
+				<textElement textAlignment="Justified" markup="styled"/>
+				<text><![CDATA[1. Baseline fee: Participants registering one (1) system incur a charge of $8700 USD.
+
+2. Additional Systems: Participant incurs an extra charge of $4700 USD for each additional system registered.
+
+Participant is provided one (1) 6’ x 30” table, two (2) padded chairs, internet access, and one (1) power strip with 4 outlets to provide 1500 Watts (120 volts) /standard electrical service for every one (1) system registered in Gazelle.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="ChapterTitle" positionType="Float" x="0" y="238" width="555" height="20" uuid="9d2808c1-1917-45ed-b218-935a14f06911"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Contract and System Payment Process: ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" x="0" y="258" width="555" height="24" uuid="e4c0041d-317f-48a4-9cc3-e96503de1b61"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[1. Contract: Participants must initial and sign the last page of this contract and submit to IHE USA on/or before October 3, 2014 in order to complete registration. ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="ChapterTitle" positionType="Float" x="0" y="109" width="555" height="20" uuid="314d00ac-e982-4b34-9018-17d63d1cf8d8"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total System Fees:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="129" width="556" height="32" uuid="b64f627e-2a06-4f2c-88f8-25bfd8d23e17"/>
+				<textFieldExpression><![CDATA["You have registered "+$F{tm_number_system}+ " systems. Your Connectathon System fees are "+$F{usr_currency_keyword}+" " + $F{tm_invoice_fees_amount} +(($F{tm_invoice_fees_discount}.compareTo(new java.math.BigDecimal(0.0)))== 1 ? ".  Discount : " + $F{usr_currency_keyword}+" " +$F{tm_invoice_fees_discount} +". Reason for discount : " +$F{tm_reasons_for_discount} + ". Your total system fees are : " +$F{usr_currency_keyword}+" " + ( $F{tm_invoice_fees_amount}.doubleValue() - $F{tm_invoice_fees_discount}.doubleValue()):  ". Your total system fees are : " +$F{usr_currency_keyword}+" " + $F{tm_invoice_fees_amount})+" due November 17, 2014."]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="ChapterTitle" positionType="Float" x="0" y="161" width="555" height="20" uuid="05052ea5-925c-4e04-91ce-6879ed5e78e9"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Connectathon Badges :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" x="0" y="181" width="555" height="57" uuid="05e5b3e2-e8c7-4266-b50a-68e62f7ece63"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[Participant is required to provide two (2) staff persons at minimum to manage onsite system testing for the entire week of January 26 – 30, 2015. Badges are not included in the cost of system registration; Participant’s staff member is required to purchase a badge in order to access the Connectathon test floor. Please refer to the Connectathon Participant Resources (http://iheusa.org/connectathon-participantresources.aspx) for important deadlines and pricing.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="143" y="289" width="237" height="34" backcolor="#CCCCCC" uuid="f0f673aa-d98c-4a84-8ada-fa15b0e26342"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<text><![CDATA[Submit Final Signed PDF Contract to IHE USA via mail or email. Faxed copies are not acceptable.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="143" y="323" width="88" height="50" uuid="2118e7e1-4830-45cf-9173-fe0d4b3a7190"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Mail]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="231" y="323" width="149" height="50" uuid="bec1ae32-e83b-4cfc-9f18-78e0f1739e55"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[IHE USA
+33 W Monroe St, Suite 1700
+Chicago, IL 60603
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="231" y="373" width="149" height="30" uuid="024d7bc2-0ead-4fe0-bd81-2cfc5e84390c"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Connectathon@ihe.net]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="143" y="373" width="88" height="30" uuid="110631ef-938e-4197-8b86-5ef18702cd4d"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Email]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" x="-1" y="408" width="555" height="55" uuid="141d2029-fbac-4945-8d6c-72cebe42bbb4"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[2. Invoicing: IHE USA will automatically process invoices for all Participants at the close of registration. Invoices will be sent via email to the primary financial contact listed in this contract on/or before October 17, 2014
+
+3. Payment: Payment is due no later than November 17, 2014. Payment types listed below. ]]></text>
+			</staticText>
+		</band>
+		<band height="250" splitType="Prevent">
+			<staticText>
+				<reportElement x="0" y="166" width="88" height="50" uuid="fdfdcf90-ff00-496d-94a2-07014f7e6dfe"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Credit Card Payment]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="368" y="54" width="188" height="50" uuid="ceb59c22-a25f-47f8-b524-260ff3423acf"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Make checks payable to IHE USA.
+Checks must be in US dollars and drawn on a US bank.
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="231" y="54" width="137" height="50" uuid="7b3d36d1-7882-4934-b235-2ad4b25c0d8c"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[N/A]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="104" width="88" height="62" uuid="8e749e86-75c2-4274-baf0-970ee104c51a"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Wire Transfer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="54" width="88" height="50" uuid="f5274b5b-8f81-4e88-9870-08c5b6ee82cf"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Mail]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="368" y="104" width="188" height="62" uuid="c98f8228-1bd3-41b7-870b-2ed586f58efa"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Swift Code: CHASUS33
+Routing Number: 071000013
+Account Number: 887280816]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="88" y="20" width="143" height="34" backcolor="#CCCCCC" uuid="62135d93-3280-408f-b986-9ad06de36338"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Address]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="ChapterTitle" positionType="Float" x="0" y="0" width="555" height="20" uuid="f1362364-dfc8-4ee8-83fe-9d30e54c3fad"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[IHE USA accepts the following forms of payment:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="231" y="166" width="137" height="50" uuid="162710f4-47bd-4cd7-b26e-ad60c1dc5485"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Natilee Simon
+Email: nsimon@himss.org
+Phone: +1-312-915-9262
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="88" y="104" width="143" height="62" uuid="6174a409-3671-48fa-af51-d24dd5c9876f"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Account Name: IHE USA
+JPMorgan Chase
+10 S. Dearborn St
+Chicago, IL 60603-2003]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="368" y="166" width="188" height="50" uuid="563c12ac-1b19-49a9-91f7-2ece3b93586d"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Contact Natilee Simon for a credit card authorization form.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="231" y="20" width="137" height="34" backcolor="#CCCCCC" uuid="5e4bf154-a0b7-44dd-a4ae-607a203f384d"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Contact]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="368" y="20" width="188" height="34" backcolor="#CCCCCC" uuid="22dff121-80fe-4db5-8373-7c6c4154fc6b"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Special Instructions]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="20" width="88" height="34" backcolor="#CCCCCC" uuid="fd0b52f8-a60d-4042-a852-c931ac07ad75"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Payment Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="228" width="552" height="20" uuid="4809393a-7e80-4138-9395-9420782b4de3"/>
+				<text><![CDATA[If your organization requires additional forms (i.e. POs or W9s) to process payment, please email connectathon@ihe.net.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="88" y="54" width="143" height="50" uuid="1e73f2fd-45be-4ec4-a005-55d4bfdde0e1"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[IHE USA
+33 W Monroe St, Suite 1700
+Chicago, IL 60603
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="231" y="104" width="137" height="62" uuid="e22adbcd-cea7-436a-8733-bcabc0c2003a"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Mark Kim
+Email: mkim@himss.org
+Phone: +1-312-915-9287
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="88" y="166" width="143" height="50" uuid="8449aaea-fda2-4005-9737-ae09dc920797"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[N/A]]></text>
+			</staticText>
+		</band>
+		<band height="446">
+			<staticText>
+				<reportElement style="contentText" positionType="Float" x="1" y="0" width="555" height="20" uuid="7bb7cca4-bdd6-4f3c-98e6-af5409de47bc"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[IHE NA Connectathon 2015 Affiliated Programs: Please confirm your participation.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" x="1" y="21" width="555" height="184" uuid="759bfadb-8c23-4dfb-abdb-a9e9c1f2686f"/>
+				<textElement textAlignment="Justified" markup="styled"/>
+				<text><![CDATA[1.  Interoperability Research Award Program (IRAP): Are you applying for the Interoperability Research Award Program? If yes, please follow the application steps as outlined on IHE USA's website at http://www.iheusa.org/connectathon-IRAP.aspx.
+     Yes ____    No ____
+
+2.  Demonstration at HIMSS14 Interoperability Showcase: Does your company plan demonstrate at the HIMSS15 Interoperability Showcase? HIMSS15 Annual Conference & Exhibition is April 12-16, 2015, in Chicago, IL
+
+     Yes* ____    No ____
+
+*If "Yes," please note that Participants must submit a separate contract and fees to HIMSS to participate in the HIMSS15 Interoperability Showcase. Additional information about the HIMSS15 Interoperability Showcase is available online at http://www.interoperabilityshowcase.org/himss15.
+
+PLEASE PROCEED TO THE NEXT PAGE TO INITIAL AND SIGN BEFORE SUBMITTING TO IHE USA.
+
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="ChapterTitle" positionType="Float" x="1" y="242" width="555" height="20" uuid="e2805dd6-7f61-47db-9082-4c8b06aa0931"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Acknowledgement of New IHE North American Connectathon 2015 Policies:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" x="0" y="262" width="555" height="180" uuid="7a892d0c-451d-47da-b754-ff58426bb85f"/>
+				<textElement textAlignment="Justified" markup="styled"/>
+				<text><![CDATA[1.  By completing this contract, Participant accepts IHE USA's Policies and Guidelines (http://www.iheusa.org/docs/NA-Connectathon-Policies-and-Guidelines-2015.pdf) and will follow in their entirety.
+<style isBold="true">Initial here ______</style>
+
+2.  By completing this contract, Participant is required to provide two (2) staff persons at minimum for the week of January 26 – 30, 2015. Participant must complete online pre-registration to purchase reduced priced participant badges by November 21, 2014 at 11:59pm ET. All badges registered after November 21, 2014 will incur additional fees as noted in the Policies and Guidelines.
+<style isBold="true">Initial here ______</style>
+
+3.  By signing this contract, your organization, its employees, representatives, and agents agree to receive communication via telephone, facsimile, email, and regular mail from IHE USA producers and organizers, their employees, representatives, and agents that are  related to your organization's participation in this event and IHE USA activities.
+<style isBold="true">Initial here ______</style>
+
+]]></text>
+			</staticText>
+			<break>
+				<reportElement x="0" y="215" width="554" height="1" uuid="7c547547-7e9d-4e54-952e-7836f0e7079d"/>
+			</break>
+		</band>
+		<band height="291">
+			<staticText>
+				<reportElement style="ChapterTitle" positionType="Float" x="0" y="0" width="217" height="20" uuid="5f0c3082-6830-48d9-80ef-e4eaede3369c"/>
+				<textElement textAlignment="Justified">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Signature]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" x="0" y="21" width="555" height="54" uuid="82a90bfc-2eeb-4a8c-9ed6-4fd087838071"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[The Participant agrees to abide by the Terms of Participation of this application/contract, which are made part of this contract by reference and are fully incorporated herein. IN WITNESS WHEREOF, the undersigned representative of the Participant, who is empowered to enter into contracts on behalf of the Participant, has executed this Agreement on behalf of the Participant. This is not a binding contract until signed by representatives of IHE USA. ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" x="0" y="76" width="555" height="168" uuid="940e9027-653c-43f0-9ac4-61406b2fc699"/>
+				<textElement textAlignment="Left">
+					<font isItalic="false"/>
+				</textElement>
+				<text><![CDATA[ Agreed to for Participation by:
+
+
+________________________________________________________________________________________________
+Signature of authorized representative                                                      Date
+
+
+
+ Accepted by IHE USA :
+
+
+________________________________________________________________________________________________
+Signature of authorized representative                                                      Date
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="contentText" positionType="Float" x="0" y="256" width="555" height="30" uuid="b852d9fd-942f-4c80-928d-fd4197f3b3a4"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Thank you for your participation in the IHE North American Connectathon 2015.
+If you have any additional questions please contact <a href="mailto:connectathon@ihe.net">connectathon@ihe.net</a>.
+]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="27" splitType="Stretch">
+			<textField>
+				<reportElement x="434" y="5" width="80" height="20" uuid="7d28541d-30c2-42f5-8984-343abfa3ac7c"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="514" y="5" width="40" height="20" uuid="86b590db-43b7-489f-bdd9-a1221792532e"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="6" width="267" height="20" uuid="207360cd-5611-4435-b74b-507bad92f1a9"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Copyright IHE USA 2012-2014]]></text>
+			</staticText>
+			<line>
+				<reportElement key="line" positionType="FixRelativeToBottom" x="0" y="3" width="555" height="1" uuid="ec6ba7d6-78f9-4826-ba44-63d2e225c83f"/>
+			</line>
+			<line>
+				<reportElement key="line" positionType="FixRelativeToBottom" x="0" y="0" width="555" height="1" backcolor="#000000" uuid="5471591f-c3f1-4e7e-b363-7e9115d92038"/>
+				<graphicElement>
+					<pen lineWidth="3.0"/>
+				</graphicElement>
+			</line>
+		</band>
+	</pageFooter>
+</jasperReport>

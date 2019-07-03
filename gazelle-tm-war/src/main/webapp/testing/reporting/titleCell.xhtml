@@ -1,0 +1,9 @@
+<f:view xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://jboss.org/schema/seam/pdf" xmlns:g="http://www.ihe.net/gazelle">
+    <!-- params = colspan, title -->
+    <p:cell colspan="#{colspan}" backgroundColor="#DEC3F3" horizontalAlignment="center">
+        <p:paragraph alignment="center" paddingBottom="10">
+            <g:pdffont size="10">#{title}</g:pdffont>
+        </p:paragraph>
+    </p:cell>
+</f:view>

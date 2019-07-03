@@ -1,0 +1,68 @@
+<s:div xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+       xmlns:s="http://jboss.org/schema/seam/taglib"
+       xmlns="http://www.w3.org/1999/xhtml">
+    #{oidsAndIPParamForSessionManager.initProxiesConfigurationsForSession()}
+
+    <s:decorate template="/layout/panels/_panel_title_id.xhtml">
+        <ui:param name="panel_id" value="panelToConfigureIPAndPortForProxies"/>
+        <ui:define name="panel_title">#{messages['gazelle.tm.ConfigureIPAndPortForProxies']}</ui:define>
+        <s:decorate id="proxyUseRegionIsEnabledDecoration"
+                    rendered="#{oidsAndIPParamForSessionManager.selectedTestingSession.isProxyUseEnabled}"
+                    template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.tm.ProxyUseIsEnabled']}</ui:define>
+            <a4j:commandButton id="disableproxyUse" value="#{messages['gazelle.tm.DisableProxyUse']}"
+                               styleClass="gzl-btn-orange"
+                               actionListener="#{oidsAndIPParamForSessionManager.disableProxyUse()}"
+                               render="panelToConfigureIPAndPortForProxies" execute="@this"/>
+        </s:decorate>
+        <s:decorate id="proxyUseRegionIsDisabledDecoration" template="/layout/display/_display.xhtml"
+                    rendered="#{!oidsAndIPParamForSessionManager.selectedTestingSession.isProxyUseEnabled}">
+            <ui:define name="label">#{messages['gazelle.tm.ProxyUseIsDisabled']}</ui:define>
+            <a4j:commandButton id="enableCriticalStatus" value="#{messages['gazelle.tm.EnableProxyUse']}"
+                               styleClass="gzl-btn-green"
+                               actionListener="#{oidsAndIPParamForSessionManager.enableProxyUse()}" execute="@this"
+                               render="panelToConfigureIPAndPortForProxies"/>
+        </s:decorate>
+        <s:div id="divForAllConfig">
+            <a4j:region id="ipProxyRegionForAll">
+                <div class="form-inline">
+                    <s:decorate id="ipProxyDecorationForAllIp" template="/layout/form/_edit.xhtml" style="display:inline">
+                        <ui:param name="id" value="ipForClassInputForAll"/>
+                        <ui:define name="label">#{messages['gazelle.tm.IPForAllServices']} :</ui:define>
+                        <h:inputText  styleClass=" form-control" id="ipForClassInputForAll" size="15"
+                                     value="#{oidsAndIPParamForSessionManager.proxyConfigurationForForAllServicesSession.ipForClass}">
+                            <a4j:ajax event="blur" execute="@this" render="ipProxyDecorationForAllIp"/>
+                        </h:inputText>
+                    </s:decorate>
+                    <s:decorate id="ipProxyDecorationForAllPortFrom" template="/layout/form/_edit.xhtml" style="display:inline">
+                        <ui:param name="id" value="portFromOutInputForAll"/>
+                        <ui:define name="label">#{messages['gazelle.tm.Port102465634From']} :</ui:define>
+                        <h:inputText  styleClass=" form-control" id="portFromOutInputForAll" size="5"
+                                     value="#{oidsAndIPParamForSessionManager.proxyConfigurationForForAllServicesSession.portRangeLow}">
+                            <a4j:ajax event="blur" execute="@this" render="ipProxyDecorationForAllPortFrom"/>
+                        </h:inputText>
+                    </s:decorate>
+                    <s:decorate id="ipProxyDecorationForAllPortTo" template="/layout/form/_edit.xhtml" style="display:inline">
+                        <ui:param name="id" value="toInputForAll"/>
+                        <ui:define name="label">#{messages['gazelle.tm.to']} :</ui:define>
+                        <h:inputText  styleClass=" form-control" id="toInputForAll" size="5"
+                                     value="#{oidsAndIPParamForSessionManager.proxyConfigurationForForAllServicesSession.portRangeHigh}">
+                            <a4j:ajax event="blur" execute="@this" render="ipProxyRegionFoipProxyDecorationForAllPortTorAll"/>
+                        </h:inputText>
+                    </s:decorate>
+                </div>
+            </a4j:region>
+        </s:div>
+        <a4j:commandButton styleClass="gzl-btn-green"
+                           actionListener="#{oidsAndIPParamForSessionManager.saveProxyConfiguration( )}"
+                           value="#{messages['gazelle.tm.SaveProxyConfigurations']}" execute="@this"
+                           render=":configForm3"/>
+        <a4j:commandButton styleClass="gzl-btn-green"
+                           rendered="#{oidsAndIPParamForSessionManager.proxyConfigurationForForAllServicesSession.ipForClass != null and oidsAndIPParamForSessionManager.proxyConfigurationForForAllServicesSession.portRangeLow != null and oidsAndIPParamForSessionManager.proxyConfigurationForForAllServicesSession.portRangeHigh != null}"
+                           actionListener="#{oidsAndIPParamForSessionManager.startAllChannels()}"
+                           value="#{messages['gazelle.tm.StartAllChannelsOnProxy']}" execute="@this"
+                           render=":configForm3"/>
+    </s:decorate>
+
+</s:div>

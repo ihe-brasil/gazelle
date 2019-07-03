@@ -1,0 +1,310 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle"
+              value="#{messages['net.ihe.gazelle.tm.InvoiceDetails']} #{financialManager.invoiceSelected.institution.name} (#{financialManager.invoiceSelected.institution.keyword})"/>
+    <ui:define name="body">
+        <div class="col-lg-8 col-lg-offset-2">
+            <h:panelGroup
+                    rendered="#{s:hasRole('admin_role') ||  s:hasRole('accounting_role') ||s:hasRole('testing_session_admin_role') }">
+                <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                    <ui:define name="panel_title">#{messages['gazelle.financial.invoice.ShowInvoiceDetails']} :
+                        #{financialManager.invoiceSelected.institution.name}
+                        (#{financialManager.invoiceSelected.institution.keyword})
+                    </ui:define>
+
+                    <div id="invoiceDetailsDiv">
+                        <h:form id="editInvoiceDetails">
+                            <s:token allowMultiplePosts="true"/>
+
+                            <ui:decorate template="/layout/panels/_panel.xhtml">
+
+                                <s:fragment>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <s:decorate id="institutionDecorationView"
+                                                        template="/layout/display/_display.xhtml">
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.financial.invoice.InstitutionName']}
+                                                </ui:define>
+                                                <h:commandLink
+                                                        action="#{institutionManagerTM.viewInstitutionForTM(financialManager.invoiceSelected.institution)}"
+                                                        value="#{financialManager.invoiceSelected.institution.name} (#{financialManager.invoiceSelected.institution.keyword}) "/>
+                                            </s:decorate>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <s:decorate id="testingSessionecorationView"
+                                                        template="/layout/display/_display.xhtml">
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.financial.invoice.TestingSession']}
+                                                </ui:define>
+                                                #{financialManager.invoiceSelected.testingSession.description}
+                                            </s:decorate>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <s:decorate id="purchaseOrderDecoration"
+                                                        template="/layout/display/_display.xhtml">
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.financial.invoice.PurchaseOrder']}
+                                                </ui:define>
+                                                <h:outputText
+                                                        value="#{financialManager.invoiceSelected.purchaseOrder}"/>
+                                            </s:decorate>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <s:decorate id="contractReceivedDateDecoration"
+                                                        template="/layout/display/_display.xhtml">
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.financial.invoice.ContractReceivedDate']}
+                                                </ui:define>
+                                                <g:date date="true" time="false"
+                                                        value="#{financialManager.invoiceSelected.contractReceivedDate}"/>
+                                            </s:decorate>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <s:decorate template="/layout/display/_display.xhtml">
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.tm.invoice.SystemsInvoiced']}
+                                                </ui:define>
+                                                <h:outputText
+                                                        value="#{financialManager.invoiceSelected.numberSystem}"/>
+                                            </s:decorate>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <s:decorate template="/layout/display/_display.xhtml">
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.tm.invoice.PaticipantsInvoiced']}
+                                                </ui:define>
+                                                <h:outputText
+                                                        value="#{financialManager.invoiceSelected.numberParticipant}"/>
+                                                <h:outputText
+                                                        value="(#{financialManager.invoiceSelected.numberExtraParticipant} #{messages['gazelle.tm.ExtraParticipants']})"/>
+                                            </s:decorate>
+                                        </div>
+                                    </div>
+                                    <div style="border:thin solid black; padding:1em;">
+                                        <s:div id="feesDiv" styleClass="row">
+                                            <div class="col-md-2">
+                                                <h:outputText value="#{messages['gazelle.financial.invoice.FeesAmount']}"/>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <h:outputText value="+ #{messages['gazelle.financial.invoice.VatAmount']}"/>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <h:outputText value=" - #{messages['gazelle.financial.invoice.FeesPaid']} "/>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <h:outputText value=" - #{messages['gazelle.financial.invoice.FeesDiscount']}"
+                                                              rendered="#{financialManager.invoiceSelected.feesDiscount &gt;= 0}"/>
+                                                <h:outputText value=" + #{messages['net.ihe.gazelle.tm.AdditionalFees']}"
+                                                              rendered="#{financialManager.invoiceSelected.feesDiscount &lt; 0}"/>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <h:outputText value=" = #{messages['gazelle.financial.invoice.FeesDue']}"/>
+                                            </div>
+                                        </s:div>
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <h:outputText value="#{financialManager.invoiceSelected.feesAmount}"/>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <h:outputText value="+ #{financialManager.invoiceSelected.vatAmount}"/>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <h:outputText value="- #{financialManager.invoiceSelected.feesPaid}"/>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <h:outputText value="- #{financialManager.invoiceSelected.feesDiscount}"/>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <h:outputText
+                                                        value="= #{financialManager.invoiceSelected.feesDue} #{financialManager.invoiceSelected.testingSession.currency.keyword}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <s:decorate id="reasonsForDiscountDecoration"
+                                                template="/layout/display/_display.xhtml">
+                                        <ui:define name="label">
+                                            <h:outputText rendered="#{financialManager.invoiceSelected.feesDiscount &gt;= 0}"
+                                                          value="#{messages['gazelle.financial.invoice.ReasonsForDiscount']}"/>
+                                            <h:outputText value="#{messages['net.ihe.gazelle.tm.ReasonForAdditionFees']}"
+                                                          rendered="#{financialManager.invoiceSelected.feesDiscount &lt; 0}"/>
+                                        </ui:define>
+                                        <h:outputText
+                                                value="#{financialManager.invoiceSelected.reasonsForDiscount}"/>
+                                    </s:decorate>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <s:decorate id="vatDueDecoration" template="/layout/display/_display.xhtml">
+                                                <ui:define name="label">#{messages['gazelle.financial.invoice.VatDue']}
+                                                </ui:define>
+                                                <h:selectBooleanCheckbox
+                                                        value="#{financialManager.invoiceSelected.vatDue}"
+                                                        disabled="true"/>
+                                            </s:decorate>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <a4j:region id="vatNumberRegion">
+                                                <s:decorate id="memberStateDecoration"
+                                                            template="/layout/display/_display.xhtml">
+                                                    <ui:define name="label">
+                                                        #{messages['gazelle.users.institution.MemberState']}
+                                                    </ui:define>
+                                                    <h:outputText
+                                                            value="#{financialManager.invoiceSelected.vatCountry}"/>
+                                                </s:decorate>
+                                                <s:decorate id="vatNumberDecoration"
+                                                            template="/layout/display/_display.xhtml">
+                                                    <ui:define name="label">
+                                                        #{messages['gazelle.users.institution.vatNumber']}
+                                                    </ui:define>
+
+                                                    <h:outputText id="vatCountryOutput" size="4"
+                                                                  value="#{financialManager.invoiceSelected.vatCountry.iso} - "
+                                                    />
+                                                    <h:outputText id="vatNumberInput"
+                                                                  value="#{financialManager.invoiceSelected.vatNumber}"/>
+
+                                                </s:decorate>
+                                            </a4j:region>
+                                        </div>
+                                    </div>
+
+                                    <s:decorate id="vatValidityDecoration" template="/layout/display/_display.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.financial.invoice.VatValidity']}
+                                        </ui:define>
+                                        <h:selectBooleanCheckbox value="#{financialManager.invoiceSelected.vatValidity}"
+                                                                 disabled="true"/>
+                                    </s:decorate>
+
+
+                                    <s:decorate template="/layout/display/_display.xhtml"
+                                                rendered="#{(financialManager.invoiceSelected.adminInvoiceNotes != null) and (!financialManager.invoiceSelected.adminInvoiceNotes.equals(''))}">
+                                        <ui:define name="label">#{messages['net.ihe.gazelle.tm.PrepareInvoice']}
+                                        </ui:define>
+                                        <pre>
+                      <h:outputText rows="4" cols="100"
+                                    value="#{financialManager.invoiceSelected.adminInvoiceNotes}"/>
+                    </pre>
+                                    </s:decorate>
+                                    <s:decorate template="/layout/display/_display.xhtml"
+                                                rendered="#{(financialManager.invoiceSelected.specialInstructions != null) and (!financialManager.invoiceSelected.specialInstructions.equals(''))}">
+                                        <ui:define name="label">#{messages['net.ihe.gazelle.tm.SpecialInstructions']}
+                                        </ui:define>
+                                        <pre>
+                      <h:outputText rows="4" cols="100"
+                                    value="#{financialManager.invoiceSelected.specialInstructions}"/>
+                    </pre>
+                                    </s:decorate>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <s:decorate id="invoiceSentDecoration"
+                                                        template="/layout/display/_display.xhtml">
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.financial.invoice.InvoiceSent']}
+                                                </ui:define>
+                                                <h:selectBooleanCheckbox
+                                                        value="#{financialManager.invoiceSelected.invoiceSent}"
+                                                        disabled="true"/>
+                                            </s:decorate>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <s:decorate id="invoiceSentDateDecoration"
+                                                        template="/layout/display/_display.xhtml">
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.financial.invoice.InvoiceSentDate']}
+                                                </ui:define>
+                                                <g:date date="true" time="false"
+                                                        value="#{financialManager.invoiceSelected.invoiceSentDate}"/>
+                                            </s:decorate>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <s:decorate id="invoicePaidDecoration"
+                                                        template="/layout/display/_display.xhtml">
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.financial.invoice.InvoicePaid']}
+                                                </ui:define>
+                                                <h:selectBooleanCheckbox
+                                                        value="#{financialManager.invoiceSelected.invoicePaid}"
+                                                        disabled="true"/>
+                                            </s:decorate>
+                                        </div>
+                                        <div class="col-md-6">
+
+                                            <s:decorate id="invoicePaymentDateDecoration"
+                                                        template="/layout/display/_display.xhtml">
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.financial.invoice.InvoicePaymentDate']}
+                                                </ui:define>
+                                                <g:date date="true" time="false"
+                                                        value="#{financialManager.invoiceSelected.invoicePaymentDate}"/>
+                                            </s:decorate>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <s:decorate id="invoicePathDecoration"
+                                                        template="/layout/display/_display.xhtml">
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.financial.invoice.InvoicePath']}
+                                                </ui:define>
+                                                <h:commandLink
+                                                        action="#{financialManager.displayInvoice( financialManager.invoiceSelected )}"
+                                                        value="#{financialManager.invoiceSelected.invoiceRelativePath}"/>
+                                                <a href="mailto:#{financialManager.emailAddressFirstBillingContact}?cc=secretariat@cocir.org&amp;bcc=#{applicationPreferenceManager.getApplicationEmailAccountForHistory()}&amp;subject=your invoice for connectathon&amp;attachment=file:///Users/epoiseau/Downloads/invoice-#{financialManager.invoiceSelected.getInstitution().getKeyword()}-#{financialManager.invoiceSelected.getTestingSession().getYear()}.pdf">
+                                                    <span class="gzl-icon-email"/>
+                                                </a>
+                                            </s:decorate>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <s:decorate id="generationDateDecoration"
+                                                        template="/layout/display/_display.xhtml">
+                                                <ui:define name="label">
+                                                    #{messages['gazelle.financial.invoice.GenerationDate']}
+                                                </ui:define>
+                                                <g:date tooltip="true"
+                                                        value="#{financialManager.invoiceSelected.invoiceGenerationDate}"/>
+                                            </s:decorate>
+                                        </div>
+                                    </div>
+                                    <s:decorate id="invoiceNumberDecoration" template="/layout/display/_display.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.financial.invoice.InvoiceNumber']}
+                                        </ui:define>
+                                        <h:outputText
+                                                value="#{financialManager.invoiceSelected.invoiceNumber}"/>
+                                    </s:decorate>
+
+
+                                </s:fragment>
+                            </ui:decorate>
+
+                            <div>
+                                <a4j:commandButton id="updateInvoice" styleClass="gzl-btn-blue"
+                                                   value="#{messages['gazelle.common.button.Edit']}"
+                                                   action="/financial/editInvoiceDetails.seam"
+                                                   rendered="#{s:hasRole('admin_role') || s:hasRole('testing_session_admin_role')}"
+                                                   execute="@this"/>
+                                <h:commandButton id="backlistinv" styleClass="gzl-btn"
+                                                 value="#{messages['gazelle.tm.invoice.BackToListInvoices']}"
+                                                 action="/administration/listInvoices.seam" immediate="true"/>
+                            </div>
+                        </h:form>
+                    </div>
+                </ui:decorate>
+            </h:panelGroup>
+        </div>
+    </ui:define>
+</ui:composition>

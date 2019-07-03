@@ -1,0 +1,1 @@
+INSERT INTO tm_configuration_type (id, last_changed, last_modifier_id, category, class_name, type_name, used_for_proxy) VALUES (nextval('tm_configuration_type_id_seq'),null,null, 'RAW', 'net.ihe.gazelle.tm.configurations.model.RawConfiguration', 'RAW', true);

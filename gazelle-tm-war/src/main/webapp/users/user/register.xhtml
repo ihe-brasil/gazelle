@@ -1,0 +1,331 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.users.registration.UserRegistration']}"/>
+    <ui:define name="body">
+        #{userManager.registerAccountButton()}
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3 col-lg-4 col-lg-offset-4">
+                <h:form id="register">
+                    <s:token allowMultiplePosts="true"/>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">#{messages['gazelle.users.registration.RegisterUserInfo']}</h3>
+                        </div>
+                        <div class="panel-body">
+                            #{messages['gazelle.users.registration.RegisterLabel1']}
+                            <s:div id="userManager"><!--  /!\ WARNING : The current id (for form) is used as a reference within Javascript for the password encryption - DO NOT CHANGE IT -->
+
+                                <!--  /!\ END - WARNING : The current id (for form) is used as a reference within Javascript for the password encryption - DO NOT CHANGE IT -->
+
+                                <a4j:region id="firstnameRegion">
+                                    <s:decorate id="firstnameDecoration" template="/layout/form/_edit.xhtml">
+                                        <ui:param name="id" value="firstName"/>
+                                        <ui:define name="label">#{messages['gazelle.users.registration.FirstName']}
+                                        </ui:define>
+                                        <h:inputText id="firstName" styleClass="form-control" tabindex="1"
+                                                     size="30"
+                                                     maxlength="128" required="true"
+                                                     value="#{userManager.selectedUser.firstname}">
+                                            <a4j:ajax event="blur" render="firstnameDecoration" execute="@this"/>
+                                        </h:inputText>
+                                    </s:decorate>
+
+                                </a4j:region>
+
+                                <a4j:region id="lastnameRegion">
+                                    <s:decorate id="lastnameDecoration" template="/layout/form/_edit.xhtml">
+                                        <ui:param name="id" value="lastName"/>
+                                        <ui:define name="label">#{messages['gazelle.users.registration.LastName']}
+                                        </ui:define>
+                                        <h:inputText id="lastName" styleClass="form-control" tabindex="2"
+                                                     size="30"
+                                                     maxlength="128" required="true"
+                                                     value="#{userManager.selectedUser.lastname}">
+                                            <a4j:ajax event="blur" render="lastnameDecoration" execute="@this"/>
+                                        </h:inputText>
+                                    </s:decorate>
+                                </a4j:region>
+
+                                <a4j:region id="emailRegion">
+                                    <s:decorate id="emailDecoration" template="/layout/form/_edit.xhtml">
+                                        <ui:param name="id" value="userEmail"/>
+                                        <ui:define name="label">#{messages['gazelle.users.registration.Email']}
+                                        </ui:define>
+                                        <h:inputText id="userEmail" styleClass="form-control" tabindex="3"
+                                                     size="30"
+                                                     maxlength="96" required="true"
+                                                     value="#{userManager.selectedUser.email}">
+                                            <a4j:ajax event="blur" render="emailDecoration" execute="@this"
+                                                      listener="#{userManager.isUserEmailAvailable()}"/>
+                                        </h:inputText>
+                                    </s:decorate>
+                                </a4j:region>
+
+                                <a4j:region id="usernameRegion">
+                                    <s:decorate id="usernameDecoration" template="/layout/form/_edit.xhtml">
+                                        <ui:param name="id" value="userUsername"/>
+                                        <ui:define name="label">#{messages['gazelle.users.registration.Username']}
+                                        </ui:define>
+                                        <h:inputText id="userUsername" styleClass="form-control"
+                                                     tabindex="4"
+                                                     size="30"
+                                                     maxlength="20" required="true"
+                                                     value="#{userManager.selectedUser.username}">
+                                            <a4j:ajax event="blur" render="usernameDecoration" execute="@this"
+                                                      listener="#{userManager.isUserNameAvailable( )}"/>
+                                        </h:inputText>
+                                    </s:decorate>
+                                </a4j:region>
+
+                                <a4j:region
+                                        id="passwordRegion"><!--  /!\ WARNING : The current ids (for decorate and inputs) are used as a reference within Javascript for the password encryption - DO NOT CHANGE IT -->
+                                    <s:decorate id="passwordDecoration" template="/layout/form/_edit.xhtml">
+                                        <ui:param name="id" value="userPasswordNotHashed"/>
+                                        <ui:define name="label">#{messages['gazelle.users.registration.Password']}
+                                        </ui:define>
+                                        <h:inputSecret id="userPasswordNotHashed" styleClass="form-control"
+                                                       tabindex="5"
+                                                       size="30" maxlength="128" required="true"
+                                                       value="#{userManager.selectedUser.password}"
+                                        >
+                                            <!-- Does not work, inputSecret does not support ajax rerendering -->
+                                            <!-- <a4j:support 	event="onblur" reRender="passwordConfirmationDecoration"
+															actionListener="#{userManager.validatePasswordConfirmation(user.password, user.passwordConfirmation)}"
+                                                        	oncomplete="onAjaxRequestComplete()" /> -->
+                                        </h:inputSecret>
+                                        <h:inputHidden id="userPassword" name="userPassword"
+                                                       value="#{userManager.selectedUser.password}"/>
+                                    </s:decorate>
+                                    <!--  /!\ END - WARNING : The current ids (for form) are used as a reference within Javascript for the password encryption - DO NOT CHANGE IT -->
+                                </a4j:region>
+
+                                <a4j:region id="passwordConfirmationRegion">
+                                    <s:decorate id="passwordConfirmationDecoration" template="/layout/form/_edit.xhtml">
+                                        <ui:param name="id" value="userPasswordConfirmationNotHashed"/>
+                                        <ui:define name="label">
+                                            #{messages['gazelle.users.registration.PasswordConfirmation']}
+                                        </ui:define>
+                                        <h:inputSecret id="userPasswordConfirmationNotHashed"
+                                                       styleClass="form-control"
+                                                       tabindex="6" size="30" maxlength="128" required="true"
+                                                       value="#{userManager.selectedUser.passwordConfirmation}"
+                                        >
+                                            <!-- Does not work, inputSecret does not support ajax rerendering -->
+                                            <!-- <a4j:support 	event="onblur" reRender="passwordConfirmationDecoration"
+															actionListener="#{userManager.validatePasswordConfirmation(user.password, user.passwordConfirmation)}"
+                                                        	oncomplete="onAjaxRequestComplete()" /> -->
+                                        </h:inputSecret>
+                                        <h:inputHidden id="userPasswordConfirmation" name="userPasswordConfirmation"
+                                                       value="#{userManager.selectedUser.passwordConfirmation}"/>
+                                    </s:decorate>
+                                </a4j:region>
+
+                                <!-- Company/institution Dropdown list -->
+                                <s:div id="institutionDiv">
+                                    <a4j:region id="institutionRegion">
+                                        <s:decorate id="institutionDecoration" template="/layout/form/_edit.xhtml">
+                                            <ui:param name="id" value="institutionListBox"/>
+                                            <ui:define name="label">
+                                                #{messages['gazelle.users.institution.InstitutionName']}
+                                                <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                                    <ui:param name="id" value="i"/>
+                                                    <ui:param name="placement" value="bottom"/>
+                                                    <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                                                    <ui:define name="content">
+                                                        <div class="gzl-never-wrap">
+                                                            <b>
+                                                                #{messages['gazelle.users.institution.help.NewInstitutionIntro']}</b>
+                                                            <ul>
+                                                                <li>
+                                                                    #{messages['gazelle.users.institution.help.NewInstitutionA1']}
+                                                                    <br/>
+                                                                    #{messages['gazelle.users.institution.help.NewInstitutionA2']}
+                                                                    <br/>
+                                                                    #{messages['gazelle.users.institution.help.NewInstitutionA3']}
+                                                                    <br/>
+                                                                </li>
+                                                                <li>
+                                                                    #{messages['gazelle.users.institution.help.NewInstitutionB1']}
+                                                                    <br/>
+                                                                    #{messages['gazelle.users.institution.help.NewInstitutionB2']}
+                                                                    <br/>
+                                                                    #{messages['gazelle.users.institution.help.NewInstitutionB3']}
+                                                                    <br/>
+                                                                    #{messages['gazelle.users.institution.help.NewInstitutionB4']}
+                                                                    <br/>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </ui:define>
+                                                </ui:decorate>
+                                            </ui:define>
+                                            <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text"
+                                                             id="institutionListBox"
+                                                             value="#{userManager.selectedInstitution}"
+                                                             required="true">
+                                                <s:selectItems
+                                                        value="#{gazelleDAO.getPossibleInstitutionsForRegistration()}"
+                                                        var="institutionFromList"
+                                                        noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                        label="#{institutionFromList.name} (#{institutionFromList.keyword})"/>
+                                                <a4j:ajax event="change" execute="@this"
+                                                          listener="#{userManager.changeInstitution()}"
+                                                          render="register:institutionDiv"/>
+                                            </h:selectOneMenu>
+                                        </s:decorate>
+                                    </a4j:region>
+
+                                    <!-- ======================= --><!-- Institution informations section 		  --><!-- ======================= -->
+                                    <s:div id="institutionDecoratePanel" styleClass="panel panel-default"
+                                           rendered="#{ not empty userManager.selectedInstitution.id and userManager.selectedInstitution.keyword.equals('NULL')}">
+                                        <div class="panel-heading">
+                                            <h3 class="panel-title">
+                                                #{messages['net.ihe.gazelle.tm.CreateANewInstitution']}</h3>
+                                        </div>
+                                        <div class="panel-body">
+                                            <a4j:region id="institutionNameRegion">
+                                                <s:decorate id="institutionNameDecoration"
+                                                            template="/layout/form/_edit.xhtml">
+                                                    <ui:param name="id" value="institutionName"/>
+                                                    <ui:define name="label">
+                                                        #{messages['gazelle.users.institution.InstitutionName']}
+                                                    </ui:define>
+                                                    <h:inputText id="institutionName" maxlength="128" size="30"
+                                                                 value="#{userManager.selectedUser.institution.name}"
+                                                                 styleClass="form-control" required="true">
+                                                        <a4j:ajax event="blur" render="institutionNameDecoration"
+                                                                  execute="@this"
+                                                                  listener="#{institutionManager.validateInstitutionName( userManager.selectedUser.institution.name ,userManager.selectedUser.institution.id)}"/>
+                                                    </h:inputText>
+                                                </s:decorate>
+                                            </a4j:region>
+                                            <!-- Institution Keyword input box -->
+                                            <a4j:region id="institutionKeywordRegion">
+                                                <s:decorate id="institutionKeywordDecoration"
+                                                            template="/layout/form/_edit.xhtml">
+                                                    <ui:param name="id" value="institutionKeyword"/>
+                                                    <ui:define name="label">
+                                                        #{messages['gazelle.users.institution.InstitutionKeyword']}
+                                                        #{messages['gazelle.users.institution.InstitutionKeywordExample']}
+                                                    </ui:define>
+                                                    <h:inputText id="institutionKeyword" maxlength="64" size="30"
+                                                                 value="#{userManager.selectedUser.institution.keyword}"
+                                                                 styleClass="form-control" required="true">
+                                                        <a4j:ajax event="blur" render="institutionKeywordDecoration"
+                                                                  execute="@this"
+                                                                  listener="#{institutionManager.validateInstitutionKeyword( userManager.selectedUser.institution.keyword , userManager.selectedUser.institution.id )}"/>
+                                                    </h:inputText>
+                                                </s:decorate>
+                                            </a4j:region>
+                                            <!-- InstitutionType select box -->
+                                            <a4j:region id="institutionRegionType">
+                                                <s:decorate id="institutionTypeDecoration"
+                                                            template="/layout/form/_edit.xhtml">
+                                                    <ui:param name="id" value="institutionListBox"/>
+                                                    <ui:define name="label">
+                                                        #{messages['gazelle.users.institution.InstitutionType']}
+                                                        <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                                            <ui:param name="id" value="t"/>
+                                                            <ui:param name="placement" value="top"/>
+                                                            <ui:param name="icon_class"
+                                                                      value="gzl-icon-question-circle"/>
+                                                            <ui:define name="content">
+                                                                <div class="gzl-never-wrap">
+                                                                    <b>
+                                                                        #{messages['gazelle.users.institution.help.InstitutionTypeIntro']} </b>
+
+                                                                    <ul>
+                                                                        <li><b>
+                                                                            #{messages['gazelle.users.institution.help.InstitutionTypeA']}
+                                                                        </b>
+                                                                            #{messages['gazelle.users.institution.help.InstitutionTypeA1']}
+                                                                            <br/>
+                                                                            #{messages['gazelle.users.institution.help.InstitutionTypeA2']}
+                                                                            <br/>
+                                                                        </li>
+                                                                        <li><b>
+                                                                            #{messages['gazelle.users.institution.help.InstitutionTypeB']}
+                                                                            :</b>
+                                                                            #{messages['gazelle.users.institution.help.InstitutionTypeB1']}
+                                                                            <br/>
+                                                                            #{messages['gazelle.users.institution.help.InstitutionTypeB2']}
+                                                                            <br/>
+                                                                        </li>
+                                                                        <li><b>
+                                                                            #{messages['gazelle.users.institution.help.InstitutionTypeC']}
+                                                                            :</b>
+                                                                            #{messages['gazelle.users.institution.help.InstitutionTypeC1']}
+                                                                            <br/>
+                                                                            #{messages['gazelle.users.institution.help.InstitutionTypeC2']}
+                                                                            <br/>
+                                                                        </li>
+                                                                        <li><b>
+                                                                            #{messages['gazelle.users.institution.help.InstitutionTypeD']}
+                                                                            :</b>
+                                                                            #{messages['gazelle.users.institution.help.InstitutionTypeD1']}
+                                                                            <br/>
+                                                                            #{messages['gazelle.users.institution.help.InstitutionTypeD2']}
+                                                                            <br/>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </ui:define>
+                                                        </ui:decorate>
+                                                    </ui:define>
+
+                                                    <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                                     id="institutionListBox"
+                                                                     value="#{userManager.selectedUser.institution.institutionType}"
+                                                                     required="true">
+                                                        <s:selectItems
+                                                                value="#{gazelleDAO.listAllInstitutionType()}"
+                                                                var="institutionTypeFromList"
+                                                                noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                                label="#{institutionTypeFromList.type}"/>
+                                                        <a4j:ajax event="change"
+                                                                  render="register:institutionDecoration"
+                                                                  execute="@region"/>
+                                                    </h:selectOneMenu>
+                                                </s:decorate>
+
+                                            </a4j:region>
+                                            <!-- Institution URL input box -->
+                                            <a4j:region id="institutionURLRegion">
+                                                <s:decorate id="institutionURLDecoration"
+                                                            template="/layout/form/_edit.xhtml">
+                                                    <ui:param name="id" value="institutionURL"/>
+                                                    <ui:define name="label">
+                                                        #{messages['gazelle.users.institution.InstitutionURL']}
+                                                    </ui:define>
+                                                    <h:inputText id="institutionURL" maxlength="255" size="30"
+                                                                 styleClass="form-control" required="true"
+                                                                 value="#{userManager.selectedUser.institution.url}">
+                                                        <a4j:ajax event="blur" render="institutionURLDecoration"
+                                                                  execute="@this"/>
+                                                    </h:inputText>
+                                                </s:decorate>
+                                            </a4j:region>
+                                        </div>
+                                    </s:div>
+                                    <div style="clear: both"><span class="required">*</span>
+                                        #{messages['gazelle.common.RequiredFields']}
+                                    </div>
+                                    <s:div id="buttonDiv">
+                                        <a4j:commandButton id="saveButton" action="#{userManager.registerUser( )}"
+                                                           value="#{messages['gazelle.common.button.Save']}"
+                                                           styleClass="gzl-btn-green"
+                                                           onclick="hashGazelleRegistration();"
+                                                           disabled="#{empty userManager.selectedInstitution or empty userManager.selectedInstitution.id}"
+                                                           render="register"/>
+                                    </s:div>
+                                </s:div>
+                            </s:div>
+                        </div>
+                    </div>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,55 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <ui:decorate template="/layout/panels/_panel_collapse.xhtml">
+        <ui:param name="panel_id" value="#{varTableId}Panel"/>
+        <ui:param name="openByDefault" value="true"/>
+        <ui:define name="panel_title">#{dataTableHeader}</ui:define>
+        <ui:param name="styleClass" value="#{varColor}"/>
+        <h:outputText value="#{varList.size()} #{messages['gazelle.tm.testing.test.filter.ToBeVerifiedTests']}."
+                      rendered="#{not empty varList}" styleClass="help-block"/>
+        <rich:dataTable cellspacing="0" width="700"
+                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" id="#{varTableId}" var="currentTestInstance"
+                        value="#{varList}" render="ds">
+            <g:column sortBy="#{'id'}" sortOrder="descending">
+                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                <g:link target="_blank" value="#{currentTestInstance}"/>
+            </g:column>
+            <ui:include src="testInstanceColumns.xhtml.html">
+                <ui:param name="ti" value="#{currentTestInstance}"/>
+            </ui:include>
+            <g:column>
+                <ui:define name="header">#{messages['gazelle.tests.test.Monitor']}</ui:define>
+                <div class="gzl-never-wrap">
+                    <a4j:commandLink id="releaseTestSupport"
+                                     title="#{messages['gazelle.tm.Release']}"
+                                     action="#{testInstanceManager.releaseTestInstance(currentTestInstance)}"
+                                     execute="@this"
+                                     render="ViewTableOfTestVal"
+                                     rendered="#{currentTestInstance.monitorInSession!=null}">
+                        <span class="gzl-icon-release"/>
+                    </a4j:commandLink>
+                    <a4j:commandLink id="claimTestSupport"
+                                     action="#{testInstanceManager.claimTestInstance(currentTestInstance)}"
+                                     execute="@this"
+                                     render="ViewTableOfTestVal"
+                                     title="#{messages['gazelle.tm.monitors.Claim']}"
+                                     rendered="#{currentTestInstance.monitorInSession == null}">
+                        <span class="gzl-icon-user"/>
+                    </a4j:commandLink>
+                    <h:outputText
+                            value="#{currentTestInstance.monitorInSession.user.firstname} #{currentTestInstance.monitorInSession.user.lastname}"
+                            rendered="#{currentTestInstance.monitorInSession != null}"/>
+                </div>
+            </g:column>
+            <f:facet name="footer">
+                <ui:include src="/util/datatableFooter.xhtml">
+                    <ui:param name="dataScrollerId" value="ds"/>
+                    <ui:param name="dataTableId" value="#{varTableId}"/>
+                </ui:include>
+            </f:facet>
+        </rich:dataTable>
+    </ui:decorate>
+</ui:composition>

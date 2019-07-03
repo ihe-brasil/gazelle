@@ -1,0 +1,67 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <div class="row">
+        <div class="col-lg-6 col-lg-offset-3">
+
+            <ui:param name="preferences" value="#{userPreferencesManager.getPreferencesForUser(user)}"/>
+            <h:outputText rendered="#{user == null}">
+                #{messages['gazelle.tm.users.noUserWithId']}
+            </h:outputText>
+            <h:panelGroup rendered="#{user != null}">
+                <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                    <ui:define name="panel_title">#{user.firstname} #{user.lastname}</ui:define>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <h:graphicImage library="img" value="#{preferences.photoUrl}" id="monitorPhoto"/>
+                        </div>
+                        <div class="col-lg-6">
+                            <s:decorate id="username" template="/layout/display/_display.xhtml">
+                                <ui:define name="label">#{messages['gazelle.users.user.UserUsername']}</ui:define>
+                                <h:outputText value="#{user.username}"/>
+                            </s:decorate>
+                            <s:decorate id="emailDecorationView" template="/layout/display/_display.xhtml"
+                                        rendered="#{preferences.displayEmail == true || s:hasRole('admin_role')}">
+                                <ui:define name="label">#{messages['gazelle.users.registration.Email']}</ui:define>
+                                <h:outputText id="emailView" value="#{user.email}"/>
+                            </s:decorate>
+                            <s:decorate id="institutionDecorationView" template="/layout/display/_display.xhtml">
+                                <ui:define name="label">#{messages['gazelle.users.user.UserInstitution']}</ui:define>
+                                <h:outputText id="instituionView" value="#{user.institution.name}"/>
+                            </s:decorate>
+                            <s:decorate id="skypeDecorationView" template="/layout/display/_display.xhtml"
+                                        rendered="#{preferences.skype != null}">
+                                <ui:define name="label">#{messages['gazelle.tm.users.SkypeAccount']}</ui:define>
+                                <h:outputText id="skypeAccount" value="#{preferences.skype}"/>
+                            </s:decorate>
+                            <s:decorate id="tableDecorationView" template="/layout/display/_display.xhtml"
+                                        rendered="#{preferences.connectathonTable != null}">
+                                <ui:define name="label">#{messages['gazelle.tm.users.TableLabel']}</ui:define>
+                                <h:outputText id="table" value="#{preferences.connectathonTable}"/>
+                            </s:decorate>
+                            <s:decorate id="langDecorate" template="/layout/display/_display.xhtml"
+                                        rendered="#{not empty preferences.spokenLanguages}">
+                                <ui:define name="label">#{messages['gazelle.tm.users.SpokenLanguages']}</ui:define>
+                                <rich:list
+                                        value="#{userPreferencesManager.getSpokenLanguagesAsList(preferences.spokenLanguages)}"
+                                        var="v" type="unordered">
+                                    <h:outputText value="#{v}"/>
+                                </rich:list>
+                            </s:decorate>
+                            <h:panelGroup rendered="#{s:hasRole('admin_role')}">
+                                <h:outputLink title="#{messages['net.ihe.gazelle.tm.ManageUser']}"
+                                              value="#{applicationPreferenceManager.getApplicationUrl()}users/user/listUsersInstitution.seam"
+                                              styleClass="gzl-btn">
+                                    <f:param name="username" value="#{user.username}"/>
+                                    <h:outputText value="#{messages['net.ihe.gazelle.tm.ManageUser']}"/>
+                                </h:outputLink>
+                            </h:panelGroup>
+                        </div>
+                    </div>
+                </ui:decorate>
+            </h:panelGroup>
+        </div>
+    </div>
+</ui:composition>

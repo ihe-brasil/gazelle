@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nodes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:/Users/aboufahj/Documents/workspace/TM/gazelle-tm/gazelle-tm-ear/src/main/doc/nodes.xsd">
+	<node value="TEST" application="BOTH">
+		<question value="LIST_TEST_STEPS_NOT_ASSIGNED_TO_TEST" />
+		<question value="LIST_TEST_WITH_NO_STEPS" />
+		<question value="LIST_CI_WITH_NO_TESTSTEPS" />
+		<question value="LIST_AIPO_WITH_NO_TEST" />
+		<question value="LIST_AIPO_WITHOUT_CONNECTATHON_TEST" />
+		<question value="LIST_AIPO_WITHOUT_PRE_CONNECTATHON_TEST" />
+	</node>
+	<node value="METATEST" application="GMM">
+		<question value="METATEST_WITH_NO_TEST" />
+	</node>
+	<node value="ROLE_IN_TEST" application="BOTH">
+		<question value="ROLE_IN_TEST_WITH_NO_TESTS" />
+		<question value="ROLE_IN_TEST_WITH_NO_TESTPARTICIPANTS" />
+	</node>
+	<node value="TEST_INSTANCE" application="TM">
+		<question value="TEST_STEPS_INSTANCES_WITH_NO_TEST_INSTANCES" />
+		<question value="LIST_CII_WITH_NO_TSI" />
+		<question value="LIST_TI_WITH_NO_TS" />
+	</node>
+</nodes>

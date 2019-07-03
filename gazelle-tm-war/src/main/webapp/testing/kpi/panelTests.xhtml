@@ -1,0 +1,71 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <h:form id="TestListForm">
+        <s:token allowMultiplePosts="true"/>
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="TestList"/>
+            <ui:param name="styleClass" value="modal-lg"/>
+            <ui:define name="popup_title">#{messages['gazelle.tm.TestList']}</ui:define>
+            <rich:dataTable var="currentElement" id="TestTable"
+                            render="datascrollerTests"
+                            value="#{items}" rowKeyVar="rowNumber"
+                            rows="#{dataScrollerMemory.numberOfResultsPerPage}">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <g:column>
+                            <h:outputText value="#{messages['gazelle.testmanagement.object.keyword']}"/>
+                        </g:column>
+                        <g:column>
+                            <h:outputText value="#{messages['gazelle.systems.system.SystemVersion']}"/>
+                        </g:column>
+                        <g:column>
+                            <h:outputText value="#{messages['gazelle.tm.tests.testStatus']}"/>
+                        </g:column>
+                        <g:column>
+                            <h:outputText value="#{messages['gazelle.systems.session.Type']}"/>
+                        </g:column>
+                        <g:column>
+                            <h:outputText value="#{messages['gazelle.tm.tests.testPeerType']}"/>
+                        </g:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <g:column sortBy="#{'keyword'}">
+                    <ui:define name="header">
+                        <h:outputText value="#{messages['gazelle.tm.Sort']}"/>
+                    </ui:define>
+                    <g:link value="#{currentElement}" detailed="false"/>
+                </g:column>
+                <g:column sortBy="#{'version'}">
+                    <h:outputText value="#{currentElement.version}"/>
+                </g:column>
+                <g:column sortBy="#{'testStatus.labelToDisplay'}">
+                    <h:outputText value="#{currentElement.testStatus.labelToDisplay}"
+                                  rendered="#{currentElement.testStatus!=null}"/>
+                </g:column>
+                <g:column sortBy="#{'testType.labelToDisplay'}">
+                    <h:outputText value="#{currentElement.testType.labelToDisplay}"
+                                  rendered="#{currentElement.testType!=null}"/>
+                </g:column>
+                <g:column sortBy="#{'testPeerType.labelToDisplay'}">
+                    <h:outputText value="#{messages[currentElement.testPeerType.labelToDisplay]}"
+                                  rendered="#{currentElement.testPeerType!=null}"/>
+                </g:column>
+
+                <f:facet name="footer">
+                    <ui:include src="/util/datatableFooter.xhtml">
+                        <ui:param name="dataScrollerId" value="datascrollerTests"/>
+                        <ui:param name="dataTableId" value="TestTable"/>
+                    </ui:include>
+                </f:facet>
+            </rich:dataTable>
+            <ui:define name="popup_footer">
+                <button type="button" class="gzl-btn" data-dismiss="modal">
+                    #{messages['gazelle.tm.Cancel']}
+                </button>
+            </ui:define>
+        </ui:decorate>
+    </h:form>
+</ui:composition>

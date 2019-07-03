@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="listOfTransactionsToSupportPerSystem" pageWidth="595" pageHeight="842" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true">
+	<parameter name="systemId" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[new Integer(1)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="testingSessionId" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[new Integer(7)]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT DISTINCT
+     tf_transaction."label" AS tf_transaction_label,
+     tf_transaction."name" AS tf_transaction_name,
+     tf_transaction_option_type."name" AS tf_transaction_option_type_name
+FROM
+     "public"."tf_actor_integration_profile" tf_actor_integration_profile INNER JOIN "public"."tf_profile_link" tf_profile_link ON tf_actor_integration_profile."id" = tf_profile_link."actor_integration_profile_id"
+     INNER JOIN "public"."tf_transaction" tf_transaction ON tf_profile_link."transaction_id" = tf_transaction."id"
+     INNER JOIN "public"."tf_transaction_option_type" tf_transaction_option_type ON tf_profile_link."transaction_option_id" = tf_transaction_option_type."id"
+     INNER JOIN "public"."tf_actor" tf_actor ON tf_actor_integration_profile."actor_id" = tf_actor."id"
+     INNER JOIN "public"."tf_integration_profile" tf_integration_profile ON tf_actor_integration_profile."integration_profile_id" = tf_integration_profile."id"
+     INNER JOIN "public"."tm_system_actor_profiles" tm_system_actor_profiles ON tf_integration_profile."id" = tm_system_actor_profiles."integration_profile_id"
+     AND tf_actor."id" = tm_system_actor_profiles."actor_id"
+     INNER JOIN "public"."tm_system" tm_system ON tm_system_actor_profiles."system_id" = tm_system."id"
+     INNER JOIN "public"."tm_system_in_session" tm_system_in_session ON tm_system."id" = tm_system_in_session."system_id"
+WHERE
+     tm_system."id" = $P{systemId}]]>
+	</queryString>
+	<field name="tf_transaction_label" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tf_transaction_name" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tf_transaction_option_type_name" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<pageHeader>
+		<band/>
+	</pageHeader>
+	<columnHeader>
+		<band height="18">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="104" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Transaction]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="104" y="0" width="50" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Opt]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="154" y="0" width="441" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Description]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20">
+			<textField hyperlinkType="None">
+				<reportElement x="154" y="0" width="441" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{tf_transaction_name}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="1" y="0" width="103" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{tf_transaction_label}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="104" y="0" width="50" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{tf_transaction_option_type_name}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,44 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
+    <!-- MODAL PANEL : This is the modal panel to display the result of the dependencies checking using DB -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
+    <h:form id="validateTFDependenciesDBSelectedSystemForm">
+        <s:token allowMultiplePosts="true"/>
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="TfDependenciesDBModalPanel"/>
+            <ui:define name="popup_title">#{messages['gazelle.systems.system.CheckTFdependencies.Header']}</ui:define>
+            <s:div rendered="#{display}">
+                <h:outputText
+                        value="#{tfDependenciesManager.validateTFDependencies(system)}"/>
+            </s:div>
+            <h2>#{messages['gazelle.systems.system.CheckTFdependencies.Title']}</h2>
+            <c:forEach items="#{tfDependenciesManager.invalidRules}" var="invalidRule">
+                <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                    <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.RuleNotMatched']}</ui:define>
+                    <s:decorate template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['gazelle.testmanagement.object.Name']}</ui:define>
+                        <h:outputText value="#{invalidRule.name}"/>
+                    </s:decorate>
+                    <s:decorate template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['net.ihe.gazelle.tm.Missing']}</ui:define>
+                        <s:decorate template="/systems/system/editSystemImplementationCriterion.xhtml">
+                            <ui:param name="criterion" value="#{invalidRule.consequence}"/>
+                        </s:decorate>
+                    </s:decorate>
+                </ui:decorate>
+
+            </c:forEach>
+            <h:outputText value="#{messages['net.ihe.gazelle.tm.EverythingIsOKNoMissingDependencies']}"
+                          rendered="#{not tfDependenciesManager.missingTfDependencies}"/>
+            <ui:define name="popup_footer">
+                <button type="button" class="gzl-btn" data-dismiss="modal">
+                    #{messages['gazelle.tm.Cancel']}
+                </button>
+            </ui:define>
+        </ui:decorate>
+    </h:form>
+</ui:composition>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.2.0.final using JasperReports Library version 6.2.0  -->
+<!-- 2016-03-09T21:59:20 -->
+<jasperReport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://jasperreports.sourceforge.net/jasperreports" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="feesStatus_subreport2" pageWidth="250" pageHeight="30" columnWidth="250" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="59af1d3d-ac3a-4968-b321-1fe202c41818">
+	<property name="ireport.zoom" value="3.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<parameter name="testingSessionId" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[29]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select * from
+(select sum(fees_amount) as contract  from tm_invoice where testing_session_id = $P{testingSessionId} and contract_received = true) as contract ,
+(select sum(fees_amount) as nocontract  from tm_invoice where testing_session_id = $P{testingSessionId} and contract_received is null) as nocontract,
+(select sum(fees_amount) as total  from tm_invoice where testing_session_id = $P{testingSessionId}) as total;]]>
+	</queryString>
+	<field name="contract" class="java.math.BigDecimal"/>
+	<field name="nocontract" class="java.math.BigDecimal"/>
+	<field name="total" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="29" splitType="Prevent">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<textField pattern="€ #,##0">
+				<reportElement x="0" y="0" width="87" height="15" uuid="ec41cf86-39cc-45c8-aeb2-c9ada1fb2d4b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{total}]]></textFieldExpression>
+			</textField>
+			<textField pattern="€ #,##0">
+				<reportElement x="88" y="0" width="14" height="15" uuid="b79eaf46-ec80-4bf0-be8b-6e4ad17cbf20"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["/"]]></textFieldExpression>
+			</textField>
+			<textField pattern="€ #,##0">
+				<reportElement x="103" y="0" width="61" height="15" forecolor="#FF0000" uuid="fa9b03d9-f476-4d02-ab8c-cddab647eab0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nocontract}]]></textFieldExpression>
+			</textField>
+			<textField pattern="€ #,##0">
+				<reportElement x="165" y="0" width="14" height="15" uuid="54525546-a4e9-4330-b2a6-6f91c81c6ed1"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["/"]]></textFieldExpression>
+			</textField>
+			<textField pattern="€ #,##0">
+				<reportElement x="180" y="0" width="70" height="15" forecolor="#009600" uuid="acf5725c-9472-4f84-b59e-dcf1652ec179"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{contract}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="15" width="87" height="14" uuid="65ab2ced-8003-44be-aeb0-c4817686fa1c"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<textField pattern="€ #,##0">
+				<reportElement x="88" y="15" width="14" height="14" uuid="4bb9cbc5-b159-4339-8958-b2e18596f417"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["/"]]></textFieldExpression>
+			</textField>
+			<textField pattern="€ #,##0">
+				<reportElement x="165" y="15" width="14" height="14" uuid="43bc7698-3fc6-404c-8762-e8a6cd743c39"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["/"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="180" y="15" width="70" height="14" uuid="a73e5802-d803-4cc6-8d34-5084fd69023f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Contract]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="103" y="15" width="61" height="14" uuid="38effb4b-710f-4db5-a53d-f9642cc09523"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[No Contract]]></text>
+			</staticText>
+		</band>
+	</detail>
+</jasperReport>

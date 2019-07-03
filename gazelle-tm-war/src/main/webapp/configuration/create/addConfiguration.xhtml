@@ -1,0 +1,209 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.configuration.system.AddConfiguration']}"/>
+    <ui:define name="body">
+        <h:form id="addConfigurationEditForm">
+            <s:token allowMultiplePosts="true"/>
+
+            #{systemConfigurationManager.getParamsUrl()}
+            <ui:decorate template="/layout/panels/_panel.xhtml">
+
+                <s:decorate template="/layout/form/_edit.xhtml" id="systemSelectForConfigurationDecorate">
+                    <ui:define name="label">#{messages['net.ihe.gazelle.tm.SystemForThisConfiguration']}</ui:define>
+                    <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text"
+                                     value="#{systemConfigurationManager.selectedSystemInSession}">
+                        <s:selectItems value="#{systemConfigurationManager.possibleSystems}" var="sis"
+                                       noSelectionLabel="${messages.PleaseSelect}" label="#{sis.label}"/>
+                        <a4j:ajax event="change" render="addConfigurationEditForm" execute="@this"
+                                  listener="#{systemConfigurationManager.setSystemInSessionForConfiguration()}"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <h:panelGroup id="addConfigurationEditPanel"
+                              rendered="#{not empty systemConfigurationManager.currentConfiguration.configuration.systemInSession}">
+                    <s:decorate template="/layout/form/_edit.xhtml" id="actorDecorate">
+                        <ui:define name="label">#{messages['gazelle.configuration.system.actorKeyword']}</ui:define>
+                        <h:selectOneMenu styleClass="form-control gzl-form-control" id="ActorListBox"
+                                         value="#{systemConfigurationManager.currentConfiguration.configuration.actor}">
+                            <s:selectItems id="actorSelectItems"
+                                           value="#{systemConfigurationManager.possibleActors}" var="actorForConf"
+                                           noSelectionLabel="${messages.PleaseSelect}"
+                                           label="#{actorForConf.keyword}-#{actorForConf.name}"/>
+                            <a4j:ajax event="change" render="typeConfigurationDecorate,includes"
+                                      listener="#{systemConfigurationManager.findPossibleConfigurationsForActor()}"
+                                      execute="@this"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+
+                    #{systemConfigurationManager.findPossibleConfigurationsForActor()}
+
+                    <a4j:region>
+                        <s:decorate template="/layout/form/_edit.xhtml" id="hostDecorate">
+                            <ui:define name="label">#{messages['gazelle.configuration.network.hostname']}</ui:define>
+                            <!--<h:selectOneMenu styleClass="form-control gzl-form-control" id="HostListBox"-->
+                                             <!--value="#{systemConfigurationManager.currentConfiguration.configuration.host}"-->
+                                             <!--required="true">-->
+                                <!--<s:selectItems id="hostnameSelectItems"-->
+                                               <!--value="#{gazelleDAO.getListOfHostForASystemInSession( systemConfigurationManager.selectedSystemInSession)}"-->
+                                               <!--var="hostFromList" noSelectionLabel="${messages.PleaseSelect}"-->
+                                               <!--label="#{hostFromList.hostname}"/>-->
+                                <!--<a4j:ajax event="change" render="includes" execute="@this"/>-->
+                            <!--</h:selectOneMenu>-->
+                            <!--<a4j:region>-->
+                                <!--<a4j:commandLink id="buttonAddNewNetworkConfiguration"-->
+                                                 <!--value="#{messages['gazelle.configuration.network.button.AddANetworkConfig']}"-->
+                                                 <!--action="#{networkConfigurationManager.addANetworkConfigButtonClick( )}"-->
+                                                 <!--bypassUpdates="true" immediate="true"-->
+                                                 <!--execute="@this"/>-->
+                            <!--</a4j:region>-->
+
+                        <!--</s:decorate>-->
+                            <h:selectOneMenu styleClass="form-control gzl-form-control" id="HostListBoxForAdmin"
+                                             value="#{systemConfigurationManager.currentConfiguration.configuration.host}"
+                                             required="true">
+                                <s:selectItems id="hostnameSelectItemsForAdmin"
+                                               value="#{gazelleDAO.getListOfHostForASystemInSessionAsAdmin( systemConfigurationManager.selectedSystemInSession)}"
+                                               var="hostFromList" noSelectionLabel="${messages.PleaseSelect}"
+                                               label="#{hostFromList.hostname}"/>
+                                <a4j:ajax event="change" render="includes" execute="@this"/>
+                            </h:selectOneMenu>
+                            <a4j:region>
+                                <a4j:commandLink id="buttonAddNewNetworkConfiguration"
+                                                 value="#{messages['gazelle.configuration.network.button.AddANetworkConfig']}"
+                                                 action="#{networkConfigurationManager.addANetworkConfigButtonClick( )}"
+                                                 bypassUpdates="true" immediate="true"
+                                                 execute="@this"/>
+                            </a4j:region>
+                        </s:decorate>
+                    </a4j:region>
+                    <a4j:region id="isSecuredRegion">
+                        <s:decorate template="/layout/form/_edit.xhtml" id="isSecuredDecorate">
+                            <ui:define name="label">#{messages['gazelle.configuration.system.isSecured']}</ui:define>
+                            <h:selectBooleanCheckbox styleClass="form-control-static"
+                                                     id="isSecuredSelectBooleanCheckBox"
+                                                     value="#{systemConfigurationManager.currentConfiguration.configuration.isSecured}">
+                                <a4j:ajax event="change" render="includes" execute="@this"/>
+                            </h:selectBooleanCheckbox>
+                        </s:decorate>
+                    </a4j:region>
+
+                    <a4j:region id="isApprovedRegion">
+                        <s:decorate template="/layout/form/_edit.xhtml" id="isApprovedDecorate">
+                            <ui:define name="label">#{messages['gazelle.configuration.system.isApproved']}</ui:define>
+                            <h:selectBooleanCheckbox styleClass="form-control-static"
+                                                     id="isApprovedSelectBooleanCheckBox"
+                                                     value="#{systemConfigurationManager.currentConfiguration.configuration.isApproved}">
+                            </h:selectBooleanCheckbox>
+                        </s:decorate>
+                    </a4j:region>
+
+                    <a4j:region id="commentRegion">
+                        <s:decorate template="/layout/form/_edit.xhtml" id="commentDecorate">
+                            <ui:param name="id" value="commentInputTextarea"/>
+                            <ui:define name="label">#{messages['gazelle.configuration.system.comment']}</ui:define>
+                            <h:inputTextarea styleClass=" form-control" id="commentInputTextarea"
+                                             value="#{systemConfigurationManager.currentConfiguration.configuration.comment}">
+                                <f:validateLength maximum="255"/>
+                            </h:inputTextarea>
+                        </s:decorate>
+                    </a4j:region>
+
+                    <br/>
+
+                    <a4j:region id="typeConfRegion">
+                        <s:decorate template="/layout/form/_edit.xhtml" id="typeConfigurationDecorate">
+	                        <ui:param name="id" value="TypeConfListBox"/>
+                            <ui:define name="label">#{messages['gazelle.configuration.system.ConfigurationTypeName']}
+                            </ui:define>
+                            <h:selectOneMenu styleClass="form-control gzl-form-control" id="TypeConfListBox"
+                                             value="#{systemConfigurationManager.currentConfiguration.configuration.configurationType}">
+                                <s:selectItems id="TypeConfSelectItems"
+                                               value="#{systemConfigurationManager.possibleConfigurationTypes}"
+                                               var="confTypeFromList" noSelectionLabel="${messages.PleaseSelect}"
+                                               label="#{confTypeFromList.typeName}"/>
+                                <a4j:ajax event="change" render="includes"
+                                          listener="#{systemConfigurationManager.changeTypeOfConfig()}"/>
+                            </h:selectOneMenu>
+
+
+                        </s:decorate>
+                    </a4j:region>
+
+                    <br/>
+                    <s:div id="includes">
+                        <h:panelGroup>
+                            <f:subview id="subview_11" rendered="#{ empty systemConfigurationManager.currentConfiguration.configuration.configurationType }">
+                                <ui:include id="chooseAConfigTypeInclude"
+                                            src="chooseAConfigType.xhtml"/>
+                            </f:subview>
+                            <f:subview id="subview_2" rendered="#{ not empty systemConfigurationManager.currentConfiguration.configuration.configurationType  and systemConfigurationManager.currentConfiguration.configuration.configurationType.typeName.equals('HL7 V2 initiator')}">
+                                <ui:include id="hl7V2InitiatorConfInclude"
+                                            src="/configuration/create/hl7V2InitiatorConf.xhtml"/>
+                            </f:subview>
+                            <f:subview id="subview_3" rendered="#{ not empty systemConfigurationManager.currentConfiguration.configuration.configurationType  and systemConfigurationManager.currentConfiguration.configuration.configurationType.typeName.equals('HL7 V2 responder')}">
+                                <ui:include id="hl7V2ResponderConfInclude"
+                                            src="/configuration/create/hl7V2ResponderConf.xhtml"/>
+                            </f:subview>
+                            <f:subview id="subview_4" rendered="#{ not empty systemConfigurationManager.currentConfiguration.configuration.configurationType  and systemConfigurationManager.currentConfiguration.configuration.configurationType.typeName.equals('HL7 V3 initiator')}">
+                                <ui:include id="hl7V3InitiatorConfInclude"
+                                            src="/configuration/create/hl7V3InitiatorConf.xhtml"/>
+                            </f:subview>
+                            <f:subview id="subview_5" rendered="#{ not empty systemConfigurationManager.currentConfiguration.configuration.configurationType  and systemConfigurationManager.currentConfiguration.configuration.configurationType.typeName.equals('HL7 V3 responder')}">
+                                <ui:include id="hl7V3ResponderConfInclude"
+                                            src="/configuration/create/hl7V3ResponderConf.xhtml"/>
+                            </f:subview>
+                            <f:subview id="subview_6" rendered="#{ not empty systemConfigurationManager.currentConfiguration.configuration.configurationType  and  systemConfigurationManager.currentConfiguration.configuration.configurationType.typeName.equals('DICOM SCU')}">
+                                <ui:include id="dicomSCUConfInclude"
+                                            src="/configuration/create/dicomConf.xhtml"/>
+                            </f:subview>
+                            <f:subview id="subview_7" rendered="#{ not empty systemConfigurationManager.currentConfiguration.configuration.configurationType  and  systemConfigurationManager.currentConfiguration.configuration.configurationType.typeName.equals('DICOM SCP')}">
+                                <ui:include id="dicomSCPConfInclude"
+                                            src="/configuration/create/dicomConf.xhtml"/>
+                            </f:subview>
+                            <f:subview id="subview_8" rendered="#{ not empty systemConfigurationManager.currentConfiguration.configuration.configurationType  and systemConfigurationManager.currentConfiguration.configuration.configurationType.typeName.equals('HTTP')}">
+                                <ui:include id="wsConfInclude"
+                                            src="/configuration/create/wsConf.xhtml"/>
+                            </f:subview>
+                            <f:subview id="subview_9" rendered="#{ not empty systemConfigurationManager.currentConfiguration.configuration.configurationType  and  systemConfigurationManager.currentConfiguration.configuration.configurationType.typeName.equals('Syslog')}">
+                                <ui:include id="syslogConfInclude"
+                                            src="/configuration/create/syslogConf.xhtml"/>
+                            </f:subview>
+                            <f:subview id="subview_10" rendered="#{ not empty systemConfigurationManager.currentConfiguration.configuration.configurationType  and  systemConfigurationManager.currentConfiguration.configuration.configurationType.typeName.equals('RAW')}">
+                                <ui:include id="rawConfInclude"
+                                            src="/configuration/create/rawConf.xhtml"/>
+                            </f:subview>
+                            <a4j:commandButton id="saveSystem" styleClass="gzl-btn-green"
+                                               value="#{messages['gazelle.common.button.Save']}"
+                                               action="#{systemConfigurationManager.addEditConfiguration()}"
+                                               rendered="#{not empty systemConfigurationManager.currentConfiguration.configuration.configurationType}"
+                                               ignoreDupResponses="true"
+                                               render="addConfigurationEditForm"/>
+
+                            <s:span rendered="#{systemConfigurationManager.currentConfiguration.configuration.lastChanged != null}">
+                                <h:outputText value="#{messages['net.ihe.gazelle.tm.LastChanged_2']} "/>
+                                <g:date value="#{systemConfigurationManager.currentConfiguration.configuration.lastChanged}"/>
+                                <h:outputText value=" #{messages['gazelle.tm.roleInTest.by']} "/>
+                                <h:outputText
+                                        rendered="#{not empty systemConfigurationManager.currentConfiguration.configuration.lastModifierId}"
+                                        value="#{systemConfigurationManager.currentConfiguration.configuration.lastModifierId}"/>
+                                <h:outputText
+                                        rendered="#{empty systemConfigurationManager.currentConfiguration.configuration.lastModifierId}"
+                                        value="#{messages['net.ihe.gazelle.tm.Automate']}"/>
+                            </s:span>
+                        </h:panelGroup>
+                    </s:div>
+                </h:panelGroup>
+            </ui:decorate>
+        </h:form>
+        <h:form id="addConfigurationCancelForm">
+            <s:token allowMultiplePosts="true"/>
+            <a4j:commandButton id="cancel" styleClass="gzl-btn"
+                               value="#{messages['gazelle.common.button.Cancel']}"
+                               action="#{systemConfigurationManager.cancelAction()}"
+                               immediate="true"/>
+        </h:form>
+
+    </ui:define>
+</ui:composition>

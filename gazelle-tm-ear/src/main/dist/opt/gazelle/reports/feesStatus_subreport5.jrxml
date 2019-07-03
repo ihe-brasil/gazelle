@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="feesStatus_subreport2" pageWidth="73" pageHeight="15" columnWidth="73" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="59af1d3d-ac3a-4968-b321-1fe202c41818">
+	<property name="ireport.zoom" value="3.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="testingSessionId" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[29]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select sum(fees_paid)  as total  from tm_invoice where testing_session_id = $P{testingSessionId} ;]]>
+	</queryString>
+	<field name="total" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="15" splitType="Prevent">
+			<textField pattern="€ #,##0">
+				<reportElement x="0" y="0" width="73" height="15" forecolor="#000000" uuid="ec41cf86-39cc-45c8-aeb2-c9ada1fb2d4b"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{total}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

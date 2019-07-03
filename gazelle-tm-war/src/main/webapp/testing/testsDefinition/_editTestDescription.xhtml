@@ -1,0 +1,51 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <h:form>
+        <h:outputText id="testId" value="#{messages['net.ihe.gazelle.tm.EditedTestDescriptionid']}" style="display: none"/>
+        <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+            <ui:param name="panel_id" value="AddNewDescriptionPanel"/>
+            <ui:define name="panel_title"> #{messages['gazelle.tm.DescriptionEditor']}</ui:define>
+            <a4j:region id="descriptionLanguageRegion">
+                <s:decorate id="descriptionLanguageDecoration" template="/layout/form/_edit.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tm.DescriptionLanguage']}</ui:define>
+                    <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                     id="descriptionLanguageListBox"
+                                     value="#{editedTestDescription.gazelleLanguage}">
+                        <s:selectItems value="#{editTestDefinitionManager.getLanguageList()}"
+                                       var="selectedLanguage" hideNoSelectionLabel="true"
+                                       label="#{selectedLanguage.keyword}"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+            </a4j:region>
+            <a4j:region id="descriptionRegion">
+                <s:decorate id="descriptionDecoration" template="/layout/form/_edit.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.table.Description']}</ui:define>
+                    <ui:decorate template="/layout/editor/_text_editor.xhtml">
+                        <ui:param name="text" value="#{editedTestDescription.description}"/>
+                        <ui:param name="id" value="TestDescriptionEditor"/>
+                        <ui:param name="isFocus" value="true"/>
+                    </ui:decorate>
+                </s:decorate>
+            </a4j:region>
+        </ui:decorate>
+
+        <a4j:poll render="testId" interval="60000"/>
+
+        <h:commandButton styleClass="gzl-btn" immediate="true"
+                         value="#{messages['gazelle.common.button.Cancel']}"
+                         action="#{editTestDefinitionManager.cancel(testId)}"/>
+        <a4j:commandButton id="adddesctotest" value="#{messages['gazelle.tm.AddThisDescription']}"
+                         action="#{editTestDefinitionManager.addTestDescription()}"
+                         styleClass="gzl-btn-green"
+                         rendered="#{editTestDefinitionManager.editedTestDescription.id == null}">
+            <a4j:ajax event="click" onbegin="jq162(&quot;div.codeview button[data-event='codeview']&quot;).click();"/>
+        </a4j:commandButton>
+        <a4j:commandButton id="updatetestdesc" value="#{messages['gazelle.tm.UpdateThisDescription']}"
+                         action="#{editTestDefinitionManager.addTestDescription()}"
+                         styleClass="btn btn-warning"
+                         rendered="#{editTestDefinitionManager.editedTestDescription.id != null}"/>
+    </h:form>
+
+</ui:composition>

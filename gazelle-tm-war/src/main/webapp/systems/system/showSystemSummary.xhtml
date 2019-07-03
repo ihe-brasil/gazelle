@@ -1,0 +1,133 @@
+<s:div xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+       xmlns:s="http://jboss.org/schema/seam/taglib">
+    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+        <ui:define name="panel_title">#{messages['gazelle.systems.system.DisplaySystemLabel1']}</ui:define>
+        <s:decorate id="institutionDecoration" template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.users.institution.InstitutionName']}</ui:define>
+            #{systemInSessionViewer.getInstitutionsForSystem(systemInSessionViewer.system)}
+        </s:decorate>
+        <s:decorate id="nameDecoration" template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.systems.system.SystemName']}</ui:define>
+            #{systemInSessionViewer.systemInSession.system.name}
+        </s:decorate>
+        <s:decorate id="keywordDecoration" template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.systems.system.SystemKeyword']}</ui:define>
+            #{systemInSessionViewer.systemInSession.system.keyword}
+        </s:decorate>
+        <s:decorate id="versionDecoration" template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.systems.system.SystemVersion']}</ui:define>
+            #{systemInSessionViewer.systemInSession.system.version}
+        </s:decorate>
+        <h:form id="conformanceStatementsForm">
+            <s:token allowMultiplePosts="true"/>
+            <a4j:region id="hl7ConformanceStatementUrlRegion">
+                <s:decorate id="hl7ConformanceStatementUrlDecoration" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.systems.system.LinksToHL7Conformance']}
+                    </ui:define>
+                    <s:span>
+                        <h:outputLink id="hl7ConformanceURLCommandLink"
+                                      rendered="#{not empty systemInSessionViewer.systemInSession.system.HL7ConformanceStatementUrl}"
+                                      value="#{systemInSessionViewer.systemInSession.system.HL7ConformanceStatementUrl}"
+                                      target="_blank">
+                            <h:outputText
+                                    value="#{systemInSessionViewer.systemInSession.system.HL7ConformanceStatementUrl}"/>
+                        </h:outputLink>
+                        <ul>
+                            <a4j:repeat value="#{systemInSessionViewer.hl7DocumentsFilesForSelectedSystem}"
+                                        var="file">
+                                <li>
+                                    <h:commandLink id="hl7ConformanceUploadsCommandLink"
+                                                   action="#{systemInSessionViewer.showHl7ConformanceStatementFile(file.name)}"
+                                                   value="#{file.name}" target="_blank"/>
+                                </li>
+                            </a4j:repeat>
+                        </ul>
+                        <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                            <ui:param name="id" value="hl7"/>
+                            <ui:param name="placement" value="bottom"/>
+                            <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                            <ui:define name="content">
+                                <div class="gzl-never-wrap">
+                                    #{messages['gazelle.systems.system.is.help.hl7ConformanceURL1']}
+                                    <br/>
+                                    #{messages['gazelle.systems.system.is.help.hl7ConformanceURL2']}
+                                    <br/>
+                                    #{messages['gazelle.systems.system.is.help.hl7ConformanceURL3']}
+                                    <br/>
+                                    #{messages['gazelle.systems.system.is.help.hl7ConformanceURL4']}
+                                    <br/>
+                                </div>
+                            </ui:define>
+                        </ui:decorate>
+                    </s:span>
+                </s:decorate>
+            </a4j:region>
+            <a4j:region id="dicomConformanceStatementUrlRegion">
+                <s:decorate id="dicomConformanceStatementUrlDecoration" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.systems.system.LinksToDicomConformance']}
+                    </ui:define>
+                    <span>
+                        <h:outputLink id="dicomConformanceURLCommandLink"
+                                      rendered="#{not empty systemInSessionViewer.systemInSession.system.dicomConformanceStatementUrl}"
+                                      value="#{systemInSessionViewer.systemInSession.system.dicomConformanceStatementUrl}"
+                                      target="_blank">
+                            <h:outputText
+                                    value="#{systemInSessionViewer.systemInSession.system.dicomConformanceStatementUrl}"/>
+                        </h:outputLink>
+                        <ul>
+                            <a4j:repeat value="#{systemInSessionViewer.dicomDocumentsFilesForSelectedSystem}"
+                                        var="file">
+                                <li>
+                                    <h:commandLink id="dicomConformanceUploadsCommandLink"
+                                                   action="#{systemInSessionViewer.showDicomConformanceStatementFile(file.name)}"
+                                                   value="#{file.name}" target="_blank"/>
+                                </li>
+                            </a4j:repeat>
+                        </ul>
+                        <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                            <ui:param name="id" value="dicom"/>
+                            <ui:param name="placement" value="bottom"/>
+                            <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                            <ui:define name="content">
+                                <div class="gzl-never-wrap">
+                                    #{messages['gazelle.systems.system.is.help.dicomConformanceURL1']}
+                                    <br/>
+                                    #{messages['gazelle.systems.system.is.help.dicomConformanceURL2']}
+                                    <br/>
+                                    #{messages['gazelle.systems.system.is.help.dicomConformanceURL3']}
+                                    <br/>
+                                    #{messages['gazelle.systems.system.is.help.dicomConformanceURL4']}
+                                    <br/>
+                                </div>
+                            </ui:define>
+                        </ui:decorate>
+                    </span>
+                </s:decorate>
+            </a4j:region>
+        </h:form>
+        <s:decorate id="integrationStatementUrlDecoration" template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.systems.system.ISURL']}</ui:define>
+            <a href="#{systemInSessionViewer.systemInSession.system.integrationStatementUrl}" target="_blank">
+                #{systemInSessionViewer.systemInSession.system.integrationStatementUrl}
+            </a>
+        </s:decorate>
+        <s:decorate id="integrationStatementDateDecoration" template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.systems.system.ISDate']}</ui:define>
+            <g:date date="true" time="false"
+                    value="#{systemInSessionViewer.systemInSession.system.integrationStatementDate}"/>
+        </s:decorate>
+        <s:decorate id="integrationStatementOwnerDecoration" template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.systems.system.OwnerUser']}</ui:define>
+            #{systemInSessionViewer.systemInSession.system.ownerUser.firstname}
+            #{systemInSessionViewer.systemInSession.system.ownerUser.lastname} -
+            #{systemInSessionViewer.systemInSession.system.ownerUser.email}
+        </s:decorate>
+        <s:decorate id="registrationStatus" template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['net.ihe.gazelle.tm.RegistrationStatus']}</ui:define>
+            <h:outputText
+                    value="#{messages[systemInSessionViewer.systemInSession.registrationStatus.labelToDisplay]}"/>
+        </s:decorate>
+    </ui:decorate>
+
+</s:div>

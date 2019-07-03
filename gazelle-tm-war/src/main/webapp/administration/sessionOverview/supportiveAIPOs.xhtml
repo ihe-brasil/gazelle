@@ -1,0 +1,248 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['net.ihe.gazelle.tm.SupportiveAIPOs']}"/>
+    <ui:define name="body">
+
+        #{dataTableStateHolder.setAscendingOn('system.keyword')}
+        #{systemInSessionOverview.initForSupportiveAIPOs()}
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">#{messages['net.ihe.gazelle.tm.SystemActorProfiles']}</h3>
+            </div>
+            <div class="panel-body">
+                <h:form id="globalform" styleClass="form-horizontal">
+                    <s:token allowMultiplePosts="true"/>
+
+                    #{systemInSessionOverview.filterSAP.modified()}
+
+
+                    <h:inputHidden id="filterUrlParameters" name="filterUrlParameters"
+                                   value="#{systemInSessionOverview.filterSAP.urlParameters}"/>
+                    <script>
+                        updateUrl("globalform:filterUrlParameters");
+                        $("#globalform\\:filterUrlParameters").bind('change',
+                                function () {
+                                    updateUrl("globalform:filterUrlParameters");
+                                });
+                    </script>
+
+
+                    <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <ui:include src="/filter/filter.xhtml">
+                                    <ui:param name="filter" value="#{systemInSessionOverview.filterSAP}"/>
+                                    <ui:param name="filterWidth" value="240"/>
+                                    <ui:param name="filterId" value="testing_session"/>
+                                    <ui:param name="filterName"
+                                              value="#{messages['gazelle.systems.testingSession']}"/>
+                                    <ui:param name="filterForm" value="globalform"/>
+                                </ui:include>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <ui:include src="/filter/filter.xhtml">
+                                    <ui:param name="filter" value="#{systemInSessionOverview.filterSAP}"/>
+                                    <ui:param name="filterWidth" value="240"/>
+                                    <ui:param name="filterId" value="institution"/>
+                                    <ui:param name="filterName" value="#{messages['gazelle.users.Institution']}"/>
+                                    <ui:param name="filterForm" value="globalform"/>
+                                </ui:include>
+                            </div>
+                            <div class="col-lg-6">
+                                <ui:include src="/filter/filter.xhtml">
+                                    <ui:param name="filter" value="#{systemInSessionOverview.filterSAP}"/>
+                                    <ui:param name="filterWidth" value="240"/>
+                                    <ui:param name="filterId" value="system"/>
+                                    <ui:param name="filterName"
+                                              value="#{messages['gazelle.configuration.system.system']}"/>
+                                    <ui:param name="filterForm" value="globalform"/>
+                                </ui:include>
+                            </div>
+                        </div>
+                        <!--  AIPO selection -->
+                        <ui:include src="/testing/research/filterAIPO.xhtml">
+                            <ui:param name="filter" value="#{systemInSessionOverview.filterSAP}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <!--  test selection -->
+                                <ui:include src="/filter/filter.xhtml">
+                                    <ui:param name="filter" value="#{systemInSessionOverview.filterSAP}"/>
+                                    <ui:param name="filterWidth" value="240"/>
+                                    <ui:param name="filterId" value="test"/>
+                                    <ui:param name="filterName" value="#{messages['gazelle.tests.test']}"/>
+                                    <ui:param name="filterForm" value="globalform"/>
+                                </ui:include>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <ui:include src="/filter/filter.xhtml">
+                                    <ui:param name="filter" value="#{systemInSessionOverview.filterSAP}"/>
+                                    <ui:param name="filterName"
+                                              value="#{messages['net.ihe.gazelle.tm.WantedTestType']}"/>
+                                    <ui:param name="filterId" value="wanted_test_type"/>
+                                    <ui:param name="filterForm" value="globalform"/>
+                                </ui:include>
+                            </div>
+                            <div class="col-lg-6">
+                                <ui:include src="/filter/filter.xhtml">
+                                    <ui:param name="filter" value="#{systemInSessionOverview.filterSAP}"/>
+                                    <ui:param name="filterName"
+                                              value="#{messages['net.ihe.gazelle.tm.Reviewable']}"/>
+                                    <ui:param name="filterId" value="reviewable"/>
+                                    <ui:param name="filterForm" value="globalform"/>
+                                </ui:include>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <ui:include src="/filter/filter.xhtml">
+                                    <ui:param name="filter" value="#{systemInSessionOverview.filterSAP}"/>
+                                    <ui:param name="filterName"
+                                              value="#{messages['net.ihe.gazelle.tm.RegisteredTestType']}"/>
+                                    <ui:param name="filterId" value="test_type"/>
+                                    <ui:param name="filterForm" value="globalform"/>
+                                </ui:include>
+                            </div>
+                            <div class="col-lg-6">
+                                <ui:include src="/filter/filter.xhtml">
+                                    <ui:param name="filter" value="#{systemInSessionOverview.filterSAP}"/>
+                                    <ui:param name="filterName"
+                                              value="#{messages['net.ihe.gazelle.tm.TestTypeReviewed']}"/>
+                                    <ui:param name="filterId" value="test_type_reviewed"/>
+                                    <ui:param name="filterForm" value="globalform"/>
+                                </ui:include>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+
+                            </div>
+                        </div>
+                        <ui:define name="filter_buttons">
+                            <a4j:commandLink actionListener="#{systemInSessionOverview.filterSAP.clear()}"
+                                             title="#{messages['gazelle.users.reset']}" type="submit"
+                                             execute="@this" render="globalform">
+                                <span class="fa fa-times-circle"/>
+                            </a4j:commandLink>
+                        </ui:define>
+                    </ui:decorate>
+                    <div class="row">
+                        <div class="col-lg-offset-9 col-lg-3">
+                            <s:div rendered="#{s:hasRole('admin_role') or s:hasRole('testing_session_admin_role')}">
+                                <h:outputText value="#{messages['net.ihe.gazelle.tm.ChangeTestingTypeTo']} "
+                                              style="font-weight:bold"/>
+
+                                <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                 value="#{systemInSessionOverview.testingType}">
+                                    <s:selectItems value="#{testingTypeManager.possibleTestingTypes}"
+                                                   noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                   var="testingType" label="#{testingType.name}"/>
+                                    <a4j:ajax event="change" render="globalform"
+                                              listener="#{systemInSessionOverview.changeAllSelectedSAPTestingType()}"/>
+                                </h:selectOneMenu>
+                            </s:div>
+                        </div>
+                    </div>
+                    <rich:dataTable id="sapTable" var="currentSystemActorProfile"
+                                    value="#{systemInSessionOverview.systemActorProfiles}" rowKeyVar="rowNumber"
+
+
+                                    rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                        <g:column sortBy="#{'system.keyword'}"
+                                  sortOrder="#{dataTableStateHolder.sortOrders['system.keyword']}">
+                            <ui:define name="header">
+                                <h:outputText value="#{messages['gazelle.systems.system.SystemKeyword']}"/>
+                            </ui:define>
+                            <g:link value="#{currentSystemActorProfile.system}" detailed="true"/>
+                        </g:column>
+                        <g:column sortBy="#{'actorIntegrationProfileOption.actorIntegrationProfile.actor.keyword'}"
+                                  sortOrder="#{dataTableStateHolder.sortOrders['actorintegrationprofileoption.actorintegrationprofile.actor.keyword']}">
+                            <ui:define name="header">
+                                <h:outputText
+                                        value="#{messages['gazelle.testmanagement.system.label.Actor']}"/>
+                            </ui:define>
+                            <g:link value="#{currentSystemActorProfile.actorIntegrationProfileOption.actorIntegrationProfile.actor}"
+                                    detailed="true"/>
+                        </g:column>
+                        <g:column
+                                sortBy="#{'actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.keyword'}"
+                                sortOrder="#{dataTableStateHolder.sortOrders['actorintegrationprofileoption.actorintegrationprofile.integrationprofile.keyword']}">
+                            <ui:define name="header">
+                                <h:outputText value="#{messages['gazelle.productregistry.system.label.IP']}"/>
+                            </ui:define>
+                            <g:link value="#{currentSystemActorProfile.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile}"
+                                    detailed="true"/>
+                        </g:column>
+                        <g:column sortBy="#{'actorIntegrationProfileOption.integrationProfileOption.keyword'}"
+                                  sortOrder="#{dataTableStateHolder.sortOrders['actorintegrationprofileoption.integrationprofileoption.keyword']}">
+                            <ui:define name="header">
+                                <h:outputText value="#{messages['gazelle.tests.test.option']}"/>
+                            </ui:define>
+                            <g:link value="#{currentSystemActorProfile.actorIntegrationProfileOption.integrationProfileOption}"
+                                    detailed="true"/>
+                        </g:column>
+                        <g:column sortBy="#{'wantedTestingType'}"
+                                  sortOrder="#{dataTableStateHolder.sortOrders['wantedtestingtype']}">
+                            <ui:define name="header">
+                                <h:outputText value="#{messages['net.ihe.gazelle.tm.WantedTestType']}"/>
+                            </ui:define>
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.NotSet']}"
+                                          rendered="#{empty currentSystemActorProfile.wantedTestingType}"/>
+                            <h:panelGrid columns="2"
+                                         rendered="#{not empty currentSystemActorProfile.wantedTestingType}">
+                                <h:outputText value="#{currentSystemActorProfile.wantedTestingType.name}"/>
+                            </h:panelGrid>
+                        </g:column>
+                        <g:column sortBy="#{'testingTypeReviewed'}"
+                                  sortOrder="#{dataTableStateHolder.sortOrders['testingtypereviewed']}">
+                            <ui:define name="header">
+                                <h:outputText value="#{messages['net.ihe.gazelle.tm.TestingTypeReviewed']}"/>
+                            </ui:define>
+                            <h:selectBooleanCheckbox styleClass="form-control-static"
+                                                     rendered="#{currentSystemActorProfile.actorIntegrationProfileOption.maybeSupportive}"
+                                                     value="#{currentSystemActorProfile.testingTypeReviewed}">
+                                <a4j:ajax event="click" render="globalform" execute="@this"
+                                          listener="#{testingTypeManager.setTestingTypeReviewedSAP(currentSystemActorProfile)}"/>
+                            </h:selectBooleanCheckbox>
+                        </g:column>
+                        <g:column sortBy="#{'testingType'}"
+                                  sortOrder="#{dataTableStateHolder.sortOrders['testingtype']}">
+                            <ui:define name="header">
+                                <h:outputText value="#{messages['gazelle.systems.TestingType']}"/>
+                            </ui:define>
+
+                            <h:outputText value="#{currentSystemActorProfile.testingType.name}"
+                                          rendered="#{!currentSystemActorProfile.actorIntegrationProfileOption.maybeSupportive}"/>
+
+                            <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                             value="#{currentSystemActorProfile.testingType}"
+                                             rendered="#{currentSystemActorProfile.actorIntegrationProfileOption.maybeSupportive}">
+                                <s:selectItems value="#{testingTypeManager.possibleTestingTypes}"
+                                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                               var="testingType" label="#{testingType.name}"/>
+                                <a4j:ajax event="change" render="globalform"
+                                          listener="#{testingTypeManager.setTestingTypeFromListboxSAP(currentSystemActorProfile)}"/>
+                            </h:selectOneMenu>
+                        </g:column>
+                        <f:facet name="footer">
+                            <ui:include src="/util/datatableFooter.xhtml">
+                                <ui:param name="dataScrollerId" value="ds"/>
+                                <ui:param name="dataTableId" value="sapTable"/>
+                            </ui:include>
+                        </f:facet>
+                    </rich:dataTable>
+
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

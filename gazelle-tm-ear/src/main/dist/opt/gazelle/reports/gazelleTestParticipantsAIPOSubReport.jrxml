@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="gazelleTestParticipantsAIPOSubReport" pageWidth="803" pageHeight="802" columnWidth="803" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="b52cac7f-a64d-4272-9a85-b54b63aa56b7">
+	<property name="ireport.zoom" value="3.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="role_in_test_id" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[12177]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+  tf_actor.keyword as tf_actor_keyword,
+  tf_integration_profile.keyword as tf_integration_profile_keyword,
+  tf_integration_profile_option.keyword as tf_integration_profile_option_keyword,
+  tm_role_in_test_test_participants.role_in_test_id
+FROM
+  public.tm_role_in_test_test_participants,
+  public.tm_test_participants,
+  public.tf_integration_profile,
+  public.tf_actor_integration_profile,
+  public.tf_actor_integration_profile_option,
+  public.tf_actor,
+  public.tf_integration_profile_option
+WHERE
+  tm_role_in_test_test_participants.test_participants_id = tm_test_participants.id AND
+  tm_test_participants.actor_integration_profile_option_id = tf_actor_integration_profile_option.id AND
+  tf_actor_integration_profile.integration_profile_id = tf_integration_profile.id AND
+  tf_actor_integration_profile.actor_id = tf_actor.id AND
+  tf_actor_integration_profile_option.actor_integration_profile_id = tf_actor_integration_profile.id AND
+  tf_actor_integration_profile_option.integration_profile_option_id = tf_integration_profile_option.id and tm_role_in_test_test_participants.role_in_test_id = $P{role_in_test_id};]]>
+	</queryString>
+	<field name="tf_actor_keyword" class="java.lang.String"/>
+	<field name="tf_integration_profile_keyword" class="java.lang.String"/>
+	<field name="tf_integration_profile_option_keyword" class="java.lang.String"/>
+	<field name="role_in_test_id" class="java.lang.Integer"/>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="0" width="60" height="20" backcolor="#FFFFFF" uuid="fff13897-a16c-4008-8c9d-576bbbcdb848"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Actor :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="248" y="0" width="60" height="20" backcolor="#FFFFFF" uuid="b5719a8e-51a2-41ef-b532-5fb61dac68d7"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Profile :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="496" y="0" width="60" height="20" backcolor="#FFFFFF" uuid="ffb9a8d0-8a96-46f4-8dde-0fa048d00896"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Option :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="59" y="0" width="190" height="20" uuid="dc06d9a7-e617-4452-a17b-53f4350453b3"/>
+				<box leftPadding="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tf_actor_keyword}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="307" y="0" width="190" height="20" uuid="9c2d141c-c885-44af-bf92-87debbbd72b2"/>
+				<box leftPadding="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tf_integration_profile_keyword}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="555" y="0" width="218" height="20" uuid="7b57e2b3-9432-4ae8-abb7-f8c790ed9962"/>
+				<box leftPadding="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tf_integration_profile_option_keyword}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

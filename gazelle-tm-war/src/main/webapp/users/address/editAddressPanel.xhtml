@@ -1,0 +1,83 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib">
+    <!-- ======================= -->
+    <!-- Address Edit section						   -->
+    <!-- ======================= -->
+    <s:fragment id="addressEditFragment${panelId}"
+                rendered="#{not empty addressVariable and not empty addressVariable.iso3166CountryCode }">
+        <!-- Address input box (for address) -->
+        <a4j:region id="addressAddressRegion${panelId}">
+            <s:decorate id="addressAddressDecoration${panelId}" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="addressAddressKeyword${panelId}"/>
+                <ui:define name="label">#{messages['gazelle.users.address.AddressAddress']}</ui:define>
+                <h:inputText id="addressAddressKeyword${panelId}" maxlength="64" size="30" styleClass="form-control"
+                             value="#{addressVariable.address}" required="true">
+                    <a4j:ajax event="blur" render="addressAddressDecoration${panelId}" execute="@this"/>
+                </h:inputText>
+            </s:decorate>
+        </a4j:region>
+        <!-- Address input box (for address line 2) -->
+        <a4j:region id="addressAddressRegion2${panelId}">
+            <s:decorate id="addressAddressKeyword2${panelId}" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="addressAddressKeyword2${panelId}"/>
+                <ui:define name="label">#{messages['gazelle.users.address.AddressAddress']}
+                    #{messages['net.ihe.gazelle.tm.Line2']}
+                </ui:define>
+                <h:inputText id="addressAddressKeyword2${panelId}" maxlength="64" size="30"
+                             value="#{addressVariable.addressLine2}" styleClass="form-control">
+                    <a4j:ajax event="blur" render="addressAddressDecoration2${panelId}" execute="@this"/>
+                </h:inputText>
+            </s:decorate>
+        </a4j:region>
+        <!-- City input box (for address) -->
+        <a4j:region id="addressCityRegion${panelId}">
+            <s:decorate id="addressCityDecoration${panelId}" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="addressCityKeyword${panelId}"/>
+                <ui:define name="label">#{messages['gazelle.users.address.AddressCity']}</ui:define>
+                <h:inputText id="addressCityKeyword${panelId}" maxlength="64" size="30" value="#{addressVariable.city}"
+                             required="true" styleClass="form-control">
+                    <a4j:ajax event="blur" render="addressCityDecoration${panelId}" execute="@this"/>
+                </h:inputText>
+            </s:decorate>
+        </a4j:region>
+        <!-- State input box (for address) -->
+        <a4j:region id="addressStateRegion${panelId}">
+            <s:decorate id="addressStateDecoration${panelId}" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="addressStateKeyword${panelId}"/>
+                <ui:define name="label">#{messages['gazelle.users.address.AddressState']}</ui:define>
+                <a4j:commandLink id="addressStateSupport${panelId}" render="addressStateDecoration${panelId}"
+                                 execute="@this"/>
+                <h:inputText id="addressStateKeyword${panelId}" maxlength="64" size="30"
+                             value="#{addressVariable.state}" required="false" styleClass="form-control"/>
+            </s:decorate>
+        </a4j:region>
+        <!-- ZipCode input box (for address) -->
+        <a4j:region id="addressZipCodeRegion${panelId}">
+            <s:decorate id="addressZipCodeDecoration${panelId}" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="addressZipCodeKeyword${panelId}"/>
+                <ui:define name="label">#{messages['gazelle.users.address.AddressZipCode']}</ui:define>
+                <h:inputText id="addressZipCodeKeyword${panelId}" maxlength="64" size="30"
+                             value="#{addressVariable.zipCode}" required="false" styleClass="form-control">
+                    <a4j:ajax event="blur" render="addressZipCodeDecoration${panelId}" execute="@this"/>
+                </h:inputText>
+            </s:decorate>
+        </a4j:region>
+        <!-- Country Suggestion box  (for address) -->
+        <a4j:region id="addressCountryRegion${panelId}">
+            <s:decorate id="addressCountryDecoration${panelId}" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="countryListBox"/>
+                <ui:define name="label">#{messages['gazelle.users.address.AddressCountry']}</ui:define>
+                <h:selectOneMenu styleClass="form-control gzl-form-control" id="countryListBox"
+                                 value="#{addressVariable.iso3166CountryCode}" required="true">
+                    <s:selectItems value="#{gazelleDAO.getPossibleCountries()}" var="countryFromList"
+                                   noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                   label="#{countryFromList.printableName}"/>
+                    <a4j:ajax event="change" render="addressCountryDecoration${panelId}"/>
+                </h:selectOneMenu>
+            </s:decorate>
+        </a4j:region>
+    </s:fragment>
+
+</ui:composition>

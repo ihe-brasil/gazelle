@@ -1,0 +1,200 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tm.ListTestsRequirements']}"/>
+    <ui:define name="body">
+        <h:form id="formTestMatrix">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <s:decorate id="TestTypeDecoration" style="font-size: 11px;"
+                                    template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tm.monitors.TestType']}</ui:define>
+                            <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text"
+                                             id="testTypeSelection"
+                                             value="#{testsRequirementsManager.selectedTestType}"
+                                             style="font-weight:bold;text-align:center;">
+                                <s:selectItems value="#{gazelleDAO.getTestTypeList()}" var="selectedType"
+                                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                               label="#{selectedType.labelToDisplay}"/>
+                                <a4j:ajax event="change" render="panelTests"
+                                          execute="@this"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </div>
+                    <div class="col-lg-6">
+                        <s:decorate id="DomainsListDecoration" style="font-size: 11px;"
+                                    template="/layout/form/_edit.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tm.patient.aaDomain']}</ui:define>
+                            <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text"
+                                             id="DomainListBox"
+                                             value="#{testsRequirementsManager.domainSelected}">
+                                <s:selectItems value="#{gazelleDAO.getPossibleDomains()}" var="domainFromList"
+                                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                               label="#{domainFromList.keyword} - #{domainFromList.name}"/>
+                                <a4j:ajax event="change" render="IPListDecoration,panelTests"
+                                          execute="@this"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <s:decorate id="IPListDecoration" style="font-size: 11px;"
+                                    template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.IntegrationProfile']}</ui:define>
+                            <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text"
+                                             id="integrationProfileListBox"
+                                             value="#{testsRequirementsManager.integrationProfileSelected}">
+                                <s:selectItems
+                                        value="#{gazelleDAO.getPossibleIntegrationProfiles(testsRequirementsManager.domainSelected)}"
+                                        var="integrationProfileFromList"
+                                        noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                        label="#{integrationProfileFromList.keyword}:#{integrationProfileFromList.name}"/>
+                                <a4j:ajax event="change" render="panelTests"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </div>
+                    <div class="col-lg-6">
+                        <s:decorate id="PeerTypeListDecoration" style="font-size: 11px;"
+                                    template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tm.TestPeerType']}</ui:define>
+
+                            #{testAdministrationManager.findTestPeerTypes()}
+                            <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text"
+                                             id="testPeerTypeSelection"
+                                             value="#{testsRequirementsManager.selectedTestPeerType}"
+                                             style="font-weight:bold;text-align:center;">
+                                <s:selectItems value="#{testsRequirementsManager.possibleTestPeerTypes}" var="peerType"
+                                               noSelectionLabel="#{messages['gazelle.tm.monitors.All']}"
+                                               label="#{messages[peerType.labelToDisplay]}"/>
+                                <a4j:ajax event="change" render="panelTests"
+                                          execute="@this"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </div>
+                </div>
+            </ui:decorate>
+
+            <s:div id="panelTests">
+
+                #{testsRequirementsManager.initTestRequirements()}
+
+                <s:div id="numberOfTests" style="font-size:x-small;font-style:italic;"
+                       rendered="#{not empty testsRequirementsManager.listOfTestsForCurrentIntegrationProfile}">
+                    <h:outputText value="#{testsRequirementsManager.listOfTestsForCurrentIntegrationProfile.size()} "/>
+                    <h:outputText value="#{messages['gazelle.tm.TestsFound']}"/>
+                </s:div>
+
+                <table border="1" class="table table-striped table-bordered" style="font-size: 10px">
+                    <thead class="dr-table-thead">
+                    <tr class="dr-table-header rich-table-header">
+                        <th class="dr-table-headercell rich-table-headercell" rowspan="2">
+                            <h:outputText value="#{messages['gazelle.tm.monitors.test']}"/>
+                        </th>
+                        <th class="dr-table-headercell rich-table-headercell"
+                            colspan="#{testsRequirementsManager.listOfActorsForCurrentIntegrationProfile.size()}">
+                            #{messages['gazelle.testmanagement.system.label.Actor']}
+                        </th>
+                    </tr>
+                    <tr class="dr-table-header rich-table-header">
+                        <a4j:repeat value="#{testsRequirementsManager.listOfActorsForCurrentIntegrationProfile}"
+                                    var="currentActor">
+                            <th class="dr-table-headercell rich-table-headercell">
+                                <h:outputText value="#{currentActor.keyword}"/>
+                            </th>
+                        </a4j:repeat>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <a4j:repeat value="#{testsRequirementsManager.listOfTestsForCurrentIntegrationProfile}"
+                                var="currentTest" rowKeyVar="testIndex">
+                        <tr>
+                            <td>
+                                <s:div id="keywtest">
+                                    <g:link target="_blank" value="#{currentTest}" title="#{currentTest.name}"/>
+                                </s:div>
+                            </td>
+                            <a4j:repeat rowKeyVar="actorIndex"
+                                        value="#{testsRequirementsManager.listOfActorsForCurrentIntegrationProfile}"
+                                        var="currentActor">
+                                <td>
+
+                                    <a4j:repeat
+                                            value="#{testsRequirementsManager.findTestsRolesForTestActorIP(currentTest,currentActor , testsRequirementsManager.integrationProfileSelected )}"
+                                            var="currentPairOfOptionAndListOfIPO">
+                                        <label>#{currentPairOfOptionAndListOfIPO.object1.keyword} : </label>
+                                        <ul>
+                                            <a4j:repeat value="#{currentPairOfOptionAndListOfIPO.object2}"
+                                                        var="currentIntegrationProfileOption">
+                                                <li>
+                                                    #{currentIntegrationProfileOption.getKeyword()}
+                                                    <s:decorate
+                                                            template="/layout/popover/_popover_on_icon.xhtml"
+                                                            rendered="#{testsRequirementsManager.displayToolTips(currentTest, testsRequirementsManager.integrationProfileSelected  ,currentActor,currentIntegrationProfileOption)}">
+                                                        <ui:param name="id"
+                                                                  value="part#{selectedTestRoles.id}"/>
+                                                        <ui:param name="placement" value="bottom"/>
+                                                        <ui:param name="icon_class"
+                                                                  value="gzl-icon-question-circle"/>
+                                                        <ui:define name="content">
+                                                            <s:decorate
+                                                                    template="/layout/display/_display.xhtml">
+                                                                <ui:define name="label">
+                                                                    #{messages['gazelle.tm.testing.URL']}
+                                                                </ui:define>
+                                                                <a target="_blank"
+                                                                   href="#{testsRequirementsManager.findTestURLByTestByIPByActorByAIP(currentTest, testsRequirementsManager.integrationProfileSelected  ,currentActor,currentIntegrationProfileOption)}">
+                                                                    <h:outputText
+                                                                            value="#{testsRequirementsManager.findTestURLByTestByIPByActorByAIP(currentTest, testsRequirementsManager.integrationProfileSelected  ,currentActor,currentIntegrationProfileOption)}"/>
+                                                                </a></s:decorate>
+                                                            <s:decorate
+                                                                    template="/layout/display/_display.xhtml">
+                                                                <ui:define name="label">
+                                                                    #{messages['gazelle.tm.testing.URLDocumentation']}
+                                                                </ui:define>
+                                                                <a target="_blank"
+                                                                   href="#{testsRequirementsManager.findTestURLDocumentationByTestByIPByActorByAIP(currentTest, testsRequirementsManager.integrationProfileSelected  ,currentActor,currentIntegrationProfileOption)}">
+                                                                    <h:outputText
+                                                                            value="#{testsRequirementsManager.findTestURLDocumentationByTestByIPByActorByAIP(currentTest, testsRequirementsManager.integrationProfileSelected  ,currentActor,currentIntegrationProfileOption)}"/>
+                                                                </a>
+                                                            </s:decorate>
+                                                        </ui:define>
+                                                    </s:decorate>
+                                                </li>
+                                            </a4j:repeat>
+                                        </ul>
+                                    </a4j:repeat>
+
+                                    <a4j:commandLink
+                                            action="#{roleInTestManager.displayTestRolesPageForSelectedTestIntegrationProfileActor( currentTest, testsRequirementsManager.integrationProfileSelected  ,currentActor)}"
+                                            rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"
+                                            immediate="true" execute="@this">
+                                        <span class="gzl-icon-pencil"/>
+                                    </a4j:commandLink>
+                                </td>
+                            </a4j:repeat>
+                        </tr>
+                    </a4j:repeat>
+                    </tbody>
+                </table>
+
+
+                <div style="font-size:x-small;font-style:italic;" align="right">
+                    #{messages['gazelle.tm.Where']} :
+                    <a4j:repeat value="#{testsRequirementsManager.getTestOptions()}" var="testOptionFromList">
+                        <b>
+                            <h:outputText value="#{testOptionFromList.keyword}:"/>
+                        </b>
+                        <h:outputText value="#{testOptionFromList.description}"/>
+
+                    </a4j:repeat>
+                </div>
+            </s:div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

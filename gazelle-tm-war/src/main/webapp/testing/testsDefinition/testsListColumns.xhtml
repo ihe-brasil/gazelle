@@ -1,0 +1,191 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <c:set var="isMasterModel" scope="view" value="#{applicationManager.isMasterModel()}"/>
+    <c:set var="isTestManagement" scope="view" value="#{applicationManager.isTestManagement()}"/>
+    <c:set var="possibleTestStatus" scope="view" value="#{editTestDefinitionManager.possibleTestStatus}"/>
+    <c:set var="possibleTestPeerTypes" scope="view" value="#{editTestDefinitionManager.possibleTestPeerTypes}"/>
+    <c:set var="testTypeList" scope="view" value="#{editTestDefinitionManager.getTestTypeList()}"/>
+
+    <g:column styleClass="#{styleClassColumn}" sortBy="#{'keyword'}" sortOrder="ascending">
+        <ui:define name="header">
+            <h:outputText value="#{messages['gazelle.testmanagement.object.keyword']}"/>
+        </ui:define>
+        <h:outputLink
+                value="#{applicationPreferenceManager.getApplicationUrl()}#{currentTest.viewFolder()}/testsDefinition/viewTestPage.seam">
+            <f:param name="id" value="#{currentTest.id}"/>
+            <f:param name="testKeyword" value="#{currentTest.keyword}"/>
+            <h:outputText value="#{currentTest.keyword}"/>
+        </h:outputLink>
+    </g:column>
+    <g:column styleClass="#{styleClassColumn}" sortBy="#{'version'}">
+        <ui:define name="header">
+            <h:outputText value="#{messages['gazelle.systems.system.SystemVersion']}"/>
+        </ui:define>
+        <h:outputText value="#{currentTest.version}"/>
+    </g:column>
+    <g:column styleClass="#{styleClassColumn}"
+              sortBy="#{'testStatus.labelToDisplay'}">
+        <ui:define name="header">
+            <h:outputText value="#{messages['gazelle.tm.tests.testStatus']}"/>
+        </ui:define>
+        <s:span>
+            <h:inputHidden id="tsh" value="#{currentTest.testStatus.id}"
+                           rendered="#{currentTest.testStatus!=null}"/>
+            <h:selectOneMenu styleClass="form-control gzl-form-control" id="StatusListBox"
+                             value="#{currentTest.testStatus}"
+                             style="font-weight:bold;text-align:center;"
+                             rendered="#{(s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and isMasterModel}">
+                <s:selectItems id="tshs"
+                               value="#{possibleTestStatus}" var="selectedStatus"
+                               hideNoSelectionLabel="true" label="#{selectedStatus.labelToDisplay}"/>
+                <a4j:ajax event="change" render="f" execute="@this"
+                          listener="#{editTestDefinitionManager.persistTest(currentTest)}"
+                          oncomplete="colorRowsOfTable();"/>
+            </h:selectOneMenu>
+            <h:outputText value="#{currentTest.testStatus.labelToDisplay}"
+                          rendered="#{currentTest.testStatus!=null and isTestManagement and (!isMasterModel || (!s:hasRole('admin_role') and !s:hasRole('tests_editor_role')))}"/>
+        </s:span>
+    </g:column>
+    <g:column styleClass="#{styleClassColumn}" sortBy="#{'testType.labelToDisplay'}">
+        <ui:define name="header">
+            <h:outputText value="#{messages['gazelle.systems.session.Type']}"/>
+        </ui:define>
+        <s:span>
+            <h:selectOneMenu styleClass="form-control gzl-form-control" id="TypeListBox" value="#{currentTest.testType}"
+                             style="font-weight:bold;text-align:center;"
+                             rendered="#{(s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and isMasterModel}">
+                <s:selectItems id="ts"
+                               value="#{testTypeList}" var="selectedType"
+                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                               label="#{selectedType.labelToDisplay}"/>
+                <a4j:ajax event="change" render="f" execute="@this"
+                          listener="#{editTestDefinitionManager.persistTest(currentTest)}"
+                          oncomplete="colorRowsOfTable();"/>
+            </h:selectOneMenu>
+            <h:outputText value="#{currentTest.testType.labelToDisplay}"
+
+                          rendered="#{currentTest.testType!=null and isTestManagement and (!isMasterModel || (!s:hasRole('admin_role') and !s:hasRole('tests_editor_role')))}"/>
+        </s:span>
+    </g:column>
+    <g:column styleClass="#{styleClassColumn}"
+              sortBy="#{'testPeerType.labelToDisplay'}">
+        <ui:define name="header">
+            <h:outputText value="#{messages['gazelle.tm.tests.testPeerType']}"/>
+        </ui:define>
+        <s:span>
+            <h:selectOneMenu styleClass="form-control gzl-form-control" id="PeerTypeListBox"
+                             value="#{currentTest.testPeerType}"
+                             style="font-weight:bold;text-align:center;"
+                             rendered="#{(s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and isMasterModel}">
+                <s:selectItems id="tpts"
+                               value="#{possibleTestPeerTypes}" var="selectedPeerType"
+                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                               label="#{messages[selectedPeerType.labelToDisplay]}"/>
+                <a4j:ajax event="change" render="f" execute="@this"
+                          listener="#{editTestDefinitionManager.persistTest(currentTest)}"
+                          oncomplete="colorRowsOfTable();"/>
+            </h:selectOneMenu>
+            <h:outputText
+                    value="#{messages[currentTest.testPeerType.labelToDisplay]}"
+
+                    rendered="#{currentTest.testPeerType!=null and isTestManagement and (!isMasterModel || (!s:hasRole('admin_role') and !s:hasRole('tests_editor_role')))}"/>
+        </s:span>
+    </g:column>
+    <g:column styleClass="#{styleClassColumn}" sortBy="#{'validated'}">
+        <ui:define name="header">
+            <h:outputText value="#{messages['net.ihe.gazelle.tm.IsValidated']}"/>
+        </ui:define>
+        <h:outputText value="#{currentTest.validated}"/>
+    </g:column>
+    <g:column styleClass="#{styleClassColumn}" sortBy="#{'author'}">
+        <ui:define name="header">
+            <h:outputText value="#{messages['net.ihe.gazelle.tm.TestAuthor']}"/>
+        </ui:define>
+        <h:outputText rendered="#{currentTest.author != null}"
+                      value="#{currentTest.author}"/>
+    </g:column>
+    <g:column styleClass="#{styleClassColumn}" sortBy="#{'lastModifierId'}">
+        <ui:define name="header">
+            <h:outputText value="#{messages['gazelle.common.LastModifier']}"/>
+        </ui:define>
+        <h:outputText value="#{currentTest.lastModifierId}"/>
+    </g:column>
+    <g:column styleClass="#{styleClassColumn}" sortBy="#{'lastChanged'}">
+        <ui:define name="header">
+            <h:outputText value="#{messages['gazelle.common.LastChanged']}"/>
+        </ui:define>
+        <g:date tooltip="true" value="#{currentTest.lastChanged}"/>
+    </g:column>
+    <g:column>
+        <ui:define name="header">
+            <h:outputText value="#{messages['gazelle.common.Action']}"/>
+
+            <h:commandLink id="pdf"
+                           rendered="#{(testDefinitionManager.testsCount(filteredTests) &lt; 100) and (s:hasRole('tests_editor_role') || s:hasRole('admin_role')) and !testDefinitionManager.isPreConnectathonTest(filteredTests)}"
+                           action="#{testsDefinitionsAdministrationManager.downloadAllTestsAsPdf(filteredTests)}"
+                           title="#{messages['net.ihe.gazelle.tm.ExportFilteredTestAsPdf']}">
+                <span class="gzl-icon-pdf"/>
+            </h:commandLink>
+            <a4j:commandLink id="pdf_"
+                             actionListener="#{testsDefinitionsAdministrationManager.splitTestList(filteredTests)}"
+                             oncomplete="jq162('#printAllTestsId').modal('show');"
+                             render="printAllTestsId, :printAllTestsForm, printAllTestsDiv"
+                             title="#{messages['net.ihe.gazelle.tm.ExportFilteredTestAsPdf']}"
+                             rendered="#{(testDefinitionManager.testsCount(filteredTests) &gt; 100) and (s:hasRole('tests_editor_role') || s:hasRole('admin_role')) and !testDefinitionManager.isPreConnectathonTest(filteredTests)}"
+                             execute="@this">
+                <span class="gzl-icon-pdf"/>
+            </a4j:commandLink>
+
+            <h:panelGroup rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}">
+                <h:commandLink title="#{messages['net.ihe.gazelle.tm.ExportTests']}"
+                               action="#{testIOManager.exportFilteredTests(filteredTests)}">
+                    <span class="gzl-icon-xml"/>
+                </h:commandLink>
+            </h:panelGroup>
+        </ui:define>
+        <div class="gzl-never-wrap">
+            <h:outputLink title="#{messages['gazelle.common.button.View']}"
+                          value="#{applicationPreferenceManager.getApplicationUrl()}#{currentTest.viewFolder()}/testsDefinition/viewTestPage.seam">
+                <f:param name="id" value="#{currentTest.id}"/>
+                <f:param name="testKeyword" value="#{currentTest.keyword}"/>
+                <span class="gzl-icon-search"/>
+            </h:outputLink>
+
+            <a4j:commandLink id="c" actionListener="#{testDefinitionManager.setSelectedTest(currentTest)}"
+                             oncomplete="jq162('#CopyConfirmationModalPanel').modal('show');"
+                             title="#{messages['gazelle.common.button.Copy']}"
+                             rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"
+                             render=" :confcopForm" execute="@this">
+                <span class="gzl-icon-files-o"/>
+            </a4j:commandLink>
+
+            <h:panelGroup rendered="#{!testDefinitionManager.isPreConnectathonTest(currentTest)}">
+                <h:commandLink id="p" title="#{messages['gazelle.common.button.Print']}"
+                               actionListener="#{testDefinitionManager.downloadTestAsPdf(currentTest.id)}">
+                    <span class="gzl-icon-pdf"/>
+                </h:commandLink>
+            </h:panelGroup>
+
+            <h:panelGroup rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}">
+                <h:commandLink title="#{messages['net.ihe.gazelle.tm.ExportTest']}"
+                               action="#{testIOManager.export(currentTest)}">
+                    <span class="gzl-icon-xml"/>
+                </h:commandLink>
+            </h:panelGroup>
+
+            <a4j:commandLink id="d"
+                             actionListener="#{testsDefinitionsAdministrationManager.setSelectedTest(currentTest)}"
+                             oncomplete="jq162('#DeleteConfirmationModalPanel').modal('show');"
+                             execute="@this"
+                             rendered="#{applicationPreferenceManager.isPossibleToDeleteOnGMM() and s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"
+                             title="#{messages['gazelle.common.button.Delete']}"
+                             render=" :deletetestForm">
+                <span class="gzl-icon-trash-o"/>
+            </a4j:commandLink>
+        </div>
+    </g:column>
+</ui:composition>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.2.0.final using JasperReports Library version 6.2.0  -->
+<!-- 2016-03-16T14:47:18 -->
+<jasperReport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://jasperreports.sourceforge.net/jasperreports" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="gazelleMultipleTestReport" pageWidth="842" pageHeight="595" orientation="Landscape" sectionType="Part" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="30" bottomMargin="30" uuid="e52780b9-8f01-4b16-86fe-712163e5aadc">
+	<property name="net.sf.jasperreports.print.create.bookmarks" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.report.1" value="*"/>
+	<property name="net.sf.jasperreports.export.xlsx.exclude.origin.keep.first.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.xlsx.exclude.origin.keep.first.report.1" value="*"/>
+	<parameter name="testList" class="java.lang.String">
+		<defaultValueExpression><![CDATA["22,23,24,25,26,27,28,29,154,22,23,24,25,26,27,28,29,154,22,23,24,25,26,27,28,29,154"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ReportTitle" class="java.lang.String"/>
+	<parameter name="applicationurl" class="java.lang.String">
+		<defaultValueExpression><![CDATA["http://localhost:8080/gazelle"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="testDescriptionLanguageId" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[1]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 1;]]>
+	</queryString>
+	<group name="dummy">
+		<groupExpression><![CDATA[1]]></groupExpression>
+		<groupHeader>
+			<part evaluationTime="Report" uuid="438b92b3-4d20-47f3-83c2-1da4fb68e11e">
+				<property name="net.sf.jasperreports.bookmarks.data.source.parameter" value="REPORT_DATA_SOURCE"/>
+				<partNameExpression><![CDATA["Table of Contents"]]></partNameExpression>
+				<p:subreportPart xmlns:p="http://jasperreports.sourceforge.net/jasperreports/parts" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/parts http://jasperreports.sourceforge.net/xsd/parts.xsd" usingCache="true">
+					<subreportParameter name="ReportTitle">
+						<subreportParameterExpression><![CDATA[$P{ReportTitle}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="applicationurl">
+						<subreportParameterExpression><![CDATA[$P{applicationurl}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportExpression><![CDATA["gazelleMultipleReportsTocPart.jasper"]]></subreportExpression>
+				</p:subreportPart>
+			</part>
+			<part uuid="3f63c482-39b2-43f1-a623-15fb046605a5">
+				<partNameExpression><![CDATA["Tests Documentation"]]></partNameExpression>
+				<p:subreportPart xmlns:p="http://jasperreports.sourceforge.net/jasperreports/parts" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/parts http://jasperreports.sourceforge.net/xsd/parts.xsd" usingCache="true">
+					<subreportParameter name="REPORT_CONNECTION">
+						<subreportParameterExpression><![CDATA[$P{REPORT_CONNECTION}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="printSequenceDiagram">
+						<subreportParameterExpression><![CDATA[true]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="testList">
+						<subreportParameterExpression><![CDATA[$P{testList}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="applicationurl">
+						<subreportParameterExpression><![CDATA[$P{applicationurl}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="testDescriptionLanguageId">
+						<subreportParameterExpression><![CDATA[$P{testDescriptionLanguageId}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="ReportTitle">
+						<subreportParameterExpression><![CDATA[$P{ReportTitle}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportExpression><![CDATA["gazelleMultipleTestReportReporting.jasper"]]></subreportExpression>
+				</p:subreportPart>
+			</part>
+		</groupHeader>
+	</group>
+</jasperReport>

@@ -1,0 +1,182 @@
+/*
+ * Copyright 2008 IHE International (http://www.ihe.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+div.schedule-invisible {
+    display: none;
+}
+
+div.schedule-visible {
+    z-index: 2001;
+    display: block;
+    position: fixed;
+    top: 0;
+    right: 400px;
+    text-align: center;
+    padding: 5px;
+}
+
+div.incompatible-browser {
+    z-index: 2001;
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 20px;
+    background: #f00;
+    text-align: center;
+    padding: 5px;
+}
+
+div.rules-left {
+    border-left: 1px black dotted;
+}
+
+div.rules-top {
+    display: inline-block;
+    width: 10px;
+    height: 1px;
+    border-top: 1px black dotted;
+}
+
+div.rules-spacer {
+    display: inline-block;
+    width: 10px;
+    height: 1px;
+}
+
+div.rules-bottom {
+    display: inline-block;
+    width: 10px;
+    height: 1px;
+    border-bottom: 1px black dotted;
+}
+
+div.rules-block {
+    display: block;
+}
+
+div.rules-condition {
+    display: inline-block;
+    width: 30px;
+    vertical-align: middle;
+    margin: 2px;
+}
+
+div.rules-criterion {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.pr-box {
+    float: left;
+    display: block;
+    width: 450px;
+    margin: 5px;
+    padding: 5px;
+}
+
+.pr-pdf {
+    display: inline-block;
+    height: 170px;
+}
+
+.pr-infos {
+    display: inline-block;
+    height: 170px;
+    width: 310px;
+}
+
+.pr-pdf2 {
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+    height: 170px;
+    width: 119px;
+}
+
+.pr-infos2 {
+    padding: 5px;
+    display: block;
+    height: 100%;
+    width: 100%;
+}
+
+.pr-label {
+    display: inline-block;
+    height: 16%;
+    min-height: 16%;
+    max-height: 16%;
+    width: 40%;
+    min-width: 40%;
+    max-width: 40%;
+}
+
+.pr-value {
+    display: inline-block;
+    height: 16%;
+    min-height: 16%;
+    max-height: 16%;
+    width: 60%;
+    min-width: 60%;
+    max-width: 60%;
+}
+
+.pr-label2 {
+    display: table-cell;
+    color: grey;
+    vertical-align: middle;
+}
+
+.pr-value2 {
+    display: table-cell;
+    vertical-align: middle;
+    overflow: hidden;
+}
+
+.dr-mpnl-pnl {
+    overflow: auto !important;
+    height: 100%;
+}
+
+.cat-row-classic {
+    background-color: #E9F6F7;
+}
+
+.cat-row-meta {
+    background-color: #E9E9F7;
+}
+
+.cat-cell-ok {
+    background-color: #DEF7DE;
+}
+
+.cat-cell-nok {
+    background-color: #F7DEE0;
+}
+
+
+.panelGridRowClass {
+    vertical-align: top;
+}
+
+.thickBottom {
+    border-bottom-width: 1px;
+    border-bottom-color: black;
+}
+
+.participantTableHeader{
+    display:none;
+}
+

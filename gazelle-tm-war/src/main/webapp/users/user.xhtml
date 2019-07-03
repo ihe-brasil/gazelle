@@ -1,0 +1,30 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tm.users.userInfo']}"/>
+    <ui:define name="body">
+        <h:form id="globalForm">
+            <s:div id="globalDiv">
+                <ui:include src="userInfo.xhtml">
+                    <ui:param name="user" value="#{userManager.getUserById()}"/>
+                </ui:include>
+            </s:div>
+        </h:form>
+        <h:form rendered="#{userManager.selectedUser != null}">
+            <div class="row">
+                <div class="col-lg-6 col-lg-offset-3">
+                    <h:panelGroup rendered="#{s:hasRole('admin_role')}">
+                        <a4j:commandButton id="authenticatorId4" styleClass="gzl-btn"
+                                           value="#{messages['gazelle.common.button.LogAs']} #{userManager.selectedUser.username}"
+                                           action="#{authenticator.authenticateWithoutCheckingPassword(userManager.selectedUser)}"
+                                           immediate="true"
+                                           render="gazelle-messages" execute="@this">
+                        </a4j:commandButton>
+                    </h:panelGroup>
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

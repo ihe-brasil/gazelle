@@ -1,0 +1,239 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['net.ihe.gazelle.tm.EditRule']}"/>
+    <ui:define name="body">
+        <rich:dragIndicator id="indicator" draggingClass="gzl-btn gzl-btn-blue">
+            #{messages['net.ihe.gazelle.tm.DragThisRuleToTheAppropriateLocation']}
+        </rich:dragIndicator>
+        <h:form id="ruleForm" rendered="#{s:hasPermission('MasterModel', 'edit', null)}">
+            <ui:decorate template="/layout/panels/_panel_title_footer.xhtml">
+                <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.RuleDetails']}</ui:define>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.testmanagement.object.Name']}</ui:define>
+                    <h:outputText value="#{rulesManager.editedItem.name}"/>
+                </s:decorate>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['net.ihe.gazelle.tm.Cause']}</ui:define>
+                    <s:decorate template="/tf/rules/criterionView.xhtml">
+                        <ui:param name="criterion" value="#{rulesManager.editedItem.cause}"/>
+                    </s:decorate>
+                </s:decorate>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['net.ihe.gazelle.tm.Consequence']}</ui:define>
+                    <s:decorate template="/tf/rules/criterionView.xhtml">
+                        <ui:param name="criterion" value="#{rulesManager.editedItem.consequence}"/>
+                    </s:decorate>
+                </s:decorate>
+                <s:decorate template="/layout/form/_edit.xhtml">
+                    <ui:param name="id" value="commentInput"/>
+                    <ui:define name="label">#{messages['gazelle.testmanagement.object.Comment']}</ui:define>
+                    <h:inputTextarea id="commentInput" styleClass=" form-control"
+                                     value="#{rulesManager.editedItem.comment}">
+
+                    </h:inputTextarea>
+                </s:decorate>
+                <h4>#{messages['net.ihe.gazelle.tm.Cause']}</h4>
+                <div class="row">
+                    <div class="col-md-4">
+                        <a4j:outputPanel layout="block">
+                            <rich:dropTarget acceptedTypes="rule" dropListener="#{rulesManager.onDropItem}"
+                                             dropValue="cause" render="ruleForm"/>
+                            <s:span>
+                                <span class="gzl-icon-plus"/>
+                                <h:outputText
+                                        value="#{messages['net.ihe.gazelle.tm.SetCauseByDropingARuleHere']}"/>
+                            </s:span>
+                        </a4j:outputPanel>
+                        <div class="col-md-8">
+                            <s:decorate template="/tf/rules/criterion.xhtml">
+                                <ui:param name="criterion" value="#{rulesManager.editedItem.cause}"/>
+                            </s:decorate>
+                        </div>
+                    </div>
+                </div>
+                <h4>#{messages['net.ihe.gazelle.tm.Consequence']}</h4>
+                <div class="row">
+                    <div class="col-md-4">
+                        <a4j:outputPanel layout="block">
+                            <rich:dropTarget acceptedTypes="rule" dropListener="#{rulesManager.onDropItem}"
+                                             dropValue="consequence" render="ruleForm"/>
+                            <s:span>
+                                <span class="gzl-icon-plus"/>
+                                <h:outputText
+                                        value="#{messages['net.ihe.gazelle.tm.SetConsequenceByDropingARuleHere']}"/>
+                            </s:span>
+                        </a4j:outputPanel>
+                        <div class="col-md-8">
+                            <s:decorate template="/tf/rules/criterion.xhtml">
+                                <ui:param name="criterion" value="#{rulesManager.editedItem.consequence}"/>
+                            </s:decorate>
+                        </div>
+                    </div>
+                </div>
+                <ui:define name="panel_footer">
+                    <a4j:commandButton styleClass="gzl-btn-green" actionListener="#{rulesManager.saveRule()}"
+                                       value="#{messages['gazelle.common.button.Save']}"
+                                       render="ruleForm"/>
+                    <a4j:commandButton styleClass="gzl-btn" action="#{rulesManager.index()}"
+                                       value="#{messages['gazelle.tf.Back']}"/>
+                </ui:define>
+            </ui:decorate>
+
+            <ui:decorate template="/layout/panels/_panel_title_footer.xhtml">
+                <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.WorkingBoard']}</ui:define>
+                <a4j:outputPanel layout="block">
+                    <rich:dropTarget acceptedTypes="rule" dropListener="#{rulesManager.onDropItem}" dropValue="board"
+                                     render="ruleForm"/>
+                    <s:span>
+                        <span class="gzl-icon-plus"/>
+                        <h:outputText
+                                value="#{messages['net.ihe.gazelle.tm.MoveARuleInBoardByDroppingOneHere']}"/>
+                    </s:span>
+                </a4j:outputPanel>
+                <s:div style="display:block;">
+                    <c:forEach items="#{rulesManager.board}" var="subCriterion">
+                        <s:div style="display:inline-block;">
+                            <s:decorate template="/tf/rules/criterion.xhtml">
+                                <ui:param name="criterion" value="#{subCriterion}"/>
+                            </s:decorate>
+                        </s:div>
+                    </c:forEach>
+                </s:div>
+                <ui:define name="panel_footer">
+                    <a4j:commandButton actionListener="#{rulesManager.addBoardAipoRule()}"
+                                       value="#{messages['net.ihe.gazelle.tm.AddAIPORule']}"
+                                       render="ruleForm" styleClass="gzl-btn-blue"/>
+                    <a4j:commandButton actionListener="#{rulesManager.addBoardAipoList()}"
+                                       value="#{messages['net.ihe.gazelle.tm.AddAIPORuleList']}"
+                                       render="ruleForm"  styleClass="gzl-btn-blue"/>
+                </ui:define>
+            </ui:decorate>
+
+        </h:form>
+        <h:form id="ViewAIPOsForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title.xhtml">
+                <ui:param name="popup_id" value="ViewAIPOs"/>
+                <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.ViewAIPOs']}</ui:define>
+                <rich:dataTable id="datatableViewAIPO" var="aipo"
+                                value="#{rulesManager.popupAipoSingle.getAipos()}" rowKeyVar="rowNumber"
+                                rows="10" render="dsView">
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.testmanagement.system.label.Actor']}
+                        </ui:define>
+                        <h:outputText value="#{aipo.actorIntegrationProfile.actor.keyword}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.configuration.network.ip']}</ui:define>
+                        <h:outputText
+                                value="#{aipo.actorIntegrationProfile.integrationProfile.keyword}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.tests.test.option']}</ui:define>
+                        <h:outputText value="#{aipo.integrationProfileOption.keyword}"/>
+                    </g:column>
+                    <f:facet name="footer">
+                        <ui:include src="/util/datatableFooter.xhtml">
+                            <ui:param name="dataScrollerId" value="dsView"/>
+                            <ui:param name="dataTableId" value="datatableViewAIPO"/>
+                        </ui:include>
+                    </f:facet>
+                </rich:dataTable>
+            </ui:decorate>
+        </h:form>
+        <h:form id="EditAIPOSingleForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="EditAIPOSingle"/>
+                <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.EditAIPO']}</ui:define>
+                <s:div id="editC">
+                    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                        <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.Criterions']}</ui:define>
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.SetTheFiltersToSelectTheAIPOYouWantToAddToTheRul']}"
+                                      styleClass="help-block"/>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <ui:include src="/filter/filter.xhtml">
+                                    <ui:param name="filter" value="#{rulesManager.editAIPOs.filter}"/>
+                                    <ui:param name="filterWidth" value="240"/>
+                                    <ui:param name="filterId" value="actor"/>
+                                    <ui:param name="filterName"
+                                              value="#{messages['gazelle.testmanagement.system.label.Actor']}"/>
+                                    <ui:param name="filterForm" value="editC"/>
+                                </ui:include>
+                            </div>
+                            <div class="col-lg-6">
+                                <ui:include src="/filter/filter.xhtml">
+                                    <ui:param name="filter" value="#{rulesManager.editAIPOs.filter}"/>
+                                    <ui:param name="filterWidth" value="240"/>
+                                    <ui:param name="filterId" value="ip"/>
+                                    <ui:param name="filterName"
+                                              value="#{messages['gazelle.configuration.network.ip']}"/>
+                                    <ui:param name="filterForm" value="editC"/>
+                                </ui:include>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <ui:include src="/filter/filter.xhtml">
+                                    <ui:param name="filter" value="#{rulesManager.editAIPOs.filter}"/>
+                                    <ui:param name="filterWidth" value="240"/>
+                                    <ui:param name="filterId" value="option"/>
+                                    <ui:param name="filterName"
+                                              value="#{messages['gazelle.tests.test.option']}"/>
+                                    <ui:param name="filterForm" value="editC"/>
+                                </ui:include>
+                            </div>
+                        </div>
+                    </ui:decorate>
+
+
+                    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                        <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.MatchingAIPOs']}</ui:define>
+                        <rich:dataTable id="datatableEditAIPO" var="aipo" value="#{rulesManager.editAIPOs}"
+                                        rowKeyVar="rowNumber" rows="10" render="dsEdit">
+                            <g:column sortBy="#{'actorIntegrationProfile.actor.keyword'}"
+                                      sortOrder="#{datatablestateholder.sortorders['actorintegrationprofile.actor.keyword']}">
+                                <ui:define name="header">#{messages['gazelle.testmanagement.system.label.Actor']}
+                                </ui:define>
+                                <h:outputText value="#{aipo.actorIntegrationProfile.actor.keyword}"/>
+                            </g:column>
+                            <g:column sortBy="#{'actorIntegrationProfile.integrationProfile.keyword'}"
+                                      sortOrder="#{datatablestateholder.sortorders['actorintegrationprofile.integrationprofile.keyword']}">
+                                <ui:define name="header">#{messages['gazelle.configuration.network.ip']}</ui:define>
+                                <h:outputText
+                                        value="#{aipo.actorIntegrationProfile.integrationProfile.keyword}"/>
+                            </g:column>
+                            <g:column sortBy="#{'integrationProfileOption.keyword'}"
+                                      sortOrder="#{datatablestateholder.sortorders['integrationprofileoption.keyword']}">
+                                <ui:define name="header">#{messages['gazelle.tests.test.option']}</ui:define>
+                                <h:outputText value="#{aipo.integrationProfileOption.keyword}"/>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="dsEdit"/>
+                                    <ui:param name="dataTableId" value="datatableEditAIPO"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </ui:decorate>
+                </s:div>
+                <ui:define name="popup_footer">
+                    <a4j:commandButton styleClass="gzl-btn"
+                                       actionListener="#{rulesManager.updateAIPOSingle()}"
+                                       oncomplete="jq162('#EditAIPOSingle').modal('hide')"
+                                       value="#{messages['gazelle.tm.cancel']}"/>
+                    <a4j:commandButton styleClass="gzl-btn-green"
+                                       actionListener="#{rulesManager.updateAIPOSingle()}"
+                                       oncomplete="jq162('#EditAIPOSingle').modal('hide')"
+                                       value="#{messages['gazelle.common.button.Save']}" type="submit"
+                                       render=":ruleForm"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

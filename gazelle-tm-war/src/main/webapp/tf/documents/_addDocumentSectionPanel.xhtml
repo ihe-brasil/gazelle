@@ -1,0 +1,15 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <s:decorate template="/layout/panels/_panel_title_id.xhtml">
+        <ui:param name="panel_id" value="addSectionPanel"/>
+        <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.Section']}</ui:define>
+        <ui:include src="/tf/documents/_addDocumentSection.xhtml">
+            <ui:param name="documentSectionParam" value="#{documentSectionParam}"/>
+            <ui:param name="managerBeanParam" value="#{managerBeanParam}"/>
+            <ui:param name="displayActionsParam" value="#{displayActionsParam}"/>
+            <ui:param name="formToRefresh" value="#{formToRefresh}"/>
+        </ui:include>
+    </s:decorate>
+</ui:composition>

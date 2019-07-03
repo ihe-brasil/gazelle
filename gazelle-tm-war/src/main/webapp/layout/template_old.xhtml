@@ -1,0 +1,430 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<f:view xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:a4j="http://richfaces.org/a4j" xmlns:s="http://jboss.org/schema/seam/taglib"
+        xmlns:rich="http://richfaces.org/rich" xmlns:c="http://java.sun.com/jstl/core"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns="http://www.w3.org/1999/xhtml" contentType="text/html">
+
+    <html>
+    <h:head>
+
+        <!--<h:outputStylesheet library="stylesheet" name="gazelle-tm-${gazelle-assets-version}.min.css"/>-->
+        <h:outputStylesheet library="stylesheet" name="bootstrap_3_3_4.min.css"/>
+        <h:outputStylesheet library="stylesheet" name="bootstrap_theme_3_3_4.min.css"/>
+        <h:outputStylesheet library="stylesheet" name="alert.css"/>
+        <!--        <h:outputStylesheet library="stylesheet" name="table.css"/>
+                <h:outputStylesheet library="stylesheet" name="theme.css"/>-->
+        <h:outputStylesheet library="stylesheet" name="tm.css"/>
+        <h:outputStylesheet library="stylesheet" name="theme-TM.css"/>
+        <h:outputStylesheet rendered="#{identity.loggedIn and applicationManager.displayToolTips()}"
+                            library="stylesheet"
+                            name="tooltip.css"/>
+        <!--<h:outputStylesheet library="stylesheet" name="theme.ecss"/>-->
+        <!--<h:outputStylesheet library="stylesheet" name="menuBackground.ecss"/>-->
+        <h:outputScript library="jscript" name="gazelleTools.js"/>
+        <h:outputScript library="jscript" name="deployCountdown.js"/>
+        <h:outputScript library="jscript" name="logoutCountdown.js"/>
+        <h:outputScript library="jscript" name="md5Encryption.js"/>
+        <h:outputScript library="jscript" name="savePassword.js"/>
+        <h:outputScript library="jscript" name="gazelleEncryptions.js"/>
+        <!--<h:outputScript library="jscript" name="scheduledPing.js"/>-->
+        <h:outputScript library="jscript" name="messageNotifications.js"/>
+        <h:outputScript library="jscript" name="autofocus.js"/>
+        <h:outputScript library="jscript" name="activeModal.js"/>
+
+        <title>${pageNameTitle}</title>
+        <link type="application/opensearchdescription+xml" rel="search"
+              href="#{applicationPreferenceManager.getApplicationUrl()}search/opensearchdescription.seam"
+              title="Gazelle"/>
+        <link rel="shortcut icon" href="/#{applicationPreferenceManager.getApplicationUrlBaseName()}/img/resources/favicon2.ico"
+              type="image/x-icon"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <ui:insert name="header"/>
+    </h:head>
+    <h:body>
+        #{userManagerExtra.userDoneAction()}
+
+        <script type="text/javascript">
+            gazelleAddToBodyOnLoad(function () {
+                schedulePing(
+                        '#{applicationPreferenceManager.getApplicationUrlBaseName()}',
+                        #{applicationManager.pingTime});
+            });
+        </script>
+
+        <c:if test="#{applicationManager.incompatibleBrowser}">
+            <div id="incompatibleBrowser" class="incompatible-browser">
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.PleaseUseACompatibleBrowser']}"/>
+                <h:outputLink value="http://www.google.com/chrome/">
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.GoogleChrome']}"/>
+                </h:outputLink>
+                <h:outputText value=" #{messages['gazelle.productregistry.search.easySearch.or']} "/>
+                <h:outputLink value="http://portableapps.com/apps/internet/firefox_portable">
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.MozillaFirefox']}"/>
+                </h:outputLink>
+            </div>
+        </c:if>
+
+        <div id="invalidPageStatus" class="schedule-invisible">
+            <h:outputText
+                    value="#{messages['net.ihe.gazelle.tm.PageExpiredAnyChangeWillBeLostTryToRefreshThePag']}"/>
+        </div>
+
+        <div id="deployScheduled" class="schedule-invisible"><span><h:outputText
+                value="#{messages['gazelle.tm.deploy.scheduled']}"/> : </span><span
+                id="deployCountdown"></span></div>
+
+        <div id="logoutScheduled" class="schedule-invisible"><span><h:form>
+            <s:token allowMultiplePosts="true"/>
+            <h:outputText value="#{messages['gazelle.tm.logout.scheduled']}"/>
+            : <span id="lougoutCountdown"></span>
+
+            <a4j:commandButton styleClass="gzl-btn" value="#{messages['net.ihe.gazelle.tm.StayConnected']}"
+                               actionListener="#{userManagerExtra.userDoneAction()}"
+                               onclick="stopCountDownLogout()">
+            </a4j:commandButton>
+        </h:form></span></div>
+
+        <div id="deployExecuted" class="schedule-invisible"><span><h:outputText
+                value="#{messages['net.ihe.gazelle.tm.redeployed']}"/></span></div>
+
+        <div id="logoutExecuted" class="schedule-invisible"><span><h:outputText
+                value="#{messages['net.ihe.gazelle.tm.loggedout']}"/></span></div>
+
+        <div id="jbossRestarted" class="schedule-invisible"><span><h:outputText
+                value="#{messages['net.ihe.gazelle.tm.TheServerIsRestartingAnyChangeWillBeLost']}"/></span>
+        </div>
+
+        <ui:include src="/ajaxStatus.xhtml"/>
+
+        <s:div id="body">
+            <div id="masthead">
+                <h:form id="mbf" itemSeparator="line">
+                    <s:token allowMultiplePosts="true"/>
+                    <h:inputHidden id="viewId" name="viewId" value="#{applicationManager.viewId}"/>
+                    <rich:toolbar id="topbarToolbar" styleClass="utility">
+                        <rich:toolbarGroup id="topbarToolbarGroupTitle" location="left">
+                            <s:span id="topbarToolbarGroupTitleSpan">
+                                <h1 id="siteName" style="font-size: 19px;">
+                                    <h:outputText
+                                            rendered="#{not identity.loggedIn or not applicationManager.isTestManagement()}"
+                                            value="#{applicationPreferenceManager.getApplicationName()}"/>
+                                    <h:outputText
+                                            rendered="#{applicationManager.isTestManagement() and identity.loggedIn}"
+                                            value="#{applicationPreferenceManager.getApplicationName()} - #{gazelleDAO.getSelectedTestingSession().description}"/>
+                                    <h:outputText value=" #{messages['net.ihe.gazelle.tm.Closed']}"
+                                                  style="font-weight:bold;   background: #f00;   color: #333;"
+                                                  rendered="#{gazelleDAO.getSelectedTestingSession().sessionClosed}"/>
+                                </h1>
+                            </s:span>
+                        </rich:toolbarGroup>
+                        <rich:toolbarGroup id="topbarToolbarGroupSearch" location="right"
+                                           rendered="#{identity.loggedIn and applicationManager.isTestManagement()}">
+                            <s:span>
+                                <ui:include src="/search/searchBar.xhtml"/>
+                            </s:span>
+                        </rich:toolbarGroup>
+                        <rich:toolbarGroup id="topbarToolbarGroupSearchNotLogged" location="right"
+                                           rendered="#{not identity.loggedIn}">
+                            <s:link id="loginLink" view="/users/login/login.xhtml" styleClass="topbarLink"
+                                    value="#{messages['gazelle.users.registration.Login']}"
+                                    rendered="#{not identity.loggedIn and applicationManager.isTestManagement()}"/>
+                            <s:link id="loginGMMLink" view="/users/login/loginPrivileged.xhtml" styleClass="topbarLink"
+                                    value="#{messages['gazelle.users.registration.Login']}"
+                                    rendered="#{not identity.loggedIn and not applicationManager.isTestManagement()}"/>
+                            <s:link id="loginCASLink" view="/users/loginCAS/login.xhtml" styleClass="topbarLink"
+                                    value="#{messages['gazelle.users.registration.LoginCAS']}"
+                                    rendered="#{not identity.loggedIn and applicationPreferenceManager.getCASEnabled()}"/>
+                        </rich:toolbarGroup>
+                        <rich:toolbarGroup id="topbarToolbarGroupSearchNew" location="right"
+                                           rendered="#{identity.loggedIn}"
+                                           style="padding: 1px">
+                            <rich:dropDownMenu style="padding: 1px">
+                                <f:facet name="label">
+                                    <h:panelGrid cellpadding="0" cellspacing="0" columns="50"
+                                                 style="vertical-align:middle">
+                                        <h:outputText value="#{identity.username}"/>
+
+                                        <s:div id="messageCounter" rendered="#{applicationManager.isUseMessages()}">
+                                            <a4j:commandButton id="messageCounterButton" styleClass="gzl-btn"
+                                                               value="#{messageManager.getUnreadCount()}"
+                                                               onclick="openMessages()"
+                                                               style="margin: 0px; width: 27px; height: 19px;">
+                                            </a4j:commandButton>
+                                        </s:div>
+
+                                        <h:graphicImage library="img"
+                                                        value="#{userPreferencesManager.userPreferences.photoUrlSmall}"/>
+
+                    <span class="gzl-icon-caret-down"/>
+                                    </h:panelGrid>
+                                </f:facet>
+                                <rich:menuItem action="/users/user/userPreferences.xhtml">
+                                    <f:facet name="icon">
+
+                                    </f:facet>
+                                    <h:panelGrid cellpadding="1" cellspacing="1" columns="2">
+                                        <h:graphicImage library="img"
+                                                        value="#{userPreferencesManager.userPreferences.photoUrl}"/>
+                                        <s:div>
+                                            <s:div>
+                                                <h:outputText
+                                                        value="#{userManager.loggedInUser.firstname} #{userManager.loggedInUser.lastname}"/>
+                                            </s:div>
+                                            <s:div>
+                                                <h:outputText
+                                                        value="#{userManager.loggedInUser.email}"/>
+                                            </s:div>
+                                            <s:div>
+                                                <h:commandLink styleClass="gzl-btn"
+                                                               style="padding: 1px 6px 1px 6px; display: inline-block; border: 1px solid #BBBBBB; font-size: 10px; border-color: gray; color: white; margin: 5px; font-family: Arial,sans-serif; font-size: 10px; font-weight: normal; height: auto;"
+                                                               onRowMouseOver="this.style.cursor='pointer'"
+                                                               action="/users/user/userPreferences.xhtml"
+                                                               value="#{messages['net.ihe.gazelle.tm.Preferences']}"
+                                                               target="_self"/>
+                                            </s:div>
+                                            <s:div>
+                                                <a4j:commandButton styleClass="gzl-btn" immediate="true"
+                                                                   action="/home.xhtml"
+                                                                   actionListener="#{identity.logout}"
+                                                                   onRowMouseOver="this.style.cursor='pointer'"
+                                                                   value="#{messages['gazelle.users.registration.Logout']}"
+                                                                   execute="@this"/>
+                                            </s:div>
+                                        </s:div>
+                                    </h:panelGrid>
+                                </rich:menuItem>
+                            </rich:dropDownMenu>
+                        </rich:toolbarGroup>
+                        <rich:toolbarGroup location="right" rendered="#{identity.loggedIn}" style="padding: 1px">
+                            <a4j:commandButton styleClass="gzl-btn" immediate="true" action="/home.xhtml"
+                                               actionListener="#{identity.logout}"
+                                               value="#{messages['gazelle.users.registration.Logout']}"
+                                               execute="@this"/>
+                        </rich:toolbarGroup>
+                    </rich:toolbar>
+                    <rich:toolbar id="newGazelleToolBar">
+                        <ui:include src="/menu/menu.xhtml">
+                            <ui:param name="menu" value="#{applicationManager.getMenu()}"/>
+                        </ui:include>
+                    </rich:toolbar>
+                </h:form>
+            </div>
+
+            <!-- end masthead -->
+            <div id="pagecell14">
+                <div>
+                    <s:div id="pageName">
+                        <h2>
+                            <h:outputText value="${pageNameTitle}"/>
+                            <h:outputLink rendered="#{applicationManager.isShowHelp()}" alt="#{messages['net.ihe.gazelle.tm.Help_2']}"
+                                          value="#{applicationManager.getHelpUrl()}" target="_blank">
+                                <span class="gzl-icon-question-circle"/>
+                            </h:outputLink>
+                        </h2>
+                        <s:div id="logoIfLoggedIn"
+                               rendered="#{identity.loggedIn and (not empty gazelleDAO.getSelectedTestingSession().getLogoUrl())}">
+                            <h:outputLink value="#{gazelleDAO.getSelectedTestingSession().getLogoLinkUrl()}"
+                                          style="text-decoration:none;border:none;" target="_blank">
+                                <h:graphicImage library="img" alt="#{messages['gazelle.tm.Logo']}" height="34"
+                                                value="#{gazelleDAO.getSelectedTestingSession().getLogoUrl()}"
+                                                style="text-decoration:none;border:none;"/>
+                            </h:outputLink>
+                        </s:div>
+                        <s:div id="logoIfNotLoggedIn"
+                               rendered="#{!identity.loggedIn or (empty gazelleDAO.getSelectedTestingSession().getLogoUrl())}">
+                            <h:outputLink value="http://gazelle.ihe.net/" style="text-decoration:none;border:none;"
+                                          target="_blank">
+                                <h:graphicImage library="img" alt="#{messages['gazelle.tm.IHELogo']}" name="gazelle.gif"
+                                                height="34"
+                                                style="text-decoration:none;border:none;"/>
+                            </h:outputLink>
+                        </s:div>
+                    </s:div>
+                    <div class="row">
+                        <div class="center-block gazelle-alert">
+                            <s:decorate id="gazelle-messages">
+                                <rich:messages globalOnly="true" escape="false" errorClass="alert alert-danger"
+                                               style="list-style: none;" styleClass="animated fade-out-up text-center"
+                                               infoClass="alert alert-success" warnClass="alert alert-warning">
+                                </rich:messages>
+                            </s:decorate>
+                        </div>
+                    </div>
+                    <div id="content" style="background: #EEEEEE;">
+                        <ui:insert name="body"/>
+                    </div>
+                </div>
+                <!--end pagecell1-->
+                <div id="siteInfo" style="background: #EEEEEE;">
+                    <rich:toolbar
+                            id="footerMenuToolBar"><!-- <rich:toolBarGroup location="left" itemSeparator="line" styleClass="form"> --><!--  To add back when the placeholders will be done -->
+                        <rich:toolbarGroup id="footerLeftToolBarGroup" location="left" styleClass="form"><a
+                                id="footerMenuAboutLink" href="javascript:#{rich:component('about')}.show()">#{messages['gazelle.common.about']}</a>
+                            <h:outputText id="footerMenuAboutOutputText" value="|"/>
+                            <a id="footerMenuContactUsLink" href="javascript:#{rich:component('contactUs')}.show()">#{messages['gazelle.common.contactUs']}</a>
+                            <h:outputText id="footerMenuContactUsOutputText" value="|"
+                                          rendered="#{not empty applicationPreferenceManager.getApplicationIssueTrackerUrl()}"/>
+                            <a4j:commandLink id="issueTrackeCommandLinkId"
+                                             value="#{messages['gazelle.common.IssueTracker']}"
+                                             rendered="#{not empty applicationPreferenceManager.getApplicationIssueTrackerUrl()}"
+                                             onclick="#{rich:component('issueTracker')}.show();"/>
+                            <h:outputText id="separatorOutputText" value="|"/>
+                            <h:outputText id="copyrightOutputText"
+                                          value="#{messages['net.ihe.gazelle.tm.Copyright']} 2015 #{messages['net.ihe.gazelle.tm.IHEInternational']}"/>
+                        </rich:toolbarGroup>
+                        <rich:toolbarGroup id="footerRightToolBarGroup" location="right">
+                            <s:div id="footerRightDiv">
+                                <h:form id="locale" action="#{localeSelector.select}">
+                                    <s:token allowMultiplePosts="true"/>
+                                    <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                     value="#{localeSelector.localeString}">
+                                        <f:selectItems value="#{localeSelector.supportedLocales}"/>
+                                        <!--<a4j:ajax event="change"-->
+                                                  <!--listener="#{userManagerExtra.changeLanguage()}"/>-->
+                                    </h:selectOneMenu>
+                                </h:form>
+                            </s:div>
+                        </rich:toolbarGroup>
+                    </rich:toolbar>
+                </div>
+            </div>
+            <!-- ******************************************* --><!-- Modal Panel : About the Test Management --><!-- ******************************************* -->
+            <rich:popupPanel id="about" onbeforeshow="ActiveModal.setActiveModalPanel('about')"
+                             autosized="true" zindex="2000">
+                <f:facet name="header">
+                    <h:outputText value="#{messages['gazelle.common.application.about.about']}"/>
+                </f:facet>
+
+                <h1>#{applicationPreferenceManager.getApplicationName()}</h1>
+
+                <p></p>
+
+                <h2>#{messages['gazelle.common.IHEIntegratingTheHeathcareEnterprise']}</h2>
+
+                <h3><i>#{messages['gazelle.common.ChangingTheWayHealthcareConnects']}...</i></h3><a
+                    href="http://www.ihe.net" target="_blank">#{messages['gazelle.common.Wwwihenet']}</a>
+
+                <p></p>
+
+                <p>
+                    <h:outputText id="versionDetails"
+                                  value="#{messages['net.ihe.gazelle.tm.TMVersion']} #{messages['net.ihe.gazelle.tm.BuildVersion']}"/>
+                </p>
+                <p>
+                    <h:outputText id="profileDetails"
+                                  value="#{messages['net.ihe.gazelle.tm.BuildProfile']} #{messages['net.ihe.gazelle.tm.MavenBuildVer']}"/>
+                </p>
+                <p>#{messages['gazelle.common.application.about.releaseDate']} :
+                    #{messages['net.ihe.gazelle.tm.BuildDate']}</p>
+
+                <p><a href="      ${applicationPreferenceManager.getApplicationGazelleReleaseNotesUrl()}"
+                      target="_blank">#{messages['gazelle.common.application.about.releaseNotes']}</a>
+                </p>
+
+                <p><a href="#{applicationPreferenceManager.getApplicationDocumentationUrl()}" target="_blank">#{messages['gazelle.common.application.about.Documentation']}</a>
+                </p>
+
+                <p>
+                    #{messages['gazelle.common.application.about.developedBy']} : <a href="http://www.inria.fr/"
+                                                                                     target="_blank">#{messages['gazelle.tm.INRIA']}</a>
+                    (#{messages['gazelle.tm.RennesFranceAnd']} <a href="http://erl.wustl.edu/" target="_blank">#{messages['gazelle.tm.MIR']}</a>
+                    (#{messages['gazelle.tm.SaintLouisUSA']})
+                </p>
+
+                <p>#{messages['gazelle.common.application.about.thanks']}.</p>
+
+                <p align="right"><a href="javascript:#{rich:component('about')}.hide()">
+                    #{messages['gazelle.common.button.mp.close']} </a></p>
+            </rich:popupPanel>
+            <!-- ******************************************* --><!-- END :Modal Panel : About the Test Management --><!-- ******************************************* --><!-- ******************************************* --><!-- Modal Panel : Contact Us 						   --><!-- ******************************************* -->
+            <rich:popupPanel id="contactUs" onbeforeshow="ActiveModal.setActiveModalPanel('contactUs')"
+                             autosized="true" zindex="2000">
+                <f:facet name="header">
+                    <h:outputText value="#{messages['gazelle.tm.ContactUs']}..."/>
+                </f:facet>
+
+                <h1>#{applicationPreferenceManager.getApplicationName()}</h1>
+
+                <h2>#{messages['gazelle.common.IHEIntegratingTheHeathcareEnterprise']}</h2>
+
+                <h3><i>#{messages['gazelle.common.ChangingTheWayHealthcareConnects']}...</i></h3><a
+                    href="http://www.ihe.net">#{messages['gazelle.common.Wwwihenet']}</a>
+
+                <p></p>
+
+                <p>
+                    #{messages['net.ihe.gazelle.tm.PleaseEmailQuestionsTo']} :
+                    #{applicationPreferenceManager.getApplicationAdminTitle()} ( <a
+                        href="mailto:#{applicationPreferenceManager.getApplicationAdminEmail()}">#{applicationPreferenceManager.getApplicationAdminName()}</a>
+                    ), #{messages['gazelle.tm.AndHeWillGuideYouThroughTheProcess']}.
+                </p>
+
+                <p><a href="javascript:#{rich:component('contactUs')}.hide()">
+                    #{messages['gazelle.common.button.mp.close']} </a></p></rich:popupPanel>
+            <!-- ******************************************* --><!-- END :Modal Panel : Contact Us 			 --><!-- ******************************************* --><!-- ******************************************* --><!-- Modal Panel : Issue Tracker						   --><!-- ******************************************* -->
+            <rich:popupPanel id="issueTracker" onbeforeshow="ActiveModal.setActiveModalPanel('issueTracker')"
+                             autosized="true" zindex="2000">
+                <f:facet name="header">
+                    <h:outputText value="#{messages['gazelle.common.IssueTracker']}..."/>
+                </f:facet>
+
+                <p></p>
+
+                <h2>#{messages['gazelle.common.IssueTrackerTitle']}</h2>
+
+                <p></p>
+                #{messages['gazelle.common.IssueTrackerInfo1']}
+                #{messages['gazelle.common.IssueTrackerInfo2']}
+
+                <p></p>#{messages['gazelle.common.IssueTrackerClickOnThatLink']}
+                <a href="#{applicationPreferenceManager.getApplicationIssueTrackerUrl()}">#{applicationPreferenceManager.getApplicationIssueTrackerUrl()}</a>
+
+                <p></p>
+
+                <p></p>
+
+                <p></p>
+
+                <p align="right"><a href="javascript:#{rich:component('issueTracker')}.hide()">
+                    #{messages['gazelle.common.button.mp.close']} </a></p>
+            </rich:popupPanel>
+            <!-- ******************************************* --><!-- END :Modal Panel : Issue Tracker			  --><!-- ******************************************* --><!-- ******************************************* --><!-- Modal Panel : Loading Splashscreen		 --><!-- ******************************************* -->
+            <rich:popupPanel id="panelLoading" autosized="true">
+                <h:graphicImage library="img" name="loading/ajax-loader.gif"/>
+            </rich:popupPanel>
+            <!-- ******************************************* --><!-- END - Modal Panel : Loading Splashscreen	 --><!-- ******************************************* -->
+            <script type="text/javascript">
+                function setLastMessagesFrame() {
+                    document.getElementById('lastMessagesFrame').src = '/#{applicationPreferenceManager.getApplicationUrlBaseName()}/users/messages.seam';
+                }
+            </script>
+            <rich:popupPanel id="lastMessagesModalPanel"
+                             onbeforeshow="ActiveModal.setActiveModalPanel('lastMessagesModalPanel')"
+                             autosized="true" zindex="2000" resizeable="true"
+                             onshow="setLastMessagesFrame();">
+                <f:facet name="header">#{messages['gazelle.common.messages.Messages']}</f:facet>
+                <div style="width: 100%; height: 100%;">
+                    <iframe id="lastMessagesFrame" src=""
+                            style="width: 100%; height: 100%; border-width: 0px;"></iframe>
+                </div>
+                <div align="right"><a href="javascript:#{rich:component('lastMessagesModalPanel')}.hide()">
+                    #{messages['gazelle.common.button.mp.close']} </a></div>
+            </rich:popupPanel>
+            <rich:hotKey key="esc"
+                         onkeydown="if(ActiveModal.activeModalPanel){RichFaces.hideModalPanel(ActiveModal.activeModalPanel);}"/>
+            <!-- Google Analytics Code and scripts --><!--  /!\ WARNING : The current id (for a4j:include) is used as a reference within Javascript for Google Analytics - DO NOT CHANGE IT -->
+            <f:subview id="subview_1">
+                <ui:include id="googleInclude" rendered="#{applicationPreferenceManager.displayGoogleAnalyticsCode()}"
+                            src="/googleAnalytics.xhtml"/>
+            </f:subview>
+            <!--  /!\ END - WARNING : The current id (for a4j:include) is used as a reference within Javascript for Google Analytics - DO NOT CHANGE IT --><!-- END - Google Analytics Code and scripts -->
+        </s:div>
+
+
+    </h:body>
+    </html>
+</f:view>

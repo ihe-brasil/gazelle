@@ -1,0 +1,89 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:define name="body">
+        <h:form id="sessions">
+            <s:token allowMultiplePosts="true"/>
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.Memory']}"/>
+                    <iframe src="/#{applicationPreferenceManager.getApplicationUrlBaseName()}/usageGraph.seam?mode=memory"
+                            style="width: 100%; height: 530px; overflow: hidden; border-width: 0px;"></iframe>
+                </div>
+                <div class="col-lg-6">
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.Sessions_2']}"/>
+                    <iframe src="/#{applicationPreferenceManager.getApplicationUrlBaseName()}/usageGraph.seam?mode=sessions"
+                            style="width: 100%; height: 530px; overflow: hidden; border-width: 0px;"></iframe>
+                </div>
+            </div>
+            <hr/>
+            <h:outputText
+                    value="#{sessionView.httpSessions.size()} #{messages['net.ihe.gazelle.tm.Sessions']}"/>
+            <rich:dataTable value="#{sessionView.httpSessions}" var="sessionUser" rowClasses="ti-row1, ti-row2">
+                <g:column>
+                    <ui:define name="header">#{messages['gazelle.users.user.UserUsername']}</ui:define>
+                    <g:link target="_blank" value="#{sessionUser.user}"/>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">#{messages['gazelle.systems.TestingSession']}</ui:define>
+                    <h:outputText value="#{sessionUser.testingSession}"/>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">#{messages['net.ihe.gazelle.tm.LastAccessedTime']}</ui:define>
+                    <h:outputText value="#{sessionUser.lastAccessedTime}"/>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">#{messages['net.ihe.gazelle.tm.BrowserInfos']}</ui:define>
+                    <h:outputText value="#{sessionUser.browserDetails}"/>
+                    <h:outputText value=" - "/>
+                    <h:outputText value="#{sessionUser.remoteIP}"/>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">#{messages['gazelle.tm.patient.Country']}</ui:define>
+                    <h:graphicImage library="img" name="flags/#{sessionUser.countryCode}.gif"
+                                    rendered="#{sessionUser.countryCode != '--' and sessionUser.countryCode != '?'}"
+                                    width="16" height="11"/>
+                    <h:outputText value="#{sessionUser.countryName}"/>
+                </g:column>
+            </rich:dataTable>
+            <hr/>
+            <h:outputText value="#{messages['net.ihe.gazelle.tm.Caches']}"/>
+            <rich:dataTable value="#{sessionView.caches}" var="cache">
+                <g:column>
+                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Name']}</ui:define>
+                    <h:outputText value="#{cache.name}"/>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">#{messages['net.ihe.gazelle.tm.Size']}</ui:define>
+                    <h:outputText value="#{cache.statistics.objectCount}"/>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">#{messages['net.ihe.gazelle.tm.MemoryStoreSize']}</ui:define>
+                    <h:outputText value="#{cache.statistics.memoryStoreObjectCount}"/>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">#{messages['net.ihe.gazelle.tm.CacheHits']}</ui:define>
+                    <h:outputText value="#{cache.statistics.cacheHits}"/>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">#{messages['net.ihe.gazelle.tm.InMemoryHits']}</ui:define>
+                    <h:outputText value="#{cache.statistics.inMemoryHits}"/>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">#{messages['net.ihe.gazelle.tm.Misses']}</ui:define>
+                    <h:outputText value="#{cache.statistics.cacheMisses}"/>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">#{messages['net.ihe.gazelle.tm.InMemoryMisses']}</ui:define>
+                    <h:outputText value="#{cache.statistics.inMemoryMisses}"/>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">#{messages['net.ihe.gazelle.tm.AverageGetTime']}</ui:define>
+                    <h:outputText value="#{cache.statistics.averageGetTime}"/>
+                </g:column>
+            </rich:dataTable>
+        </h:form>
+    </ui:define>
+</ui:composition>

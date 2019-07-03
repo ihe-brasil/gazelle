@@ -1,0 +1,30 @@
+<ui:composition xmlns:rich="http://richfaces.org/rich" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns="http://www.w3.org/1999/xhtml">
+    <h:form id="searchForm" styleClass="navbar-form navbar-left" role="search">
+        <a4j:region>
+            <s:div styleClass="form-group">
+                <rich:autocomplete id="searchSuggestSuggestion" height="250" width="300" var="searchResult"
+                                   value="#{searchGeneric.criteriaValue}" selectFirst="false"
+                                   onselectitem="#{rich:element('searchBarSubmit')}.click()"
+                                   inputClass="form-control" fetchValue="#{searchResult.query}"
+                                   autocompleteMethod="#{searchGeneric.autocomplete}" mode="ajax">
+                    <h:column>
+                        <h:outputText value="#{searchResult.type.shortId}  | "/>
+                    </h:column>
+                    <h:column>
+                        <h:outputText value="#{searchResult.valueAsString}"/>
+                    </h:column>
+                </rich:autocomplete>
+            </s:div>
+            <a4j:commandButton id="searchBarSubmit" type="submit" action="#{searchGeneric.search()}"
+                               title="#{messages['gazelle.common.button.Search']}" style="margin-left: 5px;"
+                               styleClass="gzl-btn"/>
+        </a4j:region>
+    </h:form>
+    <script>
+        document.getElementById("searchForm:searchSuggestSuggestion").className = "";
+        document.getElementById("searchForm:searchSuggestSuggestionInput").className = "form-control";
+        document.getElementById("searchForm:searchSuggestSuggestionInput").placeholder = "Search...";
+    </script>
+</ui:composition>

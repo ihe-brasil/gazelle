@@ -1,0 +1,86 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['net.ihe.gazelle.tm.ShowAuditMessage']}"/>
+    <ui:define name="body">
+        <h:form id="globalform">
+
+            <ui:decorate template="/layout/panels/_panel_title_footer.xhtml">
+                <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.AuditMessageDetails']}</ui:define>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['net.ihe.gazelle.tm.EventName']}</ui:define>
+                    <h:outputText
+                            value="#{auditMessageManager.currentAuditMessage.auditedEvent.getKeyword()}"/>
+                </s:decorate>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['net.ihe.gazelle.tm.IssuingActor']}</ui:define>
+                    <h:commandLink
+                            value="#{auditMessageManager.currentAuditMessage.issuingActor.keyword} - #{auditMessageManager.currentAuditMessage.issuingActor.name}"
+                            action="#{actorManager.editActor(auditMessageManager.currentAuditMessage.issuingActor, false)}"/>
+                </s:decorate>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['net.ihe.gazelle.tm.AuditedTransaction']}</ui:define>
+                    <h:commandLink
+                            value="#{auditMessageManager.currentAuditMessage.auditedTransaction.keyword} - #{auditMessageManager.currentAuditMessage.auditedTransaction.name}"
+                            action="#{transactionManager.editTransaction(auditMessageManager.currentAuditMessage.auditedTransaction, false)}"/>
+                </s:decorate>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['net.ihe.gazelle.tm.EventCodeType']}</ui:define>
+                    <h:outputText value="#{auditMessageManager.currentAuditMessage.eventCodeType}"
+                                  rendered="#{not empty auditMessageManager.currentAuditMessage.eventCodeType}"/>
+                </s:decorate>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.testmanagement.object.Comment']}</ui:define>
+                    <h:outputText rendered="#{not empty auditMessageManager.currentAuditMessage.comment}"
+                                  value="#{auditMessageManager.currentAuditMessage.comment}"/>
+                </s:decorate>
+                <s:decorate template="/layout/display/_display.xhtml"
+                            rendered="#{not empty auditMessageManager.currentAuditMessage.oid}">
+                    <ui:define name="label">#{messages['net.ihe.gazelle.tm.AuditMessageSpecification']}</ui:define>
+                    <h:outputLink
+                            value="#{auditMessageManager.getAuditMessageSpecUrl(auditMessageManager.currentAuditMessage)}">
+                        <h:outputText value="#{auditMessageManager.currentAuditMessage.oid}"/>
+                    </h:outputLink>
+                </s:decorate>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['net.ihe.gazelle.tm.DocumentSection_2']}</ui:define>
+                    <ui:include src="/tf/documents/_documentSection.xhtml">
+                        <ui:param name="documentSectionParam"
+                                  value="#{auditMessageManager.currentAuditMessage.documentSection}"/>
+                        <ui:param name="displayedName"
+                                  value="#{auditMessageManager.currentAuditMessage.documentSection.section}"/>
+                    </ui:include>
+                </s:decorate>
+                <!-- **********************************************************************************************
+                                * All assertionsTab
+                                ********************************************************************************************** -->
+                <s:div rendered="#{applicationManager.isAssertionEnabled()}">
+                    <div id="allAssertionsDivId">
+                        <h:form id="assertionsFormId">
+                            <ui:include src="/assertions/viewAssertions.xhtml">
+                                <ui:param name="assertions"
+                                          value="#{assertionsManager.getAuditMessageAssertions(auditMessageManager.currentAuditMessage.id)}"/>
+                            </ui:include>
+                        </h:form>
+                    </div>
+                </s:div>
+                <ui:define name="panel_footer">
+                    <h:outputLink title="#{messages['net.ihe.gazelle.tm.ListAuditMessages']}" value="index.seam"
+                                  styleClass="gzl-btn">
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.ListAuditMessages']}"/>
+                    </h:outputLink>
+
+                    <h:outputLink title="#{messages['net.ihe.gazelle.tm.EditAuditMessages']}" value="edit.seam"
+                                  styleClass="gzl-btn-green"
+                                  rendered="#{s:hasRole('tests_editor_role') and applicationManager.isMasterModel()}">
+                        <f:param name="id" value="#{auditMessageManager.currentAuditMessage.id}"/>
+                        <h:outputText value="#{messages['gazelle.common.button.Edit']}"/>
+                    </h:outputLink>
+                </ui:define>
+            </ui:decorate>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

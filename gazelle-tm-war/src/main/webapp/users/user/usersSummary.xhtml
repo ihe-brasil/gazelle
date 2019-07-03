@@ -1,0 +1,101 @@
+<!--
+ * Copyright 2008 IHE International (http://www.ihe.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ -->
+<!--  Do not add a doctype it will cause a failure for some browsers as this file is included
+	@author abderrazek boufahja
+-->
+<e:workbook xmlns:e="http://jboss.com/products/seam/excel" xmlns:f="http://java.sun.com/jsf/core"
+            xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j">
+    <e:worksheet name="users" startColumn="0" startRow="0" value="#{userManager.users}" var="currentUser">
+        <e:header>
+            <f:facet name="left">
+                #{messages['gazelle.users.ThisDocumentWasMadeOndateAndHastotalpagesPagesIt']}.
+            </f:facet>
+            <f:facet name="right">
+                ##{messages['gazelle.users.Time']}#
+            </f:facet>
+        </e:header>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.users.Institution']}"/>
+            </f:facet>
+            <e:cell value="#{currentUser.institution.keyword}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.users.LastName']}"/>
+            </f:facet>
+            <e:cell value="#{currentUser.lastname}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.users.FirstName']}"/>
+            </f:facet>
+            <e:cell value="#{currentUser.firstname}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.users.user.UserUsername']}"/>
+            </f:facet>
+            <e:cell value="#{currentUser.username}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.contacts.Email']}"/>
+            </f:facet>
+            <e:cell value="#{currentUser.email}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.users.user.Activated']}"/>
+            </f:facet>
+            <e:cell value="#{currentUser.activated}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.users.registration.Blocked']}"/>
+            </f:facet>
+            <e:cell value="#{currentUser.blocked}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.users.user.NumberOfLogins']}"/>
+            </f:facet>
+            <e:cell value="#{currentUser.loginsCounter}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.users.user.UserLastLogin']}"/>
+            </f:facet>
+            <e:cell value="#{currentUser.lastLogin}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.common.LastModifier']}"/>
+            </f:facet>
+            <e:cell value="#{currentUser.lastModifierId}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.users.roles']}"/>
+            </f:facet>
+            <e:cell>
+                <a4j:repeat var="roll" value="#{currentUser.roles}">
+                    <h:outputText value="#{roll.name}, "/>
+                </a4j:repeat>
+            </e:cell>
+        </e:column>
+    </e:worksheet>
+</e:workbook>

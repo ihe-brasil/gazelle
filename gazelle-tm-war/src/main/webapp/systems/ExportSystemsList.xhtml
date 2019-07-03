@@ -1,0 +1,71 @@
+<!--
+ * Copyright 2008 IHE International (http://www.ihe.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ -->
+<!--  Do not add a doctype it will cause a failure for some browsers as this file is included
+	@author guillaume thomazon
+-->
+<e:workbook xmlns:e="http://jboss.org/schema/seam/excel" xmlns:f="http://java.sun.com/jsf/core">
+    <e:worksheet name="ExportSystemsList" startColumn="0" startRow="0"
+                 value="#{systemInSessionOverview.getListOfSystemInSessionAsList()}" var="#{'currentSystemInSession'}">
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.users.institution.Institution']}"/>
+            </f:facet>
+            <e:cell value="#{currentSystemInSession.system.getInstitutionsForASystemAsString(currentSystemInSession.system)}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.systems.system.SystemKeyword']}"/>
+            </f:facet>
+            <e:cell value="#{currentSystemInSession.system.keyword}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.systems.system.SystemName']}"/>
+            </f:facet>
+            <e:cell value="#{currentSystemInSession.system.name}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.systems.system.SystemVersion']}"/>
+            </f:facet>
+            <e:cell value="#{currentSystemInSession.system.version}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.systems.systemInSession.table']}"/>
+            </f:facet>
+            <e:cell value="#{currentSystemInSession.tableSession.tableKeyword}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.systems.systemInSession.tableLabel']}"/>
+            </f:facet>
+            <e:cell value="#{currentSystemInSession.tableLabel}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.systems.systemInSession.skype']}"/>
+            </f:facet>
+            <e:cell value="#{currentSystemInSession.skype}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['net.ihe.gazelle.tm.Email']}"/>
+            </f:facet>
+            <e:cell value="#{currentSystemInSession.system.ownerUser.email}"/>
+        </e:column>
+    </e:worksheet>
+</e:workbook>

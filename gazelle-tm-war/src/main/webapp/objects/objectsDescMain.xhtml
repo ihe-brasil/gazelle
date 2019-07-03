@@ -1,0 +1,136 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <h:outputScript library="jscript" name="jsf_updated.js" target="head" />
+    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+        <ui:define name="panel_title">#{messages['gazelle.testmanagement.object.firstPanel']}</ui:define>
+        <h:form id="form">
+            <s:token allowMultiplePosts="true"/>
+            <a4j:queue requestDelay="300" ignoreDupResponses="true"/>
+            <p>
+                <h:outputText value="#{messages['gazelle.testmanagement.object.label2']}"/>
+            </p>
+            <div class="gzl-filter-panel form-horizontal">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <a4j:region id="InstitutionRegion">
+                            <s:decorate id="institutionDecoration"
+                                        template="/layout/form/_form_field_horizontal_3-9.xhtml"
+                                        rendered="#{s:hasRole('admin_role') || s:hasRole('monitor_role') || s:hasRole('tests_editor_role')}">
+                                <ui:define name="label">#{messages['gazelle.financial.invoice.InstitutionKeyword']}
+                                </ui:define>
+                                <ui:param name="id" value="ListInstitution"/>
+                                <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text"
+                                                 id="ListInstitution"
+                                                 value="#{objectManager.selectedInstitution}">
+                                    <s:selectItems value="#{objectManager.listInstitutionsForCurrentSession}"
+                                                   var="institutionUsed"
+                                                   noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                   label="#{institutionUsed.keyword} - #{institutionUsed.name}"/>
+                                    <a4j:ajax event="change" render="SystemInSessionDecoration,richTabForSamples"
+                                              execute="@this"
+                                              listener="#{objectManager.reinitializeAttribute(objectManager.selectedInstitution,null,null,null,false)}"/>
+                                </h:selectOneMenu>
+                            </s:decorate>
+                        </a4j:region>
+                        <a4j:region id="InstitutionRegionForUser">
+                            <s:decorate id="institutionDecorationForUser"
+                                        template="/layout/display/_display_field_horizontal_3-9.xhtml"
+                                        rendered="#{!(s:hasRole('admin_role') || s:hasRole('monitor_role') || s:hasRole('tests_editor_role'))}">
+                                #{objectManager.setSelectedInstitution(objectManager.institutionOfCurrentUser)}
+                                <ui:define name="label">#{messages['gazelle.users.Institution']} :</ui:define>
+                                <h:outputText
+                                        value="#{objectManager.institutionOfCurrentUser.keyword} - #{objectManager.institutionOfCurrentUser.name}"/>
+                            </s:decorate>
+                        </a4j:region>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <a4j:region id="SISRegion">
+                            <s:decorate id="SystemInSessionDecoration"
+                                        template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                                <ui:param name="id" value="ListSession"/>
+                                <ui:define name="label">#{messages['gazelle.systems.financial.systems']}</ui:define>
+                                <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text"
+                                                 id="ListSession"
+                                                 value="#{objectManager.selectedSystemInSession}">
+                                    <s:selectItems value="#{objectManager.getSystemListForSelectedInstitution()}"
+                                                   var="SessionUsed"
+                                                   noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                   label="#{SessionUsed.system.keyword}"/>
+                                    <a4j:ajax event="change" render="richTabForSamples, :CreatorsForm, :ReadersForm"
+                                              execute="@this"
+                                              listener="#{objectManager.reinitializeAttribute(objectManager.selectedInstitution,objectManager.selectedSystemInSession,null,null,true)}"/>
+                                </h:selectOneMenu>
+                            </s:decorate>
+                        </a4j:region>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+        <br/>
+        <s:div id="richTabForSamples">
+            <div id="ListInstanceObject" class="col-md-6">
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active">
+                        <a href="#tabForCreating"
+                           aria-controls="tabForCreating"
+                           role="tab"
+                           data-toggle="tab">#{messages['gazelle.testmanagement.object.ObjectToCreate']}</a>
+                    </li>
+                    <li role="presentation">
+                        <a href="#tabForObjToRender" aria-controls="tabForObjToRender"
+                           role="tab"
+                           data-toggle="tab">#{messages['gazelle.testmanagement.object.ObjectToRender']}</a>
+                    </li>
+                </ul>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="tabForCreating">
+                        <h:form id="CreatorsForm">
+                            <s:token allowMultiplePosts="true"/>
+                            <p class="help-block">
+                                <h:outputText
+                                        value="#{messages['gazelle.testmanagement.object.CreateLabel1']}"/>
+                            </p>
+
+                            <ui:include src="/objects/tree4Creator.xhtml">
+                                <ui:param name="treeNodeToDisplay"
+                                          value="#{objectManager.treeNodeCreatorList}"/>
+                            </ui:include>
+
+                        </h:form>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="tabForObjToRender">
+                        <h:form id="ReadersForm">
+                            <s:token allowMultiplePosts="true"/>
+                            <h:commandLink id="DOWNASCVS" action="/objects/samplesSummary.seam"
+                                           title="#{messages['gazelle.common.export.ExportAsExcel']}">
+                                <span class="gzl-icon-file-excel-o"/>
+                                #{messages['net.ihe.gazelle.tm.ExportToExcel']}
+                            </h:commandLink>
+                            <p class="help-block">
+                                <h:outputText
+                                        value="#{messages['gazelle.testmanagement.object.LabelForRenderTab']}"/>
+                            </p>
+                            <f:subview id="subview_2">
+                                <ui:include src="/objects/tree4Reader.xhtml">
+                                    <ui:param name="treeNodeToDisplay"
+                                              value="#{objectManager.treeNodeReaderList}"/>
+                                </ui:include>
+                            </f:subview>
+                        </h:form>
+                    </div>
+                </div>
+            </div>
+
+            <ui:include src="/objects/object_instance.xhtml">
+                <ui:param name="sampleReturn" value="true"/>
+            </ui:include>
+        </s:div>
+    </ui:decorate>
+</ui:composition>

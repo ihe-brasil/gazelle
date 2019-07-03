@@ -1,0 +1,14 @@
+<div xmlns:a4j="http://richfaces.org/a4j"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:s="http://jboss.org/schema/seam/taglib"
+     xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <h:outputText value="#{messages['net.ihe.gazelle.tm.NoTestingSessionIsAssignedToYouPleaseContactYour']}"
+                  rendered="#{gazelleDAO.GetAllActiveSessionsWithoutHidden().isEmpty()}"/>
+    <s:div align="right" style="height: 30px;" rendered="#{gazelleDAO.GetAllActiveSessionsWithoutHidden().isEmpty()}">
+        <s:div id="testingSessionFormDiv" align="right">
+            <a4j:commandButton id="continueButtonConfirm" value="#{messages['gazelle.common.button.Continue']}"
+                               ignoreDupResponses="true" immediate="true" styleClass="gzl-btn-green"
+                               action="/home.seam"/>
+        </s:div>
+    </s:div>
+</div>

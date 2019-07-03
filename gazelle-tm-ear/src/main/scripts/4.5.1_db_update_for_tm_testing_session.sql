@@ -1,0 +1,1 @@
+UPDATE tm_testing_session SET display_certificates_menu=false;

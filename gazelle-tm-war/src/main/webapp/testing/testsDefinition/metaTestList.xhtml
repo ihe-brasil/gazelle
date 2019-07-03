@@ -1,0 +1,155 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.common.menu.metaTestList']}"/>
+    <ui:define name="body">
+
+        #{dataTableStateHolder.setAscendingOn('keyword')}
+
+        <h:form id="_f" styleClass="form-horizontal">
+            <h:panelGroup id="testsListPanel" rendered="#{!metaTestAdministrationManager.showMetaTestPanel}">
+                <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+
+                    <ui:include src="/testing/research/filterAIPO.xhtml">
+                        <ui:param name="filter" value="#{metaTestsOverview.foundMetaTests.filter}"/>
+                        <ui:param name="filterForm" value="_f"/>
+                    </ui:include>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter" value="#{metaTestsOverview.foundMetaTests.filter}"/>
+                                <ui:param name="filterId" value="testType"/>
+                                <ui:param name="filterName" value="#{messages['gazelle.tm.monitors.TestType']}"/>
+                                <ui:param name="filterForm" value="_f"/>
+                            </ui:include>
+                        </div>
+                        <div class="col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter" value="#{metaTestsOverview.foundMetaTests.filter}"/>
+                                <ui:param name="filterId" value="testStatus"/>
+                                <ui:param name="filterName" value="#{messages['gazelle.tm.TestStatus']}"/>
+                                <ui:param name="filterForm" value="_f"/>
+                            </ui:include>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter" value="#{metaTestsOverview.foundMetaTests.filter}"/>
+                                <ui:param name="filterId" value="testPeerType"/>
+                                <ui:param name="filterName" value="#{messages['gazelle.tm.TestPeerType']}"/>
+                                <ui:param name="filterForm" value="_f"/>
+                            </ui:include>
+                        </div>
+                        <div class="col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter" value="#{metaTestsOverview.foundMetaTests.filter}"/>
+                                <ui:param name="filterId" value="testVersion"/>
+                                <ui:param name="filterName" value="#{messages['gazelle.tm.TestVersion']}"/>
+                                <ui:param name="filterForm" value="_f"/>
+                            </ui:include>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter" value="#{metaTestsOverview.foundMetaTests.filter}"/>
+                                <ui:param name="filterId" value="lastModifier"/>
+                                <ui:param name="filterName" value="#{messages['gazelle.tm.TestLastModifier']}"/>
+                                <ui:param name="filterForm" value="_f"/>
+                            </ui:include>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">
+                                    <h:outputText id="searchTextName"
+                                                  value="#{messages['net.ihe.gazelle.tm.ByKeywordOrName']}"/>
+                                </label>
+
+                                <div class="col-sm-5">
+                                    <h:panelGrid columns="3" border="0" cellpadding="0" cellspacing="0">
+                                        <h:inputText styleClass=" form-control" id="inputTextFind"
+                                                     value="#{metaTestsOverview.searchKeyword}"/>
+                                        <rich:hotKey key="return"
+                                                     onkeydown="#{rich:element('sumbitFindTextImage')}.click()"
+                                                     selector="#inputTextFind"/>
+
+                                        <a4j:commandLink id="sumbitFindTextImage" event="click" render="_f"
+                                                         title="#{messages['gazelle.common.button.Search']}">
+                                            <span class="gzl-icon-search"/>
+                                        </a4j:commandLink>
+                                    </h:panelGrid>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ui:define name="filter_buttons">
+                        <a4j:commandLink actionListener="#{metaTestsOverview.resetFilter()}"
+                                         title="#{messages['gazelle.users.reset']}" type="submit"
+                                         execute="@this" render="_f">
+                            <span class="fa fa-times-circle"/>
+                        </a4j:commandLink>
+                    </ui:define>
+                </ui:decorate>
+                <s:div
+                        rendered="#{!metaTestAdministrationManager.showMetaTestPanel and s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}">
+                    <a4j:commandButton id="AddNewMetaTestButtonTop" styleClass="gzl-btn-green"
+                                       value="#{messages['gazelle.tm.AddNewMetaTest_2']}"
+                                       actionListener="#{metaTestAdministrationManager.addNewMetaTest()}"
+                                       render="_f"/>
+                </s:div>
+                <rich:dataTable id="testsListTable" var="currentMetaTest" rowKeyVar="rowNumber"
+                                value="#{metaTestsOverview.foundMetaTests}"
+                                first="0" columnClasses="center" rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                                render="ds">
+
+                    <ui:include src="metaTestListColumns.xhtml">
+                        <ui:param name="currentMetaTest" value="#{currentMetaTest}"/>
+                    </ui:include>
+                    <f:facet name="footer">
+                        <ui:include src="/util/datatableFooter.xhtml">
+                            <ui:param name="dataScrollerId" value="ds"/>
+                            <ui:param name="dataTableId" value="testsListTable"/>
+                        </ui:include>
+                    </f:facet>
+                </rich:dataTable>
+
+                <s:div style="text-align: left;">
+                    <a4j:commandButton id="AddNewMetaTestButton"
+                                       rendered="#{!metaTestAdministrationManager.showMetaTestPanel and s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"
+                                       styleClass="gzl-btn-green" value="#{messages['gazelle.tm.AddNewMetaTest_2']}"
+                                       actionListener="#{metaTestAdministrationManager.addNewMetaTest()}"
+                                       render="_f"/>
+                </s:div>
+            </h:panelGroup>
+            <ui:include src="editMetaTest.xhtml"/>
+
+        </h:form>
+
+        <h:form id="DeleteConfirmationForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteConfirmationModalPanel"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.DeleteMetaTest']}</ui:define>
+                <p>#{messages['gazelle.tm.DeleteMetaTestn']} #{metaTestAdministrationManager.selectedMetaTest.keyword}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="deleteConfirmationPanelButton"
+                                       value="#{messages['gazelle.common.button.Delete']}"
+                                       styleClass="gzl-btn-red" ignoreDupResponses="true"
+                                       actionListener="#{metaTestAdministrationManager.deleteSelectedMetaTest()}"
+                                       onclick="jq162('#DeleteConfirmationModalPanel').modal('hide');"
+                                       render="_f"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+
+    </ui:define>
+</ui:composition>

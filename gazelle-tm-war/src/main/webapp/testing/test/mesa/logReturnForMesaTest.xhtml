@@ -1,0 +1,167 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle"
+              value="#{messages['gazelle.tests.testInstance.instanceOfTest']} : #{mesaTestManager.currentTestInstanceParticipants.testInstance.test.name } (#{mesaTestManager.currentTestInstanceParticipants.testInstance.test.keyword})"/>
+    <ui:define name="body">
+        <h:form id="formCreateInstance">
+            <s:token allowMultiplePosts="true"/>
+
+            #{mesaTestManager.initEditCurrentTestInstanceParticipant()}
+
+            <a4j:commandButton id="backEditTop" styleClass="gzl-btn"
+                               value="#{messages['net.ihe.gazelle.tm.BackToPreviousPage']}" immediate="true"
+                               action="#{mesaTestManager.createInstanceBackToPreviousScreen()}" execute="@this"
+                               render="messageDecoration"/>
+
+
+            <ui:decorate template="/layout/panels/_panel.xhtml">
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tests.test']}</ui:define>
+                    <s:div>
+                        <h:outputText
+                                value="#{mesaTestManager.currentTestInstanceParticipants.testInstance.test.keyword}-#{mesaTestManager.currentTestInstanceParticipants.testInstance.test.name}"/>
+                        <a4j:repeat
+                                value="#{mesaTestManager.getDocumentation(mesaTestManager.currentTestInstanceParticipants)}"
+                                var="documentation">
+                            <h:outputLink id="linkToDoc" value="#{documentation}"
+                                          title="#{messages['gazelle.tm.testing.URLDocumentation']}"
+                                          rendered="#{not empty documentation}" target="_blank">
+                                <span class="gzl-icon-globe"/>
+                            </h:outputLink>
+                        </a4j:repeat>
+                    </s:div>
+                </s:decorate>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.configuration.system.system']}</ui:define>
+                    <h:outputText
+                            value="#{mesaTestManager.currentTestInstanceParticipants.systemInSessionUser.systemInSession.system.keyword}"/>
+                </s:decorate>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.IntegrationProfile']}</ui:define>
+                    <h:outputText
+                            value="#{mesaTestManager.currentTestInstanceParticipants.roleInTest.testParticipantsList.get(0).actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.toString()}"
+                            rendered="#{ not empty mesaTestManager.currentTestInstanceParticipants.roleInTest.testParticipantsList and mesaTestManager.currentTestInstanceParticipants.roleInTest.testParticipantsList.size()&gt;0}"/>
+                </s:decorate>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.Actor']}</ui:define>
+                    <h:outputText
+                            value="#{mesaTestManager.currentTestInstanceParticipants.roleInTest.testParticipantsList.get(0).actorIntegrationProfileOption.actorIntegrationProfile.actor.toString()}"
+                            rendered="#{ not empty mesaTestManager.currentTestInstanceParticipants.roleInTest.testParticipantsList and mesaTestManager.currentTestInstanceParticipants.roleInTest.testParticipantsList.size()&gt;0}"/>
+                </s:decorate>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.common.LastChanged']}</ui:define>
+                    <g:date tooltip="true"
+                            value="#{mesaTestManager.currentTestInstanceParticipants.testInstance.lastChanged}"/>
+                </s:decorate>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tm.PermanentLink']}</ui:define>
+                    <h:outputLink value="#{mesaTestManager.permanentLink}">
+                        <h:outputText value="#{mesaTestManager.permanentLink}"/>
+                    </h:outputLink>
+                </s:decorate>
+                <a4j:region id="statusOfTest">
+                    <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml" id="stadeclis">
+                        <ui:param name="id" value="StatusListBox"/>
+                        <ui:define name="label">#{messages['gazelle.tm.testing.instance.status']}</ui:define>
+                        <h:selectOneMenu styleClass="form-control gzl-form-control" id="StatusListBox"
+                                         value="#{mesaTestManager.selectedStatusForEdition}"
+                                         style="font-weight:bold;" required="true">
+                            <s:selectItems
+                                    value="#{mesaTestManager.getPossibleStatusesWithStatus(mesaTestManager.selectedStatusForEdition)}"
+                                    var="statusFromList"
+                                    noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                    hideNoSelectionLabel="true"
+                                    label="#{messages[statusFromList.labelToDisplay]}"/>
+                            <a4j:ajax event="change" render="formCreateInstance"
+                                      listener="#{mesaTestManager.persistTest(mesaTestManager.currentTestInstanceParticipants.testInstance)}"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                </a4j:region>
+            </ui:decorate>
+
+
+            <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                <ui:param name="panel_id" value="info"/>
+                <ui:define name="panel_title">
+                    <h:outputText
+                            value="#{messages['gazelle.tm.testing.instance.uploadedFilesInfo']}"/>
+                </ui:define>
+                <h:outputText value="#{messages['gazelle.tm.testing.instance.noFilesCurrentlyUploaded']}"
+                              rendered="#{mesaTestManager.size==0}"/>
+                <rich:list var="file" value="#{mesaTestManager.files}" type="unordered">
+                    <h:panelGroup
+                            rendered="#{mesaTestManager.isFileExist(mesaTestManager.currentTestInstanceParticipants,file)}">
+                        <h:outputLink
+                                value="#{applicationPreferenceManager.getApplicationUrl()}testInstanceData/preti/#{file.id}/#{mesaTestManager.getURLValue(file)}"
+                                target="_blank">
+                            <h:outputText value="#{file.name}"/>
+
+                            <span class="gzl-icon-search"/>
+                        </h:outputLink>
+
+                        <a4j:commandLink actionListener="#{mesaTestManager.deleteFile(file)}"
+                                         render="formCreateInstance">
+                            <span class="gzl-icon-trash-o"/>
+                        </a4j:commandLink>
+                    </h:panelGroup>
+                    <h:panelGroup
+                            rendered="#{!mesaTestManager.isFileExist(mesaTestManager.currentTestInstanceParticipants,file)}">
+                        <h:outputText value="#{file.name} (#{messages['net.ihe.gazelle.tm.Missing_2']})"/>
+                    </h:panelGroup>
+                </rich:list>
+
+                <a4j:commandButton action="#{mesaTestManager.clearUploadData}"
+                                   value="#{messages['gazelle.tm.testing.instance.clearUploadedData']}"
+                                   rendered="#{mesaTestManager.size&gt;0}" styleClass="gzl-btn"
+                                   render="formCreateInstance"/>
+            </ui:decorate>
+
+
+            <rich:collapsiblePanel switchType="client" opened="true" render="formCreateInstance">
+                <f:facet name="header">
+                    <h:outputText value="#{messages['gazelle.tm.testing.instance.logReturn']}"/>
+                </f:facet>
+                <h:outputText value="#{messages['gazelle.tm.mesatest.filetoupload']}"/>
+
+                <ui:include src="/fineupload.xhtml">
+                    <ui:param name="id" value="mesaUploads"/>
+                    <ui:param name="idToRerender" value="formCreateInstance"/>
+                    <ui:param name="beanName" value="mesaTestManager"/>
+                    <ui:param name="multiple" value="true"/>
+                    <ui:param name="extensions"
+                              value="jpg,gif,png,bmp,tiff,pdf,log,txt,rtf,csv,zip,tar,xsd,xml,dtd,xls,xlsx,doc,docx,dot"/>
+                </ui:include>
+            </rich:collapsiblePanel>
+
+            <s:decorate id="commentdec">
+                <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                    <ui:param name="panel_id" value="descoutp"/>
+                    <ui:define name="panel_title">#{messages['gazelle.tm.testing.instance.comments']}</ui:define>
+                    <s:div style="font: 12px Arial, Verdana;word-wrap: break-word;">
+                        <g:safehtml
+                                value="#{mesaTestManager.currentTestInstanceParticipants.testInstance.descriptionXMLValid}"/>
+                    </s:div>
+                </ui:decorate>
+
+                <s:div id="description">
+                    <h:inputTextarea styleClass=" form-control" value="#{testInstanceManager.descriptionToAdd}"
+                                     rows="20"
+                                     cols="130"/>
+                    <br/>
+                    <a4j:commandButton id="AddDescButton" styleClass="gzl-btn-green"
+                                       value="#{messages['net.ihe.gazelle.tm.AddDescription']}"
+                                       actionListener="#{testInstanceManager.addDescription(mesaTestManager.currentTestInstanceParticipants, mesaTestManager.selectedSystem, mesaTestManager.selectedSystemInSession, mesaTestManager.selectedStatusForEdition)}"
+                                       render="formCreateInstance"/>
+                    <a4j:commandButton id="backEditBottom" styleClass="gzl-btn"
+                                       value="#{messages['net.ihe.gazelle.tm.BackToPreviousPage']}" immediate="true"
+                                       action="#{mesaTestManager.createInstanceBackToPreviousScreen()}" execute="@this"
+                                       render="messageDecoration"/>
+                </s:div>
+
+            </s:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,29 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <a4j:region id="tsr"
+                rendered="#{testInstanceManager.isConnectedUserAllowedToEditTestInstance() and !testInstanceManager.selectedTestInstance.testingSession.testingSessionClosedForUser()}">
+        <h:selectOneMenu
+                styleClass="form-control gzl-form-control #{testInstanceManager.selectedStatus.cssStyle}"
+                id="testInstanceStatusListBox"
+                value="#{testInstanceManager.selectedStatus}">
+            <s:selectItems value="#{testInstanceManager.testInstanceStatusList}"
+                           var="selectedTestInstanceStatus"
+                           hideNoSelectionLabel="true"
+                           label="#{messages[selectedTestInstanceStatus.labelToDisplay]}">
+            </s:selectItems>
+            <a4j:ajax event="change" oncomplete="showFailModalPanelIfNeed();"
+                      execute="@this" limitRender="true"
+                      render="#{toRender}"
+                      listener="#{testInstanceManager.saveTestInstanceIfNotFailedStatus()}"/>
+        </h:selectOneMenu>
+
+    </a4j:region>
+    <h:panelGroup id="viewTestCurrentStatusRegion"
+                  rendered="#{!testInstanceManager.isConnectedUserAllowedToEditTestInstance() or testInstanceManager.selectedTestInstance.testingSession.testingSessionClosedForUser()}">
+        <h:outputText
+                styleClass="gzl-label #{testInstanceManager.selectedStatus.cssStyle}"
+                value="#{messages[testInstanceManager.selectedStatus.labelToDisplay]}"/>
+    </h:panelGroup>
+</ui:composition>

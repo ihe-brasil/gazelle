@@ -1,0 +1,167 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:a4j="http://richfaces.org/a4j" xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <s:div id="customisedPanels">
+        <c:set var="selectedHome" scope="view" value="#{homeManager.selectedHome}"/>
+        <h:panelGroup id="SecondaryPanelAbove"
+                      rendered="#{(selectedHome.secondaryPanelContent != null or homeManager.editSecondaryContent) and selectedHome.secondaryPanelPosition.equals('above')}">
+            <ui:include src="secondaryPanel.xhtml">
+                <ui:param name="position" value="Above"/>
+            </ui:include>
+        </h:panelGroup>
+
+        <div class="panel panel-default">
+            <s:div styleClass="panel-heading" id="mainHeaderDiv">
+                <h3 class="panel-title">
+                    <h:form id="mainHeaderForm">
+                        <s:token allowMultiplePosts="true"/>
+                        <h:outputText value="#{selectedHome.mainPanelHeader}"
+                                      rendered="#{not empty selectedHome.mainPanelHeader and not homeManager.editMainPanelHeader}"/>
+                        <h:outputText value="#{messages['gazelle.tm.MainPanelHeader']}"
+                                      rendered="#{empty selectedHome.mainPanelHeader and not homeManager.editMainPanelHeader}"/>
+                        <h:inputText styleClass=" form-control" value="#{selectedHome.mainPanelHeader}"
+                                     maxlength="255" size="150"
+                                     rendered="#{homeManager.editMainPanelHeader}"/>
+
+                        <a4j:commandLink actionListener="#{homeManager.setEditMainPanelHeader(true)}"
+                                         rendered="#{s:hasRole('admin_role') and not homeManager.editMainPanelHeader}"
+                                         render="mainHeaderDiv">
+                            <span class="gzl-icon-pencil" title="#{messages['gazelle.common.button.Edit']}"/>
+                        </a4j:commandLink>
+
+                        <a4j:commandLink actionListener="#{homeManager.saveHome('mainHeader')}"
+                                         rendered="#{s:hasRole('admin_role') and homeManager.editMainPanelHeader}"
+                                         render="mainHeaderDiv">
+                            <span class="gzl-icon-save" title="#{messages['gazelle.common.button.Save']}"/>
+                        </a4j:commandLink>
+                    </h:form>
+                </h3>
+            </s:div>
+            <div class="panel-body">
+
+                <h:outputText value="#{messages['gazelle.testmanagement.home.connectathon.welcome']}"/>
+                <h:outputText rendered="#{!empty gazelleDAO.getSelectedTestingSession()}"
+                              value=" #{messages['gazelle.testmanagement.home.connectathon.forthe']}"/>
+                <br/>
+                <!-- list of active testing sessions -->
+                <s:div rendered="#{not identity.loggedIn}">
+                    <ul>
+                        <a4j:repeat id="sessionsRepeatWelcome" value="#{gazelleDAO.GetAllActiveSessionsWithoutHidden()}"
+                                    var="currentTestingSession">
+                            <li>
+                                <h:outputText value="#{currentTestingSession.description}"/>
+                                <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                    <ui:param name="id" value="t#{currentTestingSession.id}"/>
+                                    <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                                    <ui:define name="content">
+                                        <div>
+                                            <b>#{currentTestingSession.description}</b><br/><br/>
+                                            #{messages['gazelle.tm.IHE']}
+                                            #{currentTestingSession.zone} #{currentTestingSession.year}
+                                            #{currentTestingSession.zone} #{currentTestingSession.type} <br/>
+                                            #{messages['gazelle.testmanagement.home.connectathon.registrationDeadline']}
+                                            <g:date tooltip="true"
+                                                    value="#{currentTestingSession.registrationDeadlineDate}"/>
+                                            .
+                                            #{messages['gazelle.testmanagement.home.connectathon.afterRegistrationDeadline']}
+                                            <br/> <br/>
+                                            #{messages['gazelle.testmanagement.session.choice.help.ThisEventWillHelp']}
+                                            <g:date tooltip="true" value="#{currentTestingSession.beginningSession}"/>
+                                            #{messages['gazelle.testmanagement.session.choice.help.to']}
+                                            <g:date tooltip="true" value="#{currentTestingSession.endingSession}"/>
+                                            <br/>
+                                        </div>
+                                    </ui:define>
+                                </ui:decorate>
+                            </li>
+                        </a4j:repeat>
+                    </ul>
+                </s:div>
+                <!-- selected testing session -->
+                <h:panelGroup rendered="#{identity.loggedIn}">
+                    <strong>
+                        <h:outputText value="#{gazelleDAO.getSelectedTestingSession().description}"/>
+                    </strong>
+                </h:panelGroup>
+                <s:div rendered="#{identity.loggedIn and (!empty userManagerExtra.selectedTestingSession)}">
+                    <p>
+                        #{messages['gazelle.testmanagement.home.connectathon.registrationDeadline']}
+                        <g:date tooltip="true"
+                                value="#{userManagerExtra.selectedTestingSession.registrationDeadlineDate}"/>
+                        .
+                        #{messages['gazelle.testmanagement.home.connectathon.afterRegistrationDeadline']}
+                    </p>
+                </s:div>
+                <br/>
+                <s:div id="mainPanelContentDiv">
+                    <h:form id="mainContentForm">
+                        <s:token allowMultiplePosts="true"/>
+                        <s:span rendered="#{not homeManager.editMainContent}">
+                            <g:safehtml value="#{selectedHome.mainPanelContent}"/>
+                        </s:span>
+
+                        <a4j:region id="mainContentRegion"
+                                    rendered="#{s:hasRole('admin_role') and homeManager.editMainContent}">
+                            <ui:decorate template="/layout/editor/_text_editor.xhtml">
+                                <ui:param name="text" value="#{selectedHome.mainPanelContent}"/>
+                                <ui:param name="id" value="mainContentText"/>
+                                <ui:param name="isFocus" value="true"/>
+                            </ui:decorate>
+                        </a4j:region>
+
+                        <a4j:commandButton value="#{messages['gazelle.common.button.Edit']}"
+                                           actionListener="#{homeManager.setEditMainContent(true)}"
+                                           rendered="#{s:hasRole('admin_role') and not homeManager.editMainContent}"
+                                           styleClass="gzl-btn-blue" render="mainPanelContentDiv"/>
+                        <a4j:commandButton value="#{messages['gazelle.common.button.Save']}"
+                                           actionListener="#{homeManager.saveHome('mainContent')}"
+                                           rendered="#{s:hasRole('admin_role') and homeManager.editMainContent}"
+                                           styleClass="gzl-btn-green" render="mainPanelContentDiv"/>
+                        <br/>
+                        <a4j:commandButton value="#{messages['gazelle.tm.home.addASecondPanel']}"
+                                           rendered="#{s:hasRole('admin_role') and selectedHome.secondaryPanelContent == null}"
+                                           oncomplete="jq162('#selectPanelPosition').modal('show');"
+                                           styleClass="gzl-btn" render="selectPanelPosition, :selectionForm"/>
+                    </h:form>
+                </s:div>
+            </div>
+        </div>
+
+
+        <h:panelGroup id="SecondaryPanelBelow"
+                      rendered="#{(not empty selectedHome.secondaryPanelContent or homeManager.editSecondaryContent) and selectedHome.secondaryPanelPosition.equals('below')}">
+            <ui:include src="secondaryPanel.xhtml">
+                <ui:param name="position" value="Below"/>
+            </ui:include>
+        </h:panelGroup>
+
+    </s:div>
+
+    <h:form id="selectionForm">
+        <s:token allowMultiplePosts="true"/>
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="selectPanelPosition"/>
+            <ui:define name="popup_title">#{messages['gazelle.tm.home.newPanelCreation']}</ui:define>
+            <p>#{messages['gazelle.tm.home.choosePanelPosition']}</p>
+            <h:selectOneMenu styleClass="form-control gzl-form-control"
+                             value="#{selectedHome.secondaryPanelPosition}">
+                <f:selectItem itemValue="above" itemLabel="#{messages['gazelle.tm.home.above']}"/>
+                <f:selectItem itemValue="below" itemLabel="#{messages['gazelle.tm.home.below']}"/>
+            </h:selectOneMenu>
+            <ui:define name="popup_footer">
+                <h:commandButton value="#{messages['gazelle.tm.CreatePanel']}"
+                                 actionListener="#{homeManager.setEditSecondaryContent(true)}"
+                                 styleClass="btn btn-primary"
+                                 onclick="jq162('#selectPanelPosition').modal('hide');"/>
+                <h:commandButton value="#{messages['gazelle.tm.Cancel']}"
+                                 styleClass="btn btn-default"
+                                 onclick="jq162('#selectPanelPosition').modal('hide');"/>
+            </ui:define>
+        </ui:decorate>
+    </h:form>
+
+</ui:composition>
+

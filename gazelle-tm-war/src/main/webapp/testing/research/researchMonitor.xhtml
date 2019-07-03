@@ -1,0 +1,117 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.testmanagement.monitors.ResearchOfMonitors']}"/>
+    <ui:define name="body">
+        <h:form id="globalform" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <h:inputHidden id="filterUrlParameters" name="filterUrlParameters"
+                           value="#{monitorSearchFilter.monitors.filter.urlParameters}"/>
+            <script>
+                updateUrl("globalform:filterUrlParameters");
+                $("#globalform\\:filterUrlParameters").bind('change',
+                        function () {
+                            updateUrl("globalform:filterUrlParameters");
+                        });
+            </script>
+            <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        <!--  Testing session -->
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{monitorSearchFilter.monitors.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="testing_session"/>
+                            <ui:param name="filterName"
+                                      value="#{messages['gazelle.systems.testingSession']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <!--  AIPO selection -->
+                <ui:include src="/testing/research/filterAIPO.xhtml">
+                    <ui:param name="filter" value="#{monitorSearchFilter.monitors.filter}"/>
+                    <ui:param name="filterForm" value="globalform"/>
+                </ui:include>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{monitorSearchFilter.monitors.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="test"/>
+                            <ui:param name="filterName" value="#{messages['gazelle.tm.monitors.test']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{monitorSearchFilter.monitors.filter}"/>
+                            <ui:param name="filterWidth" value="120"/>
+                            <ui:param name="filterId" value="firstname"/>
+                            <ui:param name="filterName" value="#{messages['gazelle.contacts.Firstname']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{monitorSearchFilter.monitors.filter}"/>
+                            <ui:param name="filterWidth" value="120"/>
+                            <ui:param name="filterId" value="lastname"/>
+                            <ui:param name="filterName" value="#{messages['gazelle.contacts.Lastname']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{monitorSearchFilter.monitors.filter}"/>
+                            <ui:param name="filterWidth" value="120"/>
+                            <ui:param name="filterId" value="username"/>
+                            <ui:param name="filterName"
+                                      value="#{messages['gazelle.users.user.UserUsername']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <ui:define name="filter_buttons">
+                    <a4j:commandLink actionListener="#{monitorSearchFilter.monitors.filter.clear()}"
+                                     title="#{messages['gazelle.users.reset']}" type="submit"
+                                     execute="@this" render="globalform">
+                        <span class="fa fa-times-circle"/>
+                    </a4j:commandLink>
+                </ui:define>
+            </ui:decorate>
+
+            <s:div id="resultsDiv">
+                <h:outputText value="#{messages['gazelle.tm.monitor.NoMonitorForCriteria']}"
+                              rendered="#{monitorSearchFilter.monitors.size() == 0}"/>
+                <h:outputText
+                        value="#{messages['gazelle.tm.monitor.SearchReturn']} #{monitorSearchFilter.monitors.size()} #{messages['gazelle.tm.monitor.ListedBelow']}"
+                        rendered="#{monitorSearchFilter.monitors.size() &gt; 0}"/>
+                <br/>
+                <s:div rendered="#{monitorSearchFilter.monitors.size() &gt; 0}"
+                       styleClass="row" style="height: 300px">
+                    <a4j:repeat value="#{monitorSearchFilter.monitors}" var="mp">
+                        <div class="col-md-4" style="height: inherit">
+                            <f:subview id="mv#{monitor.id}">
+                                <ui:include src="/monitors/monitorInfo.xhtml">
+                                    <ui:param name="monitor" value="#{mp}"/>
+                                </ui:include>
+                            </f:subview>
+                        </div>
+                    </a4j:repeat>
+                </s:div>
+
+            </s:div>
+        </h:form>
+        <ui:include src="/testing/kpi/panelTests.xhtml">
+            <ui:param name="items" value="#{monitorSearchFilter.listTestsDisplay()}"/>
+        </ui:include>
+    </ui:define>
+</ui:composition>

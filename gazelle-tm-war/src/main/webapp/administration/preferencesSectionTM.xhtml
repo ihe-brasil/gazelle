@@ -1,0 +1,225 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+        <ui:param name="panel_id" value="mesaTest"/>
+        <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.MESATests']}</ui:define>
+        <a4j:region>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:define name="label">#{messages['gazelle.tm.mesatests.SendNotificationMails']}</ui:define>
+                <ui:param name="id" value="sendNotificationMailsBox"/>
+                <h:selectBooleanCheckbox id="sendNotificationMailsBox"
+                                         value="#{preferencesModifier.values['send_mail_mesa_notification']}"
+                                         styleClass="form-control-static"/>
+            </s:decorate>
+        </a4j:region>
+        <a4j:region>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:define name="label">#{messages['gazelle.tm.mesatests.EnableAutomaticValidation']}</ui:define>
+                <ui:param name="id" value="enableAutomaticValidationBox"/>
+                <h:selectBooleanCheckbox id="enableAutomaticValidationBox"
+                                         value="#{preferencesModifier.values['mesa_test_automatic_validation']}"
+                                         styleClass="form-control-static"/>
+            </s:decorate>
+        </a4j:region>
+    </ui:decorate>
+    <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+        <ui:param name="panel_id" value="certs"/>
+        <ui:define name="panel_title">#{messages['gazelle.common.menu.Certificates']}</ui:define>
+        <a4j:region>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="certificatesMenuURL"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.CertificatesMenuURL']}</ui:define>
+                <h:inputText id="certificatesMenuURL" size="100"
+                             value="#{preferencesModifier.values['certificates_url']}"
+                             styleClass=" form-control" required="false">
+                </h:inputText>
+            </s:decorate>
+        </a4j:region>
+    </ui:decorate>
+    <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+        <ui:param name="panel_id" value="evsClient"/>
+        <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.ExternalValidationServiceFrontend']}</ui:define>
+        <a4j:region>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="EVSUrl"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.EVSClientURL']}</ui:define>
+                <h:inputText id="EVSUrl" size="100" value="#{preferencesModifier.values['evs_client_url']}"
+                             styleClass=" form-control" required="false">
+                </h:inputText>
+            </s:decorate>
+        </a4j:region>
+    </ui:decorate>
+    <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+        <ui:param name="panel_id" value="gwt"/>
+        <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.GazelleWebserviceTester']}</ui:define>
+        <a4j:region>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="GWTUrl"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.GazelleWebserviceTesterURL']}</ui:define>
+                <h:inputText id="GWTUrl" size="100" value="#{preferencesModifier.values['gwt_url']}"
+                             styleClass=" form-control" required="false">
+                </h:inputText>
+            </s:decorate>
+        </a4j:region>
+    </ui:decorate>
+    <ui:decorate id="update" template="/layout/panels/_panel_title_fixed_id.xhtml">
+        <ui:param name="panel_id" value="update"/>
+        <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.AutoUpdateSection']}</ui:define>
+        <a4j:region>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.AutoUpdateCATResults']}</ui:define>
+                <ui:param name="id" value="autoUpdateCATResultsBox"/>
+                <h:selectBooleanCheckbox id="autoUpdateCATResultsBox"
+                                         value="#{preferencesModifier.values['auto_update_results']}"
+                                         styleClass="form-control-static"/>
+            </s:decorate>
+        </a4j:region>
+        <a4j:region>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="refreshIntervalSpinner"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.AutoUpdateTestResultInterval']})</ui:define>
+                <div class="form-control-static">
+                    <rich:inputNumberSpinner id="refreshIntervalSpinner"
+                                             value="#{preferencesModifier.values['test_result_refresh_interval']}"
+                                             minValue="1" maxValue="3600"/>
+                    <span class="gzl-icon-question-circle"
+                          title="This is the interval in milliseconds that TestInstance.xhtml will auto-refresh the Test results on the screen"/>
+                </div>
+            </s:decorate>
+        </a4j:region>
+        <a4j:region>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.CheckIntervalForAutoUpdateCATResultms']})</ui:define>
+                <ui:param name="id" value="checkIntervalCATResults"/>
+                <div class="form-control-static">
+                    <rich:inputNumberSpinner id="checkIntervalCATResults"
+                                             value="#{preferencesModifier.values['cat_result_check_interval']}"
+                                             minValue="5000" maxValue="3000000"/>
+                    <span class="gzl-icon-question-circle"
+                          title="#{messages['net.ihe.gazelle.tm.ThisIsTheIntervalInMillisecondsThatCATResultWill']})"/>
+                </div>
+            </s:decorate>
+        </a4j:region>
+        <a4j:region>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.CheckIntervalForAutoUpdatePartnersms']})</ui:define>
+                <ui:param name="id" value="checkIntervalPartners"/>
+                <div class="form-control-static">
+                    <rich:inputNumberSpinner id="checkIntervalPartners"
+                                             value="#{preferencesModifier.values['partners_check_interval']}"
+                                             minValue="5000" maxValue="3000000"/>
+                    <span class="gzl-icon-question-circle"
+                          title="#{messages['net.ihe.gazelle.tm.ThisIsTheIntervalInMillisecondsThatPartnersWillA']})"/>
+                </div>
+            </s:decorate>
+        </a4j:region>
+    </ui:decorate>
+    <ui:decorate id="proxy" template="/layout/panels/_panel_title_fixed_id.xhtml">
+        <ui:param name="panel_id" value="proxy"/>
+        <ui:define name="panel_title">#{messages['gazelle.tm.application.preferences.ProxySection']}</ui:define>
+        <a4j:region id="tfProxyRegion">
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.IHEJPProxyTRM']}</ui:define>
+                <ui:param name="id" value="iHEJPProxyTRMBox"/>
+                <h:selectBooleanCheckbox id="iHEJPProxyTRMBox"
+                                         value="#{preferencesModifier.values['proxy_transactionmonitor_enabled']}"
+                                         styleClass="form-control-static"/>
+
+            </s:decorate>
+            <s:decorate id="tfProxyOIDDecoration" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="proxyOIDInput"/>
+                <ui:define name="label">#{messages['gazelle.tm.application.preferences.ProxyOID']}</ui:define>
+
+                <h:inputText size="100" id="proxyOIDInput" value="#{preferencesModifier.values['gazelle_proxy_oid']}"
+                             styleClass=" form-control" required="false">
+                </h:inputText>
+
+            </s:decorate>
+            <s:decorate id="tfProxyURLDecoration" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="proxyURLInput"/>
+                <ui:define name="label">#{messages['gazelle.tm.application.preferences.ProxyURL']}</ui:define>
+
+                <h:inputText size="100" id="proxyURLInput"
+                             value="#{preferencesModifier.values['gazelle_proxy_url']}" styleClass=" form-control"
+                             required="false">
+                </h:inputText>
+
+            </s:decorate>
+            <s:decorate id="tfProxyMessageDecoration" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="proxyMessageInput"/>
+                <ui:define name="label">#{messages['gazelle.tm.application.preferences.ProxyMessage']}</ui:define>
+
+                <h:inputText size="100" id="proxyMessageInput"
+                             value="#{preferencesModifier.values['gazelle_proxy_message']}" styleClass=" form-control"
+                             required="false">
+                </h:inputText>
+
+            </s:decorate>
+            <s:decorate id="tfProxyStepDecoration" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="proxyStepInput"/>
+                <ui:define name="label">#{messages['gazelle.tm.application.preferences.ProxyStep']}</ui:define>
+
+                <h:inputText size="100" id="proxyStepInput"
+                             value="#{preferencesModifier.values['gazelle_proxy_step']}" styleClass=" form-control"
+                             required="false">
+                </h:inputText>
+
+            </s:decorate>
+            <s:decorate id="tfProxyWebserviceEndpointDecoration"
+                        template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="proxyWebserviceEndpointInput"/>
+                <ui:define name="label">#{messages['gazelle.tm.application.preferences.ProxyWebserviceEndpoint']}
+                </ui:define>
+
+                <h:inputText size="100" id="proxyWebserviceEndpointInput"
+                             value="#{preferencesModifier.values['gazelle_proxy_webservice_endpoint']}"
+                             styleClass=" form-control" required="false">
+                </h:inputText>
+
+            </s:decorate>
+            <s:decorate id="tfCacheProxyChannelStatus" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:define name="label">#{messages['gazelle.tm.application.preferences.ProxyCacheChannelStatus']}
+                </ui:define>
+                <ui:param name="id" value="proxyCacheChannelStatusBox"/>
+                <h:selectBooleanCheckbox id="proxyCacheChannelStatusBox"
+                                         value="#{preferencesModifier.values['cache_proxy_channel_status']}"
+                                         styleClass="form-control-static"/>
+
+            </s:decorate>
+        </a4j:region>
+    </ui:decorate>
+    <ui:decorate id="tls" template="/layout/panels/_panel_title_fixed_id.xhtml">
+        <ui:param name="panel_id" value="tls"/>
+        <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.TLSSection']}</ui:define>
+        <a4j:region>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="tlsTestUrl"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.TLSTestUrl']}</ui:define>
+                <h:inputText id="tlsTestUrl" size="100" value="#{preferencesModifier.values['tls_test_url']}"
+                             styleClass="form-control"
+                             required="false"/>
+            </s:decorate>
+            <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="tlsUrl"/>
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.TLSURL']}</ui:define>
+                <h:inputText id="tlsUrl" size="100" value="#{preferencesModifier.values['tls_url']}"
+                             styleClass="form-control"
+                             required="false"/>
+                <span class="gzl-icon-question-circle"
+                      title="#{messages['net.ihe.gazelle.tm.ThisUrlIsUsedInTestInstances']}, #{messages['net.ihe.gazelle.tm.ExampleHttpgazelleihenetgss']} "/>
+            </s:decorate>
+        </a4j:region>
+    </ui:decorate>
+
+    <!-- Pref section TM -->
+    <!--@formatter:off-->
+    <script>
+        disable_input_spinner_mouse_wheel('#{rich:clientId('refreshIntervalSpinner')}');
+        disable_input_spinner_mouse_wheel('#{rich:clientId('checkIntervalCATResults')}');
+        disable_input_spinner_mouse_wheel('#{rich:clientId('checkIntervalPartners')}');
+    </script>
+    <!--@formatter:on-->
+</ui:composition>

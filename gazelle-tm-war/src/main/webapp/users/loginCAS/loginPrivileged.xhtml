@@ -1,0 +1,94 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.users.registration.Login']}"/>
+    <ui:define name="body">
+        <h:form id="login">
+            <s:token allowMultiplePosts="true"/>
+            <h:panelGroup rendered="#{!identity.loggedIn}">
+                <!-- ======================= -->
+                <!-- User login input section 		  -->
+                <!-- ======================= -->
+                <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                    <ui:param name="panel_id" value="loginPanel"/>
+                    <ui:define name="panel_title">#{messages['gazelle.users.registration.Login']}</ui:define>
+                    <ui:include src="/users/login/loginSection.xhtml"/>
+                </ui:decorate>
+            </h:panelGroup>
+        </h:form>
+        <h:form id="logout">
+            <s:token allowMultiplePosts="true"/>
+            <h:panelGroup rendered="#{identity.loggedIn}">
+                <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                    <ui:define name="panel_title">#{messages['gazelle.users.registration.Logout']}</ui:define>
+                    <p>#{messages['gazelle.users.registration.PleaseLogoutLabel']}
+                        (#{identity.username})</p>
+                </ui:decorate>
+            </h:panelGroup>
+            <div>
+                <h:commandButton styleClass="gzl-btn" value="#{messages['gazelle.users.registration.Logout']}"
+                                 action="#{identity.logout}" rendered="#{identity.loggedIn}"/>
+            </div>
+        </h:form>
+        <!-- ******************************************* -->
+        <!-- Modal Panel : Forgot password 				  -->
+        <!-- ******************************************* -->
+        <h:form id="passwordAssistanceForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="passwordAssistance"/>
+                <ui:define name="popup_title">#{messages['gazelle.users.registration.PasswordAssistance']}...</ui:define>
+                <h2>#{messages['gazelle.users.registration.PasswordAssistance']}
+                </h2>
+
+                <p>#{interpolator.interpolate(messages['gazelle.users.registration.ForgotPasswordLabelComplete'],
+				applicationPreferenceManager.getApplicationName())}</p>
+
+                <p>#{messages['gazelle.users.registration.ForgotPasswordLabel2']}
+                </p>
+                <a4j:region id="username2Region">
+                    <s:decorate id="username2Decoration" template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="usernameText"/>
+                        <ui:define name="label">#{messages['gazelle.users.registration.Username']}</ui:define>
+                        <h:inputText  styleClass=" form-control" id="usernameText" maxlength="128" size="30"
+                                      value="#{userManager.selectedUser.username}">
+                            <a4j:ajax event="blur" render="username2Decoration"/>
+                        </h:inputText>
+                    </s:decorate>
+                </a4j:region>
+                <h:outputText value="#{messages['gazelle.users.registration.Or']}"/>
+                <a4j:region id="email2Region">
+                    <s:decorate id="email2Decoration" template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="emailText"/>
+                        <ui:define name="label">#{messages['gazelle.users.registration.EmailAddress']}</ui:define>
+                        <a4j:commandLink id="email2DecorationOnblur" render="email2Decoration"/>
+                        <h:inputText  styleClass=" form-control" id="emailText" maxlength="128" size="30"
+                                      value="#{userManager.selectedUser.email}"
+                        />
+                    </s:decorate>
+                </a4j:region>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="button" styleClass="gzl-btn-green"
+                                       value="#{messages['gazelle.users.registration.SendEmailButton']}"
+                                       action="#{userManager.sendEmailToChangePassword( )}"
+                                       onclick="jq162('#passwordAssistance').modal('hide');"
+                                       execute="@this"/>
+                    <p>
+                        #{messages['gazelle.users.registration.ForgotPasswordLabel3']}
+                        #{applicationPreferenceManager.getApplicationAdminName()} (
+                        <a href="mailto:#{applicationPreferenceManager.getApplicationAdminEmail()}">#{applicationPreferenceManager.getApplicationAdminEmail()}</a>
+                        ) #{messages['gazelle.users.registration.ForgotPasswordLabel4']}
+                    </p>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!-- ******************************************* -->
+        <!-- Modal Panel : Forgot password 				  -->
+        <!-- ******************************************* -->
+    </ui:define>
+</ui:composition>

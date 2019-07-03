@@ -1,0 +1,104 @@
+<s:div xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+       xmlns:s="http://jboss.org/schema/seam/taglib"
+       xmlns="http://www.w3.org/1999/xhtml">
+    <h:panelGroup rendered="#{tfHl7MessageProfileManager.showProfile == true}">
+        <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+            <ui:param name="panel_id" value="viewProfilePanel"/>
+            <ui:define name="panel_title">#{messages['gazelle.tf.HL7v2MessageProfileInformations']}</ui:define>
+            <a4j:region id="OidRegion">
+                <s:decorate id="oidDecoration" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.ProfileOid']}</ui:define>
+                    <h:outputText id="oid"
+                                  value="#{tfHl7MessageProfileManager.selectedProfile.profileOid}">
+                    </h:outputText>
+                </s:decorate>
+            </a4j:region>
+            <a4j:region id="domainRegion">
+                <s:decorate id="domainDecoration" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.Domain']}</ui:define>
+                    <h:outputText id="domain"
+                                  value="#{tfHl7MessageProfileManager.selectedProfile.domain.name}">
+                    </h:outputText>
+                </s:decorate>
+            </a4j:region>
+            <a4j:region id="actorRegion">
+                <s:decorate id="actorDecoration" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.Actor']}</ui:define>
+                    <h:outputText id="actor"
+                                  value="#{tfHl7MessageProfileManager.selectedProfile.actor.name}">
+                    </h:outputText>
+                </s:decorate>
+            </a4j:region>
+            <a4j:region id="transactionRegion">
+                <s:decorate id="transactionDecoration" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.table.Transaction']}</ui:define>
+                    <h:outputText id="transaction"
+                                  value="#{tfHl7MessageProfileManager.selectedProfile.transaction.keyword}">
+                    </h:outputText>
+                </s:decorate>
+            </a4j:region>
+            <a4j:region id="messageRegion">
+                <s:decorate id="messageDecoration" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.Message']}</ui:define>
+                    <h:outputText id="message"
+                                  value="#{tfHl7MessageProfileManager.selectedProfile.messageType}">
+                    </h:outputText>
+                </s:decorate>
+            </a4j:region>
+            <a4j:region id="versionRegion">
+                <s:decorate id="versionDecoration" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.Hl7Version']}</ui:define>
+                    <h:outputText id="version"
+                                  value="#{tfHl7MessageProfileManager.selectedProfile.hl7Version}">
+                    </h:outputText>
+                </s:decorate>
+            </a4j:region>
+            <a4j:region id="controlCondeRegion"
+                        rendered="#{tfHl7MessageProfileManager.selectedProfile.messageOrderControlCode != null}">
+                <s:decorate id="controlCodeDecoration" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.OrderControlCode']}</ui:define>
+                    <h:outputText id="controlCode"
+                                  value="#{tfHl7MessageProfileManager.selectedProfile.messageOrderControlCode}">
+                    </h:outputText>
+                </s:decorate>
+            </a4j:region>
+            <a4j:region id="profileTypeRegion">
+                <s:decorate id="profileTypeDecoration" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.ProfileType']}</ui:define>
+                    <h:outputText id="profileType"
+                                  value="#{tfHl7MessageProfileManager.selectedProfile.profileType}">
+                    </h:outputText>
+                </s:decorate>
+            </a4j:region>
+            <div style="clear: both"/>
+            <div>
+                <a4j:commandButton id="viewProfileBackButton" styleClass="gzl-btn"
+                                   value="#{messages['gazelle.tf.BackToList']}" bypassUpdates="true" immediate="true"
+                                   actionListener="#{tfHl7MessageProfileManager.displayAllProfiles()}"
+                                   render="globalDiv, viewProfilePanel"/>
+                <a4j:commandButton id="viewProfileEditButton" styleClass="gzl-btn-blue"
+                                   value="#{messages['gazelle.tf.EditMessageProfile']}" bypassUpdates="true"
+                                   immediate="true"
+                                   actionListener="#{tfHl7MessageProfileManager.editSelectedProfile()}"
+                                   render="globalDiv, viewProfilePanel, editProfilePanel"/>
+            </div>
+        </ui:decorate>
+    </h:panelGroup>
+
+
+    <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+        <ui:param name="panel_id" value="viewProfileContentPanel"/>
+        <ui:define name="panel_title">#{messages['gazelle.tf.HL7v2MessageProfileContent']}</ui:define>
+        <h:outputText id="warning" value="#{messages['gazelle.tf.DisplayingTheProfileContentMayTakeALongTime']}..."/>
+        <br/>
+        <a4j:commandButton id="viewProfileDisplayButton" styleClass="gzl-btn"
+                           value="#{messages['gazelle.tf.DisplayProfileContent']}"
+                           actionListener="#{tfHl7MessageProfileManager.getProfileContentFromRepository()}"
+                           render="viewProfileContentPanel"/>
+        <s:span rendered="#{tfHl7MessageProfileManager.profileContent != null}">
+            <g:safehtml value="#{tfHl7MessageProfileManager.getProfileContentForDisplay()}"/>
+        </s:span>
+    </ui:decorate>
+
+</s:div>

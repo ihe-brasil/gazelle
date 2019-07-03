@@ -1,0 +1,28 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+    <!-- delete selected annotation -->
+    <!-- ui:param name="managedbean" value="a bean name (extends AbstractSampleManager)"-->
+    <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+    <h:form id="deleteAnnForm">
+        <s:token allowMultiplePosts="true"/>
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="DeleteAnnotationPanel"/>
+            <ui:define name="popup_title">#{messages['gazelle.testmanagement.object.DeleteAnnotation']}</ui:define>
+            <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+            <ui:define name="popup_footer">
+                <button type="button" class="gzl-btn" data-dismiss="modal">
+                    #{messages['gazelle.tm.Cancel']}
+                </button>
+                <a4j:commandButton id="deleteAnnbutton"
+                                   value="#{messages['gazelle.testmanagement.object.DeleteThisAnnotation']}"
+                                   styleClass="gzl-btn-red"
+                                   actionListener="#{managedBean.deleteSelectedAnnotation()}"
+                                   onclick="jq162('#DeleteAnnotationPanel').modal('hide');"
+                                   render="annotationForReaderOnCreateForm,helloword,messageDecoration"/>
+            </ui:define>
+        </ui:decorate>
+    </h:form>
+</ui:composition>

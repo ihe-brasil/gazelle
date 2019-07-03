@@ -1,0 +1,40 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <s:div id="viewTestListDiv">
+        <h:outputText value="#{monitorInSessionVar.testList.size()} #{messages['gazelle.tm.TestsFound']}."
+                      rendered="#{not empty monitorInSessionVar.testList}"/>
+        <rich:dataTable id="viewTestListTable" cellspacing="0" rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                        width="700" border="0" var="selectedTest" value="#{monitorInSessionVar.getAllTestList()}"
+                        render="ds">
+            <f:facet name="header">#{messages['gazelle.tm.monitors.TestList']}</f:facet>
+            <g:column sortBy="#{'keyword'}" sortOrder="ascending">
+                <ui:define name="header">#{messages['gazelle.testmanagement.object.keyword']}</ui:define>
+                <g:link target="_blank" value="#{selectedTest}"/>
+            </g:column>
+            <g:column>
+                <ui:define name="header">#{messages['gazelle.testmanagement.configuration.ParameterDescription']}
+                </ui:define>
+                #{selectedTest.shortDescription}
+            </g:column>
+            <g:column>
+                <ui:define name="header">#{messages['gazelle.tm.monitors.PeerType']}</ui:define>
+                #{messages[selectedTest.testPeerType.labelToDisplay]}
+            </g:column>
+            <g:column>
+                <ui:define name="header">#{messages['gazelle.common.application.about.version']}</ui:define>
+                #{selectedTest.version}
+            </g:column>
+            <f:facet name="footer">
+                <ui:include src="/util/datatableFooter.xhtml">
+                    <ui:param name="dataScrollerId" value="ds"/>
+                    <ui:param name="dataTableId" value="viewTestListTable"/>
+                </ui:include>
+            </f:facet>
+        </rich:dataTable>
+
+    </s:div>
+    <br/>
+</ui:composition>

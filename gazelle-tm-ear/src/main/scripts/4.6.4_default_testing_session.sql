@@ -1,0 +1,1 @@
+update tm_user_preferences set selected_testing_session_id = (select id from tm_testing_session where active = true order by id desc limit 1) where selected_testing_session_id is null;

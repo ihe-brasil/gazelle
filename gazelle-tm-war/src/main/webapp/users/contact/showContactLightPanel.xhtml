@@ -1,0 +1,64 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+>
+    <!-- ======================= -->
+    <!-- Contact Edit section						   -->
+    <!-- ======================= -->
+    <s:fragment id="contactEditFragment">
+        <dl class="dl-horizontal">
+            <s:decorate id="contactIDDecoration#{panelId}" template="/layout/display/_data_list_item.xhtml"
+                        rendered="#{ s:hasRole('admin_role')}">
+                <ui:define name="label">#{messages['gazelle.users.IDInDatabase']}</ui:define>
+                <h:outputText value="#{contactVariable.id}"/>
+            </s:decorate>
+            <s:decorate id="institutionDecoration#{panelId}" template="/layout/display/_data_list_item.xhtml"
+                        rendered="#{ s:hasRole('admin_role')}">
+                <ui:define name="label">#{messages['gazelle.users.institution.InstitutionName']}</ui:define>
+                <h:outputText value="#{contactVariable.institution.name}"/>
+            </s:decorate>
+            <s:decorate id="firstNameDecoration#{panelId}" template="/layout/display/_data_list_item.xhtml"
+                        rendered="#{ not empty contactVariable.firstname }">
+                <ui:define name="label">#{messages['gazelle.contacts.Firstname']}</ui:define>
+                <h:outputText id="firstName#{panelId}" size="30" value="#{contactVariable.firstname}"/>
+            </s:decorate>
+            <s:decorate id="lastNameDecoration#{panelId}" template="/layout/display/_data_list_item.xhtml"
+                        rendered="#{ not empty contactVariable.lastname }">
+                <ui:define name="label">#{messages['gazelle.contacts.Lastname']}</ui:define>
+                <h:outputText id="lastName#{panelId}" size="30" value="#{contactVariable.lastname}"/>
+            </s:decorate>
+            <s:decorate id="emailDecoration#{panelId}" template="/layout/display/_data_list_item.xhtml"
+                        rendered="#{ not empty contactVariable.email }">
+                <ui:define name="label">#{messages['gazelle.contacts.Email']}</ui:define>
+                <h:outputText id="email#{panelId}" size="30" value="#{contactVariable.email}"/>
+            </s:decorate>
+            <s:decorate id="phoneDecoration#{panelId}" template="/layout/display/_data_list_item.xhtml"
+                        rendered="#{ not empty contactVariable.personalPhone }">
+                <ui:define name="label">#{messages['gazelle.contacts.Phone']}</ui:define>
+                <h:outputText id="phone#{panelId}" size="30" value="#{contactVariable.personalPhone}"/>
+            </s:decorate>
+            <s:decorate id="titleDecoration#{panelId}" template="/layout/display/_data_list_item.xhtml"
+                        rendered="#{ not empty contactVariable.title }">
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.Title']}</ui:define>
+                <h:outputText id="title#{panelId}" size="30" value="#{contactVariable.title}"/>
+            </s:decorate>
+            <s:decorate id="cellPhoneDecoration#{panelId}" template="/layout/display/_data_list_item.xhtml"
+                        rendered="#{ not empty contactVariable.cellPhone }">
+                <ui:define name="label">#{messages['gazelle.contacts.CellPhone']}</ui:define>
+                <h:outputText id="cellPhone#{panelId}" size="30" value="#{contactVariable.cellPhone}"/>
+            </s:decorate>
+            <s:decorate id="faxDecoration#{panelId}" template="/layout/display/_data_list_item.xhtml"
+                        rendered="#{ not empty contactVariable.personalFax }">
+                <ui:define name="label">#{messages['gazelle.contacts.Fax']}</ui:define>
+                <h:outputText id="fax#{panelId}" size="30" value="#{contactVariable.personalFax}"/>
+            </s:decorate>
+            <h:panelGrid id="contactfunctions" columns="3">
+                <h:outputText value="#{messages['gazelle.contacts.ProfessionalFunctions']}" style="font-weight:bold;"/>
+
+                <rich:list value="#{contactVariable.personFunction}" var="function" type="unordered">
+                    <h:outputText value="#{messages[function.name]} "/>
+                </rich:list>
+            </h:panelGrid>
+        </dl>
+    </s:fragment>
+</ui:composition>

@@ -1,0 +1,38 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+        <ui:param name="panel_id" value="#{varTableId}Panel"/>
+        <ui:define name="panel_title">#{dataTableHeader}</ui:define>
+        <h:outputText value="#{varList.size()} #{messages['net.ihe.gazelle.tm.TestInstances']}"
+                      rendered="#{varList.size() &gt; 0}" styleClass="help-block"/>
+        <rich:dataTable cellspacing="0" width="700" border="0"
+                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" id="#{varTableId}"
+                        var="selectedTestInstance" value="#{varList}"
+                        render="ds">
+            <g:column sortBy="#{'id'}" sortOrder="#{datatablestateholder.sortOrders['id']}">
+                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                <g:link target="_blank" value="#{selectedTestInstance}"/>
+            </g:column>
+            <ui:include src="testInstanceColumns.xhtml.html">
+                <ui:param name="ti" value="#{selectedTestInstance}"/>
+            </ui:include>
+            <g:column>
+                <ui:define name="header">#{messages['gazelle.tests.test.Monitor']}</ui:define>
+                <h:outputText
+                        value="#{selectedTestInstance.monitorInSession.user.firstname} #{selectedTestInstance.monitorInSession.user.lastname}"
+                        rendered="#{selectedTestInstance.monitorInSession != null}"/>
+            </g:column>
+
+            <f:facet name="footer">
+                <ui:include src="/util/datatableFooter.xhtml">
+                    <ui:param name="dataScrollerId" value="ds"/>
+                    <ui:param name="dataTableId" value="#{varTableId}"/>
+                </ui:include>
+            </f:facet>
+        </rich:dataTable>
+    </ui:decorate>
+
+</ui:composition>

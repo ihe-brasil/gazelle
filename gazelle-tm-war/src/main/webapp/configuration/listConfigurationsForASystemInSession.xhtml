@@ -1,0 +1,58 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <!-- Variable used for the systemInSession is systemInSessionToUse -->
+    <s:div id="panelOfConfigs">
+        #{configurationsOverview.setSelectedSystemInSession(systemInSessionToUse)}
+        #{configurationsOverview.setSelectedActor(selectedActorForConfigs)}
+        <h:form id="filter" rendered="#{identity.loggedIn}" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <h:inputHidden id="filterUrlParameters" name="filterUrlParameters"
+                           value="#{configurationsOverview.filter.urlParameters}"/>
+            <s:div rendered="#{isUpdateUrl}">
+                <script>
+                    updateUrl("filter:filterUrlParameters");
+                    $("#filter\\:filterUrlParameters").bind('change',
+                            function () {
+                                updateUrl("filter:filterUrlParameters");
+                            });
+                </script>
+            </s:div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <!--  type -->
+                    <ui:include src="/filter/filter.xhtml">
+                        <ui:param name="filter" value="#{configurationsOverview.filter}"/>
+                        <ui:param name="filterWidth" value="240"/>
+                        <ui:param name="filterId" value="class"/>
+                        <ui:param name="idSuffix" value="filterConfigurations"/>
+                        <ui:param name="filterName" value="#{messages['gazelle.systems.session.Type']}"/>
+                        <ui:param name="filterForm"
+                                  value="filter,formConfigurationsTable,CopyConfigConfirmationModalPanelForm,DeleteConfigConfirmationModalPanelForm"/>
+                    </ui:include>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <!--  actor -->
+                    <ui:include src="/filter/filter.xhtml">
+                        <ui:param name="filter" value="#{configurationsOverview.filter}"/>
+                        <ui:param name="filterWidth" value="240"/>
+                        <ui:param name="filterId" value="actor"/>
+                        <ui:param name="idSuffix" value="filterConfigurations"/>
+                        <ui:param name="filterName" value="#{messages['gazelle.testmanagement.object.Actor']}"/>
+                        <ui:param name="filterForm"
+                                  value="filter,formConfigurationsTable,CopyConfigConfirmationModalPanelForm,DeleteConfigConfirmationModalPanelForm"/>
+                    </ui:include>
+                </div>
+            </div>
+        </h:form>
+        <ui:include src="/configuration/configurationList.xhtml">
+            <ui:param name="showActions" value="#{showActions}"/>
+            <ui:param name="formId" value="formConfigurationsTable"/>
+            <ui:param name="idToRerender"
+                      value="filter,formConfigurationsTable,CopyConfigConfirmationModalPanelForm,DeleteConfigConfirmationModalPanelForm"/>
+        </ui:include>
+    </s:div>
+</ui:composition>

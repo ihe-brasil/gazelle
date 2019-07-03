@@ -1,0 +1,205 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.productregistry.search.Search']}"/>
+    <ui:define name="body">
+        <h:outputScript library="jscript" name="prsearch.js"/>
+        <h:form id="globalform" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <h:inputHidden id="filterUrlParameters" name="filterUrlParameters"
+                           value="#{prSearch.filter.urlParameters}"/>
+            <script>
+                updateUrl("globalform:filterUrlParameters");
+                $("#globalform\\:filterUrlParameters").bind('change',
+                        function () {
+                            updateUrl("globalform:filterUrlParameters");
+                        });
+            </script>
+            <s:div id="globalDiv">
+                <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter" value="#{prSearch.filterLike}"/>
+                                <ui:param name="filterWidth" value="340"/>
+                                <ui:param name="filterId" value="system"/>
+                                <ui:param name="filterName" value="#{messages['net.ihe.gazelle.tm.Like']}"/>
+                                <ui:param name="filterForm" value="globalform"/>
+                            </ui:include>
+                        </div>
+                        <div class="col-lg-6">
+                            <a4j:commandLink event="click" oncomplete="jq162('#aiposModalPanel').modal('show');"
+                                             execute="@this" render=" :aiposForm"
+                                             rendered="#{prSearch.showRatio}"
+                                             actionListener="#{prSearch.showAIPOs(-1)}">
+                                <span class="gzl-icon-info-circle"/>
+                            </a4j:commandLink>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter" value="#{prSearch.filter}"/>
+                                <ui:param name="filterWidth" value="240"/>
+                                <ui:param name="filterId" value="institution"/>
+                                <ui:param name="filterName" value="#{messages['gazelle.users.Institution']}"/>
+                                <ui:param name="filterForm" value="globalform"/>
+                            </ui:include>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter" value="#{prSearch.filter}"/>
+                                <ui:param name="filterWidth" value="240"/>
+                                <ui:param name="filterId" value="systemName"/>
+                                <ui:param name="filterName"
+                                          value="#{messages['gazelle.productregistry.system.label.SystemName']}"/>
+                                <ui:param name="filterForm" value="globalform"/>
+                            </ui:include>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter" value="#{prSearch.filter}"/>
+                                <ui:param name="filterWidth" value="240"/>
+                                <ui:param name="filterId" value="systemType"/>
+                                <ui:param name="filterName"
+                                          value="#{messages['gazelle.productregistry.system.label.ST']}"/>
+                                <ui:param name="filterForm" value="globalform"/>
+                            </ui:include>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter" value="#{prSearch.filter}"/>
+                                <ui:param name="filterWidth" value="240"/>
+                                <ui:param name="filterId" value="systemSubType"/>
+                                <ui:param name="filterName"
+                                          value="#{messages['net.ihe.gazelle.tm.SystemSubType']}"/>
+                                <ui:param name="filterForm" value="globalform"/>
+                            </ui:include>
+                        </div>
+                    </div>
+
+                    <!--  AIPO selection -->
+                    <ui:include src="/testing/research/filterAIPO.xhtml">
+                        <ui:param name="filter" value="#{prSearch.filter}"/>
+                        <ui:param name="filterForm" value="globalform"/>
+                    </ui:include>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <ui:include src="/filter/filterDate.xhtml">
+                                <ui:param name="filter" value="#{prSearch.filter}"/>
+                                <ui:param name="filterWidth" value="240"/>
+                                <ui:param name="filterId" value="date"/>
+                                <ui:param name="filterName"
+                                          value="#{messages['gazelle.productregistry.search.criteria.PublicationDate']}"/>
+                                <ui:param name="filterForm" value="globalform"/>
+                            </ui:include>
+                        </div>
+                    </div>
+
+                    <ui:define name="filter_buttons">
+                        <a4j:commandLink actionListener="#{prSearch.clearFilters()}"
+                                         title="#{messages['gazelle.users.reset']}" type="submit"
+                                         execute="@this"
+                                         render="globalform">
+                            <span class="fa fa-times-circle"/>
+                        </a4j:commandLink>
+                    </ui:define>
+                </ui:decorate>
+            </s:div>
+            <s:div>
+                <h:outputText
+                        value="#{prSearch.systems.size()} #{messages['gazelle.productregistry.search.button.IntegrationStatementsForThisSearch']}"
+                        rendered="#{prSearch.systems.size() &gt; 1}"/>
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.OneIntegrationStatementForThisSearch']}"
+                              rendered="#{prSearch.systems.size() == 1}"/>
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.NoIntegrationStatementForThisSearch']}"
+                              rendered="#{prSearch.systems.size() == 0}"/>
+
+                #{prSearch.logResearch()}
+
+                <a4j:outputPanel id="systemsPanel">
+                    <s:div style="text-align: center">
+                        <rich:dataScroller for="listSystems" maxPages="10" renderIfSinglePage="false" immediate="true"
+                                           render="systemsPanel"/>
+                    </s:div>
+                    #{prSearch.setIndex(-1)}
+                    <s:div rendered="#{prSearch.systems.size() &gt; 0}">
+                        <a4j:repeat id="listSystems" value="#{prSearch.systems}" var="sis" rows="12">
+                            #{prSearch.setIndex(prSearch.getIndex()+1)}
+                            <h:panelGroup rendered="#{prSearch.displayStartDiv()}">
+                                <ui:include src="/layout/output_html.xhtml">
+                                    <ui:param name="htmlText" value="&lt;div class=&quot;row&quot;&gt;"/>
+                                </ui:include>
+                            </h:panelGroup>
+                            <div class="col-md-4">
+                                <f:subview id="isv#{sis.id}">
+                                    <ui:include src="integrationStatementsInfo.xhtml">
+                                        <ui:param name="currentSystem" value="#{sis}"/>
+                                    </ui:include>
+                                </f:subview>
+                            </div>
+                            <h:panelGroup rendered="#{prSearch.displayEndDiv()}">
+                                <ui:include src="/layout/output_html.xhtml">
+                                    <ui:param name="htmlText" value="&lt;/div&gt;"/>
+                                </ui:include>
+                            </h:panelGroup>
+                        </a4j:repeat>
+                    </s:div>
+
+                </a4j:outputPanel>
+            </s:div>
+        </h:form>
+
+        <h:form id="aiposForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="aiposModalPanel"/>
+                <ui:param name="styleClass" value="modal-lg"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.ProfilesActors']}</ui:define>
+                <div class="dr-mpnl-pnl">
+                    <rich:dataTable var="aipo" value="#{prSearch.aipoList}" rows="15">
+                        <g:column style="text-align:right">
+                            <ui:define name="header">#{messages['gazelle.tf.table.IntegrationProfile']}</ui:define>
+                            <h:outputText
+                                    value="#{aipo.actorIntegrationProfile.integrationProfile.toString()}"/>
+                        </g:column>
+                        <g:column style="text-align:left">
+                            <ui:define name="header">#{messages['gazelle.testmanagement.system.label.Actor']}
+                            </ui:define>
+                            <h:outputText value="#{aipo.actorIntegrationProfile.actor.toString()}"/>
+                        </g:column>
+                        <g:column style="text-align:left">
+                            <ui:define name="header">#{messages['gazelle.tf.table.IntegrationProfileOption']}
+                            </ui:define>
+                            <h:outputText value="#{aipo.integrationProfileOption.getSelectableLabel()}"/>
+                        </g:column>
+                        <g:column>
+                            <ui:define name="header">
+                                <h:outputText value="#{messages['net.ihe.gazelle.tm.Match']}"/>
+                            </ui:define>
+                            <s:span styleClass="gzl-icon-checked" rendered="#{prSearch.aipos[aipo]}"/>
+                            <s:span styleClass="gzl-icon-times" rendered="#{not prSearch.aipos[aipo]}"/>
+                        </g:column>
+                        <f:facet name="footer">
+                            <rich:dataScroller id="datascrollerAIPOs"/>
+                        </f:facet>
+                    </rich:dataTable>
+                </div>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

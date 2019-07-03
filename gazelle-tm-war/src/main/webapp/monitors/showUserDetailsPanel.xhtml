@@ -1,0 +1,33 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <s:decorate id="id" template="/layout/display/_display.xhtml">
+        <ui:define name="label">#{messages['gazelle.users.user.UserInstitution']}</ui:define>
+        #{userVar.institution.name}
+
+    </s:decorate>
+    <s:decorate id="username" template="/layout/display/_display.xhtml">
+        <ui:define name="label">#{messages['gazelle.users.user.UserUsername']}</ui:define>
+        #{userVar.username}
+    </s:decorate>
+    <s:decorate id="firstname" template="/layout/display/_display.xhtml">
+        <ui:define name="label">#{messages['gazelle.users.registration.FirstName']}</ui:define>
+        #{userVar.firstname}
+    </s:decorate>
+    <s:decorate id="lastname" template="/layout/display/_display.xhtml">
+        <ui:define name="label">#{messages['gazelle.users.registration.LastName']}</ui:define>
+        #{userVar.lastname}
+    </s:decorate>
+    <s:decorate id="email" template="/layout/display/_display.xhtml">
+        <ui:define name="label">#{messages['gazelle.users.registration.Email']}</ui:define>
+        #{userVar.email}
+    </s:decorate>
+    <s:decorate id="blocked" template="/layout/display/_display.xhtml">
+        <ui:define name="label">#{messages['gazelle.users.registration.Blocked']}</ui:define>
+        #{userVar.blocked}
+    </s:decorate>
+    <s:decorate id="activated" template="/layout/display/_display.xhtml">
+        <ui:define name="label">#{messages['gazelle.users.registration.Activated']}</ui:define>
+        #{userVar.activated}
+    </s:decorate>
+</ui:composition>

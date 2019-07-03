@@ -1,0 +1,41 @@
+<s:div xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+       xmlns:s="http://jboss.org/schema/seam/taglib"
+       xmlns="http://www.w3.org/1999/xhtml">
+
+    #{messages['gazelle.systems.demonstration.DisplayDemonstration']} <p/>
+
+    <s:decorate id="name" template="/layout/display/_display.xhtml">
+        <ui:define name="label">#{messages['gazelle.systems.demonstration.Name']}</ui:define>
+        #{demonstrationManager.selectedDemonstration.name}
+    </s:decorate>
+
+    <s:decorate id="description" template="/layout/display/_display.xhtml">
+        <ui:define name="label">#{messages['gazelle.systems.demonstration.Description']}</ui:define>
+        #{demonstrationManager.selectedDemonstration.description}
+    </s:decorate>
+
+    <s:decorate id="url" template="/layout/display/_display.xhtml">
+        <ui:define name="label">#{messages['gazelle.systems.demonstration.URL']}</ui:define>
+        <a href="#{demonstrationManager.selectedDemonstration.url}" target="_blank">
+            #{demonstrationManager.selectedDemonstration.url}</a></s:decorate>
+
+    <s:decorate id="beginningDemonstration" template="/layout/display/_display.xhtml">
+        <ui:define name="label">#{messages['gazelle.systems.session.StartDate']}</ui:define>
+        <g:date date="true" time="false"
+                value="#{demonstrationManager.selectedDemonstration.beginningDemonstration}"/>
+    </s:decorate>
+
+    <s:decorate id="endingDemonstration" template="/layout/display/_display.xhtml">
+        <ui:define name="label">#{messages['gazelle.systems.session.EndDate']}</ui:define>
+        <g:date date="true" time="false" value="#{demonstrationManager.selectedDemonstration.endingDemonstration}"/>
+    </s:decorate>
+
+    <s:decorate id="country" template="/layout/display/_display.xhtml">
+        <ui:define name="label">#{messages['gazelle.systems.demonstration.country']}</ui:define>
+        <h:panelGrid columns="2" id="countryOutput">
+            <h:graphicImage library="img" name="#{demonstrationManager.selectedDemonstration.iso3166CountryCode.flagUrl}"/>
+            #{demonstrationManager.selectedDemonstration.iso3166CountryCode.printableName}
+        </h:panelGrid>
+    </s:decorate>
+</s:div>

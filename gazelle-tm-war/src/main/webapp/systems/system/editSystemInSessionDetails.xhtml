@@ -1,0 +1,146 @@
+<div xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+     xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <!-- ======================= -->
+    <!-- System summary section					  -->
+    <!-- ======================= -->
+
+    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+        <ui:define name="panel_title">#{messages['gazelle.systems.system.DisplaySystemLabel1']}</ui:define>
+
+        <div id="systemInSessionDiv">
+            <h:form id="systemInSessionDetailsForm" class="form-horizontal">
+                <s:token allowMultiplePosts="true"/>
+                <s:fragment id="systemInSessionFragment">
+                    <a4j:region id="isCopyRegion">
+                        <s:decorate id="nameDecoration" template="/layout/display/_display_field_horizontal_3-9.xhtml">
+                            <ui:define name="label"> #{messages['gazelle.systems.systemInSession.isACopy']}
+                                <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                    <ui:param name="id" value="copy"/>
+                                    <ui:param name="placement" value="bottom"/>
+                                    <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                                    <ui:define name="content">
+                                        <span class="gzl-never-wrap">#{messages['gazelle.systems.system.help.IsACopy1']}</span>
+                                    </ui:define>
+                                </ui:decorate>
+                            </ui:define>
+                            <div class="form-control-static">
+                                <h:outputText value="#{messages['gazelle.common.Yes']}"
+                                              rendered="#{ systemInSessionEditor.systemInSession.isCopy}"/>
+                                <h:outputText value="#{messages['gazelle.common.No']} "
+                                              rendered="#{ (systemInSessionEditor.systemInSession.isCopy == null) or (!systemInSessionEditor.systemInSession.isCopy) }"/>
+                            </div>
+                        </s:decorate>
+                    </a4j:region>
+                    <a4j:region id="powerRegion" rendered="false">
+                        <s:decorate id="powerDecoration" template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                            <ui:param name="id" value="power"/>
+                            <ui:define name="label">#{messages['gazelle.tm.Power']}</ui:define>
+                            <h:inputText styleClass=" form-control" id="power" maxlength="10" size="10"
+                                         value="#{systemInSessionEditor.systemInSession.power}">
+                                <a4j:ajax event="blur" render="powerDecoration"/>
+                            </h:inputText>
+                        </s:decorate>
+                    </a4j:region>
+                    <a4j:region id="skypeRegion">
+                        <s:decorate id="skypeDecoration" template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                            <ui:param name="id" value="skype"/>
+                            <ui:define name="label">#{messages['gazelle.systems.systemInSession.skype']}
+                                <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                    <ui:param name="id" value="sk"/>
+                                    <ui:param name="placement" value="bottom"/>
+                                    <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                                    <ui:define name="content">
+                                        <span class="gzl-never-wrap">#{messages['gazelle.systems.system.help.Skype1']}<br/>#{messages['gazelle.systems.system.help.Skype2']}</span>
+                                    </ui:define>
+                                </ui:decorate>
+                            </ui:define>
+                            <h:inputText styleClass=" form-control" id="skype" maxlength="30" size="30"
+                                         value="#{systemInSessionEditor.systemInSession.skype}">
+                                <a4j:ajax event="blur" render="skypeRegion"/>
+                            </h:inputText>
+                        </s:decorate>
+                    </a4j:region>
+                    <a4j:region id="blogRegion" rendered="false">
+                        <s:decorate id="blogDecoration" template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                            <ui:param name="id" value="blog"/>
+                            <ui:define name="label">#{messages['gazelle.systems.systemInSession.blog']}</ui:define>
+                            <h:inputText styleClass=" form-control" id="blog" maxlength="30" size="30"
+                                         value="#{systemInSessionEditor.systemInSession.blog}">
+                                <a4j:ajax event="blur" render="blogRegion"/>
+                            </h:inputText>
+                        </s:decorate>
+                    </a4j:region>
+                    <a4j:region id="tableLabelRegion">
+                        <s:decorate id="tableLabelDecoration"
+                                    template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                            <ui:param name="id" value="tableLabel"/>
+                            <ui:define name="label">#{messages['gazelle.systems.systemInSession.tableLabel']}
+                                <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                    <ui:param name="id" value="ta"/>
+                                    <ui:param name="placement" value="bottom"/>
+                                    <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                                    <ui:define name="content">
+                                        <span class="gzl-never-wrap">#{messages['gazelle.systems.system.help.TableLabel1']}<br/> #{messages['gazelle.systems.system.help.TableLabel2']}</span>
+                                    </ui:define>
+                                </ui:decorate>
+                            </ui:define>
+                            <h:inputText styleClass=" form-control" id="tableLabel" maxlength="60" size="30"
+                                         value="#{systemInSessionEditor.systemInSession.tableLabel}">
+                                <a4j:ajax event="blur" render="tableLabelRegion"/>
+                            </h:inputText>
+                        </s:decorate>
+                    </a4j:region>
+                    <a4j:region id="tableRegion"
+                                rendered="#{s:hasPermission('SystemInSessionManager','canModifyTableSession')}">
+                        <s:decorate id="tableDecoration" template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                            <ui:define name="label">#{messages['gazelle.systems.systemInSession.table']}</ui:define>
+                            <ui:param name="id" value="tableSessionList"/>
+                            <h:selectOneMenu styleClass="form-control gzl-form-control" id="tableSessionList"
+                                             value="#{systemInSessionEditor.systemInSession.tableSession}">
+                                <s:selectItems
+                                        value="#{testingSessionManager.listTableSessionAvailable(systemInSessionEditor.systemInSession.tableSession)}"
+                                        var="tableFromList"
+                                        noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                        label="#{tableFromList.tableKeyword}"/>
+                                <a4j:ajax event="change"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </a4j:region>
+                    <a4j:region id="tableRegionView"
+                                rendered="#{!s:hasPermission('SystemInSessionManager','canModifyTableSession')}">
+                        <s:decorate id="tableViewDecoration"
+                                    template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                            <ui:param name="id" value="tableView"/>
+                            <ui:define name="label">#{messages['gazelle.systems.systemInSession.table']}
+                                <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                    <ui:param name="id" value="ta"/>
+                                    <ui:param name="placement" value="bottom"/>
+                                    <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                                    <ui:define name="content">
+                                        <span class="gzl-never-wrap">#{messages['gazelle.systems.system.help.TableName1']}<br/>#{messages['gazelle.systems.system.help.TableName2']} <br/>#{messages['gazelle.systems.system.help.TableName3']}</span>
+                                    </ui:define>
+                                </ui:decorate>
+                            </ui:define>
+                            <h:outputText id="tableView"
+                                          value="#{systemInSessionEditor.systemInSession.tableSession.tableKeyword}"/>
+                        </s:decorate>
+                    </a4j:region>
+                </s:fragment>
+            </h:form>
+
+
+            <div id="editSystemSummarySaveSystemDiv">
+                <a4j:commandButton id="updateSystemInSession" styleClass="gzl-btn-orange"
+                                   value="#{messages['gazelle.common.button.Update']}"
+                                   actionListener="#{systemInSessionEditor.updateSystemInSession()}"
+                                   render=":systemInSessionDetailsForm"/>
+                <a4j:commandButton id="cancelAdminButton" styleClass="gzl-btn"
+                                   value="#{messages['gazelle.common.button.Cancel']}" immediate="true"
+                                   action="#{systemInSessionEditor.viewSystemInSession(systemInSessionEditor.systemInSession,systemInSessionEditor.defaultTab)}"
+                                   execute="@this" onclick="processFormHidden();"/>
+            </div>
+        </div>
+    </ui:decorate>
+</div>

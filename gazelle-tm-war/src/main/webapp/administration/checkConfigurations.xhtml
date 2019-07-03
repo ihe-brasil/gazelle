@@ -1,0 +1,149 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns="http://www.w3.org/1999/xhtml" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:rich="http://richfaces.org/rich" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['net.ihe.gazelle.tm.ConfigurationsChecks']}"/>
+    <ui:define name="body">
+        <h:form id="portForm">
+            <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+                <ui:param name="panel_id" value="portPanel"/>
+                <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.ProxyPorts']}</ui:define>
+                <a4j:region>
+                    <s:decorate id="testAuthorDecoration" template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['net.ihe.gazelle.tm.FindDuplicateProxyPortInThisTestingSession']}</ui:define>
+                        <a4j:commandButton
+                                actionListener="#{configurationsAdminChecks.checkProxyPortIsUniqueInCurrentTestingSession()}"
+                                styleClass="gzl-btn-blue"
+                                value="#{messages['net.ihe.gazelle.tm.Analyze']}"
+                                render="portForm"/>
+                        <h:panelGroup
+                                rendered="#{configurationsAdminChecks.duplicatesConfsList != null and empty configurationsAdminChecks.duplicatesConfsList}">
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.AllProxyPortsAreUniqueForTheCurrentTestingSessio']}"/>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{not empty configurationsAdminChecks.duplicatesConfsList}">
+                            <rich:dataTable id="duplicatesPortsTable" var="conf" rowKeyVar="rowNumber"
+                                            rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                                            value="#{configurationsAdminChecks.getDuplicatesConfsListDM()}"
+                                            render="ds">
+                                <g:column sortBy="#{'configuration.systemInSession.system.keyword'}"
+                                          sortOrder="#{datatablestateholder.sortorders['configuration.systeminsession.system.keyword']}">
+                                    <ui:define name="header">
+                                        <h:outputText value="#{messages['gazelle.tm.Sys']}"/>
+                                    </ui:define>
+                                    <g:link target="_blank" value="#{conf.configuration.systemInSession.system}"/>
+                                    <h:outputText value=" / "/>
+                                    <g:link target="_blank"
+                                            value="#{conf.configuration.systemInSession.system.uniqueInstitution}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">
+                                        <h:outputText value="#{messages['gazelle.systems.session.Type']}"/>
+                                    </ui:define>
+                                    <h:outputText value="#{conf.typeLabel}"/>
+                                </g:column>
+                                <g:column sortBy="#{'configuration.host.ip'}">
+                                    <ui:define name="header">
+                                        <h:outputText value="#{messages['gazelle.configuration.network.ip']}"/>
+                                    </ui:define>
+                                    <h:outputText value="#{conf.configuration.host.ip}"/>
+                                </g:column>
+                                <g:column sortBy="#{'portProxy'}" sortOrder="ascending">
+                                    <ui:define name="header">
+                                        <h:outputText value="#{messages['gazelle.configuration.system.Port']}"/>
+                                    </ui:define>
+                                    <h:outputText value="#{conf.port}"/>
+                                    <h:outputText style="color:red;" value="(#{conf.portProxy})"
+                                                  title="#{messages['net.ihe.gazelle.tm.ProxyPort']}"/>
+                                </g:column>
+
+                                <f:facet name="footer">
+                                    <ui:include src="/util/datatableFooter.xhtml">
+                                        <ui:param name="dataScrollerId" value="ds"/>
+                                        <ui:param name="dataTableId" value="duplicatesPortsTable"/>
+                                    </ui:include>
+                                </f:facet>
+                            </rich:dataTable>
+                        </h:panelGroup>
+                    </s:decorate>
+                </a4j:region>
+            </ui:decorate>
+        </h:form>
+        <h:form id="ipForm">
+            <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+                <ui:param name="panel_id" value="portPanel"/>
+                <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.IPs']}</ui:define>
+                <a4j:region>
+                    #{oidsAndIPParamForSessionManager.initializeNetworkConfiguration()}
+                    <div class="form-inline">
+                        <s:decorate template="/layout/display/_display.xhtml">
+                            <ui:define name="label">
+                                <h:outputText value="#{messages['net.ihe.gazelle.tm.TestIfIPIsAvailableInThisTestingSessionrangeFrom']} #{oidsAndIPParamForSessionManager.networkConfigurationForTestingSession.ipRangeLow} #{messages['gazelle.tm.to']}                              #{oidsAndIPParamForSessionManager.networkConfigurationForTestingSession.ipRangeHigh})"/>
+                            </ui:define>
+                            <ui:param name="id" value="ipInput"/>
+                            <h:inputText styleClass="form-control" id="ipInput" value="#{configurationsAdminChecks.ipToTest}"/>
+                            <a4j:commandButton
+                                    actionListener="#{configurationsAdminChecks.isIPAvailable()}"
+                                    styleClass="gzl-btn-blue"
+                                    value="#{messages['net.ihe.gazelle.tm.Analyze']}"
+                                    render="ipForm"/>
+                        </s:decorate>
+                    </div>
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.IPAvailableInThisTestingSession']}" rendered="#{configurationsAdminChecks.hostsAvailable == null}"
+                                  style="color: green;"/>
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.IPAlreadyUsedInThisTestingSession']}"
+                                  rendered="#{configurationsAdminChecks.hostsAvailable != null and not empty configurationsAdminChecks.hostsAvailable}"
+                                  style="color: red;"/>
+                </a4j:region>
+
+                <a4j:region>
+                    <s:decorate id="testAuthorDecoration" template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['net.ihe.gazelle.tm.FindDuplicateIPsInThisTestingSession']}</ui:define>
+                        <a4j:commandButton
+                                actionListener="#{configurationsAdminChecks.checkIpIsUniqueInCurrentTestingSession()}"
+                                styleClass="gzl-btn-blue"
+                                value="#{messages['net.ihe.gazelle.tm.Analyze']}"
+                                render="ipForm"/>
+                        <h:panelGroup
+                                rendered="#{configurationsAdminChecks.duplicatesIpsList != null and empty configurationsAdminChecks.duplicatesIpsList}">
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.AllIpsAreUniqueForTheCurrentTestingSession']}"/>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{not empty configurationsAdminChecks.duplicatesIpsList}">
+                            <rich:dataTable id="duplicatesIPsTable" var="host" rowKeyVar="rowNumber"
+                                            rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                                            value="#{configurationsAdminChecks.getDuplicatesIpsListDM()}"
+                                            render="ds">
+                                <g:column sortBy="#{'ip'}"
+                                          sortOrder="ascending">
+                                    <ui:define name="header">
+                                        <h:outputText value="#{messages['gazelle.configuration.network.ip']}"/>
+                                    </ui:define>
+                                    <h:outputText value="#{host.ip}"/>
+                                </g:column>
+                                <g:column sortBy="#{'hostname'}">
+                                    <ui:define name="header">
+                                        <h:outputText value="#{messages['gazelle.configuration.network.hostname']}"/>
+                                    </ui:define>
+                                    <h:outputText value="#{host.hostname}"/>
+                                </g:column>
+                                <g:column sortBy="#{'institution'}">
+                                    <ui:define name="header">
+                                        <h:outputText value="#{messages['net.ihe.gazelle.tm.Institution']}"/>
+                                    </ui:define>
+                                    <h:outputText value="#{host.institution.name}/#{host.institution.keyword}"/>
+                                </g:column>
+
+                                <f:facet name="footer">
+                                    <ui:include src="/util/datatableFooter.xhtml">
+                                        <ui:param name="dataScrollerId" value="ds"/>
+                                        <ui:param name="dataTableId" value="duplicatesIPsTable"/>
+                                    </ui:include>
+                                </f:facet>
+                            </rich:dataTable>
+                        </h:panelGroup>
+                    </s:decorate>
+                </a4j:region>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

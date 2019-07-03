@@ -1,0 +1,23 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tm.monitors.Monitor']}"/>
+    <ui:define name="body">
+
+        #{monitorSearchFilter.getMonitorInSessionById()}
+
+        <h:form id="globalform">
+            <s:token allowMultiplePosts="true"/>
+            <s:div id="globalDiv">
+                <ui:include src="monitorInfo.xhtml">
+                    <ui:param name="monitor" value="#{monitorSearchFilter.displayedMonitor}"/>
+                </ui:include>
+            </s:div>
+        </h:form>
+        <ui:include src="/testing/kpi/panelTests.xhtml">
+            <ui:param name="items" value="#{monitorSearchFilter.listTestsDisplay()}"/>
+        </ui:include>
+    </ui:define>
+</ui:composition>

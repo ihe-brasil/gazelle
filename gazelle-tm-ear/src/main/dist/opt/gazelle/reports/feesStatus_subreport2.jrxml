@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.2.0.final using JasperReports Library version 6.2.0  -->
+<!-- 2016-03-10T09:54:57 -->
+<jasperReport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://jasperreports.sourceforge.net/jasperreports" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="feesStatus_subreport2" pageWidth="300" pageHeight="30" columnWidth="300" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="59af1d3d-ac3a-4968-b321-1fe202c41818">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<parameter name="testingSessionId" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[35]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select * from (SELECT
+  count(id) as total
+FROM
+  public.tm_system_in_session
+  where testing_session_id = $P{testingSessionId} ) as total, (
+SELECT
+  count(id) as completed
+FROM
+  public.tm_system_in_session
+  where testing_session_id = $P{testingSessionId} and registration_status = 2 ) as completed, (
+SELECT
+  count(id) as inprogress
+FROM
+  public.tm_system_in_session
+  where testing_session_id = $P{testingSessionId} and registration_status = 0) as inprogress, (
+SELECT
+  count(id) as dropped
+FROM
+  public.tm_system_in_session
+  where testing_session_id = $P{testingSessionId} and registration_status = 1 ) as unknown, (
+SELECT
+  count(id) as empty
+FROM
+  public.tm_system_in_session
+  where testing_session_id = $P{testingSessionId} and registration_status is null) as emtpy;]]>
+	</queryString>
+	<field name="total" class="java.lang.Long"/>
+	<field name="completed" class="java.lang.Long"/>
+	<field name="inprogress" class="java.lang.Long"/>
+	<field name="dropped" class="java.lang.Long"/>
+	<field name="empty" class="java.lang.Long"/>
+	<detail>
+		<band height="30" splitType="Prevent">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+			<textField>
+				<reportElement x="0" y="0" width="60" height="15" uuid="ec41cf86-39cc-45c8-aeb2-c9ada1fb2d4b">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{total}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="15" width="60" height="15" uuid="634a04a0-580f-4612-af35-c65ce3d8b471">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="63" y="0" width="14" height="15" uuid="634a04a0-580f-4612-af35-c65ce3d8b471">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[/]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="63" y="15" width="14" height="15" uuid="634a04a0-580f-4612-af35-c65ce3d8b471">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[/]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="80" y="0" width="60" height="15" uuid="49d391d0-192f-476d-8fdf-bcd7be9b16fd"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{completed}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="80" y="15" width="60" height="15" uuid="634a04a0-580f-4612-af35-c65ce3d8b471">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Completed]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="143" y="0" width="14" height="15" uuid="634a04a0-580f-4612-af35-c65ce3d8b471">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[/]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="143" y="15" width="14" height="15" uuid="634a04a0-580f-4612-af35-c65ce3d8b471">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[/]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="160" y="0" width="60" height="15" uuid="9b3c879e-cdda-4cff-97e5-4ac3820b7638"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{inprogress}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="160" y="15" width="60" height="15" uuid="634a04a0-580f-4612-af35-c65ce3d8b471">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[In Progress]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="240" y="0" width="60" height="15" uuid="a9f7b502-e04a-44f8-9e06-758f56998fd0">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dropped}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="240" y="15" width="60" height="15" uuid="634a04a0-580f-4612-af35-c65ce3d8b471">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Dropped]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="223" y="0" width="14" height="15" uuid="634a04a0-580f-4612-af35-c65ce3d8b471">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[/]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="223" y="15" width="14" height="15" uuid="634a04a0-580f-4612-af35-c65ce3d8b471">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[/]]></text>
+			</staticText>
+		</band>
+	</detail>
+</jasperReport>

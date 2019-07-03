@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.2.0.final using JasperReports Library version 6.2.0  -->
+<!-- 2016-03-04T21:39:25 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="GazelleTest" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="70aaee7a-e44f-4e1f-97e7-1f40c31c98a1">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gazelle Production"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String">
+		<defaultValueExpression><![CDATA["/Users/epoiseau/workspace/gazelle-tm/gazelle-tm-ear/src/main/dist/opt/gazelle/reports/"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="test_keyword" class="java.lang.String">
+		<defaultValueExpression><![CDATA["ARI_RPT"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="applicationurl" class="java.lang.String">
+		<defaultValueExpression><![CDATA["http://localhost:8080/TM"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="testDescriptionLanguageId" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[1]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 1 ;]]>
+	</queryString>
+	<field name="?column?" class="java.lang.Integer"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="149" splitType="Stretch">
+			<subreport>
+				<reportElement x="3" y="0" width="797" height="149" uuid="332ce410-1111-4af3-b9ff-c1b78e69a639"/>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="applicationurl">
+					<subreportParameterExpression><![CDATA[$P{applicationurl}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="testDescriptionLanguageId">
+					<subreportParameterExpression><![CDATA[$P{testDescriptionLanguageId}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="printSequenceDiagram">
+					<subreportParameterExpression><![CDATA[true]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="tm_test_keyword">
+					<subreportParameterExpression><![CDATA[$P{test_keyword}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="printTitle">
+					<subreportParameterExpression><![CDATA[true]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["gazelleTestSubReport.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="20" splitType="Stretch">
+			<frame>
+				<reportElement x="2" y="0" width="800" height="20" uuid="21e10fef-58dd-407d-beee-b1d3e7d7e5bb"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+				</box>
+				<textField pattern="" isBlankWhenNull="false">
+					<reportElement key="textField" x="592" y="3" width="170" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="408a3b84-fbe5-4a21-86d4-da69771f0421"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Page " + $V{PAGE_NUMBER} + " of "]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Report" pattern="" isBlankWhenNull="false">
+					<reportElement key="textField" x="762" y="3" width="36" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="b608a04e-4a33-40d7-9395-e7ca6683de23"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement>
+						<font fontName="Arial" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField pattern="EEE, d MMM yyyy HH:mm:ss Z">
+					<reportElement x="1" y="5" width="201" height="15" uuid="7568108e-9de9-48c1-b5b6-5e86d8bece5f"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</pageFooter>
+	<lastPageFooter>
+		<band height="22">
+			<frame>
+				<reportElement x="1" y="0" width="800" height="21" uuid="87cc3d5d-7e68-4e7b-a9bc-76994b7d2d20"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+				</box>
+				<staticText>
+					<reportElement x="23" y="0" width="348" height="20" forecolor="#90A66F" uuid="92b023bb-5ce9-4121-abad-bd76b1912500"/>
+					<textElement verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Please consider the environmental impact before printing this report]]></text>
+				</staticText>
+				<image scaleImage="FillFrame">
+					<reportElement x="0" y="0" width="20" height="20" uuid="6f063c82-df14-4490-8855-1b5a6972ea75"/>
+					<imageExpression><![CDATA["tree.png"]]></imageExpression>
+				</image>
+				<textField evaluationTime="Report" pattern="" isBlankWhenNull="false">
+					<reportElement key="textField" x="763" y="2" width="36" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="e5ec2bea-1c5b-42f2-b658-1036da12e7c1"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement>
+						<font fontName="Arial" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField pattern="" isBlankWhenNull="false">
+					<reportElement key="textField" x="593" y="2" width="170" height="15" forecolor="#000000" backcolor="#FFFFFF" uuid="0a756a57-2e28-4ace-96ac-fd6fcdef3c06"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Page " + $V{PAGE_NUMBER} + " of "]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</lastPageFooter>
+</jasperReport>

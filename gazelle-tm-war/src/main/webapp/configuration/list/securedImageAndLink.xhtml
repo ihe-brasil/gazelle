@@ -1,0 +1,15 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <s:span rendered="#{configuration.configuration.isSecured}">
+
+        <s:span styleClass="gzl-icon-lock"
+                rendered="#{systemConfigurationManager.getLinkForTLSValidation(configuration).equals('#')}"/>
+        <h:outputLink value="#{systemConfigurationManager.getLinkForTLSValidation(configuration)}"
+                      rendered="#{!systemConfigurationManager.getLinkForTLSValidation(configuration).equals('#')}"
+                      target="_blank" title="#{messages['net.ihe.gazelle.tm.PerformATLSTestOnThisPort']}">
+            <span class="gzl-icon-lock"/>
+        </h:outputLink>
+    </s:span>
+</ui:composition>

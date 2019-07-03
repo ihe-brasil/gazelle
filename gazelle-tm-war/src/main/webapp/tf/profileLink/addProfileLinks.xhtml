@@ -1,0 +1,242 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{profileLinksManager.getAddTitle()}"/>
+    <ui:define name="body">
+
+        <!--@formatter:off-->
+        <script type="text/javascript">
+            function showlinkModalIfNeed() {
+                var linkModal = document
+                        .getElementById("addActorIntegrationProfilePopup");
+                if (linkModal != null) {
+                   jq162('#addActorIntegrationProfilePopup').modal('show');
+                }
+            }
+        </script>
+        <!--@formatter:on-->
+
+        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+            <ui:define name="panel_title">#{profileLinksManager.getAddTitle()}</ui:define>
+            <div id="profileLinksManager">
+                <!-- **********************************************************************************************
+                     * Panel for add to actor
+                     ********************************************************************************************** -->
+                <h:panelGroup rendered="#{profileLinksManager.isCallerClass('ACTOR')}">
+                    <ui:decorate template="/layout/panels/_panel.xhtml">
+                        <s:decorate id="vaid" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Id']}</ui:define>
+                            #{profileLinkActor.id}
+                        </s:decorate>
+                        <s:decorate id="vakeywordDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Keyword']}</ui:define>
+                            #{profileLinkActor.keyword}
+                        </s:decorate>
+                        <s:decorate id="vanameDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Name']}</ui:define>
+                            #{profileLinkActor.name}
+                        </s:decorate>
+                        <s:decorate id="vadescriptionDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Description']}</ui:define>
+                            #{profileLinkActor.description}
+                        </s:decorate>
+                    </ui:decorate>
+                </h:panelGroup>
+                <!-- **********************************************************************************************
+                     * Panel for add to transaction
+                     ********************************************************************************************** -->
+                <h:panelGroup rendered="#{profileLinksManager.isCallerClass('TRANSACTION')}">
+                    <ui:decorate template="/layout/panels/_panel.xhtml">
+                        <s:decorate id="vtid" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Id']}</ui:define>
+                            #{profileLinkTransaction.id}
+                        </s:decorate>
+                        <s:decorate id="vtkeywordDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Label']}</ui:define>
+                            #{profileLinkTransaction.keyword}
+                        </s:decorate>
+                        <s:decorate id="vtnameDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Name']}</ui:define>
+                            #{profileLinkTransaction.name}
+                        </s:decorate>
+                        <s:decorate id="vtdescriptionDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Description']}</ui:define>
+                            #{profileLinkTransaction.description}
+                        </s:decorate>
+                        <s:decorate id="vtreferenceDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.TFReference']}</ui:define>
+                            #{profileLinkTransaction.reference}
+                        </s:decorate>
+                    </ui:decorate>
+                </h:panelGroup>
+                <!-- **********************************************************************************************
+                     * Panel for add to integration profile
+                     ********************************************************************************************** -->
+                <h:panelGroup rendered="#{profileLinksManager.isCallerClass('INTEGRATION_PROFILE')}">
+                    <ui:decorate template="/layout/panels/_panel.xhtml">
+                        <s:decorate id="vipid" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Id']}</ui:define>
+                            #{profileLinkIntegrationProfile.id}
+                        </s:decorate>
+                        <s:decorate id="viplabelDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Keyword']}</ui:define>
+                            #{profileLinkIntegrationProfile.keyword}
+                        </s:decorate>
+                        <s:decorate id="vipnameDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Name']}</ui:define>
+                            #{profileLinkIntegrationProfile.name}
+                        </s:decorate>
+                        <s:decorate id="vipdescriptionDecoration" template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tf.table.Description']}</ui:define>
+                            #{profileLinkIntegrationProfile.description}
+                        </s:decorate>
+                    </ui:decorate>
+                </h:panelGroup>
+            </div>
+            <!-- **********************************************************************************************
+                 * lists panel
+                 **********************************************************************************************  -->
+
+            <ui:decorate template="/layout/panels/_panel.xhtml">
+                <h:form id="addProfileLinks">
+                    <s:token allowMultiplePosts="true"/>
+                    <h:panelGrid columns="4" columnClasses="alignTop,alignTop,alignTop,alignTop">
+
+                        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                            <ui:define name="panel_title">#{messages['gazelle.tf.ActorsTab']}</ui:define>
+                            <h:selectManyListbox size="#{actorSize}" style="max-width:300px"
+                                                 value="#{profileLinksManager.profileLinkSelectedActors}"
+                                                 readonly="#{actorReadOnly}"
+                                                 disabled="#{actorReadOnly}">
+                                <s:selectItems var="a" value="#{profileLinkActors}"
+                                               label="#{a.keyword} - #{a.name}"/>
+                                <s:convertEntity/>
+                            </h:selectManyListbox>
+                        </ui:decorate>
+                        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                            <ui:define name="panel_title">#{messages['gazelle.tf.IntegrationProfilesTab']}</ui:define>
+                            <h:selectManyListbox size="#{integrationProfileSize}" style="max-width:300px"
+                                                 value="#{profileLinksManager.profileLinkSelectedIntegrationProfiles}"
+                                                 readonly="#{integrationProfileReadOnly}"
+                                                 disabled="#{integrationProfileReadOnly}">
+                                <s:selectItems var="b" value="#{profileLinkIntegrationProfiles}"
+                                               label="#{b.keyword} - #{b.name}"/>
+                                <s:convertEntity/>
+                            </h:selectManyListbox>
+                        </ui:decorate>
+
+
+                        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                            <ui:define name="panel_title">#{messages['gazelle.tf.TransactionsTab']}</ui:define>
+                            <h:selectManyListbox size="#{transactionSize}" style="max-width:300px"
+                                                 value="#{profileLinksManager.profileLinkSelectedTransactions}"
+                                                 readonly="#{transactionReadOnly}" disabled="#{transactionReadOnly}">
+                                <s:selectItems var="c" value="#{profileLinkTransactions}"
+                                               label="#{c.keyword} - #{c.name}"/>
+                                <s:convertEntity/>
+                            </h:selectManyListbox>
+                        </ui:decorate>
+
+                        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                            <ui:define name="panel_title">#{messages['gazelle.tf.LabelOption']}</ui:define>
+                            <h:selectOneListbox size="2" style="max-width:85px"
+                                                value="#{selectedTransactionOptionType}">
+                                <s:selectItems var="o" value="#{transactionOptionTypes}"
+                                               label="#{o.name}"/>
+                                <s:convertEntity></s:convertEntity>
+                            </h:selectOneListbox>
+                        </ui:decorate>
+                    </h:panelGrid>
+                    <div>
+                        <h:commandButton id="cancel" styleClass="gzl-btn"
+                                         value="#{messages['gazelle.tf.ProfileLinksDone']}"
+                                         action="#{profileLinksManager.finished()}"/>
+                        <a4j:commandButton action="#{profileLinksManager.createLinks()}"
+                                           value="#{messages['gazelle.tf.ProfileLinksCreate']}"
+                                           styleClass="gzl-btn-green" oncomplete="showlinkModalIfNeed();"
+                                           execute="addProfileLinks" render=" :addActorIntegrationProfileLink"/>
+                    </div>
+
+                    <h:panelGrid>
+                        <rich:dataTable id="profileLinksRelatedToActor" var="ipTrans"
+                                        value="#{actorManager.getIntegrationProfilesAndTransactionsForActor()}"
+                                        rendered="#{profileLinksManager.actorReadOnly and actorManager.getIntegrationProfilesAndTransactionsForActor() != null and actorManager.getIntegrationProfilesAndTransactionsForActor().size() &gt; 0}">
+                            <f:facet name="header">#{messages['net.ihe.gazelle.tm.ProfilTransactionAlreadyPresent']}
+                            </f:facet>
+                            <g:column sortBy="#{'actorIntegrationProfile.integrationProfile.keyword'}">
+                                <ui:define name="header">#{messages['gazelle.tf.IntegrationProfile']}</ui:define>
+                                <h:outputText
+                                        value="#{ipTrans.actorIntegrationProfile.integrationProfile.keyword} - #{ipTrans.actorIntegrationProfile.integrationProfile.name}"/>
+                            </g:column>
+                            <g:column sortBy="#{'transaction.keyword'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Transaction']}</ui:define>
+                                <h:outputText
+                                        value="#{ipTrans.transaction.keyword} - #{ipTrans.transaction.name}"/>
+                            </g:column>
+                        </rich:dataTable>
+                        <rich:dataTable id="profileLinksRelatedToIntegrationProfile" var="profileLink"
+                                        value="#{integrationProfileManager.getProfileLinksForIntegrationProfile()}"
+                                        rendered="#{profileLinksManager.integrationProfileReadOnly and integrationProfileManager.getProfileLinksForIntegrationProfile() != null and integrationProfileManager.getProfileLinksForIntegrationProfile().size() &gt; 0}">
+                            <f:facet name="header">#{messages['net.ihe.gazelle.tm.ActorTransactionAlreadyPresent']}
+                            </f:facet>
+                            <g:column sortBy="#{'actorIntegrationProfile.actor.keyword'}"
+                                      sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.Actor']}</ui:define>
+                                <h:outputText
+                                        value="#{profileLink.actorIntegrationProfile.actor.keyword} - #{profileLink.actorIntegrationProfile.actor.name}"/>
+                            </g:column>
+                            <g:column align="left" width="150" sortBy="#{'transaction.keyword'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Transaction']}</ui:define>
+                                <h:outputText
+                                        value="#{profileLink.transaction.keyword} - #{profileLink.transaction.name}"/>
+                            </g:column>
+                        </rich:dataTable>
+
+                        <rich:dataTable id="profileLinksRelatedToTransaction" var="pl"
+                                        value="#{transactionManager.getProfileLinkForTransaction()}"
+                                        rendered="#{profileLinksManager.transactionReadOnly and transactionManager.getProfileLinkForTransaction() != null and transactionManager.getProfileLinkForTransaction().size() &gt; 0}">
+                            <f:facet name="header">#{messages['net.ihe.gazelle.tm.ActorTransactionAlreadyPresent']}
+                            </f:facet>
+                            <g:column sortBy="#{'actorIntegrationProfile.actor.keyword'}"
+                                      sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.Actor']}</ui:define>
+                                <h:outputText
+                                        value="#{pl.actorIntegrationProfile.actor.keyword} - #{pl.actorIntegrationProfile.actor.name}"/>
+                            </g:column>
+                            <g:column align="left" width="150" sortBy="#{'transaction.keyword'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Transaction']}</ui:define>
+                                <h:outputText
+                                        value="#{pl.transaction.keyword} - #{pl.transaction.name}"/>
+                            </g:column>
+                        </rich:dataTable>
+                    </h:panelGrid>
+                </h:form>
+            </ui:decorate>
+        </ui:decorate>
+
+        <h:form id="addActorIntegrationProfileLink">
+            <s:div rendered="#{!profileLinksManager.isLinkExist()}">
+                <s:token allowMultiplePosts="true"/>
+                <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                    <ui:param name="popup_id" value="addActorIntegrationProfilePopup"/>
+                    <ui:define name="popup_title">#{messages['gazelle.tf.transaction.profileLinks.Add']}</ui:define>
+                    <p style="color: red">#{messages['net.ihe.gazelle.tm.TheLinkBetweenActorAndIntegrationProfileDoesntEx']}</p>
+                    <p>#{messages['net.ihe.gazelle.tm.DoYouWantToCreateLinkBetweenActorAndIntegrationP']}</p>
+                    <p>#{messages['net.ihe.gazelle.tm.ThisActionWillAlsoCreateTheActortransactionLinkR']}</p>
+                    <ui:define name="popup_footer">
+                        <h:commandButton styleClass="gzl-btn-green"
+                                         value="#{messages['net.ihe.gazelle.tm.Create']}"
+                                         action="#{profileLinksManager.forceLinkCreation()}"
+                                         onclick="jq162('#addActorIntegrationProfilePopup').modal('hide');"/>
+                        <h:commandButton value="#{messages['gazelle.tm.Cancel']}"
+                                         styleClass="btn btn-default"
+                                         onclick="jq162('#addActorIntegrationProfilePopup').modal('hide');"/>
+                    </ui:define>
+                </ui:decorate>
+            </s:div>
+        </h:form>
+
+    </ui:define>
+</ui:composition>

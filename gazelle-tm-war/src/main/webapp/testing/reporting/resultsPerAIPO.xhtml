@@ -1,0 +1,55 @@
+<!--@formatter:off-->
+<f:view xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://jboss.org/schema/seam/pdf" xmlns:g="http://www.ihe.net/gazelle">
+    <!-- param : systemInSessionResults -->
+    <p:table columns="5" widthPercentage="100" headerRows="3" footerRows="1" spacingAfter="20" widths="3 3 3 1 2">
+        <f:facet name="defaultCell">
+            <p:cell horizontalAlignment="center" verticalAlignment="middle"/>
+        </f:facet>
+        <!-- table title -->
+        <ui:include src="titleCell.xhtml">
+            <ui:param name="colspan" value="5"/>
+            <ui:param name="title" value="#{messages['net.ihe.gazelle.tm.ResultsPerIntegrationProfileActorOption']}"/>
+        </ui:include>
+        <!-- table header -->
+        <ui:include src="headerCell.xhtml">
+            <ui:param name="title" value="#{messages['gazelle.tf.table.IntegrationProfile']}"/>
+        </ui:include>
+        <ui:include src="headerCell.xhtml">
+            <ui:param name="title" value="#{messages['gazelle.testmanagement.system.label.Actor']}"/>
+        </ui:include>
+        <ui:include src="headerCell.xhtml">
+            <ui:param name="title" value="#{messages['gazelle.tests.test.option']}"/>
+        </ui:include>
+        <ui:include src="headerCell.xhtml">
+            <ui:param name="title" value="#{messages['gazelle.systems.session.Type']}"/>
+        </ui:include>
+        <ui:include src="headerCell.xhtml">
+            <ui:param name="title" value="#{messages['net.ihe.gazelle.tm.Result']}"/>
+        </ui:include>
+        <!-- table footer -->
+        <p:cell colspan="5" backgroundColor="#EEEEEE">
+            <p:paragraph><g:pdffont size="8">#{messages['net.ihe.gazelle.tm.TThoroughSSupportive']}</g:pdffont></p:paragraph>
+        </p:cell>
+        <!-- table content -->
+        <ui:repeat value="#{systemInSessionResults}" var="result">
+            <p:cell colspan="1">
+                <p:paragraph paddingBottom="10"><g:pdffont size="8">#{result.systemActorProfile.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.name}</g:pdffont></p:paragraph>
+            </p:cell>
+            <p:cell colspan="1">
+                <p:paragraph paddingBottom="10"><g:pdffont size="8">#{result.systemActorProfile.actorIntegrationProfileOption.actorIntegrationProfile.actor.name}</g:pdffont></p:paragraph>
+            </p:cell>
+            <p:cell colspan="1">
+                <p:paragraph paddingBottom="10"><g:pdffont size="8">#{result.systemActorProfile.actorIntegrationProfileOption.integrationProfileOption.name}</g:pdffont></p:paragraph>
+            </p:cell>
+            <p:cell colspan="1">
+                <p:paragraph paddingBottom="10"><g:pdffont size="8">#{result.systemActorProfile.testingType.keyword}</g:pdffont></p:paragraph>
+            </p:cell>
+            <p:cell colspan="1">
+                <p:paragraph paddingBottom="10"><g:pdffont size="8">#{messages[result.status.labelToDisplay]}</g:pdffont></p:paragraph>
+            </p:cell>
+        </ui:repeat>
+    </p:table>
+</f:view>
+
+<!--@formatter:on-->

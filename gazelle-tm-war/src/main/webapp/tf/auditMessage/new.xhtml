@@ -1,0 +1,26 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['net.ihe.gazelle.tm.NewAuditMessage_2']}"/>
+    <ui:define name="body">
+        <h:form id="editForm">
+            <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                <ui:param name="panel_id" value="addPanel"/>
+                <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.EditAuditMessage']}</ui:define>
+                <ui:include src="_editAttributes.xhtml">
+                    <ui:param name="selectedAuditMessage" value="#{auditMessageManager.currentAuditMessage}"/>
+                </ui:include>
+                <a4j:commandButton id="saveAuditMessageButton" value="#{messages['gazelle.common.button.Save']}"
+                                 styleClass="gzl-btn-green"
+                                 rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}"
+                                 action="#{auditMessageManager.save()}"/>
+                <h:outputLink title="#{messages['net.ihe.gazelle.tm.ListAuditMessages']}" value="index.seam"
+                              styleClass="gzl-btn">
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.ListAuditMessages']}"/>
+                </h:outputLink>
+            </ui:decorate>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

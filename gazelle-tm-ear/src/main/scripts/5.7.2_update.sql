@@ -1,0 +1,1 @@
+ALTER TABLE tm_invoice DROP CONSTRAINT IF EXISTS tm_invoice_fees_discount_check;

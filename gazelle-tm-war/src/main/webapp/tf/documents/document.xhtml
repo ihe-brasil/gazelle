@@ -1,0 +1,351 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.common.menu.DocumentsManagement']}"/>
+    <ui:define name="body">
+        <h:form id="globalform" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <h:inputHidden id="filterUrlParameters" name="filterUrlParameters"
+                           value="#{documentManager.filter.urlParameters}"/>
+            <script>
+                updateUrl("globalform:filterUrlParameters");
+                $("#globalform\\:filterUrlParameters").bind('change',
+                        function () {
+                            updateUrl("globalform:filterUrlParameters");
+                        });
+            </script>
+            <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{documentManager.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="domain"/>
+                            <ui:param name="filterName"
+                                      value="#{messages['gazelle.productregistry.system.label.Domain']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{documentManager.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="revision"/>
+                            <ui:param name="filterName" value="#{messages['net.ihe.gazelle.tm.Revision']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{documentManager.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="type"/>
+                            <ui:param name="filterName" value="#{messages['net.ihe.gazelle.tm.Type']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filterDate.xhtml">
+                            <ui:param name="filter" value="#{documentManager.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="dateOfPublication"/>
+                            <ui:param name="filterName"
+                                      value="#{messages['net.ihe.gazelle.tm.DateOfPublication']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{documentManager.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="volume"/>
+                            <ui:param name="filterName" value="#{messages['net.ihe.gazelle.tm.Volume']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{documentManager.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="lifecycleStatus"/>
+                            <ui:param name="filterName"
+                                      value="#{messages['net.ihe.gazelle.tm.LifeCycleStatus']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{documentManager.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="title"/>
+                            <ui:param name="filterName" value="#{messages['net.ihe.gazelle.tm.Title']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                    <div class="col-lg-6">
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{documentManager.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="name"/>
+                            <ui:param name="filterName"
+                                      value="#{messages['gazelle.testmanagement.object.Name']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <div class="row">
+                    <a4j:commandButton id="newDocumentButton"
+                                       rendered="#{s:hasRole('tests_editor_role') and applicationManager.isMasterModel()}"
+                                       value="#{messages['net.ihe.gazelle.tm.NewDocument']}"
+                                       ignoreDupResponses="true" immediate="true" styleClass="gzl-btn-green"
+                                       actionListener="#{documentManager.newDocument()}"
+                                       render="globalform"/>
+                </div>
+
+                <ui:define name="filter_buttons">
+                    <a4j:commandLink actionListener="#{documentManager.filter.clear()}"
+                                     title="#{messages['gazelle.users.reset']}" type="submit"
+                                     execute="@this" render="globalform,results">
+                        <span class="fa fa-times-circle"/>
+                    </a4j:commandLink>
+                </ui:define>
+            </ui:decorate>
+
+            <s:div id="editDiv" rendered="#{documentManager.renderAddPanel}">
+                <ui:include src="/tf/documents/_editDocumentForm.xhtml">
+                </ui:include>
+            </s:div>
+            <s:div id="results">
+                <s:div rendered="#{documentManager.documents.size() &gt; 0}">
+                    <h:outputText
+                            value="#{documentManager.documents.size()} #{messages['net.ihe.gazelle.tm.documents.ForThisSearch']}"/>
+                    <a4j:commandButton id="RefreshResultsButton"
+                                       value="#{messages['net.ihe.gazelle.tm.RefreshResults']}"
+                                       ignoreDupResponses="true" immediate="true" styleClass="gzl-btn"
+                                       render="globalform"/>
+                    <a4j:commandButton actionListener="#{documentManager.resetCache()}" styleClass="gzl-btn"
+                                       value="#{messages['net.ihe.gazelle.tm.ResetCache']}"/>
+                </s:div>
+                <rich:dataTable id="DocumentTable" var="currentDocument" value="#{documentManager.documents}"
+
+
+                                rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                                rendered="#{documentManager.documents.size() &gt; 0}" render="ds">
+                    <g:column sortBy="#{'name'}">
+                        <ui:define name="header">
+                            <h:outputText
+                                    value="#{messages['gazelle.productregistry.system.label.Domain']}"/>
+                        </ui:define>
+                        <g:link value="#{currentDocument.domain}" detailed="false"/>
+                    </g:column>
+                    <g:column sortBy="#{'type'}">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.Type']}"/>
+                        </ui:define>
+                        <h:outputText id="documentTypeOutputText"
+                                      value="#{currentDocument.type.friendlyName}"/>
+                    </g:column>
+                    <g:column sortBy="#{'volume'}">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.Volume']}"/>
+                        </ui:define>
+                        <h:outputText id="documentvolumeOutputText" value="#{currentDocument.volume}"/>
+                    </g:column>
+                    <g:column sortBy="#{'title'}" filterBy="#{'title'}" filterEvent="onkeyup">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.Title']}"/>
+                        </ui:define>
+                        <h:outputText id="documentTitleOutputText" value="#{currentDocument.title}"/>
+                    </g:column>
+                    <g:column sortBy="#{'revision'}">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.Revision']}"/>
+                        </ui:define>
+                        <h:outputText id="documentRevisionOutputText"
+                                      value="#{currentDocument.revision}"/>
+                    </g:column>
+                    <g:column sortBy="#{'dateOfpublication'}">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.DateOfPublication']}"/>
+                        </ui:define>
+                        <g:date time="false" value="#{currentDocument.dateOfpublication}"/>
+                    </g:column>
+                    <g:column sortBy="#{'lifecyclestatus'}">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.LifeCycleStatus']}"/>
+                        </ui:define>
+                        <h:outputText id="documentLifecyclestatusOutputText"
+                                      value="#{currentDocument.lifecyclestatus.friendlyName}"/>
+                    </g:column>
+                    <g:column sortBy="#{'url'}">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.testmanagement.object.Name']}"/>
+                        </ui:define>
+                        <ui:include src="/tf/documents/_documentPdfLink.xhtml">
+                            <ui:param name="document" value="#{currentDocument}"/>
+                            <ui:param name="displayedName" value="#{currentDocument.name}"/>
+                        </ui:include>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">
+                            <h:outputText value="##{messages['net.ihe.gazelle.tm.DocumentSections']}"/>
+                        </ui:define>
+                        <h:outputText id="documentNbSectionOutputText"
+                                      value="#{currentDocument.documentSection.size()}"/>
+                    </g:column>
+                    <g:column sortBy="#{'lastChanged'}" sortOrder="descending"
+                              sortMode="DESCENDING">
+                        <ui:define name="header">#{messages['gazelle.tm.test.LastUpdate']}</ui:define>
+                        <g:date tooltip="true" value="#{currentDocument.lastChanged}"/>
+                    </g:column>
+                    <g:column sortBy="#{'lastModifierId'}" sortOrder="ascending">
+                        <ui:define name="header">#{messages['gazelle.tm.search.user']}</ui:define>
+                        <h:outputText value="#{currentDocument.lastModifierId}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+                        <div class="gzl-never-wrap">
+                            <a4j:commandLink
+                                    action="#{documentManager.show(currentDocument)}"
+                                    title="#{messages['gazelle.common.button.View']}"
+                                    onRowMouseOver="this.style.cursor='pointer'">
+                                <span class="gzl-icon-search"/>
+                            </a4j:commandLink>
+                            <a4j:commandLink action="#{documentManager.edit(currentDocument)}"
+                                             title="#{messages['gazelle.common.button.Edit']}"
+                                             rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}">
+                                <span class="gzl-icon-pencil"/>
+                            </a4j:commandLink>
+                            <a4j:commandLink event="click" render="globalform" execute="@this"
+                                             title="#{messages['net.ihe.gazelle.tm.CloneThisDocument']}"
+                                             rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}"
+                                             actionListener="#{documentManager.clone(currentDocument)}">
+                                <span class="gzl-icon-files-o"/>
+                            </a4j:commandLink>
+
+                            <a4j:commandLink event="click" title="#{messages['gazelle.common.button.Delete']}"
+                                             rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}"
+                                             oncomplete="jq162('#DeleteConfirmationModalPanel').modal('show');"
+                                             render="DeleteConfirmationModalPanel,globalform, :deleteDocumentForm"
+                                             execute="@this"
+                                             actionListener="#{documentManager.setSelectedDocument(currentDocument)}">
+                                <span class="gzl-icon-trash-o"/>
+                            </a4j:commandLink>
+
+                        </div>
+                    </g:column>
+                    <f:facet name="footer">
+                        <ui:include src="/util/datatableFooter.xhtml">
+                            <ui:param name="dataScrollerId" value="ds"/>
+                            <ui:param name="dataTableId" value="DocumentTable"/>
+                        </ui:include>
+                    </f:facet>
+                </rich:dataTable>
+                <h:commandLink value="#{messages['gazelle.common.export.ExportAsExcel']}"
+                               action="#{gazelleExcelExporterJboss7.export('globalform:DocumentTable')}"/>
+            </s:div>
+        </h:form>
+        <h:form id="deleteDocumentForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteConfirmationModalPanel"/>
+                <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.Document.deleteConfirmation']}</ui:define>
+                <h:outputText
+                        rendered="#{documentManager.selectedDocument.hasDocumentSectionsLinkedToOtherEntities()}"
+                        id="currentDocument_cannotDeleteLabelOutputText"
+                        value="#{messages['net.ihe.gazelle.tm.YouCannotDeleteThisDocummentAsItIsCurrentlyLinke']}"/>
+                <rich:dataTable id="TransactionEntitiesTable" var="transaction"
+                                value="#{documentManager.selectedDocument.getTransactionsLinked()}"
+                                rows="5"
+                                rendered="#{documentManager.selectedDocument.getTransactionsLinked().size() &gt; 0}">
+                    <g:column sortBy="#{'name'}">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.tf.Transaction']}"/>
+                        </ui:define>
+                        <h:commandLink value="#{transaction.name}"
+                                       action="#{transactionManager.showTransaction(transaction)}"
+                                       target="Transaction"/>
+                    </g:column>
+                    <f:facet name="footer">
+                        <rich:dataScroller maxPages="5" renderIfSinglePage="false"/>
+                    </f:facet>
+                </rich:dataTable>
+                <rich:dataTable id="IntegrationProfileEntitiesTable" var="integrationProfile"
+                                value="#{documentManager.selectedDocument.getIntegrationProfileLinked()}"
+                                rows="5"
+                                rendered="#{documentManager.selectedDocument.getIntegrationProfileLinked().size() &gt; 0}">
+                    <g:column sortBy="#{'name'}">
+                        <ui:define name="header">
+                            <h:outputText
+                                    value="#{messages['gazelle.tf.table.IntegrationProfile']}"/>
+                        </ui:define>
+                        <h:commandLink value="#{integrationProfile.name}"
+                                       action="#{integrationProfileManager.showIntegrationProfile(integrationProfile)}"
+                                       target="integrationProfile"/>
+                    </g:column>
+                    <f:facet name="footer">
+                        <rich:dataScroller maxPages="5" renderIfSinglePage="false"/>
+                    </f:facet>
+                </rich:dataTable>
+                <rich:dataTable id="AIPOEntitiesTable" var="currentAipo"
+                                value="#{documentManager.selectedDocument.getAIPOLinked()}"
+                                rows="5"
+                                rendered="#{documentManager.selectedDocument.getAIPOLinked().size() &gt; 0}">
+                    <f:facet name="header">
+                        <rich:columnGroup>
+                            <g:column colspan="3">
+                                <h:outputText
+                                        value="#{messages['net.ihe.gazelle.tm.ActorIntegrationProfileOption']}"/>
+                            </g:column>
+                        </rich:columnGroup>
+                    </f:facet>
+                    <g:column sortBy="#{'actorIntegrationProfile.actor.keyword'}"
+                              sortOrder="ascending">
+                        <ui:define name="header">#{messages['gazelle.tf.Actor']}</ui:define>
+                        <h:commandLink
+                                value="#{currentAipo.actorIntegrationProfile.actor.keyword} - #{currentAipo.actorIntegrationProfile.actor.name}"
+                                action="#{actorManager.editActor(currentAipo.actorIntegrationProfile.actor, false)}"/>
+                    </g:column>
+                    <g:column sortBy="#{'actorIntegrationProfile.integrationProfile.keyword'}">
+                        <ui:define name="header">#{messages['gazelle.tf.IntegrationProfile']}</ui:define>
+                        <h:commandLink
+                                value="#{currentAipo.actorIntegrationProfile.integrationProfile.keyword} - #{currentAipo.actorIntegrationProfile.integrationProfile.name}"
+                                action="#{integrationProfileManager.editIntegrationProfile(currentAipo.actorIntegrationProfile.integrationProfile, false)}"/>
+                    </g:column>
+                    <g:column sortBy="#{'integrationProfileOption.keyword'}">
+                        <ui:define name="header">#{messages['gazelle.tf.IntegrationProfileOption']}</ui:define>
+                        <h:commandLink
+                                value="#{currentAipo.integrationProfileOption.keyword} - #{currentAipo.integrationProfileOption.name}"
+                                action="#{integrationProfileOptionManager.editIntegrationProfileOption(currentAipo.integrationProfileOption, false)}"/>
+                    </g:column>
+                    <f:facet name="footer">
+                        <rich:dataScroller maxPages="5" renderIfSinglePage="false"/>
+                    </f:facet>
+                </rich:dataTable>
+                <h:outputText rendered="#{documentManager.selectedDocument.isNotLinkedToOtherEntities()}"
+                              id="currentDocument_DeleteLabelOutputText"
+                              value="#{messages['net.ihe.gazelle.tm.Document.deleteConfirmation']} #{documentManager.selectedDocument.name}?"/>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="deleteButtonConfirm"
+                                       rendered="#{documentManager.selectedDocument.isNotLinkedToOtherEntities()}"
+                                       value="#{messages['gazelle.common.button.Delete']}"
+                                       ignoreDupResponses="true" styleClass="gzl-btn-red"
+                                       actionListener="#{documentManager.delete()}"
+                                       onclick="jq162('#DeleteConfirmationModalPanel').modal('hide');"
+                                       render="globalform"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

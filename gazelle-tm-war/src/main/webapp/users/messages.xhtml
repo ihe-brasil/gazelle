@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns="http://www.w3.org/1999/xhtml">
+<h:outputStylesheet library="stylesheet" name="gazelle-theme.css"/>
+<h:outputStylesheet rendered="#{userManagerExtra.displayToolTips()}" library="stylesheet"
+                    name="tooltip.css"/>
+<h:head>
+    <title>#{messages['gazelle.common.messages.Messages']}</title>
+    <link rel="shortcut icon" href="/#{applicationPreferenceManager.getApplicationUrlBaseName()}/img/resources/favicon.ico"
+          type="image/x-icon"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <ui:insert name="header"/>
+</h:head>
+<h:body>
+    <h:form id="formListMessagesModalPanel">
+        <s:token allowMultiplePosts="true"/>
+        #{messageManager.resetUnreadCount()}
+        #{dataTableStateHolder.setDescendingOn('date')}
+        <a4j:commandButton styleClass="gzl-btn" value="#{messages['gazelle.common.button.Refresh']}"
+                           render="formListMessagesModalPanel"/>
+        <rich:dataTable id="messageModalPanelList" value="#{messageManager.messages}" var="message"
+                        rows="10">
+            <g:column sortBy="#{'date'}" sortOrder="#{dataTableStateHolder.sortOrders['date']}">
+                <ui:define name="header">#{messages['gazelle.systems.is.pdf.ISDateShort']}</ui:define>
+                <g:date tooltip="true" value="#{message.date}"/>
+            </g:column>
+            <g:column sortBy="#{'type'}" sortOrder="#{dataTableStateHolder.sortOrders['type']}">
+                <ui:define name="header">#{messages['gazelle.systems.session.Type']}</ui:define>
+                <span class="#{message.image}"/>
+                #{messageManager.getFormattedType(message)}
+            </g:column>
+            <g:column sortBy="#{'author'}" sortOrder="#{dataTableStateHolder.sortOrders['author']}">
+                <ui:define name="header">#{messages['gazelle.tm.Author']}</ui:define>
+                <g:link value="#{gazelleDAO.FindUserWithUsername(message.author)}" detailed="false"
+                        target="_blank"/>
+            </g:column>
+            <g:column>
+                <ui:define name="header">#{messages['gazelle.message.simple']}</ui:define>
+                #{messageManager.getFormattedMessage(message)}
+            </g:column>
+            <g:column>
+                <ui:define name="header">#{messages['gazelle.tm.Link']}</ui:define>
+                <h:outputLink value="#{message.getFormattedLink()}" target="_blank">
+                    <h:outputText value="#{messages['gazelle.tm.Link']}"/>
+                </h:outputLink>
+            </g:column>
+            <f:facet name="footer">
+                <rich:dataScroller maxPages="10" renderIfSinglePage="false" immediate="true"/>
+            </f:facet>
+        </rich:dataTable>
+    </h:form>
+
+</h:body>
+</html>

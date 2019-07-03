@@ -1,0 +1,151 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['net.ihe.gazelle.tm.TFRules']}"/>
+    <ui:define name="body">
+        <h:form id="rulesForm" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <s:div rendered="#{s:hasPermission('MasterModel', 'edit', null)}">
+            </s:div>
+            #{aipoSelector.setTestingSession(null)}
+            <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                <ui:include src="/filter/filter.xhtml">
+                    <ui:param name="filter" value="#{aipoSelector.filter}"/>
+                    <ui:param name="filterWidth" value="240"/>
+                    <ui:param name="filterId" value="integrationProfile"/>
+                    <ui:param name="filterName" value="#{messages['gazelle.tf.integrationProfile']}"/>
+                    <ui:param name="filterForm" value="rulesForm"/>
+                </ui:include>
+                <!-- integrationProfileOption -->
+                <ui:include src="/filter/filter.xhtml">
+                    <ui:param name="filter" value="#{aipoSelector.filter}"/>
+                    <ui:param name="filterWidth" value="240"/>
+                    <ui:param name="filterId" value="integrationProfileOption"/>
+                    <ui:param name="filterName"
+                              value="#{messages['gazelle.tests.test.integrationProfileOption']}"/>
+                    <ui:param name="filterForm" value="rulesForm"/>
+                </ui:include>
+                <!-- actor -->
+                <ui:include src="/filter/filter.xhtml">
+                    <ui:param name="filter" value="#{aipoSelector.filter}"/>
+                    <ui:param name="filterWidth" value="240"/>
+                    <ui:param name="filterId" value="actor"/>
+                    <ui:param name="filterName"
+                              value="#{messages['gazelle.testmanagement.object.Actor']}"/>
+                    <ui:param name="filterForm" value="rulesForm"/>
+                </ui:include>
+                <ui:define name="filter_buttons">
+                    <a4j:commandLink actionListener="#{aipoSelector.filter.clear()}"
+                                     title="#{messages['gazelle.users.reset']}" type="submit"
+                                     execute="@this" render="rulesForm">
+                        <span class="fa fa-times-circle"/>
+                    </a4j:commandLink>
+                </ui:define>
+            </ui:decorate>
+            <a4j:commandButton value="#{messages['net.ihe.gazelle.tm.AddNew']}"
+                               actionListener="#{rulesManager.addNew()}"
+                               styleClass="gzl-btn-green"/>
+            <rich:dataTable id="rulesTable" var="currentValue" value="#{rulesManager.aipoR}" rowKeyVar="rowNumber"
+                            rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                <g:column>
+                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Name']}</ui:define>
+                    <h:outputText value="#{currentValue.name}"/>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Comment']}</ui:define>
+                    <h:outputText value="#{currentValue.comment}"/>
+                </g:column>
+                <g:column rendered="#{applicationManager.isAssertionEnabled()}">
+                    <ui:define name="header"># #{messages['net.ihe.gazelle.tm.OfAssertionsLinked']}</ui:define>
+                    <h:outputText value="#{rulesManager.getNbAssertionsFor(currentValue.id)}"/>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">#{messages['gazelle.tf.table.Action']}</ui:define>
+                    <div class="gzl-never-wrap">
+
+                        <a4j:commandLink actionListener="#{rulesManager.view(currentValue)}"
+                                         oncomplete="jq162('#ViewRule').modal('show')"
+                                         title="#{messages['gazelle.common.button.View']}"
+                                         render="viewRuleC">
+                            <span class="gzl-icon-search"/>
+                        </a4j:commandLink>
+
+                        <a4j:commandLink action="#{rulesManager.edit(currentValue)}"
+                                         title="#{messages['gazelle.common.button.Edit']}"
+                                         rendered="#{s:hasPermission('MasterModel', 'edit', null)}">
+                            <span class="gzl-icon-pencil"/>
+                        </a4j:commandLink>
+
+                        <a4j:commandLink oncomplete="jq162('#DeleteRule').modal('show')"
+                                         title="#{messages['gazelle.common.button.Delete']}"
+                                         rendered="#{s:hasPermission('MasterModel', 'edit', null)}"
+                                         execute="@this"
+                                         actionListener="#{rulesManager.preDelete(currentValue)}">
+                            <span class="gzl-icon-trash-o"/>
+                        </a4j:commandLink>
+
+                    </div>
+                </g:column>
+                <f:facet name="footer">
+                    <ui:include src="/util/datatableFooter.xhtml">
+                        <ui:param name="dataScrollerId" value="ds"/>
+                        <ui:param name="dataTableId" value="rulesTable"/>
+                    </ui:include>
+                </f:facet>
+            </rich:dataTable>
+        </h:form>
+        <h:form id="deletefrm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title.xhtml">
+                <ui:param name="popup_id" value="DeleteRule"/>
+                <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.DeleteRule']}</ui:define>
+                <a4j:commandButton value="#{messages['net.ihe.gazelle.tm.DeleteRule']}"
+                                   styleClass="gzl-btn-red" actionListener="#{rulesManager.delete()}"
+                                   oncomplete="jq162('#DeleteRule').modal('hide')"
+                                   render="rulesForm"/>
+                <a4j:commandButton value="#{messages['gazelle.common.button.Cancel']}"
+                                   onclick="jq162('#DeleteRule').modal('hide')"
+                                   styleClass="gzl-btn"/>
+            </ui:decorate>
+        </h:form>
+        <h:form id="ViewRuleForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title.xhtml">
+                <ui:param name="popup_id" value="ViewRule"/>
+                <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.ViewRule']}</ui:define>
+                <s:div id="viewRuleC">
+                    <s:decorate template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['gazelle.testmanagement.object.Name']}</ui:define>
+                        <h:outputText value="#{rulesManager.editedItem.name}"/>
+                    </s:decorate>
+                    <s:decorate template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['net.ihe.gazelle.tm.Cause']}</ui:define>
+                        <s:decorate template="/tf/rules/criterionView.xhtml">
+                            <ui:param name="criterion" value="#{rulesManager.editedItem.cause}"/>
+                        </s:decorate>
+                    </s:decorate>
+                    <s:decorate template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['net.ihe.gazelle.tm.Consequence']}</ui:define>
+                        <s:decorate template="/tf/rules/criterionView.xhtml">
+                            <ui:param name="criterion" value="#{rulesManager.editedItem.consequence}"/>
+                        </s:decorate>
+                    </s:decorate>
+                    <s:decorate template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['gazelle.testmanagement.object.Comment']}</ui:define>
+                        <h:outputText value="#{rulesManager.editedItem.comment}"/>
+                    </s:decorate>
+                    <br/>
+                    <s:div rendered="#{applicationManager.isAssertionEnabled()}">
+                        <ui:include src="/testing/testsDefinition/viewAssertions.xhtml">
+                            <ui:param name="assertions"
+                                      value="#{assertionsManager.getRuleAssertions(rulesManager.editedItem.id)}"/>
+                        </ui:include>
+                    </s:div>
+                </s:div>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

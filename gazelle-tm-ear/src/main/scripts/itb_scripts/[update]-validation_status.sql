@@ -1,0 +1,2 @@
+﻿update validation_status set label_key_for_display='gazelle.tm.tee.validation.status.failed' where id=2 and key='FAIL';
+update validation_status set label_key_for_display='gazelle.tm.tee.validation.status.passed' where id=4 and key='PASS';

@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 6.6.0  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="invoice_withFeesAndSystems" pageWidth="595" pageHeight="842" columnWidth="515" leftMargin="40" rightMargin="40" topMargin="20" bottomMargin="20" uuid="6d275f00-2dff-46f8-842c-857263588ecf">
+	<property name="ireport.scriptlethandling" value="0"/>
+	<property name="ireport.encoding" value="UTF-8"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="158"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<import value="net.sf.jasperreports.engine.*"/>
+	<import value="java.util.*"/>
+	<import value="net.sf.jasperreports.engine.data.*"/>
+	<style name="default" isDefault="true" fontName="Arial"/>
+	<parameter name="companyKeyword" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA["Forcare"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="testingSessionId" class="java.lang.Integer" isForPrompting="false">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA[32]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+     tm_invoice."invoice_generation_date" AS tm_invoice_invoice_generation_date,
+     tm_invoice."invoice_number" AS tm_invoice_invoice_number,
+     tm_invoice."vat_amount" AS tm_invoice_vat_amount,
+     tm_invoice."vat_number" AS tm_invoice_vat_number,
+     tm_invoice."vat_country" AS tm_invoice_vat_country,
+     tm_invoice."vat_due" AS tm_invoice_vat_due,
+     tm_testing_session."vat_percent" AS tm_testing_session_vat_percent,
+     tm_testing_session."fee_participant" AS tm_testing_session_fee_participant,
+     tm_invoice."fees_amount" AS tm_invoice_fees_amount,
+     tm_invoice."fees_discount" AS tm_invoice_fees_discount,
+     tm_invoice."purchase_order" AS tm_invoice_purchase_order,
+     tm_invoice."number_system" AS tm_invoice_number_system,
+     tm_invoice."number_extra_participant" AS tm_invoice_number_extra_participant
+FROM
+     "public"."usr_institution" usr_institution
+     INNER JOIN "public"."tm_institution_system" tm_institution_system ON usr_institution."id" = tm_institution_system."institution_id"
+     INNER JOIN "public"."tm_system" tm_system ON tm_institution_system."system_id" = tm_system."id"
+     INNER JOIN "public"."tm_invoice" tm_invoice ON tm_institution_system."institution_id" = tm_invoice."institution_id"
+     INNER JOIN "public"."tm_testing_session" tm_testing_session ON tm_invoice."testing_session_id" = tm_testing_session."id"
+
+WHERE
+     tm_testing_session."id" = $P{testingSessionId}
+ AND usr_institution."keyword" = $P{companyKeyword}
+
+GROUP BY
+
+     tm_invoice.invoice_generation_date,
+     tm_invoice.invoice_number,
+     tm_invoice.vat_amount,
+     tm_invoice.fees_amount,
+     tm_invoice_vat_number,
+     tm_invoice_vat_country,
+     tm_invoice_vat_due,
+     tm_testing_session_vat_percent,
+tm_testing_session_fee_participant,
+     tm_invoice_fees_discount,
+     tm_invoice_purchase_order,
+     tm_invoice_number_system,
+     tm_invoice_number_extra_participant]]>
+	</queryString>
+	<field name="tm_invoice_invoice_generation_date" class="java.sql.Timestamp"/>
+	<field name="tm_invoice_invoice_number" class="java.lang.Integer"/>
+	<field name="tm_invoice_vat_amount" class="java.math.BigDecimal"/>
+	<field name="tm_invoice_vat_number" class="java.lang.String"/>
+	<field name="tm_invoice_vat_country" class="java.lang.String"/>
+	<field name="tm_invoice_vat_due" class="java.lang.Boolean"/>
+	<field name="tm_testing_session_vat_percent" class="java.math.BigDecimal"/>
+	<field name="tm_testing_session_fee_participant" class="java.math.BigDecimal"/>
+	<field name="tm_invoice_fees_amount" class="java.math.BigDecimal"/>
+	<field name="tm_invoice_fees_discount" class="java.math.BigDecimal"/>
+	<field name="tm_invoice_purchase_order" class="java.lang.String"/>
+	<field name="tm_invoice_number_system" class="java.lang.Integer"/>
+	<field name="tm_invoice_number_extra_participant" class="java.lang.Integer"/>
+	<background>
+		<band/>
+	</background>
+	<title>
+		<band height="61">
+			<textField>
+				<reportElement x="230" y="0" width="284" height="10" backcolor="#FFFFFF" uuid="410232b1-ff37-4aa9-9e7b-42f792e8da33">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Left" markup="styled">
+					<font size="7.5"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Eidgenössisches Departement des Innern EDI"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="230" y="20" width="284" height="10" backcolor="#FFFFFF" uuid="9f324957-4f20-4e31-97a8-5dcce271332d">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Left" markup="styled">
+					<font size="7.5"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Abteilung Ressourcenmanagement"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="230" y="10" width="284" height="10" backcolor="#FFFFFF" uuid="fdde79f2-8f25-425e-b396-cb21125bc0c0">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Left" markup="styled">
+					<font size="7.5" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Bundesamt für Gesundheit BAG"]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="0" y="0" width="160" height="53" uuid="293d200a-b883-4bae-bcc2-e42a77263dcd">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<imageExpression><![CDATA["SwissConfederation.png"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<detail>
+		<band height="574">
+			<subreport isUsingCache="false">
+				<reportElement x="316" y="0" width="200" height="140" uuid="399b1aa1-e85a-4c61-94e0-d00011b00d36"/>
+				<subreportParameter name="companyKeyword">
+					<subreportParameterExpression><![CDATA[$P{companyKeyword}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="VATString">
+					<subreportParameterExpression><![CDATA[($F{tm_invoice_vat_number}.length()>0)?($F{tm_invoice_vat_country}.concat("-").concat($F{tm_invoice_vat_number})):""]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "createInvoiceForGivenCompanySubreport1.jasper"]]></subreportExpression>
+			</subreport>
+			<textField isBlankWhenNull="false">
+				<reportElement key="textField" mode="Transparent" x="-137" y="-508" width="247" height="27" uuid="eb9e3e31-ce16-44c8-98d7-ba259e306b55"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Participation Fee for "+ ($F{tm_invoice_number_system}).toString() + " system(s) (1)"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement key="textField" mode="Opaque" x="41" y="324" width="247" height="27" uuid="b3444bb2-dd18-4f00-8110-13c8449c90ba"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Totalbetrag :"]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00" isBlankWhenNull="true">
+				<reportElement key="textField" mode="Opaque" x="0" y="83" width="230" height="20" uuid="005b97e7-a576-4c49-a55f-fbd23afdc074"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Invoice # : EPD-Projectathon-"+$F{tm_invoice_invoice_number}.toString()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="41" y="424" width="150" height="20" uuid="d63aa1f7-27e1-420e-a914-1566e2043408"/>
+				<textElement textAlignment="Right">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Bank :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="41" y="444" width="150" height="20" uuid="697684e1-1f8e-433a-bd4f-3783ba103a7c"/>
+				<textElement textAlignment="Right">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Bank Account :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="201" y="424" width="236" height="20" uuid="30db1fc0-484f-4ffe-9e4e-68b1963d804a"/>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[PostFinance, Mingerstrasse 20, 3030 Bern]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="41" y="484" width="150" height="20" uuid="d0a76ebd-6559-496a-8ddb-917395c8b349"/>
+				<textElement textAlignment="Right">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BIC :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="41" y="464" width="150" height="20" uuid="74e6369d-b657-44f2-a34a-ca29bd78e04b"/>
+				<textElement textAlignment="Right">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[IBAN :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="41" y="404" width="150" height="20" uuid="e0890f91-2156-4d8b-a12a-2906d05fe5aa"/>
+				<textElement textAlignment="Right">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Account holder :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="201" y="445" width="236" height="20" uuid="96154df5-4c38-4b15-930a-9fb436a2f8e9"/>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[30-698-1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="201" y="464" width="236" height="20" uuid="1144c187-2aed-4ded-bfa3-4a38f37d2c27"/>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[CH81 0900 0000 3000 0698 1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-1" y="544" width="515" height="20" uuid="8c94d87b-f7c6-4bb6-8004-2e69660d410c"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Zahlbar innert 30 Tagen]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="201" y="404" width="236" height="20" uuid="6b1ee953-9bda-4b9f-9fa8-e7e0c00dba43"/>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Bundesamt für Gesundheit, 3003 Bern"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="201" y="484" width="236" height="20" uuid="4a8601e5-5b1c-4543-802b-68e7f708aa13">
+					<printWhenExpression><![CDATA[($F{tm_invoice_vat_country}.length() > 1 && $F{tm_invoice_vat_number}.length() > 0) ?Boolean.TRUE:Boolean.FALSE]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["POFICHBEXXX"]]></textFieldExpression>
+			</textField>
+			<textField pattern="CHF #,##0.00" isBlankWhenNull="false">
+				<reportElement key="textField" mode="Opaque" x="288" y="324" width="197" height="27" uuid="3f26a4a7-442c-4883-b6b2-e4787641df94"/>
+				<textElement textAlignment="Right">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[BigDecimal.valueOf($F{tm_invoice_number_extra_participant}).multiply($F{tm_testing_session_fee_participant})]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00" isBlankWhenNull="false">
+				<reportElement key="textField" mode="Opaque" x="41" y="270" width="247" height="27" uuid="be2dbfaf-e8d2-4748-b903-d1b79c001ecf">
+					<printWhenExpression><![CDATA[($F{tm_invoice_number_extra_participant}>0)?Boolean.TRUE:Boolean.FALSE]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Teilnahmegebühr für "+$F{tm_invoice_number_extra_participant} + "  Person(en) :"]]></textFieldExpression>
+			</textField>
+			<textField pattern="CHF #,##0.00" isBlankWhenNull="false">
+				<reportElement key="textField" mode="Opaque" x="288" y="270" width="197" height="27" uuid="5ab923d4-26a2-44eb-bd7d-ff8e51e97b8a">
+					<printWhenExpression><![CDATA[($F{tm_invoice_number_extra_participant}>0)?Boolean.TRUE:Boolean.FALSE]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_invoice_fees_amount}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="189" width="515" height="20" uuid="bb8a1301-222f-47ab-a303-2cacee9b9685"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Teilnahmegebühr EPD-Projectathon April 2019]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField" mode="Opaque" x="289" y="155" width="226" height="20" uuid="a962c123-29fd-4404-ad76-2f544dc9585a"/>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_invoice_invoice_generation_date}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="228" y="155" width="59" height="20" uuid="faed72cd-2aac-489e-9caf-e4a747949f4c"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Bern,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="223" width="121" height="20" uuid="8b37842b-2c22-4bf7-a80a-93ee7555d007">
+					<printWhenExpression><![CDATA[($F{tm_invoice_purchase_order}.length() > 0) ? Boolean.TRUE:Boolean.FALSE]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Purchase Order # :]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement key="textField" mode="Opaque" x="121" y="223" width="230" height="20" uuid="f7f21d08-ba2f-4ea2-a0bc-2f2893e52ca3">
+					<printWhenExpression><![CDATA[($F{tm_invoice_purchase_order}.length() > 0) ? Boolean.TRUE:Boolean.FALSE]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font size="12" isBold="true" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_invoice_purchase_order}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00" isBlankWhenNull="false">
+				<reportElement key="textField" mode="Opaque" x="41" y="297" width="247" height="27" uuid="b4326417-f9db-494d-856d-6ae263f320d5">
+					<printWhenExpression><![CDATA[($F{tm_invoice_number_extra_participant}>0)?Boolean.TRUE:Boolean.FALSE]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["eHealthSuisse bezahlt :"]]></textFieldExpression>
+			</textField>
+			<textField pattern="CHF #,##0.00" isBlankWhenNull="false">
+				<reportElement key="textField" mode="Opaque" x="288" y="297" width="197" height="27" uuid="a7ec6cd7-1399-45a3-864c-ce03f46a072c">
+					<printWhenExpression><![CDATA[($F{tm_invoice_number_extra_participant}>0)?Boolean.TRUE:Boolean.FALSE]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_invoice_fees_discount}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="120" splitType="Prevent">
+			<image>
+				<reportElement x="150" y="4" width="394" height="113" uuid="9fd7ab98-8757-4717-bb9e-97a8fc4260a8"/>
+				<imageExpression><![CDATA["eHS_A4hoch_Fuss_Logo_gross.png"]]></imageExpression>
+			</image>
+		</band>
+	</pageFooter>
+	<summary>
+		<band/>
+	</summary>
+</jasperReport>

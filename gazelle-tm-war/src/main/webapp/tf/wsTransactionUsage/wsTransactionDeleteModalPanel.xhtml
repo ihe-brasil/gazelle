@@ -1,0 +1,25 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <h:form id="deleteForm">
+        <s:token allowMultiplePosts="true"/>
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="DeleteSelectedWSTrans"/>
+            <ui:define name="popup_title">#{messages['gazelle.tf.DeleteSelectedWSTransactionUsage']}</ui:define>
+            <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+            <ui:define name="popup_footer">
+                <button type="button" class="gzl-btn" data-dismiss="modal">
+                    #{messages['gazelle.tm.Cancel']}
+                </button>
+                <h:panelGroup rendered="#{wsTransactionUsageManager.canDeleteSelectedWSTrans()}">
+                    <a4j:commandButton value="#{messages['gazelle.tf.DeleteThisWebserviceTransactionUsage']}"
+                                       styleClass="gzl-btn-red"
+                                       actionListener="#{wsTransactionUsageManager.deleteSelectedWSTransactionUsage()}"
+                                       onclick="jq162('#DeleteSelectedWSTrans').modal('hide');"
+                                       render="wsForm,messageDecoration"/>
+                </h:panelGroup>
+            </ui:define>
+        </ui:decorate>
+    </h:form>
+</ui:composition>

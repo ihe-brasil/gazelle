@@ -1,0 +1,93 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j" xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <s:div rendered="#{not empty criterion}">
+        <c:if test="#{rulesManager.isList(criterion)}">
+            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                <ui:define name="panel_title">
+                    <div class="row">
+                        <a4j:outputPanel layout="block" style="cursor:move;">
+                            <s:span>
+                                <rich:dragSource dragIndicator=":indicator" type="rule"
+                                                 dragValue="#{criterion.fakeId}"/>
+                                <h:outputText value="#{messages['net.ihe.gazelle.tm.CriterionList']}"/>
+                            </s:span>
+                        </a4j:outputPanel>
+
+                        <a4j:commandLink event="click" execute="@this" render="ruleForm"
+                                         title="#{messages['gazelle.common.button.Delete']}"
+                                         actionListener="#{rulesManager.removeCriterion(criterion.fakeId)}"><span
+                                class="gzl-icon-trash-o"></span></a4j:commandLink>
+                    </div>
+                </ui:define>
+                <a4j:outputPanel layout="block">
+                    <rich:dropTarget acceptedTypes="rule" dropListener="#{rulesManager.onDropItem}"
+                                     dropValue="#{criterion.fakeId}" render="ruleForm"/>
+                    <s:span>
+                        <span class="gzl-icon-plus"/>
+                        <h:outputText
+                                value="#{messages['net.ihe.gazelle.tm.AddRuleByDroppingOneHere']}"/>
+                    </s:span>
+                </a4j:outputPanel>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['net.ihe.gazelle.tm.Mode']}</ui:define>
+                    <h:selectOneRadio layout="lineDirection" value="#{criterion['or']}">
+                        <f:selectItem itemLabel="#{messages['net.ihe.gazelle.tm.OR']}"
+                                      itemValue="#{true}"/>
+                        <f:selectItem itemLabel="#{messages['net.ihe.gazelle.tm.AND']}"
+                                      itemValue="#{false}"/>
+                        <a4j:ajax event="change" render="ruleForm"/>
+                    </h:selectOneRadio>
+                </s:decorate>
+                <s:div style="display:block;">
+                    <c:forEach items="#{criterion.aipoCriterions}" var="subCriterion">
+                        <s:div style="display:inline-block;">
+                            <s:decorate template="/tf/rules/criterion.xhtml">
+                                <ui:param name="criterion" value="#{subCriterion}"/>
+                            </s:decorate>
+                        </s:div>
+                    </c:forEach>
+                </s:div>
+            </ui:decorate>
+
+        </c:if>
+        <c:if test="#{not rulesManager.isList(criterion)}">
+            <ui:decorate template="/layout/panels/_panel.xhtml">
+                <div class="row">
+                    <div class="col-md-8">
+                        <a4j:outputPanel layout="block" style="cursor:move;">
+                            <s:span>
+                                <rich:dragSource dragIndicator=":indicator" type="rule"
+                                                 dragValue="#{criterion.fakeId}"/>
+                                <h:outputText value="#{criterion.toString()}"/>
+                            </s:span>
+                        </a4j:outputPanel>
+                    </div>
+                    <div class="col-md-4">
+                        <a4j:commandLink action="#{rulesManager.setPopupAipoSingle(criterion)}"
+                                         oncomplete="jq162('#ViewAIPOs').modal('show')"
+                                         title="#{messages['net.ihe.gazelle.tm.ViewAIPOs']}"
+                                         render=":ViewAIPOsForm">
+                            <s:span styleClass="gzl-icon-search"/>
+                        </a4j:commandLink>
+                        <a4j:commandLink action="#{rulesManager.setPopupAipoSingle(criterion)}"
+                                         oncomplete="jq162('#EditAIPOSingle').modal('show')"
+                                         title="#{messages['gazelle.common.button.Edit']}"
+                                         render=":EditAIPOSingleForm">
+                            <s:span styleClass="gzl-icon-pencil"/>
+                        </a4j:commandLink>
+                        <a4j:commandLink event="click" execute="@this" render="ruleForm"
+                                         title="#{messages['gazelle.common.button.Delete']}"
+                                         actionListener="#{rulesManager.removeCriterion(criterion.fakeId)}">
+                            <span class="gzl-icon-trash-o"/>
+                        </a4j:commandLink>
+                    </div>
+                </div>
+            </ui:decorate>
+
+        </c:if>
+    </s:div>
+</ui:composition>

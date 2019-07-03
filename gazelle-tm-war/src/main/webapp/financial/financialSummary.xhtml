@@ -1,0 +1,875 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:a4j="http://richfaces.org/a4j" xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.systems.financial.FinancialSummary']}"/>
+    <ui:define name="body">
+        <script type="text/javascript">
+            function hideOutOfDate() {
+                var outmodal = document
+                    .getElementById("selectInstitution:contrdiv");
+                if (outmodal != null) {
+                    outmodal.setAttribute("style", "display : none;");
+                }
+            }
+        </script>
+
+        <h:form id="selectInstitution" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <h:panelGroup
+                    rendered="#{s:hasRole('admin_role') || s:hasRole('institutions_editor_role') || s:hasRole('project-manager_role') ||  s:hasRole('accounting_role') ||  s:hasRole('testing_session_admin_role')}">
+                <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                    <a4j:region id="InstitutionRegion">
+                        <s:decorate id="institutionDecoration"
+                                    template="/layout/form/_form_field_horizontal_inline.xhtml">
+                            <ui:param name="id" value="ListInstitution"/>
+                            <ui:define name="label">#{messages['gazelle.financial.invoice.InstitutionKeyword']}
+                            </ui:define>
+                            <h:selectOneMenu
+                                    styleClass="form-control gzl-form-control  gzl-select-text ListInstitutionIn"
+                                    id="ListInstitution"
+                                    value="#{financialManager.selectedInstitution}">
+                                <s:selectItems
+                                        value="#{gazelleDAO.getListOfInstitutionsRegisterInSession(gazelleDAO.getSelectedTestingSession())}"
+                                        var="institutionUsed"
+                                        noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                        label="#{institutionUsed.keyword} - #{institutionUsed.name}"/>
+                                <a4j:ajax event="change" execute="@this"
+                                          render="finandiv,institutionDecoration2"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </a4j:region>
+                </ui:decorate>
+            </h:panelGroup>
+            <s:div id="updatefs">
+                <s:div rendered="#{!s:hasRole('admin_role') and !s:hasRole('institutions_editor_role') and !s:hasRole('project-manager_role') and !s:hasRole('accounting_role')}">
+                    #{financialManager.forceSelectedInstitution()}
+                </s:div>
+            </s:div>
+
+            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                <ui:define name="panel_title">#{messages['gazelle.systems.financial.FinancialSummary']}</ui:define>
+                <s:div id="finandiv">
+                    <h:panelGroup rendered="#{financialManager.isFinancialSummaryDecorateRendered()}">
+
+                        #{financialManager.getFinancialSummaryWithNoReturn()}
+
+                        <s:div rendered="#{financialManager.financialSummary.invoice.invoiceSent}">
+                            <p class="text-danger">
+                                <span class="gzl-icon-exclamation-triangle gzl-icon-2x"
+                                      title="#{messages['gazelle.tm.invoice.Warning']}"></span>
+
+                                <h:outputText value="#{messages['gazelle.tm.invoice.WarningTheInvoiceIsAlreadySent']}"/>
+                            </p>
+                        </s:div>
+
+                        <s:div id="contrdiv">
+                            <s:div rendered="#{financialManager.financialSummary.invoice.contractOutOfDate}">
+                                <p class="text-danger">
+                                    <span class="gzl-icon-exclamation-triangle"
+                                          title="#{messages['gazelle.tm.invoice.Warning']}"></span>
+                                    <h:outputText value="#{messages['gazelle.tm.ContractOutOfDate']}."/>
+                                    <s:span rendered="#{financialManager.financialSummary.invoice.lastGenerationDate != null}">
+                                        <h:outputText
+                                                value="#{messages['gazelle.tm.TheLatestContractWasDownloadedAt']} "/>
+                                        <g:date tooltip="true"
+                                                value="#{financialManager.financialSummary.invoice.lastGenerateDateAsDate}"/>
+                                        <h:outputText value="."/>
+                                    </s:span>
+                                </p>
+                            </s:div>
+                        </s:div>
+
+                        <p>#{messages['gazelle.systems.system.FinancialSummary2']}</p>
+                        #{financialManager.prepareContactsForFinancialSummary()}
+
+                        <h:panelGroup
+                                rendered="#{financialManager.billingContactsForFinancialSummary.size() &gt; 0}">
+                            <f:facet name="header">
+                                <h:outputText id="financialContactsOutputText"
+                                              value="#{messages['gazelle.systems.financial.FinancialContacts']}"/>
+                            </f:facet>
+                            <rich:dataTable id="billingContacts" var="PersonWrapperForFinancialSummary"
+                                            value="#{financialManager.billingContactsForFinancialSummary}">
+                                <g:column>
+                                    <ui:define name="header">
+                                        <h:outputText
+                                                value="#{messages['gazelle.systems.financial.LastName']}"/>
+                                    </ui:define>
+                                    #{PersonWrapperForFinancialSummary.lastname}
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">
+                                        <h:outputText
+                                                value="#{messages['gazelle.users.FirstName']}"/>
+                                    </ui:define>
+                                    #{PersonWrapperForFinancialSummary.firstname}
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">
+                                        <h:outputText
+                                                value="#{messages['gazelle.systems.financial.Email']}"/>
+                                    </ui:define>
+                                    #{PersonWrapperForFinancialSummary.email}
+                                </g:column>
+                            </rich:dataTable>
+                        </h:panelGroup>
+
+                        <h:panelGroup
+                                rendered="#{financialManager.commercialContactsForFinancialSummary.size() &gt; 0}">
+                            <f:facet name="header">
+                                <h:outputText
+                                        value="#{messages['gazelle.systems.financial.MarketingContacts']}"/>
+                            </f:facet>
+                            <rich:dataTable id="marketingContacts" var="PersonWrapperForFinancialSummary"
+                                            value="#{financialManager.commercialContactsForFinancialSummary}">
+                                <g:column >
+                                    <ui:define name="header">
+                                        <h:outputText
+                                                value="#{messages['gazelle.systems.financial.LastName']}"/>
+                                    </ui:define>
+                                    #{PersonWrapperForFinancialSummary.lastname}
+                                </g:column>
+                                <g:column >
+                                    <ui:define name="header">
+                                        <h:outputText
+                                                value="#{messages['gazelle.users.FirstName']}"/>
+                                    </ui:define>
+                                    #{PersonWrapperForFinancialSummary.firstname}
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">
+                                        <h:outputText
+                                                value="#{messages['gazelle.systems.financial.Email']}"/>
+                                    </ui:define>
+                                    #{PersonWrapperForFinancialSummary.email}
+                                </g:column>
+                            </rich:dataTable>
+                        </h:panelGroup>
+
+                        <h:panelGroup width="60%" columns="3" id="technicalContact"
+                                      rendered="#{financialManager.technicalContactsForFinancialSummary.size() &gt; 0}">
+                            <f:facet name="header">
+                                <h:outputText
+                                        value="#{messages['gazelle.systems.financial.TechnicalContacts']}"/>
+                            </f:facet>
+                            <rich:dataTable id="techContacts" var="PersonWrapperForFinancialSummary"
+                                            value="#{financialManager.technicalContactsForFinancialSummary}">
+                                <g:column>
+                                    <ui:define name="header">
+                                        <h:outputText
+                                                value="#{messages['gazelle.systems.financial.LastName']}"/>
+                                    </ui:define>
+                                    #{PersonWrapperForFinancialSummary.lastname}
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">
+                                        <h:outputText
+                                                value="#{messages['gazelle.users.FirstName']}"/>
+                                    </ui:define>
+                                    #{PersonWrapperForFinancialSummary.firstname}
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">
+                                        <h:outputText
+                                                value="#{messages['gazelle.systems.financial.Email']}"/>
+                                    </ui:define>
+                                    #{PersonWrapperForFinancialSummary.email}
+                                </g:column>
+                            </rich:dataTable>
+                        </h:panelGroup>
+
+
+                        <h:panelGroup
+                                rendered="#{financialManager.financialSummary.financialSummaryOneSystems.size() &gt; 0}">
+                            <f:facet name="header">
+                                <h:outputText
+                                        value="#{messages['gazelle.systems.financial.SystemsSummary']}"/>
+                            </f:facet>
+                            <rich:dataTable id="financialManager" var="financialSummaryForOneSystem"
+                                            value="#{financialManager.getFinancialSummaryForOneSystem()}">
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.systems.financial.SystemName']}
+                                    </ui:define>
+
+                                    <a4j:commandLink
+                                            action="#{systemInSessionViewer.editSystemInSessionSummaryActionRedirect(financialSummaryForOneSystem.getSystemInSession())}"
+                                            value="#{financialSummaryForOneSystem.getSystemInSession().getSystem().getName()}"
+                                            event="click" execute="@this"
+                                            render="selectInstitution"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.systems.financial.Domains']}
+                                    </ui:define>
+                                    <h:outputText
+                                            value="#{financialSummaryForOneSystem.getDomainsForSystem()}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.systems.financial.SystemFee']}
+                                    </ui:define>
+                                    <h:outputText
+                                            value="#{financialSummaryForOneSystem.getSystemFee()}"/>
+                                </g:column>
+                                <g:column style="background-color:#CCCCCC; ">
+                                    <ui:define name="header">#{messages['gazelle.systems.financial.Total']}
+                                    </ui:define>
+                                    <h:outputText
+                                            value="#{financialSummaryForOneSystem.getSystemFee()}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">
+                                        #{messages['gazelle.systems.financial.hasMissingDependencies']}
+                                    </ui:define>
+                                    <s:span styleClass="gzl-icon-circle-red"
+                                            title="#{messages['gazelle.systems.financial.DependenciesNOKTooltip']}"
+                                            rendered="#{(financialSummaryForOneSystem.hasMissingDependecies == null) or financialSummaryForOneSystem.hasMissingDependecies}"/>
+
+
+                                    <s:span styleClass="gzl-icon-circle-green"
+                                            title="#{messages['gazelle.systems.financial.DependenciesOKTooltip']}"
+                                            rendered="#{(financialSummaryForOneSystem.hasMissingDependecies != null) and !financialSummaryForOneSystem.hasMissingDependecies}"/>
+                                </g:column>
+                                <f:facet name="footer">
+                                    <rich:columnGroup>
+                                        <g:column>
+                                            #{messages['gazelle.systems.financial.Total']}
+                                            (#{financialManager.financialSummary.financialSummaryOneSystems.size()}
+                                            #{messages['gazelle.systems.financial.systems']})
+                                            <h:outputText
+                                                    value="(#{financialManager.financialSummary.invoice.numberSystem} #{messages['gazelle.tm.Factured']})"
+                                                    rendered="#{financialManager.financialSummary.invoice.invoiceSent}"/>
+                                        </g:column>
+                                        <g:column>
+                                            <h:outputText
+                                                    value="#{financialManager.financialSummary.domains}"/>
+                                        </g:column>
+                                        <g:column>
+                                            <h:outputText
+                                                    value="#{financialManager.calculateTotalSystemsFee()}"/>
+                                        </g:column>
+                                    </rich:columnGroup>
+                                </f:facet>
+                            </rich:dataTable>
+                        </h:panelGroup>
+
+                        <s:decorate template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tm.monitors.Systems']}</ui:define>
+                            <h:outputText id="systemsOutputText"
+                                          value="#{financialManager.financialSummary.financialSummaryOneSystems.size()}"/>
+                        </s:decorate>
+
+                        <s:decorate template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.users.connectaton.participants.Participants']}
+                            </ui:define>
+                            <h:outputText id="participantsOutputText"
+                                          value="#{financialManager.financialSummary.numberParticipant}"/>
+                            <s:span rendered="#{financialManager.financialSummary.getNumberAdditionalParticipant(gazelleDAO.getSelectedTestingSession()) &gt; 0}">
+                                <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                    <ui:param name="id" value="participantsCalcul"/>
+                                    <ui:param name="placement" value="bottom"/>
+                                    <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                                    <ui:define name="content">
+                                        <div class="gzl-never-wrap">
+                                            #{gazelleDAO.getSelectedTestingSession().getNbParticipantsIncludedInSystemFees()}
+                                            #{messages['net.ihe.gazelle.tm.X_2']}
+                                            #{financialManager.financialSummary.financialSummaryOneSystems.size()}
+                                            +
+                                            #{financialManager.financialSummary.getNumberAdditionalParticipant(gazelleDAO.getSelectedTestingSession())}
+                                            =
+                                            #{financialManager.financialSummary.numberParticipant}
+                                        </div>
+                                    </ui:define>
+                                </ui:decorate>
+                            </s:span>
+                        </s:decorate>
+
+                        <s:decorate template="/layout/display/_display.xhtml">
+                            <ui:define name="label">#{messages['gazelle.tm.invoice.NumberTable']}</ui:define>
+                            <h:outputText
+                                    value="#{financialManager.financialSummary.numberTable}"/>
+                        </s:decorate>
+
+                        <s:span id="panelDiscountAmount"
+                                rendered="#{financialManager.financialSummary.isDiscount and financialManager.financialSummary.financialSummaryOneSystems.size() &gt; 0
+                                and financialManager.financialSummary.domains.length() &gt; 0 and financialManager.billingContactsForFinancialSummary.size() &gt; 0
+                                and financialManager.technicalContactsForFinancialSummary.size() &gt; 0 and financialManager.commercialContactsForFinancialSummary.size() &gt; 0
+                                and financialManager.financialSummary.isDomainExist()  and financialManager.ifBillingContactsHasAddress()}">
+                            <s:span rendered="#{financialManager.financialSummary.invoice.feesDiscount &gt;= 0}">
+                                <s:decorate template="/layout/display/_display.xhtml">
+                                    <ui:define name="label">#{messages['gazelle.testmanagement.financial.DiscountAmount']}
+                                    </ui:define>
+                                    <h:outputText id="feeDiscountAsCurrencyOutputText"
+                                                  value="#{financialManager.financialSummary.feeDiscountAsCurrency}"/>
+                                </s:decorate>
+                                <s:decorate template="/layout/display/_display.xhtml">
+                                    <ui:define name="label">#{messages['gazelle.financial.invoice.ReasonsForDiscount']}
+                                    </ui:define>
+                                    <h:outputText id="reasonForDiscountOutputText"
+                                                  value="#{financialManager.financialSummary.reasonForDiscount}"/>
+                                </s:decorate>
+                            </s:span>
+                            <!-- TODO : GZL-4646 -->
+                            <s:span rendered="#{financialManager.financialSummary.invoice.feesDiscount &lt; 0}">
+                                <s:decorate template="/layout/display/_display.xhtml">
+                                    <ui:define name="label">#{messages['net.ihe.gazelle.tm.AdditionalFees']}</ui:define>
+                                    <h:outputText id="additionalOutputText"
+                                                  value="#{financialManager.financialSummary.getAdditionalFeeAsCurrency()}"/>
+                                </s:decorate>
+                                <s:decorate template="/layout/display/_display.xhtml">
+                                    <ui:define name="label">#{messages['net.ihe.gazelle.tm.ReasonsForAdditionFees']}</ui:define>
+                                    <h:outputText id="reasonForAdditionalOutputText"
+                                                  value="#{financialManager.financialSummary.reasonForDiscount}"/>
+                                </s:decorate>
+                            </s:span>
+                        </s:span>
+                        <div class="row">
+
+                            <s:div id="calc" styleClass="col-lg-6">
+                                <f:facet name="header">
+                                    <h:outputText
+                                            value="#{messages['gazelle.systems.financial.FinancialSummary']}"/>
+                                </f:facet>
+                                <table id="financialSummaryTable" border="0" cellpadding="0" cellspacing="0">
+                                    <thead>
+                                    <tr>
+                                        <th class="rich-table-subheadercell" colspan="2">
+                                            <h:outputText
+                                                    value="#{messages['gazelle.systems.financial.FinancialSummary']}"/>
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody class="dr-table360" style="padding-left: 10px;">
+                                    <tr>
+                                        <td>#{messages['net.ihe.gazelle.tm.SystemsFees']}
+                                        </td>
+                                        <td align="right">
+                                            #{financialManager.financialSummary.getSystemsFeesAsCurrency()}
+                                        </td>
+                                        <td>
+                                            <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                                <ui:param name="id" value="systemsFeeAsCurrencyCalcul"/>
+                                                <ui:param name="placement" value="bottom"/>
+                                                <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                                                <ui:define name="content">
+                                                    <div class="gzl-never-wrap">
+                                                        1
+                                                        #{messages['net.ihe.gazelle.tm.X_2']}
+                                                        #{financialManager.financialSummary.financialSummaryOneSystems.get(0).getSystemFee()}
+                                                        <h:panelGroup
+                                                                rendered="#{financialManager.financialSummary.displayMore}">
+                                                            +
+                                                            #{financialManager.financialSummary.financialSummaryOneSystems.size()-1}
+                                                            #{messages['net.ihe.gazelle.tm.X_2']}
+                                                            #{financialManager.financialSummary.financialSummaryOneSystems.get(1).getSystemFee()}
+                                                        </h:panelGroup>
+                                                        =
+                                                        #{financialManager.financialSummary.getSystemsFeesAsCurrency()}
+                                                    </div>
+                                                </ui:define>
+                                            </ui:decorate>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#{messages['net.ihe.gazelle.tm.ParticipantsFees']}
+                                        </td>
+                                        <td align="right">
+                                            #{financialManager.financialSummary.getParticipantsFeeAsCurrency()}
+                                        </td>
+                                        <td>
+                                            <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                                <ui:param name="id" value="participantsFeeAsCurrencyCalcul"/>
+                                                <ui:param name="placement" value="bottom"/>
+                                                <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                                                <ui:define name="content">
+                                                    <div class="gzl-never-wrap">
+                                                        #{financialManager.financialSummary.getNumberAdditionalParticipant(gazelleDAO.getSelectedTestingSession())}
+                                                        #{messages['net.ihe.gazelle.tm.X_2']}
+                                                        #{gazelleDAO.getSelectedTestingSession().feeParticipant}
+                                                        =
+                                                        #{financialManager.financialSummary.getParticipantsFeeAsCurrency()}
+                                                    </div>
+                                                </ui:define>
+                                            </ui:decorate>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#{messages['gazelle.testmanagement.financial.TotalWithoutTax']}
+                                        </td>
+                                        <td align="right">
+                                            #{financialManager.financialSummary.feeAsCurrency}
+                                        </td>
+                                        <td>
+                                            <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                                <ui:param name="id" value="feeAsCurrencyCalcul"/>
+                                                <ui:param name="placement" value="bottom"/>
+                                                <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                                                <ui:define name="content">
+                                                    <div class="gzl-never-wrap">
+                                                        1
+                                                        #{messages['net.ihe.gazelle.tm.X_2']}
+                                                        #{financialManager.financialSummary.financialSummaryOneSystems.get(0).getSystemFee()}
+                                                        <h:panelGroup
+                                                                rendered="#{financialManager.financialSummary.displayMore}">
+                                                            +
+                                                            #{financialManager.financialSummary.financialSummaryOneSystems.size()-1}
+                                                            #{messages['net.ihe.gazelle.tm.X_2']}
+                                                            #{financialManager.financialSummary.financialSummaryOneSystems.get(1).getSystemFee()}
+                                                        </h:panelGroup>
+                                                        +
+                                                        #{financialManager.financialSummary.getNumberAdditionalParticipant(gazelleDAO.getSelectedTestingSession())}
+                                                        #{messages['net.ihe.gazelle.tm.X_2']}
+                                                        #{gazelleDAO.getSelectedTestingSession().feeParticipant}
+                                                        =
+                                                        #{financialManager.financialSummary.feeAsCurrency}
+                                                    </div>
+                                                </ui:define>
+                                            </ui:decorate>
+                                        </td>
+                                    </tr>
+                                    <s:span rendered="#{financialManager.financialSummary.isDiscount and financialManager.financialSummary.financialSummaryOneSystems.size() &gt; 0 and financialManager.financialSummary.domains.length() &gt; 0 and financialManager.billingContactsForFinancialSummary.size() &gt; 0 and financialManager.technicalContactsForFinancialSummary.size() &gt; 0 and financialManager.commercialContactsForFinancialSummary.size() &gt; 0 and financialManager.financialSummary.isDomainExist()  and financialManager.ifBillingContactsHasAddress()}">
+                                        <tr>
+                                            <td>
+                                                <h:outputText value="#{messages['gazelle.testmanagement.financial.DiscountAmount']} :"
+                                                              rendered="#{financialManager.financialSummary.invoice.feesDiscount &gt;= 0}"/>
+                                                <h:outputText value="#{messages['net.ihe.gazelle.tm.AdditionalFees_2']}"
+                                                              rendered="#{financialManager.financialSummary.invoice.feesDiscount &lt; 0}"/>
+                                            </td>
+                                            <td align="right">
+                                                <h:outputText
+                                                        value="#{financialManager.financialSummary.getAdditionalFeeAsCurrency()}"/>
+                                            </td>
+                                        </tr>
+                                    </s:span>
+                                    <tr>
+                                        <td>#{messages['gazelle.testmanagement.financial.VATAmount']}
+                                        </td>
+                                        <td align="right">
+                                            #{financialManager.financialSummary.feeVATAsCurrency}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#{messages['gazelle.testmanagement.financial.TotalVATIncluded']}
+                                        </td>
+                                        <td align="right">
+                                            #{financialManager.financialSummary.totalFeeToPayAsCurrency}
+                                        </td>
+                                        <td>
+                                            <s:span rendered="#{financialManager.financialSummary.isDiscount and financialManager.financialSummary.financialSummaryOneSystems.size() &gt; 0 and financialManager.financialSummary.domains.length() &gt; 0 and financialManager.billingContactsForFinancialSummary.size() &gt; 0 and financialManager.technicalContactsForFinancialSummary.size() &gt; 0 and financialManager.commercialContactsForFinancialSummary.size() &gt; 0 and financialManager.financialSummary.isDomainExist()  and financialManager.ifBillingContactsHasAddress()}">
+                                                <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                                    <ui:param name="id" value="totalFeeToPayAsCurrencyCalcul"/>
+                                                    <ui:param name="placement" value="bottom"/>
+                                                    <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                                                    <ui:define name="content">
+                                                        <div class="gzl-never-wrap">
+                                                            #{financialManager.financialSummary.feeAsCurrency}
+                                                            <h:outputText
+                                                                    value="- #{financialManager.financialSummary.feeDiscountAsCurrency}"
+                                                                    rendered="#{financialManager.financialSummary.invoice.feesDiscount &gt;= 0}"/>
+                                                            <h:outputText value="+ #{financialManager.financialSummary.getAdditionalFeeAsCurrency()}"
+                                                                          rendered="#{financialManager.financialSummary.invoice.feesDiscount &lt; 0}"/>
+                                                            +
+                                                            #{financialManager.financialSummary.feeVATAsCurrency}
+                                                            =
+                                                            #{financialManager.financialSummary.totalFeeToPayAsCurrency}
+                                                        </div>
+                                                    </ui:define>
+                                                </ui:decorate>
+                                            </s:span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#{messages['gazelle.financial.invoice.FeesPaid']}
+                                            :
+                                        </td>
+                                        <td align="right">
+                                            #{financialManager.financialSummary.totalFeePaidAsCurrency}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#{messages['gazelle.financial.invoice.FeesDue']} :</td>
+                                        <td align="right">
+                                            #{financialManager.financialSummary.totalFeeDueAsCurrency}
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </s:div>
+                            <s:div id="sent" styleClass="col-lg-6"
+                                   rendered="#{financialManager.financialSummary.invoice.invoiceSent}">
+                                <f:facet name="header">
+
+                                </f:facet>
+                                <table border="0" cellpadding="0" cellspacing="0">
+                                    <thead>
+                                    <tr>
+                                        <th colspan="2" class="rich-table-subheadercell">
+                                            <h:outputText
+                                                    value="#{messages['gazelle.tm.invoice.FinancialSummaryInvoiced']}"/>
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody class="dr-table360">
+                                    <tr>
+                                        <td>#{messages['gazelle.testmanagement.financial.TotalWithoutTax']}
+                                        </td>
+                                        <td align="right">
+                                            #{financialManager.financialSummary.invoice.currency}
+                                            #{financialManager.financialSummary.invoice.feesAmount}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#{messages['gazelle.testmanagement.financial.VATAmount']}
+                                        </td>
+                                        <td align="right">
+                                            #{financialManager.financialSummary.invoice.currency}
+                                            #{financialManager.financialSummary.invoice.vatAmount}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#{messages['gazelle.testmanagement.financial.TotalVATIncluded']}
+                                        </td>
+                                        <td align="right">
+                                            #{financialManager.financialSummary.invoice.currency}
+                                            #{financialManager.financialSummary.invoice.feesAmount}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#{messages['gazelle.financial.invoice.FeesPaid']}
+                                            :
+                                        </td>
+                                        <td align="right">
+                                            #{financialManager.financialSummary.invoice.currency}
+                                            #{financialManager.financialSummary.invoice.feesPaid}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#{messages['gazelle.financial.invoice.FeesDue']} :</td>
+                                        <td align="right">
+                                            #{financialManager.financialSummary.invoice.totalFeeToPayAsCurrency}
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </s:div>
+
+                        </div>
+
+
+                        <br/>
+                        <br/>
+
+                        <h3>
+                            <h:outputText
+                                    value="#{messages['gazelle.systems.system.FinancialSummaryNoContractButtonReason']}"
+                                    rendered="#{!financialManager.userCanDownloadContract()}"/>
+                        </h3>
+
+                        <s:div
+                                rendered="#{ empty financialManager.selectedInstitution.mailingAddress  }">
+                            <h:outputText
+                                    value="#{messages['gazelle.institutions.institution.MissingMailingAddress']}"
+                                    style="font-weight:bold;color:red;"
+                                    rendered="#{  s:hasRole('vendor_admin_role') }"/>
+                            <h:outputText
+                                    value="#{messages['gazelle.institutions.institution.MissingMailingAddressPleaseInformVendorAdmin']}"
+                                    rendered="#{  (s:hasRole('vendor_role') || s:hasRole('admin_role')) and !s:hasRole('vendor_admin_role') }"
+                                    style="font-weight:bold;color:red;"/>
+                            <a4j:commandButton id="commbut" styleClass="gzl-btn-green"
+                                               action="#{institutionManagerTM.updateInstitutionForTM(financialManager.selectedInstitution.id)}"
+                                               value="#{messages['gazelle.institutions.institution.AddMissingMailingAddressButton']}"
+                                               rendered="#{ s:hasRole('vendor_admin_role') }"/>
+                        </s:div>
+
+                        <s:div
+                                rendered="#{financialManager.billingContactsForFinancialSummary.size() == 0}">
+                            <h:outputText value="#{messages['gazelle.systems.system.MissingBillingContacts']}"
+                                          style="font-weight:bold;color:red"/>
+                            <h:outputText value=" #{messages['gazelle.tm.financial.contact.PleaseInformYourAdmin']}"
+                                          rendered="#{ s:hasRole('vendor_role') and !s:hasRole('vendor_admin_role') }"
+                                          style="font-weight:bold;color:red"/>
+                            <h:outputText
+                                    value="#{messages['net.ihe.gazelle.tm.PleaseInformTheAdministratorOfThisOrganizationTh']}"
+                                    rendered="#{ s:hasRole('admin_role') }"
+                                    style="font-weight:bold;color:red"/>
+                        </s:div>
+
+                        <s:div rendered="#{!financialManager.ifBillingContactsHasAddress() }">
+                            <h:outputText
+                                    value="#{messages['gazelle.systems.system.MissingBillingContactsAddress']}"
+                                    style="font-weight:bold;color:red"/>
+                            <h:outputText value=" #{messages['gazelle.tm.financial.contact.PleaseInformYourAdmin']}"
+                                          rendered="#{  s:hasRole('vendor_role') and !s:hasRole('vendor_admin_role') }"
+                                          style="font-weight:bold;color:red"/>
+                            <h:outputText
+                                    value="#{messages['net.ihe.gazelle.tm.PleaseInformTheAdministratorOfThisOrganizationTh']}"
+                                    rendered="#{ s:hasRole('admin_role') }"
+                                    style="font-weight:bold;color:red"/>
+                        </s:div>
+
+                        <s:div
+                                rendered="#{financialManager.technicalContactsForFinancialSummary.size() == 0}">
+                            <h:outputText value="#{messages['gazelle.systems.system.MissingTechnicalContacts']}"
+                                          style="font-weight:bold;color:red"/>
+                            <h:outputText value=" #{messages['gazelle.tm.financial.contact.PleaseInformYourAdmin']}"
+                                          rendered="#{  s:hasRole('vendor_role') and !s:hasRole('vendor_admin_role') }"
+                                          style="font-weight:bold;color:red"/>
+                            <h:outputText
+                                    value="#{messages['net.ihe.gazelle.tm.PleaseInformTheAdministratorOfThisOrganizationTh']}"
+                                    rendered="#{ s:hasRole('admin_role') }"
+                                    style="font-weight:bold;color:red"/>
+                        </s:div>
+
+                        <s:div
+                                rendered="#{financialManager.commercialContactsForFinancialSummary.size() == 0}">
+                            <h:outputText value="#{messages['gazelle.systems.system.MissingCommercialContacts']}"
+                                          style="font-weight:bold;color:red"/>
+                            <h:outputText value=" #{messages['gazelle.tm.financial.contact.PleaseInformYourAdmin']}"
+                                          rendered="#{  s:hasRole('vendor_role') and !s:hasRole('vendor_admin_role') }"
+                                          style="font-weight:bold;color:red"/>
+                            <h:outputText
+                                    value="#{messages['net.ihe.gazelle.tm.PleaseInformTheAdministratorOfThisOrganizationTh']}"
+                                    rendered="#{ s:hasRole('admin_role') }"
+                                    style="font-weight:bold;color:red"/>
+                        </s:div>
+                        <s:div
+                                rendered="#{financialManager.commercialContactsForFinancialSummary.size() == 0 || financialManager.technicalContactsForFinancialSummary.size() == 0 ||
+                                !financialManager.ifBillingContactsHasAddress() ||financialManager.billingContactsForFinancialSummary.size() == 0}">
+                            <h:commandButton id="butt" styleClass="gzl-btn-green"
+                                             action="#{institutionManagerTM.updateMissingContacts(financialManager.selectedInstitution)}"
+                                             value="#{messages['gazelle.contacts.AddNewContact']}"
+                                             rendered="#{ s:hasRole('vendor_admin_role') }"/>
+                        </s:div>
+
+                        <s:div
+                                rendered="#{financialManager.financialSummary.financialSummaryOneSystems.size() == 0}">
+                            <h:outputText value="#{messages['gazelle.systems.system.MissingSystem']}"
+                                          style="font-weight:bold;color:red"/>
+                            <h:commandButton id="butt5" styleClass="gzl-btn-green"
+                                             action="#{systemInSessionViewer.addNewSystemActionRedirect()}"
+                                             value="#{messages['gazelle.common.menu.MenuRegisterANewSystem']}"
+                                             rendered="#{  s:hasRole('vendor_role') || s:hasRole('vendor_admin_role') }"
+                                             execute="@this"/>
+                        </s:div>
+
+                        <s:div rendered="#{financialManager.financialSummary.domains.length() == 0}">
+                            <h:outputText value="#{messages['gazelle.systems.system.MissingDomain']}"
+                                          style="font-weight:bold;color:red"/>
+                            <a4j:commandButton id="butt6" styleClass="gzl-btn-green"
+                                               action="#{systemInSessionViewer.goToSystemList()}"
+                                               value="#{messages['gazelle.common.menu.MenuManageSystems']}"
+                                               rendered="#{  s:hasRole('vendor_role') || s:hasRole('vendor_admin_role') }"
+                                               execute="@this"/>
+                        </s:div>
+
+                        <s:div
+                                rendered="#{financialManager.financialSummary.getHasASystemGotMissingDependencies()}">
+                            <h:outputText value="#{messages['gazelle.systems.system.MissingDependencies']}"
+                                          style="font-weight:bold;color:red"/>
+                        </s:div>
+
+                        <s:div rendered="#{ !financialManager.financialSummary.isDomainExist()}">
+                            <h:outputText
+                                    value="#{messages['gazelle.systems.system.MissingActorProfilesForSystem']}"
+                                    style="font-weight:bold;color:red"/>
+                            <a4j:commandButton id="butt7" styleClass="gzl-btn-green"
+                                               action="#{systemInSessionViewer.goToSystemList()}"
+                                               value="#{messages['gazelle.common.menu.MenuManageSystems']}"
+                                               rendered="#{  s:hasRole('vendor_role') || s:hasRole('vendor_admin_role') }"
+                                               execute="@this"/>
+                        </s:div>
+
+
+                        <h:panelGrid id="panel" columns="1" border="0"
+                                     rendered="#{ not empty financialManager.selectedInstitution.mailingAddress  and financialManager.financialSummary.financialSummaryOneSystems.size() &gt; 0 and financialManager.financialSummary.domains.length() &gt; 0 and financialManager.billingContactsForFinancialSummary.size() &gt; 0 and financialManager.technicalContactsForFinancialSummary.size() &gt; 0 and financialManager.commercialContactsForFinancialSummary.size() &gt; 0 and financialManager.financialSummary.isDomainExist()  and financialManager.ifBillingContactsHasAddress()}">
+                            <f:facet name="header">
+                                <h:outputText
+                                        value="#{messages['gazelle.systems.financial.CurrentAmountReachedFor']} #{gazelleDAO.getSelectedTestingSession().description} #{messages['gazelle.systems.financial.Registration']}  :   #{financialManager.financialSummary.totalFeeToPayAsCurrency}"/>
+                            </f:facet>
+                        </h:panelGrid>
+                        <br/>
+
+                        <s:div rendered="#{financialManager.userCanDownloadContract()}">
+                            <h:outputText value="#{messages['gazelle.systems.financial.IfAllSystemsAreRegistered']}"/>
+
+                            <a4j:commandLink
+                                    onclick="rich:component('panelLoading').show();window.setTimeout( 'rich:component(\'panelLoading\').hide();', 3000 );hideOutOfDate();"/>
+                            <h:commandButton id="butt8" styleClass="gzl-btn-blue"
+                                             value="#{messages['gazelle.systems.financial.button.DownloadContract']}"
+                                             actionListener="#{financialManager.generateContractPDF()}"
+                                             render="contrdiv"/>
+                        </s:div>
+                        <s:div rendered="#{!financialManager.userCanDownloadContract()}">
+                            <a4j:commandButton id="butt9" styleClass="gzl-btn-blue"
+                                               value="#{messages['gazelle.systems.financial.button.DownloadContract']}"
+                                               oncomplete="jq162('#cannotGenerateContractModalPanel').modal('show');"
+                                               render=" :cannotGenerateContractForm, cannotGenerateContractModalPanel"
+                                               execute="@this"/>
+                        </s:div>
+                        <a4j:region>
+                            <s:div id="specinsdiv">
+                                <s:decorate template="/layout/form/_edit.xhtml">
+                                    <ui:define name="label">
+                                        #{messages['net.ihe.gazelle.tm.SpecialInstructionsForInvoice']}
+                                    </ui:define>
+                                    <c:choose>
+                                        <c:when test="#{ !s:hasRole('vendor_admin_role')||s:hasRole('admin_role') }">
+                                            <h:outputText style="font-weight:bold; color:red;"
+                                                          value="#{financialManager.financialSummary.invoiceSpecialInstruction}"/>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <h:inputTextarea styleClass=" form-control" rows="4" cols="100"
+                                                             value="#{financialManager.financialSummary.invoiceSpecialInstruction}"/>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </s:decorate>
+                                <c:choose>
+                                    <c:when test="#{ !(!s:hasRole('vendor_admin_role')||s:hasRole('admin_role')) }">
+                                        <div>
+                                            <a4j:commandButton id="updateInvoice" styleClass="gzl-btn-green"
+                                                               value="#{messages['net.ihe.gazelle.tm.UpdateInstructionsForInvoice']}"
+                                                               actionListener="#{financialManager.saveSpecialInstructionFromFinancialSummary()}"
+                                                               render="messDec"/>
+                                        </div>
+                                    </c:when>
+                                    <c:otherwise>
+                                    </c:otherwise>
+                                </c:choose>
+                            </s:div>
+                        </a4j:region>
+
+                    </h:panelGroup>
+                </s:div>
+            </ui:decorate>
+        </h:form>
+
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!--  Cannot Generate Contract confirmation Modal Panel					-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="cannotGenerateContractForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="cannotGenerateContractModalPanel"/>
+                <ui:define name="popup_title">
+                    #{messages['gazelle.systems.system.confirmation.CannotGenerateContractHeader']}
+                </ui:define>
+                <h:outputText
+                        value="#{messages['gazelle.systems.system.confirmation.CannotGenerateContractLabel']}"/>
+                <h3>
+                    <h:outputText
+                            value="#{messages['gazelle.systems.system.FinancialSummaryNoContractButtonReason']}"
+                            rendered="#{!financialManager.userCanDownloadContract()}"/>
+                </h3>
+                <h:panelGroup rendered="#{empty financialManager.selectedInstitution.mailingAddress}">
+                    <br/>
+                    <h:outputText
+                            value="#{messages['gazelle.institutions.institution.MissingMailingAddress']}"
+                            style="font-weight:bold;color:red"
+                            rendered="#{  s:hasRole('vendor_admin_role') }"/>
+                    <h:outputText
+                            value="#{messages['gazelle.institutions.institution.MissingMailingAddressPleaseInformVendorAdmin']}"
+                            rendered="#{  s:hasRole('vendor_role') and !s:hasRole('vendor_admin_role') and !s:hasRole('admin_role')}"
+                            style="font-weight:bold;color:red"/>
+                    <h:outputText
+                            value="* #{messages['net.ihe.gazelle.tm.PleaseInformTheAdministratorOfThisOrganizationTh_2']}"
+                            rendered="#{ s:hasRole('admin_role') }"
+                            style="font-weight:bold;color:red"/>
+                    <h:commandButton styleClass="gzl-btn-green"
+                                     action="#{institutionManagerTM.updateInstitutionForTM(financialManager.selectedInstitution.id)}"
+                                     value="#{messages['gazelle.institutions.institution.AddMissingMailingAddressButton']}"
+                                     rendered="#{ s:hasRole('vendor_admin_role') }"/>
+                </h:panelGroup>
+                <h:panelGroup
+                        rendered="#{financialManager.billingContactsForFinancialSummary.size() == 0}">
+                    <br/>
+                    <h:outputText value="#{messages['gazelle.systems.system.MissingBillingContacts']}"
+                                  style="font-weight:bold;color:red"
+                                  rendered="#{ !s:hasRole('admin_role')}"/>
+                    <h:outputText value=" #{messages['gazelle.tm.financial.contact.PleaseInformYourAdmin']}"
+                                  rendered="#{  s:hasRole('vendor_role') and !s:hasRole('vendor_admin_role') and !s:hasRole('admin_role') }"
+                                  style="font-weight:bold;color:red"/>
+                    <h:outputText
+                            value="* #{messages['net.ihe.gazelle.tm.PleaseInformTheAdministratorOfThisOrganizationTh_3']}"
+                            rendered="#{ s:hasRole('admin_role') }"
+                            style="font-weight:bold;color:red"/>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{!financialManager.ifBillingContactsHasAddress() }">
+                    <br/>
+                    <h:outputText
+                            value="#{messages['gazelle.systems.system.MissingBillingContactsAddress']}"
+                            style="font-weight:bold;color:red"
+                            rendered="#{ !s:hasRole('admin_role')}"/>
+                    <h:outputText value=" #{messages['gazelle.tm.financial.contact.PleaseInformYourAdmin']}"
+                                  rendered="#{  s:hasRole('vendor_role') and !s:hasRole('vendor_admin_role') and !s:hasRole('admin_role')}"
+                                  style="font-weight:bold;color:red"/>
+                    <h:outputText
+                            value="* #{messages['net.ihe.gazelle.tm.PleaseInformTheAdministratorOfThisOrganizationTh_4']}"
+                            rendered="#{ s:hasRole('admin_role') }"
+                            style="font-weight:bold;color:red"/>
+                </h:panelGroup>
+                <h:panelGroup
+                        rendered="#{financialManager.technicalContactsForFinancialSummary.size() == 0}">
+                    <br/>
+                    <h:outputText value="#{messages['gazelle.systems.system.MissingTechnicalContacts']}"
+                                  style="font-weight:bold;color:red"
+                                  rendered="#{ !s:hasRole('admin_role')}"/>
+                    <h:outputText value=" #{messages['gazelle.tm.financial.contact.PleaseInformYourAdmin']}"
+                                  rendered="#{  s:hasRole('vendor_role') and !s:hasRole('vendor_admin_role') and !s:hasRole('admin_role')}"
+                                  style="font-weight:bold;color:red"/>
+                    <h:outputText
+                            value="* #{messages['net.ihe.gazelle.tm.PleaseInformTheAdministratorOfThisOrganizationTh_5']}"
+                            rendered="#{ s:hasRole('admin_role') }"
+                            style="font-weight:bold;color:red"/>
+                </h:panelGroup>
+                <h:panelGroup
+                        rendered="#{financialManager.commercialContactsForFinancialSummary.size() == 0}">
+                    <br/>
+                    <h:outputText value="#{messages['gazelle.systems.system.MissingCommercialContacts']}"
+                                  style="font-weight:bold;color:red"
+                                  rendered="#{ !s:hasRole('admin_role')}"/>
+                    <h:outputText value=" #{messages['gazelle.tm.financial.contact.PleaseInformYourAdmin']}"
+                                  rendered="#{  s:hasRole('vendor_role') and !s:hasRole('vendor_admin_role')}"
+                                  style="font-weight:bold;color:red"/>
+                    <h:outputText
+                            value="* #{messages['net.ihe.gazelle.tm.PleaseInformTheAdministratorOfThisOrganizationTh_6']}"
+                            rendered="#{ s:hasRole('admin_role') }"
+                            style="font-weight:bold;color:red"/>
+                </h:panelGroup>
+                <h:panelGroup
+                        rendered="#{financialManager.financialSummary.financialSummaryOneSystems.size() == 0}">
+                    <br/>
+                    <h:outputText value="#{messages['gazelle.systems.system.MissingSystem']}"
+                                  style="font-weight:bold;color:red"/>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{financialManager.financialSummary.domains.length() == 0}">
+                    <br/>
+                    <h:outputText value="#{messages['gazelle.systems.system.MissingDomain']}"
+                                  style="font-weight:bold;color:red"/>
+                </h:panelGroup>
+                <h:panelGroup
+                        rendered="#{financialManager.financialSummary.getHasASystemGotMissingDependencies()}">
+                    <br/>
+                    <h:outputText value="#{messages['gazelle.systems.system.MissingDependencies']}"
+                                  style="font-weight:bold;color:red"/>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{financialManager.financialSummary.isDomainExist() == false}">
+                    <br/>
+                    <h:outputText
+                            value="#{messages['gazelle.systems.system.MissingActorProfilesForSystem']}"
+                            style="font-weight:bold;color:red"/>
+                </h:panelGroup>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!--  END : Cannot Generate Contract confirmation Modal Panel			-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+
+
+    </ui:define>
+</ui:composition>

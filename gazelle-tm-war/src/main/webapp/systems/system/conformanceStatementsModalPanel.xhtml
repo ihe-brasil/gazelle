@@ -1,0 +1,181 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core">
+    <script type="text/javascript">
+        function ajaxRequestContainsErrors() {
+            return document.getElementById("maximumSeverity").value == "2";
+        }
+    </script>
+    <a4j:outputPanel ajaxRendered="true">
+        <h:form style="display:none" prependId="false">
+            <s:token allowMultiplePosts="true"/>
+            <h:inputHidden id="maximumSeverity" value="#{facesContext.maximumSeverity.ordinal}"/>
+        </h:form>
+    </a4j:outputPanel>
+    <!-- ******************************************* -->
+    <!-- Modal Panel : Add HL7 Document	   	      -->
+    <!-- ******************************************* -->
+    <h:form id="hl7DocumentsForm">
+        <s:token allowMultiplePosts="true"/>
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="hl7DocumentsModalPanel"/>
+            <ui:define name="popup_title">#{messages['gazelle.systems.system.AddAHL7Document']}...</ui:define>
+            <s:div id="hl7DocumentsDecoration">
+                <strong>#{messages['gazelle.systems.system.AddAHL7Document.Title']}
+                    #{systemInSessionEditor.getSystemName()}
+                </strong>
+                <p>
+                    #{messages['gazelle.systems.system.AddAHL7Document.Info1']}
+                </p>
+                <h:selectOneRadio id="hl7Radio" value="#{systemInSessionEditor.hl7URLRadioButtonSelected}">
+                    <f:selectItem itemLabel="#{messages['gazelle.common.EnterURL']}" itemValue="true"/>
+                    <f:selectItem itemLabel="#{messages['gazelle.common.UploadDocumentsBelow']}" itemValue="false"/>
+                    <a4j:ajax event="change" render="hl7DocumentsDecoration,buttonsDiv" execute="@this"
+                              listener="#{systemInSessionEditor.initializeNewHL7Url()}"/>
+                </h:selectOneRadio>
+                <s:div id="EnterHl7URLDecoration" rendered="#{systemInSessionEditor.getHl7URLRadioButtonSelected()}">
+                    <a4j:region id="hl7Url">
+                        <s:decorate id="hl7UrlDecoration" template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                            <ui:param name="id" value="hl7ConformanceInput"/>
+                            <ui:define name="label">#{messages['gazelle.common.URL']}</ui:define>
+                            <h:inputText styleClass=" form-control" id="hl7ConformanceInput" maxlength="255" size="50"
+                                         value="#{systemInSessionEditor.newUrlForHL7}">
+                                <a4j:ajax event="blur" render="hl7UrlDecoration" execute="@this"
+                                          listener="#{systemInSessionEditor.validateURL(systemInSessionEditor.newUrlForHL7)}"/>
+                            </h:inputText>
+                        </s:decorate>
+                    </a4j:region>
+                </s:div>
+                <s:decorate id="hl7UploadDocumentsDecoration"
+                            rendered="#{!systemInSessionEditor.getHl7URLRadioButtonSelected()}">
+                    <p class="gzl-alert gzl-alert-blue">
+                        #{messages['net.ihe.gazelle.tm.AcceptedFileTypesArePdfDocOdtRtfDocx']}
+                    </p>
+                    <rich:fileUpload fileUploadListener="#{systemInSessionEditor.listenerHl7DocumentsFiles}"
+                                     maxFilesQuantity="#{systemInSessionEditor.getMaxUploads()}"
+                                     id="uploadHL7Conformance" styleClass="panelStyleForFileUpload" listHeight="180px"
+                                     immediateUpload="true"
+                                     sizeErrorLabel="Size error - Files over 10 Mb will be refused. Thanks for your understanding"
+                                     acceptedTypes="pdf, doc, odt, rtf, docx" allowFlash="true">
+
+                    </rich:fileUpload>
+                </s:decorate>
+            </s:div>
+            <ui:define name="popup_footer">
+                <s:div id="buttonsDiv">
+                    <s:div rendered="#{systemInSessionEditor.getHl7URLRadioButtonSelected()}">
+                        <a4j:commandButton id="cancelHl7URLButton" styleClass="gzl-btn"
+                                           value="#{messages['gazelle.common.button.Cancel']}"
+                                           actionListener="#{systemInSessionEditor.initializeNewHL7Url()}"
+                                           onclick="jq162('#hl7DocumentsModalPanel').modal('hide');"
+                                           render="hl7DocumentsDecoration"/>
+                        <a4j:commandButton id="saveHl7URLButton" styleClass="gzl-btn-green"
+                                           value="#{messages['gazelle.common.button.Save']}"
+                                           actionListener="#{systemInSessionEditor.saveHL7URLInModalPanel( )}"
+                                           oncomplete="if (!ajaxRequestContainsErrors()) jq162('#hl7DocumentsModalPanel').modal('hide');"
+                                           render="hl7ConformanceStatementUrlDecoration, hl7ConformanceStatementUrlEditionDecoration"/>
+
+                    </s:div>
+                    <s:div rendered="#{!systemInSessionEditor.getHl7URLRadioButtonSelected()}">
+                        <a4j:commandButton id="cancelHl7UploadsButton" styleClass="gzl-btn"
+                                           actionListener="#{systemInSessionEditor.initializeHL7Documents()}"
+                                           value="#{messages['gazelle.common.button.Cancel']}"
+                                           onclick="jq162('#hl7DocumentsModalPanel').modal('hide');"
+                                           render="hl7DocumentsDecoration"/>
+                        <a4j:commandButton id="saveHl7UploadsButton" styleClass="gzl-btn-green"
+                                           value="#{messages['gazelle.common.button.Save']}"
+                                           actionListener="#{systemInSessionEditor.persistHL7DocumentsFiles( systemInSessionEditor.getSystem().id )}"
+                                           oncomplete="jq162('#hl7DocumentsModalPanel').modal('hide');"
+                                           render="hl7ConformanceStatementUrlDecoration, hl7ConformanceStatementUrlEditionDecoration"/>
+                    </s:div>
+                </s:div>
+            </ui:define>
+        </ui:decorate>
+    </h:form>
+    <!-- ******************************************* -->
+    <!-- END : Modal Panel : Add HL7 Document		  -->
+    <!-- ******************************************* -->
+    <!-- ******************************************* -->
+    <!-- Modal Panel : Add DICOM Document	   	      -->
+    <!-- ******************************************* -->
+    <h:form id="dicomDocumentsForm">
+        <s:token allowMultiplePosts="true"/>
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="dicomDocumentsModalPanel"/>
+            <ui:define name="popup_title">#{messages['gazelle.systems.system.AddADicomDocument']}...</ui:define>
+            <s:div id="dicomDocumentsDecoration">
+                <strong>#{messages['gazelle.systems.system.AddADicomDocument.Title']}
+                    #{systemInSessionEditor.getSystemName()}
+                </strong>
+                <p>
+                    #{messages['gazelle.systems.system.AddADicomDocument.Info1']}
+                </p>
+                <h:selectOneRadio id="dicomRadio" value="#{systemInSessionEditor.dicomURLRadioButtonSelected}">
+                    <f:selectItem itemLabel="#{messages['gazelle.common.EnterURL']}" itemValue="true"/>
+                    <f:selectItem itemLabel="#{messages['gazelle.common.UploadDocumentsBelow']}" itemValue="false"/>
+                    <a4j:ajax event="change" render="dicomDocumentsDecoration,buttonsDiv" execute="@this"
+                              listener="#{systemInSessionEditor.initializeNewDicomUrl()}"/>
+                </h:selectOneRadio>
+                <s:div id="EnterDicomURLDecoration"
+                       rendered="#{systemInSessionEditor.getDicomURLRadioButtonSelected()}">
+                    <s:decorate id="dicomUrlDecoration" template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                        <ui:param name="id" value="dicomConformanceInput"/>
+                        <ui:define name="label">#{messages['gazelle.common.URL']}</ui:define>
+                        <h:inputText styleClass=" form-control" id="dicomConformanceInput" maxlength="255"
+                                     size="50"
+                                     value="#{systemInSessionEditor.newUrlForDicom}">
+                            <a4j:ajax event="blur" render="dicomUrlDecoration" execute="@this"
+                                      listener="#{systemInSessionEditor.validateURL(systemInSessionEditor.newUrlForDicom)}"/>
+                        </h:inputText>
+                    </s:decorate>
+                </s:div>
+                <s:div id="dicomUploadDocumentsDecoration"
+                       rendered="#{!systemInSessionEditor.getDicomURLRadioButtonSelected()}">
+                    <p class="gzl-alert gzl-alert-blue">
+                        #{messages['net.ihe.gazelle.tm.AcceptedFileTypesArePdfDocOdtRtfDocx']}
+                    </p>
+                    <rich:fileUpload fileUploadListener="#{systemInSessionEditor.listenerDicomDocumentsFiles}"
+                                     maxFilesQuantity="#{systemInSessionEditor.getMaxUploads()}"
+                                     id="uploadDicomConformance" styleClass="panelStyleForFileUpload"
+                                     listHeight="180px" immediateUpload="true"
+                                     sizeErrorLabel="Size error - Files over 10 Mb will be refused. Thanks for your understanding"
+                                     acceptedTypes="pdf, doc, odt, rtf, docx" allowFlash="true">
+                    </rich:fileUpload>
+                </s:div>
+            </s:div>
+            <ui:define name="popup_footer">
+                <s:div id="buttonsDiv">
+                    <s:div rendered="#{systemInSessionEditor.getDicomURLRadioButtonSelected()}">
+                        <a4j:commandButton id="cancelDicomURLButton" styleClass="gzl-btn"
+                                           actionListener="#{systemInSessionEditor.initializeNewDicomUrl()}"
+                                           value="#{messages['gazelle.common.button.Cancel']}"
+                                           onclick="jq162('#dicomDocumentsModalPanel').modal('hide');"
+                                           render="dicomDocumentsDecoration"/>
+                        <a4j:commandButton id="saveDicomURLButton" styleClass="gzl-btn-green"
+                                           value="#{messages['gazelle.common.button.Save']}"
+                                           actionListener="#{systemInSessionEditor.saveDicomURLInModalPanel(  )}"
+                                           oncomplete="if (!ajaxRequestContainsErrors()) jq162('#dicomDocumentsModalPanel').modal('hide');"
+                                           render="dicomConformanceStatementUrlDecoration, dicomConformanceStatementUrlEditionDecoration"/>
+                    </s:div>
+                    <s:div rendered="#{!systemInSessionEditor.getDicomURLRadioButtonSelected()}">
+                        <a4j:commandButton id="cancelDicomUploadsButton" styleClass="gzl-btn"
+                                           actionListener="#{systemInSessionEditor.initializeDicomDocuments()}"
+                                           value="#{messages['gazelle.common.button.Cancel']}"
+                                           onclick="jq162('#dicomDocumentsModalPanel').modal('hide');"
+                                           render="dicomDocumentsDecoration"/>
+                        <a4j:commandButton id="saveDicomUploadsButton" styleClass="gzl-btn-green"
+                                           value="#{messages['gazelle.common.button.Save']}"
+                                           actionListener="#{systemInSessionEditor.persistDicomDocumentsFiles( systemInSessionEditor.getSystem().id )}"
+                                           oncomplete="jq162('#dicomDocumentsModalPanel').modal('hide');"
+                                           render="dicomConformanceStatementUrlDecoration, dicomConformanceStatementUrlEditionDecoration"/>
+                    </s:div>
+                </s:div>
+            </ui:define>
+        </ui:decorate>
+    </h:form>
+    <!-- ******************************************* -->
+    <!-- END : Modal Panel : Add DICOM Document	  -->
+    <!-- ******************************************* -->
+</ui:composition>

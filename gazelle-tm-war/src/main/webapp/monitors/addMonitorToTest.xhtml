@@ -1,0 +1,248 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tm.MonitorsAssignment']}"/>
+    <ui:define name="body">
+        <h:form id="globalform" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <a4j:queue requestDelay="300" ignoreDupResponses="true"/>
+
+            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                <ui:define name="panel_title">#{messages['gazelle.tm.AssignMonitorsToTests_2']}</ui:define>
+                <s:div id="globalDiv" styleClass="row">
+                    <div class="col-lg-8">
+                        <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+
+                            <!--  AIPO selection -->
+                            <ui:include src="/testing/research/filterAIPO.xhtml">
+                                <ui:param name="filter" value="#{testMonitorManager.filter}"/>
+                                <ui:param name="filterForm" value="globalform"/>
+                            </ui:include>
+                            <!--  monitor selection -->
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <ui:include src="/filter/filter.xhtml">
+                                        <ui:param name="filter" value="#{testMonitorManager.filter}"/>
+                                        <ui:param name="filterWidth" value="240"/>
+                                        <ui:param name="filterId" value="monitor"/>
+                                        <ui:param name="filterName"
+                                                  value="#{messages['gazelle.tests.test.Monitor']}"/>
+                                        <ui:param name="filterForm" value="globalform"/>
+                                    </ui:include>
+                                </div>
+                            </div>
+                            <!--  test selection -->
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <ui:include src="/filter/filter.xhtml">
+                                        <ui:param name="filter" value="#{testMonitorManager.filter}"/>
+                                        <ui:param name="filterWidth" value="240"/>
+                                        <ui:param name="filterId" value="test"/>
+                                        <ui:param name="filterName" value="#{messages['gazelle.tests.test']}"/>
+                                        <ui:param name="filterForm" value="globalform"/>
+                                    </ui:include>
+                                </div>
+                                <div class="col-lg-6">
+                                    <ui:include src="/filter/filter.xhtml">
+                                        <ui:param name="filter" value="#{testMonitorManager.filter}"/>
+                                        <ui:param name="filterId" value="testPeerType"/>
+                                        <ui:param name="filterName" value="#{messages['gazelle.tm.TestPeerType']}"/>
+                                        <ui:param name="filterForm" value="globalform"/>
+                                    </ui:include>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <ui:include src="/filter/filter.xhtml">
+                                        <ui:param name="filter" value="#{testMonitorManager.filter}"/>
+                                        <ui:param name="filterId" value="testType"/>
+                                        <ui:param name="filterName"
+                                                  value="#{messages['gazelle.tm.monitors.TestType']}"/>
+                                        <ui:param name="filterForm" value="globalform"/>
+                                    </ui:include>
+                                </div>
+
+                                <div class="col-lg-6">
+                                    <ui:include src="/filter/filter.xhtml">
+                                        <ui:param name="filter" value="#{testMonitorManager.filter}"/>
+                                        <ui:param name="filterId" value="testStatus"/>
+                                        <ui:param name="filterName" value="#{messages['gazelle.tm.TestStatus']}"/>
+                                        <ui:param name="filterForm" value="globalform"/>
+                                    </ui:include>
+                                </div>
+                            </div>
+
+                            <ui:define name="filter_buttons">
+                                <a4j:commandLink actionListener="#{testMonitorManager.filter.clear()}"
+                                                 title="#{messages['gazelle.users.reset']}"
+                                                 execute="@this" render="globalform">
+                                    <span class="fa fa-times-circle"/>
+                                </a4j:commandLink>
+                            </ui:define>
+                        </ui:decorate>
+                    </div>
+                </s:div>
+                <s:div id="resultsForSearchDecorateSearch">
+                    <s:div id="ViewTableOfTestVal">
+                        <br/>
+                        <br/>
+                        <s:div id="listTestNotEmpty" rendered="#{testMonitorManager.tests.size()&gt;0}">
+                            <rich:dataTable id="tableOfTest" var="currentTest" value="#{testMonitorManager.tests}"
+                                            rowKeyVar="rowNumber"
+                                            rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                                <g:column rendered="#{s:hasRole('admin_role')}">
+                                    <ui:define name="header">#{messages['gazelle.tm.TestId']}</ui:define>
+                                    <h:outputText value="#{currentTest.id}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.testmanagement.object.keyword']}
+                                    </ui:define>
+                                    <h:outputLink id="viewTestPermalinkForTestInstancePage" target="_blank"
+                                                  propagation="none"
+                                                  value="#{testsDefinitionsAdministrationManager.getTestPermalink(currentTest)}">
+                                        <h:outputText value="#{currentTest.keyword}" title="#{currentTest.name}"
+                                                      id="currentTestKeyword"/>
+                                    </h:outputLink>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.tm.tests.testStatus']}</ui:define>
+                                    <h:outputText value="#{testMonitorManager.getStatus(currentTest)}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.tm.TestPeerType']}</ui:define>
+                                    <h:outputText
+                                            value="#{testMonitorManager.getTestPeerType(currentTest)}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.tm.monitors.TestType']}</ui:define>
+                                    <h:outputText value="#{testMonitorManager.getTestType(currentTest)}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Description']}</ui:define>
+                                    <h:outputText value="#{currentTest.shortDescription}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.systems.system.SystemVersion']}
+                                    </ui:define>
+                                    <h:outputText value="#{currentTest.version}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">
+                                        <s:div>
+                                            <h:outputText value="#{messages['gazelle.tm.Selection']} "/>
+
+                                            <a4j:commandLink event="click" render="resultsForSearchDecorateSearch"
+                                                             execute="@this"
+                                                             title="#{messages['gazelle.tm.SelectAllTests']}"
+                                                             actionListener="#{testMonitorManager.diselectAllTestsAndUpdatListMonitor()}">
+                                                <span class="gzl-icon-not-checked"/>
+                                            </a4j:commandLink>
+
+                                            <a4j:commandLink event="click" render="resultsForSearchDecorateSearch"
+                                                             title="#{messages['gazelle.tm.AllTestsAreSelected']}"
+                                                             execute="@this"
+                                                             actionListener="#{testMonitorManager.selectAllTestsAndUpdatListMonitor()}">
+                                                <span class="gzl-icon-checked"/>
+                                            </a4j:commandLink>
+
+                                        </s:div>
+                                    </ui:define>
+                                    <a4j:commandLink event="click" render="resultsForSearchDecorateSearch"
+                                                     title="#{messages['gazelle.tm.SelectThisTest']}"
+                                                     rendered="#{!testMonitorManager.testsSelectedContain(currentTest)}"
+                                                     execute="@this"
+                                                     actionListener="#{testMonitorManager.addTestToSelectionAndUpdateListMonitor(currentTest)}">
+                                        <span class="gzl-icon-not-checked"/>
+                                    </a4j:commandLink>
+
+                                    <a4j:commandLink event="click" render="resultsForSearchDecorateSearch"
+                                                     execute="@this"
+                                                     rendered="#{testMonitorManager.testsSelectedContain(currentTest)}"
+                                                     title="#{messages['gazelle.tm.DiselectThisTest']}"
+                                                     actionListener="#{testMonitorManager.deleteTestFromSelectionAndUpdateListMonitor(currentTest)}">
+                                        <span class="gzl-icon-checked"/>
+                                    </a4j:commandLink>
+
+                                </g:column>
+                                <f:facet name="footer">
+                                    <ui:include src="/util/datatableFooter.xhtml">
+                                        <ui:param name="dataScrollerId" value="ds"/>
+                                        <ui:param name="dataTableId" value="tableOfTest"/>
+                                    </ui:include>
+                                </f:facet>
+                            </rich:dataTable>
+                        </s:div>
+                        <s:div id="listTestIsEmpty" rendered="#{testMonitorManager.tests.size()==0}">
+                            <h:outputText
+                                    value="#{messages['gazelle.testmanagement.system.NoTestAvailable']}"/>
+                        </s:div>
+                        <s:div id="ListMonitorDiv">
+                            <s:div rendered="#{testMonitorManager.testsSelected != null}">
+                                <s:div rendered="#{testMonitorManager.testsSelected.size()&gt;0}">
+                                    <br/>
+                                    <h:outputText
+                                            value="#{messages['gazelle.tm.NumberOfMonitorsForAllTheSelectedTests']} : #{testMonitorManager.listMonitorsForSelectedTests.size()}"/>
+                                    <s:decorate id="dispMonitorsdec" template="/layout/display/_display.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.tm.MonitorsForSelectedTests']}
+                                        </ui:define>
+                                        <rich:list var="currentMonitor"
+                                                   value="#{testMonitorManager.listMonitorsForSelectedTests}"
+                                                   type="unordered">
+                                            <h:outputText
+                                                    value="#{currentMonitor.user.firstname} #{currentMonitor.user.lastname}"/>
+                                        </rich:list>
+                                        <h:outputText
+                                                value="#{messages['gazelle.tm.NoMonitorWasFindedForSelectedTests']}"
+                                                rendered="#{testMonitorManager.listMonitorsForSelectedTests.size()==0}"/>
+                                    </s:decorate>
+                                    <a4j:commandButton id="modbutt" value="#{messages['gazelle.tm.ModifyListMonitors']}"
+                                                       oncomplete="jq162('#modifylistmon').modal('show');"
+                                                       styleClass="gzl-btn" execute="@this"
+                                                       render="modifylistmon, :modform"/>
+                                </s:div>
+                            </s:div>
+                        </s:div>
+                    </s:div>
+                </s:div>
+                <br/>
+                <a4j:commandButton id="backmo" value="#{messages['gazelle.tm.BackToMonitorsList']}"
+                                   styleClass="gzl-btn" action="/administration/listMonitors.seam"
+                                   execute="@this"/>
+            </ui:decorate>
+
+        </h:form>
+        <h:form id="modform">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="modifylistmon"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.ModifyListMonitors_2']}</ui:define>
+                <s:decorate id="editMonitorsdec" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tm.MonitorsForSelectedTests']}</ui:define>
+                    <rich:pickList value="#{testMonitorManager.listMonitorsForSelectedTestsByAdmin}" id="picklistval"
+                                   sourceListWidth="250px" targetListWidth="250px">
+                        <s:selectItems value="#{testMonitorManager.listAllMonitorsForSelectedSession}"
+                                       var="currentMonitor"
+                                       label="#{currentMonitor.user.firstname} #{currentMonitor.user.lastname}"/>
+                        <s:convertEntity></s:convertEntity>
+                    </rich:pickList>
+                </s:decorate>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="saveModifbutt" value="#{messages['gazelle.tm.SaveModifications']}"
+                                       onclick="jq162('#modifylistmon').modal('hide');"
+                                       action="#{testMonitorManager.saveAddedMonitorsToTests()}"
+                                       styleClass="gzl-btn-green"
+                                       render="ListMonitorDiv,messageDecoration, :globalform"/>
+                    <a4j:commandButton id="resetmodif" value="#{messages['gazelle.users.reset']}"
+                                       actionListener="#{testMonitorManager.resetListMonitors()}"
+                                       styleClass="gzl-btn"
+                                       execute="@this" render="modform"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

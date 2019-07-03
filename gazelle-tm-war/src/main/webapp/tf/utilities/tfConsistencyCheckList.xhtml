@@ -1,0 +1,882 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle"
+              value="#{messages['gazelle.tf.tfConsistencyCheck.tfConsistencyCheckList']}"/>
+    <script type="text/javascript">
+        function setCaretToEnd(e) {
+            var control = $((e.target ? e.target : e.srcElement).id);
+            if (control.createTextRange) {
+                var range = control.createTextRange();
+                range.collapse(false);
+                range.select();
+            } else if (control.setSelectionRange) {
+                control.focus();
+                var length = control.value.length;
+                control.setSelectionRange(length, length);
+            }
+            control.selectionStart = control.selectionEnd = control.value.length;
+        }
+    </script>
+    <ui:define name="body">
+        <h:form id="TFModelConsistencyRefreshAllForm">
+            <s:token allowMultiplePosts="true"/>
+            <div id="TFModelConsistencyRefreshAllDiv" align="left">
+                <h:commandButton styleClass="gzl-btn"
+                                 value="#{messages['gazelle.tf.tfConsistencyCheck.button.RefreshAll']}"
+                                 action="#{tfConsistencyCheckManager.refreshLists()}"
+                                 id="TFModelConsistencyRefreshAllCommandButton"/>
+            </div>
+        </h:form>
+        <!--TODO user bootstrap grid-->
+        <style>
+
+            .cols20 {
+                vertical-align: top;
+                horizontal-align: left;
+                width: 20%;
+            }
+
+            .cols80 {
+                vertical-align: top;
+                horizontal-align: left;
+                width: 80%;
+            }
+        </style>
+        <div class="row">
+            <div class="col-lg-4">
+                <h:form id="tfConsistencyPanelGridForm">
+                    <s:token allowMultiplePosts="true"/>
+                    <rich:panelMenu mode="ajax" iconExpandedGroup="disc" iconCollapsedGroup="disc"
+                                    iconExpandedTopGroup="chevronUp" iconGroupTopPosition="right"
+                                    iconCollapsedTopGroup="chevronDown" iconCollapsedTopPosition="right">
+                        <!-- 		Domains 		-->
+                        <rich:panelMenuGroup label="#{messages['gazelle.tf.Domains']}" expanded="true">
+                            <rich:panelMenuItem label="#{messages['gazelle.tf.tfConsistencyCheck.domainsNoProfile']}"
+                                                action="#{tfConsistencyCheckManager.SetCurrentDisplayPanelLabel('domainsNoProfilePanelSelected')}"
+                                                render="resultsForm">
+                            </rich:panelMenuItem>
+                        </rich:panelMenuGroup>
+                        <!-- 		Actor - Integration Profiles 		-->
+                        <rich:panelMenuGroup label="#{messages['gazelle.tf.ActorIntegrationProfiles']}" expanded="true">
+                            <rich:panelMenuItem
+                                    label="#{messages['gazelle.tf.tfConsistencyCheck.actorIntegrationProfilesNoTransactions']}"
+                                    action="#{tfConsistencyCheckManager.SetCurrentDisplayPanelLabel('actorIntegrationProfilesNoTransactionsPanelSelected')}"
+                                    render="resultsForm">
+                            </rich:panelMenuItem>
+                            <rich:panelMenuItem
+                                    label="#{messages['gazelle.tf.tfConsistencyCheck.actorIntegrationProfilesNullTransactions']}"
+                                    action="#{tfConsistencyCheckManager.SetCurrentDisplayPanelLabel('actorIntegrationProfilesNullTransactionsPanelSelected')}"
+                                    render="resultsForm">
+                            </rich:panelMenuItem>
+                            <rich:panelMenuItem
+                                    label="#{messages['gazelle.tf.tfConsistencyCheck.actorIntegrationProfilesNoAssignedOptions']}"
+                                    action="#{tfConsistencyCheckManager.SetCurrentDisplayPanelLabel('actorIntegrationProfilesNoAssignedOptionsPanelSelected')}"
+                                    render="resultsForm">
+                            </rich:panelMenuItem>
+                            <rich:panelMenuItem
+                                    label="#{messages['gazelle.tf.tfConsistencyCheck.actorIntegrationProfilesAnyNoneOptions']}"
+                                    action="#{tfConsistencyCheckManager.SetCurrentDisplayPanelLabel('actorIntegrationProfilesAnyNoneOptionsPanelSelected')}"
+                                    render="resultsForm">
+                            </rich:panelMenuItem>
+                            <rich:panelMenuItem
+                                    label="#{messages['gazelle.tf.tfConsistencyCheck.actorIntegrationProfilesWithoutNoneOptions']}"
+                                    action="#{tfConsistencyCheckManager.SetCurrentDisplayPanelLabel('actorIntegrationProfilesWithoutNoneOptionsPanelSelected')}"
+                                    render="resultsForm">
+                            </rich:panelMenuItem>
+                        </rich:panelMenuGroup>
+                        <!-- 		Integration Profiles 		-->
+                        <rich:panelMenuGroup label="#{messages['gazelle.tf.IntegrationProfiles']}" expanded="true">
+                            <rich:panelMenuItem
+                                    label="#{messages['gazelle.tf.tfConsistencyCheck.integrationProfilesNoDomain']}"
+                                    action="#{tfConsistencyCheckManager.SetCurrentDisplayPanelLabel('integrationProfilesNoDomainPanelSelected')}"
+                                    render="resultsForm">
+                            </rich:panelMenuItem>
+                            <rich:panelMenuItem
+                                    label="#{messages['gazelle.tf.tfConsistencyCheck.integrationProfilesGreaterThanOneDomain']}"
+                                    action="#{tfConsistencyCheckManager.SetCurrentDisplayPanelLabel('integrationProfilesGreaterThanOneDomainPanelSelected')}"
+                                    render="resultsForm">
+                            </rich:panelMenuItem>
+                            <rich:panelMenuItem
+                                    label="#{messages['gazelle.tf.tfConsistencyCheck.integrationProfilesNoActors']}"
+                                    action="#{tfConsistencyCheckManager.SetCurrentDisplayPanelLabel('integrationProfilesNoActorsPanelSelected')}"
+                                    render="resultsForm">
+                            </rich:panelMenuItem>
+                        </rich:panelMenuGroup>
+                        <!-- 		Actors 		-->
+                        <rich:panelMenuGroup label="#{messages['gazelle.tf.Actors']}" expanded="true">
+                            <rich:panelMenuItem label="#{messages['gazelle.tf.tfConsistencyCheck.actorsNoProfiles']}"
+                                                action="#{tfConsistencyCheckManager.SetCurrentDisplayPanelLabel('actorsNoProfilesPanelSelected')}"
+                                                render="resultsForm">
+                            </rich:panelMenuItem>
+                        </rich:panelMenuGroup>
+                        <!-- 		Transactions 		-->
+                        <rich:panelMenuGroup label="#{messages['gazelle.tf.Transactions']}" expanded="true">
+                            <rich:panelMenuItem label="#{messages['gazelle.tf.tfConsistencyCheck.transactionsNoAIP']}"
+                                                action="#{tfConsistencyCheckManager.SetCurrentDisplayPanelLabel('transactionsNoAIPPanelSelected')}"
+                                                render="resultsForm">
+                            </rich:panelMenuItem>
+                            <rich:panelMenuItem label="#{messages['gazelle.tf.tfConsistencyCheck.TransactionsWithoutReferencedStandards']}"
+                                                action="#{tfConsistencyCheckManager.SetCurrentDisplayPanelLabel('transactionsWithoutReferencedStandardPanelSelected')}"
+                                                render="resultsForm">
+                            </rich:panelMenuItem>
+                        </rich:panelMenuGroup>
+                        <!-- 		Integration Profile Options 		-->
+                        <rich:panelMenuGroup label="#{messages['gazelle.tf.IntegrationProfileOptions']}"
+                                             expanded="true">
+                            <rich:panelMenuItem
+                                    label="#{messages['gazelle.tf.tfConsistencyCheck.ipOptionsNoTfReference']}"
+                                    action="#{tfConsistencyCheckManager.SetCurrentDisplayPanelLabel('ipOptionsNoTfReferencePanelSelected')}"
+                                    render="resultsForm">
+                            </rich:panelMenuItem>
+                            <rich:panelMenuItem label="#{messages['gazelle.tf.tfConsistencyCheck.ipOptionsNoAIP']}"
+                                                action="#{tfConsistencyCheckManager.SetCurrentDisplayPanelLabel('ipOptionsNoAIPPanelSelected')}"
+                                                render="resultsForm">
+                            </rich:panelMenuItem>
+                        </rich:panelMenuGroup>
+                        <!-- 		Documents and Document section 		-->
+                        <rich:panelMenuGroup label="#{messages['net.ihe.gazelle.tm.DocumentsAndDocumentSections']}"
+                                             expanded="true">
+                            <rich:panelMenuItem label="#{messages['net.ihe.gazelle.tm.DocumentsWithoutSections']}"
+                                                action="#{tfConsistencyCheckManager.SetCurrentDisplayPanelLabel('docWithoutSectionPanelSelected')}"
+                                                render="resultsForm">
+                            </rich:panelMenuItem>
+                            <rich:panelMenuItem label="#{messages['net.ihe.gazelle.tm.DocumentsWithBrokenURL']}"
+                                                action="#{tfConsistencyCheckManager.SetCurrentDisplayPanelLabel('DocumentWithBrokenURLPanelSelected')}"
+                                                render="resultsForm">
+                            </rich:panelMenuItem>
+                            <rich:panelMenuItem
+                                    label="#{messages['net.ihe.gazelle.tm.TransactionsWithoutDocumentSection']}"
+                                    action="#{tfConsistencyCheckManager.SetCurrentDisplayPanelLabel('transactionWithoutSectionPanelSelected')}"
+                                    render="resultsForm">
+                            </rich:panelMenuItem>
+                            <rich:panelMenuItem
+                                    label="#{messages['net.ihe.gazelle.tm.IntegrationProfileWithoutDocumentSection']}"
+                                    action="#{tfConsistencyCheckManager.SetCurrentDisplayPanelLabel('integrationProfileWithoutSectionPanelSelected')}"
+                                    render="resultsForm">
+                            </rich:panelMenuItem>
+                            <rich:panelMenuItem label="#{messages['net.ihe.gazelle.tm.DomainWihtoutDocument']}"
+                                                action="#{tfConsistencyCheckManager.SetCurrentDisplayPanelLabel('DomainWithoutSectionPanelSelected')}"
+                                                render="resultsForm">
+                            </rich:panelMenuItem>
+                            <rich:panelMenuItem label="#{messages['net.ihe.gazelle.tm.AIPOWithoutDocumentSection']}"
+                                                action="#{tfConsistencyCheckManager.SetCurrentDisplayPanelLabel('AIPOWithoutDocumentSection')}"
+                                                render="resultsForm">
+                            </rich:panelMenuItem>
+                        </rich:panelMenuGroup>
+                    </rich:panelMenu>
+                </h:form>
+            </div>
+            <div class="col-lg-8">
+                <h:form id="resultsForm" styleClass="form-horizontal">
+                    <s:token allowMultiplePosts="true"/>
+                    <!-- 		Default 		-->
+                    <h:outputText
+                            value="#{messages['gazelle.tf.tfConsistencyCheck.defaultDescription']}"
+                            id="defaultDescriptionOnlyPanel" styleClass="gzl-alert gzl-alert-blue"
+                            rendered="#{tfConsistencyCheckManager.GetCurrentDisplayPanelLabel() == ''}"/>
+                    <!-- 		Domains 		-->
+                    <s:decorate template="/layout/panels/_panel_title.xhtml" id="domainsNoProfile"
+                                rendered="#{tfConsistencyCheckManager.GetCurrentDisplayPanelLabel() == 'domainsNoProfilePanelSelected'}">
+                        <ui:define name="panel_title">#{messages['gazelle.tf.tfConsistencyCheck.domainsNoProfile']}
+                        </ui:define>
+                        <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                      rendered="#{tfConsistencyCheckManager.getDomainsNoProfiles().size == 0}"/>
+                        <rich:dataTable id="domainsNoProfileDataTable" var="domain"
+                                        value="#{tfConsistencyCheckManager.getDomainsNoProfiles()}"
+                                        rendered="#{tfConsistencyCheckManager.getDomainsNoProfiles().size &gt; 0}"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                            <g:column sortBy="#{'id'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                #{domain.id}
+                            </g:column>
+                            <g:column sortBy="#{'keyword'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.Domain']}</ui:define>
+                                <h:commandLink value="#{domain.keyword} - #{domain.name}"
+                                               action="#{domainManager.editDomain(domain, false)}"/>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId" value="domainsNoProfileDataTable"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </s:decorate>
+                    <!-- 		Actor - Integration Profiles 		-->
+                    <s:decorate template="/layout/panels/_panel_title.xhtml"
+                                id="actorIntegrationProfilesNoTransactionsPanelId"
+                                rendered="#{tfConsistencyCheckManager.GetCurrentDisplayPanelLabel() == 'actorIntegrationProfilesNoTransactionsPanelSelected'}">
+                        <ui:define name="panel_title">
+                            #{messages['gazelle.tf.tfConsistencyCheck.actorIntegrationProfilesNoTransactions']}
+                        </ui:define>
+                        <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                      rendered="#{tfConsistencyCheckManager.getActorIntegrationProfilesNoTransactions().size == 0}"/>
+                        <rich:dataTable id="actorIntegrationProfilesNoTransactionsDataTable" var="aip"
+                                        value="#{tfConsistencyCheckManager.getActorIntegrationProfilesNoTransactions()}"
+                                        rendered="#{tfConsistencyCheckManager.getActorIntegrationProfilesNoTransactions().size &gt; 0}"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                            <g:column sortBy="#{'id'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                <h:outputText value="#{aip.id}"/>
+                            </g:column>
+                            <g:column sortBy="#{'actor.keyword'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.Actor']}</ui:define>
+                                <h:commandLink value="#{aip.actor.keyword} - #{aip.actor.name}"
+                                               action="#{actorManager.editActor(aip.actor, false)}"/>
+                            </g:column>
+                            <g:column sortBy="#{'integrationProfile.keyword'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.IntegrationProfile']}</ui:define>
+                                <h:commandLink
+                                        value="#{aip.integrationProfile.keyword} - #{aip.integrationProfile.name}"
+                                        action="#{integrationProfileManager.editIntegrationProfile(aip.integrationProfile, false)}"/>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId"
+                                              value="actorIntegrationProfilesNoTransactionsDataTable"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </s:decorate>
+                    <s:decorate template="/layout/panels/_panel_title.xhtml"
+                                id="actorIntegrationProfilesNullTransactionsPanelId"
+                                rendered="#{tfConsistencyCheckManager.GetCurrentDisplayPanelLabel() == 'actorIntegrationProfilesNullTransactionsPanelSelected'}">
+                        <ui:define name="panel_title">
+                            #{messages['gazelle.tf.tfConsistencyCheck.actorIntegrationProfilesNullTransactions']}
+                        </ui:define>
+                        <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                      rendered="#{tfConsistencyCheckManager.getActorIntegrationProfilesNullTransactions().size == 0}"/>
+                        <rich:dataTable id="actorIntegrationProfilesNullTransactionsDataTable" var="aip"
+                                        value="#{tfConsistencyCheckManager.getActorIntegrationProfilesNullTransactions()}"
+                                        rendered="#{tfConsistencyCheckManager.getActorIntegrationProfilesNullTransactions().size &gt; 0}"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                            <g:column sortBy="#{'id'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                <h:outputText value="#{aip.id}"/>
+                            </g:column>
+                            <g:column sortBy="#{'actor.keyword'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.Actor']}</ui:define>
+                                <h:commandLink value="#{aip.actor.keyword} - #{aip.actor.name}"
+                                               action="#{actorManager.editActor(aip.actor, false)}"/>
+                            </g:column>
+                            <g:column sortBy="#{'integrationProfile.keyword'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.IntegrationProfile']}</ui:define>
+                                <h:commandLink
+                                        value="#{aip.integrationProfile.keyword} - #{aip.integrationProfile.name}"
+                                        action="#{integrationProfileManager.editIntegrationProfile(aip.integrationProfile, false)}"/>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId"
+                                              value="actorIntegrationProfilesNullTransactionsDataTable"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </s:decorate>
+                    <s:decorate template="/layout/panels/_panel_title.xhtml"
+                                id="actorIntegrationProfilesNoAssignedOptionsPanelId"
+                                rendered="#{tfConsistencyCheckManager.GetCurrentDisplayPanelLabel() == 'actorIntegrationProfilesNoAssignedOptionsPanelSelected'}">
+                        <ui:define name="panel_title">
+                            #{messages['gazelle.tf.tfConsistencyCheck.actorIntegrationProfilesNoAssignedOptions']}
+                        </ui:define>
+                        <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                      rendered="#{tfConsistencyCheckManager.getActorIntegrationProfilesNoAssignedOptions().size == 0}"/>
+                        <rich:dataTable id="actorIntegrationProfilesNoAssignedOptionsDataTable" var="aip"
+                                        value="#{tfConsistencyCheckManager.getActorIntegrationProfilesNoAssignedOptions()}"
+                                        rendered="#{tfConsistencyCheckManager.getActorIntegrationProfilesNoAssignedOptions().size &gt; 0}"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                            <g:column sortBy="#{'id'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                <h:outputText value="#{aip.id}"/>
+                            </g:column>
+                            <g:column sortBy="#{'actor.keyword'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.Actor']}</ui:define>
+                                <h:commandLink value="#{aip.actor.keyword} - #{aip.actor.name}"
+                                               action="#{actorManager.editActor(aip.actor, false)}"/>
+                            </g:column>
+                            <g:column sortBy="#{'integrationProfile.keyword'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.IntegrationProfile']}</ui:define>
+                                <h:commandLink
+                                        value="#{aip.integrationProfile.keyword} - #{aip.integrationProfile.name}"
+                                        action="#{integrationProfileManager.editIntegrationProfile(aip.integrationProfile, false)}"/>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId"
+                                              value="actorIntegrationProfilesNoAssignedOptionsDataTable"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </s:decorate>
+                    <s:decorate template="/layout/panels/_panel_title.xhtml"
+                                id="actorIntegrationProfilesAnyNoneOptionsPanelId"
+                                rendered="#{tfConsistencyCheckManager.GetCurrentDisplayPanelLabel() == 'actorIntegrationProfilesAnyNoneOptionsPanelSelected'}">
+                        <ui:define name="panel_title">
+                            #{messages['gazelle.tf.tfConsistencyCheck.actorIntegrationProfilesAnyNoneOptions']}
+                        </ui:define>
+                        <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                      rendered="#{tfConsistencyCheckManager.getActorIntegrationProfilesAnyNoneOptions().size == 0}"/>
+                        <rich:dataTable id="actorIntegrationProfilesAnyNoneOptionsDataTable" var="aip"
+                                        value="#{tfConsistencyCheckManager.getActorIntegrationProfilesAnyNoneOptions()}"
+                                        rendered="#{tfConsistencyCheckManager.getActorIntegrationProfilesAnyNoneOptions().size &gt; 0}"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                            <g:column sortBy="#{'id'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                <h:outputText value="#{aip.id}"/>
+                            </g:column>
+                            <g:column sortBy="#{'actor.keyword'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.Actor']}</ui:define>
+                                <h:commandLink value="#{aip.actor.keyword} - #{aip.actor.name}"
+                                               action="#{actorManager.editActor(aip.actor, false)}"/>
+                            </g:column>
+                            <g:column sortBy="#{'integrationProfile.keyword'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.IntegrationProfile']}</ui:define>
+                                <h:commandLink
+                                        value="#{aip.integrationProfile.keyword} - #{aip.integrationProfile.name}"
+                                        action="#{integrationProfileManager.editIntegrationProfile(aip.integrationProfile, false)}"/>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId"
+                                              value="actorIntegrationProfilesAnyNoneOptionsDataTable"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </s:decorate>
+
+                    <s:decorate template="/layout/panels/_panel_title.xhtml"
+                                id="actorIntegrationProfilesWithoutNoneOptionsPanelId"
+                                rendered="#{tfConsistencyCheckManager.GetCurrentDisplayPanelLabel() == 'actorIntegrationProfilesWithoutNoneOptionsPanelSelected'}">
+                        <ui:define name="panel_title">
+                            #{messages['gazelle.tf.tfConsistencyCheck.actorIntegrationProfilesWithoutNoneOptions']}
+                        </ui:define>
+                        <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                      rendered="#{tfConsistencyCheckManager.getActorIntegrationProfilesWithoutNoneOptions().size == 0}"/>
+                        <rich:dataTable id="actorIntegrationProfilesAnyNoneOptionsDataTable" var="aip"
+                                        value="#{tfConsistencyCheckManager.getActorIntegrationProfilesWithoutNoneOptions()}"
+                                        rendered="#{tfConsistencyCheckManager.getActorIntegrationProfilesWithoutNoneOptions().size &gt; 0}"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                            <g:column sortBy="#{'id'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                <h:outputText value="#{aip.id}"/>
+                            </g:column>
+                            <g:column sortBy="#{'actor.keyword'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.Actor']}</ui:define>
+                                <h:commandLink value="#{aip.actor.keyword} - #{aip.actor.name}"
+                                               action="#{actorManager.editActor(aip.actor, false)}"/>
+                            </g:column>
+                            <g:column sortBy="#{'integrationProfile.keyword'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.IntegrationProfile']}</ui:define>
+                                <h:commandLink
+                                        value="#{aip.integrationProfile.keyword} - #{aip.integrationProfile.name}"
+                                        action="#{integrationProfileManager.editIntegrationProfile(aip.integrationProfile, false)}"/>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId"
+                                              value="actorIntegrationProfilesAnyNoneOptionsDataTable"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </s:decorate>
+
+                    <!-- 		Integration Profiles 		-->
+                    <s:decorate template="/layout/panels/_panel_title.xhtml" id="integrationProfilesNoDomain"
+                                rendered="#{tfConsistencyCheckManager.GetCurrentDisplayPanelLabel() == 'integrationProfilesNoDomainPanelSelected'}">
+                        <ui:define name="panel_title">
+                            #{messages['gazelle.tf.tfConsistencyCheck.integrationProfilesNoDomain']}
+                        </ui:define>
+                        <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                      rendered="#{tfConsistencyCheckManager.getIntegrationProfilesNoDomain().size == 0}"/>
+                        <rich:dataTable id="integrationProfilesNoDomainDataTable" var="integrationProfile"
+                                        value="#{tfConsistencyCheckManager.getIntegrationProfilesNoDomain()}"
+                                        rendered="#{tfConsistencyCheckManager.getIntegrationProfilesNoDomain().size &gt; 0}"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                            <g:column sortBy="#{'id'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                #{integrationProfile.id}
+                            </g:column>
+                            <g:column sortBy="#{'keyword'}">
+                                <ui:define name="header">#{messages['gazelle.tf.IntegrationProfile']}</ui:define>
+                                <h:commandLink value="#{integrationProfile.keyword} - #{integrationProfile.name}"
+                                               action="#{integrationProfileManager.editIntegrationProfile(integrationProfile, false)}"/>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId" value="integrationProfilesNoDomainDataTable"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </s:decorate>
+                    <s:decorate template="/layout/panels/_panel_title.xhtml"
+                                id="integrationProfilesGreaterThanOneDomain"
+                                rendered="#{tfConsistencyCheckManager.GetCurrentDisplayPanelLabel() == 'integrationProfilesGreaterThanOneDomainPanelSelected'}">
+                        <ui:define name="panel_title">
+                            #{messages['gazelle.tf.tfConsistencyCheck.integrationProfilesGreaterThanOneDomain']}
+                        </ui:define>
+                        <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                      rendered="#{tfConsistencyCheckManager.getIntegrationProfilesGreaterThanOneDomain().size == 0}"/>
+                        <rich:dataTable id="integrationProfilesGreaterThanOneDomainDataTable" var="integrationProfile"
+                                        value="#{tfConsistencyCheckManager.getIntegrationProfilesGreaterThanOneDomain()}"
+                                        rendered="#{tfConsistencyCheckManager.getIntegrationProfilesGreaterThanOneDomain().size &gt; 0}"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                            <g:column sortBy="#{'id'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                #{integrationProfile.id}
+                            </g:column>
+                            <g:column sortBy="#{'keyword'}">
+                                <ui:define name="header">#{messages['gazelle.tf.IntegrationProfile']}</ui:define>
+                                <h:commandLink value="#{integrationProfile.keyword} - #{integrationProfile.name}"
+                                               action="#{integrationProfileManager.editIntegrationProfile(integrationProfile, false)}"/>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId"
+                                              value="integrationProfilesGreaterThanOneDomainDataTable"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </s:decorate>
+                    <s:decorate template="/layout/panels/_panel_title.xhtml" id="integrationProfilesNoActors"
+                                rendered="#{tfConsistencyCheckManager.GetCurrentDisplayPanelLabel() == 'integrationProfilesNoActorsPanelSelected'}">
+                        <ui:define name="panel_title">
+                            #{messages['gazelle.tf.tfConsistencyCheck.integrationProfilesNoActors']}
+                        </ui:define>
+                        <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                      rendered="#{tfConsistencyCheckManager.getIntegrationProfilesNoActors().size == 0}"/>
+                        <rich:dataTable id="integrationProfilesNoActorsDataTable" var="integrationProfile"
+                                        value="#{tfConsistencyCheckManager.getIntegrationProfilesNoActors()}"
+                                        rendered="#{tfConsistencyCheckManager.getIntegrationProfilesNoActors().size &gt; 0}"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                            <g:column sortBy="#{'id'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                #{integrationProfile.id}
+                            </g:column>
+                            <g:column sortBy="#{'keyword'}">
+                                <ui:define name="header">#{messages['gazelle.tf.IntegrationProfile']}</ui:define>
+                                <h:commandLink value="#{integrationProfile.keyword} - #{integrationProfile.name}"
+                                               action="#{integrationProfileManager.editIntegrationProfile(integrationProfile, false)}"/>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId" value="integrationProfilesNoActorsDataTable"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </s:decorate>
+                    <!-- 		Actors 		-->
+                    <s:decorate template="/layout/panels/_panel_title.xhtml" id="actorsNoProfiles"
+                                rendered="#{tfConsistencyCheckManager.GetCurrentDisplayPanelLabel() == 'actorsNoProfilesPanelSelected'}">
+                        <ui:define name="panel_title">#{messages['gazelle.tf.tfConsistencyCheck.actorsNoProfiles']}
+                        </ui:define>
+                        <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                      rendered="#{tfConsistencyCheckManager.getActorsNoProfiles().size == 0}"/>
+                        <rich:dataTable id="actorsNoProfilesDataTable" var="actor"
+                                        value="#{tfConsistencyCheckManager.getActorsNoProfiles()}"
+                                        rendered="#{tfConsistencyCheckManager.getActorsNoProfiles().size &gt; 0}"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                            <g:column sortBy="#{'id'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                #{actor.id}
+                            </g:column>
+                            <g:column sortBy="#{'keyword'}">
+                                <ui:define name="header">#{messages['gazelle.tf.Actor']}</ui:define>
+                                <h:commandLink value="#{actor.keyword} - #{actor.name}"
+                                               action="#{actorManager.editActor(actor, false)}"/>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId" value="actorsNoProfilesDataTable"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </s:decorate>
+                    <!-- 		Transactions 		-->
+                    <s:decorate template="/layout/panels/_panel_title.xhtml" id="transactionsNoAIPPanelId"
+                                rendered="#{tfConsistencyCheckManager.GetCurrentDisplayPanelLabel() == 'transactionsNoAIPPanelSelected'}">
+                        <ui:define name="panel_title">#{messages['gazelle.tf.tfConsistencyCheck.transactionsNoAIP']}
+                        </ui:define>
+                        <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                      rendered="#{tfConsistencyCheckManager.getTransactionsNoAIP().size == 0}"/>
+                        <rich:dataTable id="transactionsNoAIPDataTable" var="transaction"
+                                        value="#{tfConsistencyCheckManager.getTransactionsNoAIP()}"
+                                        rendered="#{tfConsistencyCheckManager.getTransactionsNoAIP().size &gt; 0}"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                            <g:column sortBy="#{'id'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                #{transaction.id}
+                            </g:column>
+                            <g:column sortBy="#{'keyword'}" filterBy="#{'keyword'}"
+                                      filterEvent="onkeyup">
+                                <ui:define name="header">#{messages['gazelle.tf.Transaction']}</ui:define>
+                                <h:commandLink value="#{transaction.keyword} - #{transaction.name}"
+                                               action="#{transactionManager.editTransaction(transaction, false)}"/>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId" value="transactionsNoAIPDataTable"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </s:decorate>
+                    <s:decorate template="/layout/panels/_panel_title.xhtml" id="transactionsWithoutReferencedStandardPanelId"
+                                rendered="#{tfConsistencyCheckManager.GetCurrentDisplayPanelLabel() == 'transactionsWithoutReferencedStandardPanelSelected'}">
+                        <ui:define name="panel_title">#{messages['gazelle.tf.tfConsistencyCheck.TransactionsWithoutReferencedStandards']}
+                        </ui:define>
+                        <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                      rendered="#{tfConsistencyCheckManager.getTransactionsWithoutReferencedStandard().size == 0}"/>
+                        <rich:dataTable id="transactionsWithoutReferencedStandardDataTable" var="transaction"
+                                        value="#{tfConsistencyCheckManager.getTransactionsWithoutReferencedStandard()}"
+                                        rendered="#{tfConsistencyCheckManager.getTransactionsWithoutReferencedStandard().size &gt; 0}"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                            <g:column sortBy="#{'id'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                #{transaction.id}
+                            </g:column>
+                            <g:column sortBy="#{'keyword'}" filterBy="#{'keyword'}"
+                                      filterEvent="onkeyup">
+                                <ui:define name="header">#{messages['gazelle.tf.Transaction']}</ui:define>
+                                <h:commandLink value="#{transaction.keyword} - #{transaction.name}"
+                                               action="#{transactionManager.editTransaction(transaction, false)}"/>
+                            </g:column>
+                            <g:column sortBy="#{'transactionStatusType.name'}" filterBy="#{'transactionStatusType.name'}"
+                                      filterEvent="onkeyup">
+                                <ui:define name="header">#{messages['gazelle.tm.tests.testStatus']}</ui:define>
+                                <h:outputText value="#{transaction.transactionStatusType.name}"/>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId" value="transactionsWithoutReferencedStandardDataTable"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </s:decorate>
+                    <!-- 		Integration Profile Options 		-->
+                    <s:decorate template="/layout/panels/_panel_title.xhtml" id="ipOptionsNoTfReferencePanelId"
+                                rendered="#{tfConsistencyCheckManager.GetCurrentDisplayPanelLabel() == 'ipOptionsNoTfReferencePanelSelected'}">
+                        <ui:define name="panel_title">
+                            #{messages['gazelle.tf.tfConsistencyCheck.ipOptionsNoTfReference']}
+                        </ui:define>
+                        <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                      rendered="#{tfConsistencyCheckManager.getIpOptionsNoTfReference().size == 0}"/>
+                        <rich:dataTable id="ipOptionsNoTfReferenceDataTable" var="option"
+                                        value="#{tfConsistencyCheckManager.getIpOptionsNoTfReference()}"
+                                        rendered="#{tfConsistencyCheckManager.getIpOptionsNoTfReference().size &gt; 0}"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                            <g:column sortBy="#{'id'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                #{option.id}
+                            </g:column>
+                            <g:column sortBy="#{'keyword'}">
+                                <ui:define name="header">#{messages['gazelle.tf.IntegrationProfileOption']}</ui:define>
+                                <h:commandLink value="#{option.keyword} - #{option.name}"
+                                               action="#{integrationProfileOptionManager.editIntegrationProfileOption(option, false)}"/>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId" value="ipOptionsNoTfReferenceDataTable"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </s:decorate>
+                    <s:decorate template="/layout/panels/_panel_title.xhtml" id="ipOptionsNoAIPPanelId"
+                                rendered="#{tfConsistencyCheckManager.GetCurrentDisplayPanelLabel() == 'ipOptionsNoAIPPanelSelected'}">
+                        <ui:define name="panel_title">#{messages['gazelle.tf.tfConsistencyCheck.ipOptionsNoAIP']}
+                        </ui:define>
+                        <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                      rendered="#{tfConsistencyCheckManager.getIpOptionsNoAIP().size == 0}"/>
+                        <rich:dataTable id="ipOptionsNoAIPDataTable" var="option"
+                                        value="#{tfConsistencyCheckManager.getIpOptionsNoAIP()}"
+                                        rendered="#{tfConsistencyCheckManager.getIpOptionsNoAIP().size &gt; 0}"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                            <g:column sortBy="#{'id'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                #{option.id}
+                            </g:column>
+                            <g:column sortBy="#{'keyword'}">
+                                <ui:define name="header">#{messages['gazelle.tf.IntegrationProfileOption']}</ui:define>
+                                <h:commandLink value="#{option.keyword} - #{option.name}"
+                                               action="#{integrationProfileOptionManager.editIntegrationProfileOption(option, false)}"/>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId" value="ipOptionsNoAIPDataTable"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </s:decorate>
+                    <s:decorate template="/layout/panels/_panel_title.xhtml" id="transactionWithoutSectionPanelId"
+                                rendered="#{tfConsistencyCheckManager.GetCurrentDisplayPanelLabel() == 'transactionWithoutSectionPanelSelected'}">
+                        <ui:define name="panel_title">
+                            <h:outputText
+                                    value="#{tfConsistencyCheckManager.getTransactionWithoutDocumentsSection().size} #{messages['net.ihe.gazelle.tm.TransactionsWithoutSections']}"/>
+                        </ui:define>
+                        <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                      rendered="#{tfConsistencyCheckManager.getTransactionWithoutDocumentsSection().size == 0}"/>
+                        <rich:dataTable id="transactionWithoutDocumentsSectionTable" var="currentTransaction"
+                                        value="#{tfConsistencyCheckManager.getTransactionWithoutDocumentsSection()}"
+                                        rendered="#{tfConsistencyCheckManager.getTransactionWithoutDocumentsSection().size &gt; 0}"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                            <g:column sortBy="#{'id'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                <h:outputText value="#{currentTransaction.id}"/>
+                            </g:column>
+                            <g:column sortBy="#{'keyword'}" filterBy="#{'keyword'}"
+                                      filterEvent="onkeyup">
+                                <ui:define name="header">#{messages['gazelle.tf.Transaction']}</ui:define>
+                                <h:commandLink target="edit"
+                                               value="#{currentTransaction.keyword} - #{currentTransaction.name}"
+                                               action="#{transactionManager.editTransaction(currentTransaction, false)}"/>
+                            </g:column>
+                            <g:column width="150" sortBy="#{'documentSection'}">
+                                <ui:define name="header">#{messages['net.ihe.gazelle.tm.Specification']}</ui:define>
+                                <ui:include src="/tf/transaction/_documentSectionForTransaction_columnAction.xhtml">
+                                    <ui:param name="ipParam" value="#{currentTransaction}"/>
+                                    <ui:param name="controllerParam" value="#{transactionManager}"/>
+                                    <ui:param name="formParam" value="transactionManagerForm"/>
+                                    <ui:param name="callerPageParam" value="consistencyCheck"/>
+                                </ui:include>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId" value="transactionWithoutDocumentsSectionTable"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </s:decorate>
+                    <s:decorate template="/layout/panels/_panel_title.xhtml" id="DomainWithoutDocumentPanelId"
+                                rendered="#{tfConsistencyCheckManager.GetCurrentDisplayPanelLabel() == 'DomainWithoutSectionPanelSelected'}">
+                        <ui:define name="panel_title">
+                            <h:outputText
+                                    value="#{tfConsistencyCheckManager.getDomainWithoutDocument().size} #{messages['net.ihe.gazelle.tm.DomainsWithoutDocument']}"/>
+                        </ui:define>
+                        <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                      rendered="#{tfConsistencyCheckManager.getDomainWithoutDocument().size == 0}"/>
+                        <rich:dataTable id="DoaminWithoutSectionTable" var="currentDomain"
+                                        value="#{tfConsistencyCheckManager.getDomainWithoutDocument()}"
+                                        rendered="#{tfConsistencyCheckManager.getDomainWithoutDocument().size &gt; 0}"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                            <g:column sortBy="#{'id'}">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                <h:outputText value="#{currentDomain.id}"/>
+                            </g:column>
+                            <g:column sortBy="#{'keyword'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.Domain']}</ui:define>
+                                <h:commandLink target="edit" value="#{currentDomain.keyword} - #{currentDomain.name}"
+                                               action="#{domainManager.editDomain(currentDomain, false)}"/>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId" value="DoaminWithoutSectionTable"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </s:decorate>
+                    <s:decorate template="/layout/panels/_panel_title.xhtml"
+                                id="integrationProfileWithoutSectionPanelId"
+                                rendered="#{tfConsistencyCheckManager.GetCurrentDisplayPanelLabel() == 'integrationProfileWithoutSectionPanelSelected'}">
+                        <ui:define name="panel_title">
+                            <h:outputText
+                                    value="#{tfConsistencyCheckManager.getIntegrationProfileWithoutDocumentSection().size} #{messages['net.ihe.gazelle.tm.IntegrationProfilesWithoutSections']}"/>
+                        </ui:define>
+                        <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                      rendered="#{tfConsistencyCheckManager.getIntegrationProfileWithoutDocumentSection().size == 0}"/>
+                        <rich:dataTable id="integrationProfileWithoutSectionTable" var="currentIntegrationProfile"
+                                        value="#{tfConsistencyCheckManager.getIntegrationProfileWithoutDocumentSection()}"
+                                        rendered="#{tfConsistencyCheckManager.getIntegrationProfileWithoutDocumentSection().size &gt; 0}"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                            <g:column sortBy="#{'id'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                <h:outputText value="#{currentIntegrationProfile.id}"/>
+                            </g:column>
+                            <g:column sortBy="#{'keyword'}"
+                                      filterBy="#{'keyword'}" filterEvent="onkeyup">
+                                <ui:define name="header">#{messages['gazelle.tf.IntegrationProfile']}</ui:define>
+                                <h:commandLink target="edit"
+                                               value="#{currentIntegrationProfile.keyword} - #{currentIntegrationProfile.name}"
+                                               action="#{integrationProfileManager.editIntegrationProfile(currentIntegrationProfile, false)}"/>
+                            </g:column>
+                            <g:column width="150" sortBy="#{'documentSection'}">
+                                <ui:define name="header">#{messages['net.ihe.gazelle.tm.Specification']}</ui:define>
+                                <ui:include src="/tf/integrationProfile/_documentSectionForIP_columnAction.xhtml">
+                                    <ui:param name="ipParam" value="#{currentIntegrationProfile}"/>
+                                    <ui:param name="controllerParam" value="#{integrationProfileManager}"/>
+                                    <ui:param name="formParam" value="resultsForm"/>
+                                    <ui:param name="callerPageParam" value="consistencyCheck"/>
+                                </ui:include>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId" value="integrationProfileWithoutDocumentSection"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </s:decorate>
+                    <s:decorate template="/layout/panels/_panel_title.xhtml" id="DocumentWithBrokenURLPanelId"
+                                rendered="#{tfConsistencyCheckManager.GetCurrentDisplayPanelLabel() == 'DocumentWithBrokenURLPanelSelected'}">
+                        <ui:define name="panel_title">
+                            <h:outputText
+                                    value="#{tfConsistencyCheckManager.getDocWithbrokenURL().size} #{messages['net.ihe.gazelle.tm.DocumentsWithBrokenURL']}"/>
+                        </ui:define>
+                        <div id="performCheckUrlDiv" align="left">
+                            <a4j:commandButton styleClass="gzl-btn" immediate="true"
+                                               value="#{messages['net.ihe.gazelle.tm.PerformUrlCheckOnAllDocuments']}"
+                                               action="#{tfConsistencyCheckManager.performCheckDocumentsURL()}"
+                                               id="performURLCheckCommandButton" execute="@this"
+                                               render="tfConsistencyPanelGridForm"/>
+                        </div>
+                        <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                      rendered="#{tfConsistencyCheckManager.getDocWithbrokenURL().size == 0}"/>
+                        <rich:dataTable id="DocumentWithBrokenURLTable" var="currentDocument"
+                                        value="#{tfConsistencyCheckManager.getDocWithbrokenURL()}"
+                                        rendered="#{tfConsistencyCheckManager.getDocWithbrokenURL().size &gt; 0}"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                            <g:column sortBy="#{'id'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                <h:outputText value="#{currentDocument.id}"/>
+                            </g:column>
+                            <g:column sortBy="#{'name'}">
+                                <ui:define name="header">#{messages['net.ihe.gazelle.tm.DocumentName']}</ui:define>
+                                <h:outputLink id="viewDocumentPermalink" target="_blank"
+                                              value="#{documentManager.getDocumentPermalink(currentDocument)}"
+                                              title="#{messages['net.ihe.gazelle.tm.ViewDocumentDetails']}">
+                                    <h:outputText value="#{currentDocument.name}"/>
+                                </h:outputLink>
+                            </g:column>
+                            <g:column sortBy="#{'linkStatusDescription'}">
+                                <ui:define name="header">#{messages['net.ihe.gazelle.tm.UrlStatus']}</ui:define>
+                                <h:outputText value="#{currentDocument.linkStatusDescription}"/>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId" value="DocumentWithBrokenURLTable"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </s:decorate>
+                    <s:decorate template="/layout/panels/_panel_title.xhtml" id="docWithoutSectionPanelId"
+                                rendered="#{tfConsistencyCheckManager.GetCurrentDisplayPanelLabel() == 'docWithoutSectionPanelSelected'}">
+                        <ui:define name="panel_title">
+                            <h:outputText
+                                    value="#{tfConsistencyCheckManager.docWithoutSections.size} #{messages['net.ihe.gazelle.tm.DocumentsWithoutSections']}"/>
+                        </ui:define>
+                        <s:div id="filterDiv" styleClass="col-lg-5">
+
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter"
+                                          value="#{tfConsistencyCheckManager.docWithoutSectionsFilter}"/>
+                                <ui:param name="filterWidth" value="240"/>
+                                <ui:param name="filterId" value="type"/>
+                                <ui:param name="filterName" value="#{messages['net.ihe.gazelle.tm.Type']}"/>
+                                <ui:param name="filterForm" value="resultsForm"/>
+                            </ui:include>
+                        </s:div>
+                        <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                      rendered="#{tfConsistencyCheckManager.docWithoutSections.size == 0}"/>
+                        <rich:dataTable id="docWithoutSectionsTable" var="currentDocument"
+                                        value="#{tfConsistencyCheckManager.docWithoutSections}"
+                                        rendered="#{tfConsistencyCheckManager.docWithoutSections.size &gt; 0}"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                            <g:column sortBy="#{'id'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                <h:outputText value="#{currentDocument.id}"/>
+                            </g:column>
+                            <g:column sortBy="#{'name'}" filterBy="#{'name'}" filterEvent="onkeyup">
+                                <ui:define name="header">#{messages['net.ihe.gazelle.tm.DocumentName']}</ui:define>
+                                <h:outputLink id="viewDocumentPermalink" target="_blank"
+                                              value="#{documentManager.getDocumentPermalink(currentDocument)}"
+                                              title="#{messages['net.ihe.gazelle.tm.ViewDocumentDetails']}">
+                                    <h:outputText value="#{currentDocument.name}"/>
+                                </h:outputLink>
+                            </g:column>
+                            <g:column sortBy="#{'type'}">
+                                <ui:define name="header">#{messages['net.ihe.gazelle.tm.DocumentType']}</ui:define>
+                                <h:outputText value="#{currentDocument.type.friendlyName}"/>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId" value="docWithoutSectionsTable"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </s:decorate>
+                    <s:decorate template="/layout/panels/_panel_title.xhtml" id="AIPOWithoutDocumentSectionPanelId"
+                                rendered="#{tfConsistencyCheckManager.GetCurrentDisplayPanelLabel() == 'AIPOWithoutDocumentSection'}">
+                        <ui:define name="panel_title">
+                            <h:outputText
+                                    value="#{tfConsistencyCheckManager.getAipoWithoutDocumentSection().size} #{messages['net.ihe.gazelle.tm.AIPOWithoutDocumentSection']}"/>
+                        </ui:define>
+                        <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                      rendered="#{tfConsistencyCheckManager.getAipoWithoutDocumentSection().size == 0}"/>
+                        <rich:dataTable id="AIPOWithoutDocumentSectionTable" var="currentAipo"
+                                        value="#{tfConsistencyCheckManager.getAipoWithoutDocumentSection()}"
+                                        rendered="#{tfConsistencyCheckManager.getAipoWithoutDocumentSection().size &gt; 0}"
+                                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                            <g:column sortBy="#{'id'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                <h:outputText value="#{currentAipo.id}"/>
+                            </g:column>
+                            <g:column sortBy="#{'actorIntegrationProfile.actor.keyword'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.Actor']}</ui:define>
+                                <h:commandLink
+                                        value="#{currentAipo.actorIntegrationProfile.actor.keyword} - #{currentAipo.actorIntegrationProfile.actor.name}"
+                                        action="#{actorManager.editActor(currentAipo.actorIntegrationProfile.actor, false)}"/>
+                            </g:column>
+                            <g:column sortBy="#{'actorIntegrationProfile.integrationProfile.keyword'}">
+                                <ui:define name="header">#{messages['gazelle.tf.IntegrationProfile']}</ui:define>
+                                <h:commandLink
+                                        value="#{currentAipo.actorIntegrationProfile.integrationProfile.keyword} - #{currentAipo.actorIntegrationProfile.integrationProfile.name}"
+                                        action="#{integrationProfileManager.editIntegrationProfile(currentAipo.actorIntegrationProfile.integrationProfile, false)}"/>
+                            </g:column>
+                            <g:column sortBy="#{'integrationProfileOption.keyword'}">
+                                <ui:define name="header">#{messages['gazelle.tf.IntegrationProfileOption']}</ui:define>
+                                <h:commandLink
+                                        value="#{currentAipo.integrationProfileOption.keyword} - #{currentAipo.integrationProfileOption.name}"
+                                        action="#{integrationProfileOptionManager.editIntegrationProfileOption(currentAipo.integrationProfileOption, false)}"/>
+                            </g:column>
+                            <g:column sortBy="#{'documentSection'}">
+                                <ui:define name="header">#{messages['net.ihe.gazelle.tm.Specification']}</ui:define>
+                                <s:div rendered="#{currentAipo.integrationProfileOption.isNotNone()}">
+                                    <ui:include src="/tf/integrationProfileOption/_documentSectionForAipo.xhtml">
+                                        <ui:param name="aipoParam" value="#{currentAipo}"/>
+                                        <ui:param name="controllerParam"
+                                                  value="#{integrationProfileOptionManager}"/>
+                                        <ui:param name="formParam" value="resultsForm"/>
+                                        <ui:param name="callerPageParam" value="consistencyCheck"/>
+                                    </ui:include>
+                                </s:div>
+                            </g:column>
+                            <f:facet name="footer">
+                                <ui:include src="/util/datatableFooter.xhtml">
+                                    <ui:param name="dataScrollerId" value="ds"/>
+                                    <ui:param name="dataTableId" value="AIPOWithoutDocumentSectionTable"/>
+                                </ui:include>
+                            </f:facet>
+                        </rich:dataTable>
+                    </s:decorate>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

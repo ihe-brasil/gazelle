@@ -1,0 +1,542 @@
+<p:document xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://java.sun.com/jsf/core"
+            xmlns:p="http://jboss.org/schema/seam/pdf" xmlns:g="http://www.ihe.net/gazelle"
+            type="PDF" pageSize="A4" disposition="attachment"
+            title="#{connectathonReport.reportId}">
+    <p:header borderWidthBottom="1" alignment="left">
+        <g:pdffont size="10">[
+            <p:pageNumber/>
+            ] #{connectathonReport.reportId}
+        </g:pdffont>
+    </p:header>
+    <p:footer alignment="center">
+        <g:pdffont size="8">
+            <p:text value="#{messages['net.ihe.gazelle.tm.ThisReportShallNotBeReproducedExceptInFullWithou']}"/>
+        </g:pdffont>
+    </p:footer>
+    <p:image alignment="right" wrap="true" value="/img/IHE_bg.gif" width="60" height="45"/>
+    <p:paragraph spacingAfter="10">
+        <g:pdffont style="ITALIC" color="#52288B" size="16">
+            <p:text value="#{messages['net.ihe.gazelle.tm.ConnectathonReport']}"/>
+        </g:pdffont>
+    </p:paragraph>
+    <p:chapter number="#{connectathonReport.updateIndex()}">
+        <p:title>
+            <p:paragraph>
+                <g:pdffont style="bold" size="16">
+                    <p:text value="#{messages['net.ihe.gazelle.tm.ReportSummary']}"/>
+                </g:pdffont>
+            </p:paragraph>
+        </p:title>
+        <p:section>
+            <p:title>
+                <p:paragraph>
+                    <g:pdffont style="bold" size="14">
+                        <p:text value="#{messages['net.ihe.gazelle.tm.TestLaboratory']}"/>
+                    </g:pdffont>
+                </p:paragraph>
+            </p:title>
+            <p:table columns="2" widthPercentage="80" widths="1 4" spacingBefore="10">
+                <f:facet name="defaultCell">
+                    <p:cell horizontalAlignment="left" verticalAlignment="middle"/>
+                </f:facet>
+                <ui:include src="/testing/reporting/headerCell.xhtml">
+                    <ui:param name="title" value="#{messages['net.ihe.gazelle.tm.Contact']}"/>
+                </ui:include>
+                <p:cell>
+                    <g:pdffont size="8">
+                        <p:text value="#{connectathonReport.selectedTestingSession.contactFirstname} #{connectathonReport.selectedTestingSession.contactLastname}"/>
+                    </g:pdffont>
+                </p:cell>
+                <ui:include src="/testing/reporting/headerCell.xhtml">
+                    <ui:param name="title" value="#{messages['net.ihe.gazelle.tm.EmailAddress']}"/>
+                </ui:include>
+                <p:cell>
+                    <g:pdffont size="8">
+                        <p:text value="#{connectathonReport.selectedTestingSession.contactEmail}"/>
+                    </g:pdffont>
+                </p:cell>
+                <!-- <ui:include src="/testing/reporting/headerCell.xhtml">
+                                <ui:param name="title" value="Name" />
+                            </ui:include>
+                            <p:cell>
+                                <g:pdffont size="8">Test lab's name</g:pdffont>
+                            </p:cell>
+                            <ui:include src="/testing/reporting/headerCell.xhtml">
+                                <ui:param name="title" value="Mailing address" />
+                            </ui:include>
+                            <p:cell>
+                                <g:pdffont size="8">
+                                    <p:text
+                                        value="test lab street" />
+                                </g:pdffont>
+                                <g:pdffont size="8">
+                                    <p:text
+                                        value="test lab zip code" />
+                                </g:pdffont>
+                                <g:pdffont size="8">
+                                    <p:text
+                                        value="test lab city" />
+                                </g:pdffont>
+                                <g:pdffont size="8">
+                                    <p:text
+                                        value="test lab state" />
+                                </g:pdffont>
+                                <g:pdffont size="8">
+                                    <p:text
+                                        value="test lab country" />
+                                </g:pdffont>
+                            </p:cell> -->
+            </p:table>
+        </p:section>
+        <p:section>
+            <p:title>
+                <p:paragraph>
+                    <g:pdffont size="14" style="bold">
+                        <p:text value="#{messages['net.ihe.gazelle.tm.TestedOrganization']}"/>
+                    </g:pdffont>
+                </p:paragraph>
+            </p:title>
+            <p:table columns="2" widthPercentage="80" widths="1 4" spacingBefore="10">
+                <f:facet name="defaultCell">
+                    <p:cell horizontalAlignment="left" verticalAlignment="middle"/>
+                </f:facet>
+                <ui:include src="/testing/reporting/headerCell.xhtml">
+                    <ui:param name="title" value="#{messages['gazelle.testmanagement.object.Name']}"/>
+                </ui:include>
+                <p:cell>
+                    <g:pdffont size="8">#{connectathonReport.selectedInstitution.name}</g:pdffont>
+                </p:cell>
+                <ui:include src="/testing/reporting/headerCell.xhtml">
+                    <ui:param name="title" value="#{messages['gazelle.users.address.InstitutionMailingAddress']}"/>
+                </ui:include>
+                <p:cell>
+                    <g:pdffont size="8">
+                        <p:text value="#{connectathonReport.selectedInstitution.mailingAddress.address}"/>
+                    </g:pdffont>
+                    <g:pdffont size="8">
+                        <p:text value="#{connectathonReport.selectedInstitution.mailingAddress.zipCode}"/>
+                    </g:pdffont>
+                    <g:pdffont size="8">
+                        <p:text value="#{connectathonReport.selectedInstitution.mailingAddress.city}"/>
+                    </g:pdffont>
+                    <g:pdffont size="8">
+                        <p:text value="#{connectathonReport.selectedInstitution.mailingAddress.state}"/>
+                    </g:pdffont>
+                    <g:pdffont size="8">
+                        <p:text value="#{connectathonReport.selectedInstitution.mailingAddress.iso3166CountryCode.printableName}"/>
+                    </g:pdffont>
+                </p:cell>
+            </p:table>
+        </p:section>
+        <p:section>
+            <p:title>
+                <p:paragraph>
+                    <g:pdffont size="14" style="bold">
+                        <p:text value="#{messages['net.ihe.gazelle.tm.TestedSystems']})"/>
+                    </g:pdffont>
+                </p:paragraph>
+            </p:title>
+            <ui:include src="/testing/reporting/systemDescription.xhtml">
+                <ui:param name="ts" value="#{connectathonReport.selectedTestingSession}"/>
+                <ui:param name="listSystemInSession" value="#{connectathonReport.systemsInSession}"/>
+            </ui:include>
+        </p:section>
+        <p:section>
+            <p:title>
+                <p:paragraph>
+                    <g:pdffont style="bold" size="14">
+                        <p:text value="#{messages['net.ihe.gazelle.tm.ReportIdentification']}"/>
+                    </g:pdffont>
+                </p:paragraph>
+            </p:title>
+            <p:paragraph spacingAfter="10">
+                <g:pdffont size="8">
+                    <p:text value="#{messages['net.ihe.gazelle.tm.ThisReportHasBeenGeneratedOn']} #{dateDisplay.displayDate(connectathonReport.generationDate)} #{messages['net.ihe.gazelle.tm.WithIdentifier']} #{connectathonReport.reportId}"/>
+                </g:pdffont>
+            </p:paragraph>
+        </p:section>
+        <p:section>
+            <p:title>
+                <p:paragraph>
+                    <g:pdffont size="14" style="bold">#{messages['net.ihe.gazelle.tm.Disclaimer']}</g:pdffont>
+                </p:paragraph>
+            </p:title>
+            <p:paragraph spacingAfter="10">
+                <g:pdffont size="8">#{connectathonReport.getDisclaimer()}</g:pdffont>
+            </p:paragraph>
+        </p:section>
+    </p:chapter>
+    <ui:repeat value="#{connectathonReport.systemsInSession}" var="currentSIS">
+        <p:newPage/>
+        <p:chapter number="#{connectathonReport.updateIndex()}">
+            <p:title>
+                <p:paragraph spacingBefore="20">
+                    <g:pdffont size="16" style="bold">
+                        <p:anchor name="#{currentSIS.system.keyword}">#{currentSIS.system.name}
+                            (#{currentSIS.system.version})
+                        </p:anchor>
+                    </g:pdffont>
+                </p:paragraph>
+            </p:title>
+            <!-- AIPO results -->
+            <p:section>
+                #{connectathonReport.getResultsForSystemInSession(currentSIS)}
+                <p:title>
+                    <p:paragraph spacingAfter="10">
+                        <g:pdffont size="14" style="bold">
+                            #{messages['net.ihe.gazelle.tm.ResultsPerIntegrationProfileActorOption']}
+                        </g:pdffont>
+                    </p:paragraph>
+                </p:title>
+                <ui:include src="/testing/reporting/resultsPerAIPO.xhtml">
+                    <ui:param name="systemInSessionResults" value="#{connectathonReport.systemAIPOResults}"/>
+                </ui:include>
+            </p:section>
+            <!-- test instance performed -->
+            <p:section>
+                <p:title>
+                    <p:paragraph>
+                        <g:pdffont size="14" style="bold">#{messages['net.ihe.gazelle.tm.TestInstancesSummary']}
+                        </g:pdffont>
+                    </p:paragraph>
+                </p:title>
+                <ui:include src="/testing/reporting/testInstanceSummary.xhtml">
+                    <ui:param name="testInstancesSummary"
+                              value="#{connectathonReport.getTestInstancesSummary(currentSIS)}"/>
+                </ui:include>
+            </p:section>
+            <!-- test instance details -->
+            <p:section>
+                <p:title>
+                    <p:paragraph>
+                        <g:pdffont size="14" style="bold">
+                            #{messages['net.ihe.gazelle.tm.TestInstanceDetailsperIntegrationProfileActorOpt']}
+                        </g:pdffont>
+                    </p:paragraph>
+                </p:title>
+                <p:paragraph>
+                    <g:pdffont size="8">
+                        #{messages['net.ihe.gazelle.tm.InTheNextSubsectionsPerformedTestInstancesAreGat']}.
+                    </g:pdffont>
+                </p:paragraph>
+                <ui:repeat value="#{connectathonReport.systemAIPOResults}" var="aipoResult">
+                    <p:section>
+                        <p:title>
+                            <p:paragraph>
+                                <g:pdffont size="12" style="bold">
+                                    <p:text value="#{aipoResult.systemActorProfile.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.name} / #{aipoResult.systemActorProfile.actorIntegrationProfileOption.actorIntegrationProfile.actor.name} / #{aipoResult.systemActorProfile.actorIntegrationProfileOption.integrationProfileOption.keyword}"/>
+                                </g:pdffont>
+                            </p:paragraph>
+                        </p:title>
+                        <p:paragraph spacingAfter="10">
+                            <g:pdffont size="8">
+                                <p:text value="#{connectathonReport.getTextForTestInstanceDetails(aipoResult)}"/>
+                            </g:pdffont>
+                        </p:paragraph>
+                        <ui:include src="/testing/reporting/testInstances.xhtml">
+                            <ui:param name="details" value="#{connectathonReport.aipoDetails}"/>
+                        </ui:include>
+                    </p:section>
+                </ui:repeat>
+            </p:section>
+            <!-- statistics test instances -->
+            <p:section>
+                #{connectathonReport.prepareStatistics(currentSIS)}
+                <p:title>
+                    <p:paragraph spacingAfter="10">
+                        <g:pdffont size="14" style="bold">#{messages['gazelle.common.menu.MenuStatistics']}</g:pdffont>
+                    </p:paragraph>
+                </p:title>
+                <p:paragraph spacingAfter="10">
+                    <g:pdffont size="8">
+                        #{messages['net.ihe.gazelle.tm.ThisSectionGathersSomeStatisticsOnTestInstancesO']}.
+                    </g:pdffont>
+                </p:paragraph>
+                <p:section>
+                    <p:title>
+                        <p:paragraph>
+                            <g:pdffont size="12" style="bold">#{messages['net.ihe.gazelle.tm.TestInstancesPerDomain']}
+                            </g:pdffont>
+                        </p:paragraph>
+                    </p:title>
+                    <p:paragraph spacingAfter="10">
+                        <g:pdffont size="8">
+                            #{messages['net.ihe.gazelle.tm.BelowIsTheDistributionOfTestInstancesPerformedAc']}.
+                        </g:pdffont>
+                    </p:paragraph>
+                    <p:paragraph>
+                        <p:table columns="2">
+                            <f:facet name="defaultCell">
+                                <p:cell horizontalAlignment="center" verticalAlignment="middle" borderWidth="0"/>
+                            </f:facet>
+                            <p:cell>
+                                <p:piechart chart="#{connectathonReport.getPieChart('domain')}"/>
+                            </p:cell>
+                            <p:cell>
+                                <p:table columns="2">
+                                    <ui:include src="/testing/reporting/headerCell.xhtml">
+                                        <ui:param name="title" value="#{messages['gazelle.tf.Domain']}"/>
+                                    </ui:include>
+                                    <ui:include src="/testing/reporting/headerCell.xhtml">
+                                        <ui:param name="title" value="#{messages['net.ihe.gazelle.tm.NbOfTI']}"/>
+                                    </ui:include>
+                                    <ui:repeat value="#{connectathonReport.statisticsPerDomain}" var="stat">
+                                        <p:cell>
+                                            <p:paragraph>
+                                                <g:pdffont size="8">#{stat[0].keyword}</g:pdffont>
+                                            </p:paragraph>
+                                        </p:cell>
+                                        <p:cell>
+                                            <p:paragraph>
+                                                <g:pdffont size="8">#{stat[1]}</g:pdffont>
+                                            </p:paragraph>
+                                        </p:cell>
+                                    </ui:repeat>
+                                </p:table>
+                            </p:cell>
+                        </p:table>
+                    </p:paragraph>
+                </p:section>
+                <p:section>
+                    <p:title>
+                        <p:paragraph>
+                            <g:pdffont size="12" style="bold">
+                                #{messages['net.ihe.gazelle.tm.TestInstancesPerIntegrationProfile']}
+                            </g:pdffont>
+                        </p:paragraph>
+                    </p:title>
+                    <p:paragraph spacingAfter="10">
+                        <g:pdffont size="8">
+                            #{messages['net.ihe.gazelle.tm.BelowIsTheDistributionOfTestInstancesPerformedAc_2']}.
+                        </g:pdffont>
+                    </p:paragraph>
+                    <p:paragraph>
+                        <p:table columns="2">
+                            <f:facet name="defaultCell">
+                                <p:cell horizontalAlignment="center" verticalAlignment="middle" borderWidth="0"/>
+                            </f:facet>
+                            <p:cell>
+                                <p:piechart chart="#{connectathonReport.getPieChart('integrationProfile')}"/>
+                            </p:cell>
+                            <p:cell>
+                                <p:table columns="2" widthPercentage="100">
+                                    <ui:include src="/testing/reporting/headerCell.xhtml">
+                                        <ui:param name="title"
+                                                  value="#{messages['gazelle.testmanagement.system.label.IP']}"/>
+                                    </ui:include>
+                                    <ui:include src="/testing/reporting/headerCell.xhtml">
+                                        <ui:param name="title" value="#{messages['net.ihe.gazelle.tm.NbOfTI']}"/>
+                                    </ui:include>
+                                    <ui:repeat value="#{connectathonReport.statisticsPerIntegrationProfile}" var="stat">
+                                        <p:cell>
+                                            <p:paragraph>
+                                                <g:pdffont size="8">#{stat[0].keyword}</g:pdffont>
+                                            </p:paragraph>
+                                        </p:cell>
+                                        <p:cell>
+                                            <p:paragraph>
+                                                <g:pdffont size="8">#{stat[1]}</g:pdffont>
+                                            </p:paragraph>
+                                        </p:cell>
+                                    </ui:repeat>
+                                </p:table>
+                            </p:cell>
+                        </p:table>
+                    </p:paragraph>
+                </p:section>
+                <p:section>
+                    <p:title>
+                        <p:paragraph>
+                            <g:pdffont size="12" style="bold">#{messages['net.ihe.gazelle.tm.TestInstancesPerActor']}
+                            </g:pdffont>
+                        </p:paragraph>
+                    </p:title>
+                    <p:paragraph spacingAfter="10">
+                        <g:pdffont size="8">
+                            #{messages['net.ihe.gazelle.tm.BelowIsTheDistributionOfTestInstancesPerformedAc_3']}.
+                        </g:pdffont>
+                    </p:paragraph>
+                    <p:paragraph>
+                        <p:table border="0" columns="2">
+                            <f:facet name="defaultCell">
+                                <p:cell horizontalAlignment="center" verticalAlignment="middle" borderWidth="0"/>
+                            </f:facet>
+                            <p:cell>
+                                <p:piechart chart="#{connectathonReport.getPieChart('actor')}"/>
+                            </p:cell>
+                            <p:cell>
+                                <p:table columns="2">
+                                    <ui:include src="/testing/reporting/headerCell.xhtml">
+                                        <ui:param name="title"
+                                                  value="#{messages['gazelle.testmanagement.system.label.Actor']}"/>
+                                    </ui:include>
+                                    <ui:include src="/testing/reporting/headerCell.xhtml">
+                                        <ui:param name="title" value="#{messages['net.ihe.gazelle.tm.NbOfTI']}"/>
+                                    </ui:include>
+                                    <ui:repeat value="#{connectathonReport.statisticsPerActor}" var="stat">
+                                        <p:cell>
+                                            <p:paragraph>
+                                                <g:pdffont size="8">#{stat[0].keyword}</g:pdffont>
+                                            </p:paragraph>
+                                        </p:cell>
+                                        <p:cell>
+                                            <p:paragraph>
+                                                <g:pdffont size="8">#{stat[1]}</g:pdffont>
+                                            </p:paragraph>
+                                        </p:cell>
+                                    </ui:repeat>
+                                </p:table>
+                            </p:cell>
+                        </p:table>
+                    </p:paragraph>
+                </p:section>
+                <p:section>
+                    <p:title>
+                        <p:paragraph>
+                            <g:pdffont size="12" style="bold">
+                                #{messages['net.ihe.gazelle.tm.TestInstancesPerPartnerorganizationLevel']}
+                            </g:pdffont>
+                        </p:paragraph>
+                    </p:title>
+                    <p:paragraph spacingAfter="10">
+                        <g:pdffont size="8">
+                            #{messages['net.ihe.gazelle.tm.BelowIsTheDistributionOfTestInstancesPerformedPe']}
+                        </g:pdffont>
+                    </p:paragraph>
+                    <p:paragraph>
+                        <p:table columns="2">
+                            <f:facet name="defaultCell">
+                                <p:cell horizontalAlignment="center" verticalAlignment="middle" borderWidth="0"/>
+                            </f:facet>
+                            <p:cell>
+                                <p:piechart chart="#{connectathonReport.getPieChart('organization')}"/>
+                            </p:cell>
+                            <p:cell>
+                                <p:table columns="2">
+                                    <ui:include src="/testing/reporting/headerCell.xhtml">
+                                        <ui:param name="title" value="#{messages['gazelle.common.Institution']}"/>
+                                    </ui:include>
+                                    <ui:include src="/testing/reporting/headerCell.xhtml">
+                                        <ui:param name="title" value="#{messages['net.ihe.gazelle.tm.NbOfTI']}"/>
+                                    </ui:include>
+                                    <ui:repeat value="#{connectathonReport.statisticsPerInstitutionPartner}" var="stat">
+                                        <p:cell>
+                                            <p:paragraph>
+                                                <g:pdffont size="8">#{stat[0].keyword}</g:pdffont>
+                                            </p:paragraph>
+                                        </p:cell>
+                                        <p:cell>
+                                            <p:paragraph>
+                                                <g:pdffont size="8">#{stat[1]}</g:pdffont>
+                                            </p:paragraph>
+                                        </p:cell>
+                                    </ui:repeat>
+                                </p:table>
+                            </p:cell>
+                        </p:table>
+                    </p:paragraph>
+                </p:section>
+                <p:section>
+                    <p:title>
+                        <p:paragraph>
+                            <g:pdffont size="12" style="bold">
+                                #{messages['net.ihe.gazelle.tm.TestInstancesPerPartnersystemLevel']}
+                            </g:pdffont>
+                        </p:paragraph>
+                    </p:title>
+                    <p:paragraph spacingAfter="10">
+                        <g:pdffont size="8">
+                            #{messages['net.ihe.gazelle.tm.BelowIsTheDistributionOfTestInstancesPerformedPe_2']}
+                        </g:pdffont>
+                    </p:paragraph>
+                    <p:paragraph>
+                        <p:table columns="2">
+                            <f:facet name="defaultCell">
+                                <p:cell horizontalAlignment="center" verticalAlignment="middle" borderWidth="0"/>
+                            </f:facet>
+                            <p:cell>
+                                <p:piechart chart="#{connectathonReport.getPieChart('system')}"/>
+                            </p:cell>
+                            <p:cell>
+                                <p:table columns="2">
+                                    <ui:include src="/testing/reporting/headerCell.xhtml">
+                                        <ui:param name="title"
+                                                  value="#{messages['gazelle.configuration.system.system']}"/>
+                                    </ui:include>
+                                    <ui:include src="/testing/reporting/headerCell.xhtml">
+                                        <ui:param name="title" value="#{messages['net.ihe.gazelle.tm.NbOfTI']}"/>
+                                    </ui:include>
+                                    <ui:repeat value="#{connectathonReport.statisticsPerSystemPartner}" var="stat">
+                                        <p:cell>
+                                            <p:paragraph>
+                                                <g:pdffont size="8">#{stat[0].keyword}</g:pdffont>
+                                            </p:paragraph>
+                                        </p:cell>
+                                        <p:cell>
+                                            <p:paragraph>
+                                                <g:pdffont size="8">#{stat[1]}</g:pdffont>
+                                            </p:paragraph>
+                                        </p:cell>
+                                    </ui:repeat>
+                                </p:table>
+                            </p:cell>
+                        </p:table>
+                    </p:paragraph>
+                </p:section>
+                <p:section>
+                    <p:title>
+                        <p:paragraph>
+                            <g:pdffont size="12" style="bold">
+                                #{messages['net.ihe.gazelle.tm.TestInstancesPerMonitor']}
+                            </g:pdffont>
+                        </p:paragraph>
+                    </p:title>
+                    <p:paragraph spacingAfter="10">
+                        <g:pdffont size="8">
+                            #{messages['net.ihe.gazelle.tm.BelowIsTheDistributionOfTestInstancesVerifiedPer']}
+                        </g:pdffont>
+                    </p:paragraph>
+                    <p:paragraph>
+                        <p:table columns="2">
+                            <f:facet name="defaultCell">
+                                <p:cell horizontalAlignment="center" verticalAlignment="middle" borderWidth="0"/>
+                            </f:facet>
+                            <p:cell>
+                                <p:piechart chart="#{connectathonReport.getPieChart('monitor')}"/>
+                            </p:cell>
+                            <p:cell>
+                                <p:table columns="2">
+                                    <ui:include src="/testing/reporting/headerCell.xhtml">
+                                        <ui:param name="title" value="#{messages['gazelle.tm.monitors.Monitor']}"/>
+                                    </ui:include>
+                                    <ui:include src="/testing/reporting/headerCell.xhtml">
+                                        <ui:param name="title" value="#{messages['net.ihe.gazelle.tm.NbOfTI']}"/>
+                                    </ui:include>
+                                    <ui:repeat value="#{connectathonReport.statisticsPerMonitor}" var="stat">
+                                        <p:cell>
+                                            <p:paragraph>
+                                                <g:pdffont size="8">#{stat[0].user.username}</g:pdffont>
+                                            </p:paragraph>
+                                        </p:cell>
+                                        <p:cell>
+                                            <p:paragraph>
+                                                <g:pdffont size="8">#{stat[1]}</g:pdffont>
+                                            </p:paragraph>
+                                        </p:cell>
+                                    </ui:repeat>
+                                </p:table>
+                            </p:cell>
+                        </p:table>
+                    </p:paragraph>
+                </p:section>
+            </p:section>
+        </p:chapter>
+    </ui:repeat>
+    <p:paragraph spaceBefore="10">
+        <g:pdffont size="8">#{messages['net.ihe.gazelle.tm.TheLineBelowIndicatesTheEndOfThisReportAnyTextBe']}
+        </g:pdffont>
+    </p:paragraph>
+    <p:html>
+        <hr width="100%" align="center"/>
+    </p:html>
+</p:document>

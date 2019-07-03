@@ -1,0 +1,93 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml">
+    <s:div id="datoftdiv">
+        <rich:dataTable id="objfttable" var="currentObjectFileType"
+                        value="#{objectTypeManager.getListObjectFileType()}" rowKeyVar="rowNumber"
+                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+            <g:column sortBy="#{'id'}" sortOrder="ascending">
+                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                <h:outputText value="#{currentObjectFileType.id}"/>
+            </g:column>
+            <g:column sortBy="#{'keyword'}" sortOrder="ascending">
+                <ui:define name="header">#{messages['gazelle.testmanagement.object.keyword']}</ui:define>
+                <h:outputText value="#{currentObjectFileType.keyword}"/>
+            </g:column>
+            <g:column sortBy="#{'description'}" sortOrder="ascending">
+                <ui:define name="header">#{messages['gazelle.tf.table.Description']}</ui:define>
+                <h:outputText value="#{currentObjectFileType.description}"/>
+            </g:column>
+            <g:column sortBy="#{'extensions'}" sortOrder="ascending">
+                <ui:define name="header">#{messages['gazelle.tm.Extensions']}</ui:define>
+                <h:outputText value="#{currentObjectFileType.extensions}"/>
+            </g:column>
+            <g:column sortBy="#{'writable'}" sortOrder="ascending">
+                <ui:define name="header">#{messages['gazelle.tm.Writable']}</ui:define>
+                <h:selectBooleanCheckbox id="wirtboo"
+                                         value="#{currentObjectFileType.writable}"
+                                         rendered="#{(s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}">
+                    <a4j:ajax event="change"
+                              render="objfttable" execute="@this"
+                              listener="#{objectTypeManager.persistObjectFileType(currentObjectFileType)}"/>
+                </h:selectBooleanCheckbox>
+                <h:outputText id="outputtextwrit" value="#{currentObjectFileType.writable}"
+                              rendered="#{currentObjectFileType.writable!=null and applicationManager.isTestManagement()}"/>
+            </g:column>
+            <g:column>
+                <ui:define name="header">#{messages['net.ihe.gazelle.tm.ValidateInEVSClient']}</ui:define>
+                <h:selectBooleanCheckbox value="#{currentObjectFileType.validate}"
+                                         rendered="#{(s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}">
+                    <a4j:ajax event="change"
+                              render="objfttable" execute="@this"
+                              listener="#{objectTypeManager.persistObjectFileType(currentObjectFileType)}"/>
+                </h:selectBooleanCheckbox>
+                <h:outputText value="#{currentObjectFileType.validate}"
+                              rendered="#{applicationManager.isTestManagement()}"/>
+            </g:column>
+            <g:column
+                      rendered="#{(s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}">
+                <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+
+                <div class="gzl-never-wrap">
+                    <a4j:commandLink event="click"
+                                     oncomplete="jq162('#DescribeNewObjectFileType').modal('show');"
+                                     render="DescribeNewObjectFileType, :createOFTForm"
+                                     title="#{messages['gazelle.tm.EditSelectedTypeOfDocument']}"
+                                     rendered="#{applicationManager.isMasterModel()}"
+                                     actionListener="#{objectTypeManager.setSelectedObjectFileType(currentObjectFileType) }">
+                        <span class="gzl-icon-pencil"/>
+                    </a4j:commandLink>
+
+
+                    <a4j:commandLink event="click"
+                                     title="#{messages['gazelle.tm.DeleteSelectedTypeOfDocument']}"
+                                     rendered="#{(s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel() and applicationPreferenceManager.isPossibleToDeleteOnGMM()}"
+                                     oncomplete="jq162('#DeleteSelectedObjectFileType').modal('show');"
+                                     render="DeleteSelectedObjectFileType, :deleteFormoft"
+                                     actionListener="#{objectTypeManager.setSelectedObjectFileType(currentObjectFileType) }">
+                        <span class="gzl-icon-trash-o"/>
+                    </a4j:commandLink>
+
+                </div>
+
+            </g:column>
+            <f:facet name="footer">
+                <ui:include src="/util/datatableFooter.xhtml">
+                    <ui:param name="dataScrollerId" value="ds"/>
+                    <ui:param name="dataTableId" value="objfttable"/>
+                </ui:include>
+            </f:facet>
+        </rich:dataTable>
+    </s:div>
+    <s:div id="addObjectFTDiv" style="align:right;"
+           rendered="#{(s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}">
+        <a4j:commandButton id="addOFTCommandButon" styleClass="gzl-btn-green" style="align:right;"
+                           value="#{messages['gazelle.testmanagement.object.NewObjectFileType']}"
+                           actionListener="#{objectTypeManager.initializeSelectedObjectFileType()}"
+                           oncomplete="jq162('#DescribeNewObjectFileType').modal('show');"
+                           immediate="true"
+                           render="DescribeNewObjectFileType, :createOFTForm"
+                           execute="@this"/>
+    </s:div>
+</ui:composition>

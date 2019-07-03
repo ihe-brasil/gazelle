@@ -1,0 +1,11 @@
+<div
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns="http://www.w3.org/1999/xhtml">
+    <!-- Some monitors in Gazelle ! -->
+    <h:outputText id="deleteConfirmationPanelOutputText"
+                  value="#{messages['gazelle.users.user.confirmation.delete.label']} "
+                  rendered="#{userManagerExtra.selectedUserForDeleteIsMonitor == false}"/>
+    <h:outputText id="userIsMonitor" value="#{messages['gazelle.tm.ThisUserCannotBeDeletedBecauseItHasBeenSetAsMoni']}."
+                  rendered="#{userManagerExtra.selectedUserForDeleteIsMonitor == true}"/>
+    <br/>
+</div>

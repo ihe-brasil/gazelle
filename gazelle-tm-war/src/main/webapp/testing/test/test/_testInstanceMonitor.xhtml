@@ -1,0 +1,32 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <s:decorate id="viewTestMonitorDecoration" template="/layout/display/_display.xhtml"
+                rendered="#{testInstanceManager.selectedTestInstance.monitorInSession != null}">
+        <ui:define name="label">#{messages['gazelle.tm.test.TestMonitor']}</ui:define>
+        <g:link target="_blank"
+                value="#{testInstanceManager.selectedTestInstance.monitorInSession.user}"/>
+
+        <a4j:commandLink id="claimTestSupport" limitRender="true"
+                         action="#{testInstanceManager.releaseTestInstance()}"
+                         rendered="#{monitorInSessionAdministrationManager.isConnectedUserMonitorForSelectedSession() and
+                          testInstanceManager.canChangeMonitor()}"
+                         execute="@this"
+                         render="#{toRender}">
+            <i class="gzl-icon-release"/>
+        </a4j:commandLink>
+    </s:decorate>
+    <s:decorate id="claimTestDecoration" template="/layout/display/_display.xhtml"
+                rendered="#{(testInstanceManager.selectedTestInstance.monitorInSession == null) and (monitorInSessionAdministrationManager.isConnectedUserMonitorForSelectedSession())}">
+        <ui:define name="label">#{messages['gazelle.tm.test.TestMonitor']}</ui:define>
+        <a4j:commandLink id="claimTestSupport" limitRender="true"
+                         action="#{testInstanceManager.claimTestInstance()}"
+                         rendered="#{testInstanceManager.canChangeMonitor()}"
+                         execute="@this"
+                         render="#{toRender}">
+            <i class="gzl-icon-user"/>
+        </a4j:commandLink>
+    </s:decorate>
+</ui:composition>

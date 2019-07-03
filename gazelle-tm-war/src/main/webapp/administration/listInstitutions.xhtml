@@ -1,0 +1,162 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.users.institution.AllInstitutionsLabel1']}"/>
+    <ui:define name="body">
+
+        <p>#{messages['gazelle.tm.AllTheInstitutionsAreListedBelowClickOnTheAssoci']}.</p>
+        <h:form id="selectInstitutionForm">
+            <s:token allowMultiplePosts="true"/>
+            <a4j:queue requestDelay="300" ignoreDupResponses="true"/>
+            <h:panelGroup
+                    rendered="#{s:hasRole('admin_role') || s:hasRole('institutions_editor_role') || s:hasRole('project-manager_role')}">
+                <h:outputText value="#{institutionManager.computeNbOfInstitutions()} #{messages['net.ihe.gazelle.tm.InstitutionsRegistered']}"/>
+            </h:panelGroup>
+
+            <div id="actionButtonsDiv" align="left">
+                <a4j:commandButton id="addNewInstitutionButton" styleClass="gzl-btn-green"
+                                   rendered="#{s:hasRole('admin_role') || !s:hasRole('testing_session_admin_role')}"
+                                   value="#{messages['gazelle.users.institution.AddAnInstitution']}"
+                                   action="#{institutionManager.addNewInstitutionButton()}"/>
+            </div>
+            #{dataTableStateHolder.setAscendingOn('name')}
+            <rich:dataTable id="institutionTable" var="institutionUsed"
+                            value="#{institutionManager.getFilteredInstitutions()}"
+                            rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                <g:column>
+                    <h:panelGroup rendered="#{s:hasRole('admin_role')|| s:hasRole('accounting_role')}">
+                        <a href="#{institutionUsed.url}" style="color: white;" target="_blank"
+                           title="#{messages['gazelle.tm.GoTo']} : #{institutionUsed.url}"
+                           alt="#{messages['gazelle.tm.GoTo']} : #{institutionUsed.url}">
+                            <span class="gzl-icon-globe"/>
+                        </a>
+                    </h:panelGroup>
+                    <h:panelGroup
+                            rendered="#{s:hasRole('admin_role') and applicationManager.isTestManagement()}">
+                        <a4j:commandLink id="usersSupport" title="#{messages['gazelle.common.button.Users']}"
+                                         action="#{userManager.displayUsersForCompany(  institutionUsed  )}"
+                                         immediate="true"
+                                         onRowMouseOver="this.style.cursor='pointer'">
+                            <span class="gzl-icon-user" title="#{messages['gazelle.common.button.Users']}"/>
+                        </a4j:commandLink>
+                    </h:panelGroup>
+                    <h:panelGroup
+                            rendered="#{(s:hasRole('admin_role')|| s:hasRole('accounting_role')) and applicationManager.isTestManagement()}">
+                        <a4j:commandLink id="contactsSupport" title="#{messages['gazelle.common.button.Contacts']}"
+                                         action="#{personManager.displayContactsForCompany(  institutionUsed  )}"
+                                         immediate="true" onRowMouseOver="this.style.cursor='pointer'">
+                            <span class="gzl-icon-users"/>
+                        </a4j:commandLink>
+                    </h:panelGroup>
+                    <h:panelGroup
+                            rendered="#{(s:hasRole('admin_role')|| s:hasRole('accounting_role')) and applicationManager.isTestManagement()}">
+                        <a4j:commandLink id="invoiceSupport" title="#{messages['gazelle.tm.Invoice']}"
+                                         action="#{financialManager.editInvoiceForCurrentSession(  institutionUsed  )}"
+                                         immediate="true" onRowMouseOver="this.style.cursor='pointer'">
+                                          <span class="gzl-icon-stack">
+                                              <span class="gzl-icon-file-o gzl-icon-stack-1x"/>
+                                              <span class="gzl-icon-usd gzl-icon-stack-1x"/>
+                                          </span>
+                        </a4j:commandLink>
+                    </h:panelGroup>
+                </g:column>
+                <g:column filterBy="#{'name'}" filterEvent="onkeyup"
+                          sortBy="#{'name'}" sortOrder="#{dataTableStateHolder.sortOrders['name']}">
+                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Name']}</ui:define>
+                    <h:commandLink value="#{institutionUsed.name}" immediate="true"
+                                   action="#{institutionManagerTM.viewInstitutionForTM(institutionUsed)}"/>
+                </g:column>
+                <g:column filterBy="#{'keyword'}"
+                          filterEvent="onkeyup" sortBy="#{'keyword'}"
+                          sortOrder="#{dataTableStateHolder.sortOrders['keyword']}">
+                    <ui:define name="header">#{messages['gazelle.testmanagement.object.keyword']}</ui:define>
+                    #{institutionUsed.keyword}
+                </g:column>
+                <g:column filterBy="#{'institutionType.type'}"
+                          filterEvent="onkeyup" sortBy="#{'institutionType.type'}"
+                          sortOrder="#{dataTableStateHolder.sortOrders['institutionType.type']}">
+                    <ui:define name="header">#{messages['gazelle.users.InstitutionType']}</ui:define>
+
+                    #{institutionUsed.institutionType.type}
+                </g:column>
+                <g:column
+                        sortBy="#{gazelleDAO.getNumberOfSystemsForAnInstitutionForCurrentSession(institutionUsed)}">
+                    <ui:define name="header"># #{messages['gazelle.systems.SystemPlural']}</ui:define>
+                    #{gazelleDAO.getNumberOfSystemsForAnInstitutionForCurrentSession(institutionUsed)}
+                </g:column>
+                <g:column sortBy="#{'lastChanged'}"
+                          sortOrder="#{dataTableStateHolder.sortOrders['lastChanged']}">
+                    <ui:define name="header">#{messages['gazelle.users.LastModified']}</ui:define>
+                    <g:date tooltip="true" value="#{institutionUsed.lastChanged}"/>
+                </g:column>
+                <g:column sortBy="#{'lastModifierId'}"
+                          sortOrder="#{dataTableStateHolder.sortOrders['lastModifierId']}">
+                    <ui:define name="header">#{messages['gazelle.users.LastModifier']}</ui:define>
+                    #{institutionUsed.lastModifierId}
+                </g:column>
+                <g:column width="100px">
+                    <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+                    <div class="gzl-never-wrap">
+                        <h:panelGroup rendered="#{s:hasRole('admin_role') || s:hasRole('accounting_role')  }">
+                            <a4j:commandLink id="viewButtonSupport" title="#{messages['gazelle.common.button.View']}"
+                                             action="#{institutionManagerTM.viewInstitutionForTM(institutionUsed)}"
+                                             onRowMouseOver="this.style.cursor='pointer'"
+                                             immediate="true">
+                                <span class="gzl-icon-search"/>
+                            </a4j:commandLink>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{s:hasRole('admin_role')}">
+
+                            <a4j:commandLink id="editButtonSupport" title="#{messages['gazelle.common.button.Edit']}"
+                                             action="#{institutionManagerTM.updateInstitutionForTM(institutionUsed.id)}"
+                                             onRowMouseOver="this.style.cursor='pointer'"
+                                             immediate="true">
+                                <span class="gzl-icon-pencil"/>
+                            </a4j:commandLink>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{s:hasRole('admin_role')   }">
+
+                            <a4j:commandLink id="deleteButtonSupport"
+                                             title="#{messages['gazelle.common.button.Delete']}"
+                                             actionListener="#{institutionManagerTM.setSelectedInstitution( institutionUsed ) }"
+                                             oncomplete="jq162('#DeleteConfirmationModalPanel').modal('show');"
+                                             onRowMouseOver="this.style.cursor='pointer'"
+                                             render="DeleteConfirmationModalPanel,DeleteConfirmationDiv"
+                                             execute="@this">
+                                <span class="gzl-icon-trash-o"/>
+                            </a4j:commandLink>
+                        </h:panelGroup>
+                    </div>
+                </g:column>
+                <f:facet name="footer">
+                    <ui:include src="/util/datatableFooter.xhtml">
+                        <ui:param name="dataScrollerId" value="ds"/>
+                        <ui:param name="dataTableId" value="institutionTable"/>
+                    </ui:include>
+                </f:facet>
+            </rich:dataTable>
+
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteConfirmationModalPanel"/>
+                <ui:define name="popup_title">#{messages['gazelle.users.institution.confirmation.delete.label']}</ui:define>
+                <s:div id="DeleteConfirmationDiv">
+                    <p>#{messages['gazelle.users.institution.confirmation.delete.label']}
+                        #{institutionManagerTM.selectedInstitution.name} ?</p>
+                </s:div>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="deleteConfirmationButton"
+                                       value="#{messages['gazelle.common.button.Delete']}"
+                                       styleClass="gzl-btn-red"
+                                       actionListener="#{institutionManagerTM.deleteInstitution()}"
+                                       onclick="jq162('#DeleteConfirmationModalPanel').modal('hide');"
+                                       render="selectInstitutionForm" execute="@this"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,57 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['net.ihe.gazelle.tm.EditTestRolesOf']} #{editedTest.name}"/>
+    <ui:define name="body">
+        <h:form>
+            <a4j:commandButton styleClass="gzl-btn" immediate="true"
+                               value="#{messages['net.ihe.gazelle.tm.BackToTest']}"
+                               action="#{editTestDefinitionManager.backTo(editedTest.id)}" execute="@this"/>
+        </h:form>
+        <rich:collapsiblePanel switchType="client" rendered="#{editedTest.testDescription.size()&gt;0}"
+                               label="#{messages['gazelle.tm.test.TestDescription']} #{messages['net.ihe.gazelle.tm.In']} #{editedTest.getContextualDescription().gazelleLanguage.keyword}">
+            <g:safehtml value="#{editedTest.getContextualDescription().description}"/>
+        </rich:collapsiblePanel>
+        <h:panelGroup
+                rendered="#{editedTest.id != null and s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}">
+            <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                <ui:param name="panel_id" value="displayRoles"/>
+                <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.EditTestAssertions']}</ui:define>
+                <rich:dataTable rows="20" id="idScheme" var="assertion"
+                                rendered="#{testLinkManager.isTestSelected() and testLinkManager.isIdSchemeSelected()}"
+                                value="#{testLinkManager.getAssertionsFromTestSteps()}"
+
+
+                                render="ds">
+                    <g:column>
+                        <a4j:commandButton styleClass="gzl-btn-green"
+                                           rendered="#{not testLinkManager.isSelectedTestLinkedTo(assertion.id) }"
+                                           actionListener="#{testLinkManager.linkSelectedTestTo(assertion.id)}"
+                                           immdediate="true" value="#{messages['gazelle.tm.LinkTo']}" render="action"/>
+                        <a4j:commandButton styleClass="gzl-btn-red"
+                                           rendered="#{testLinkManager.isSelectedTestLinkedTo(assertion.id)}"
+                                           actionListener="#{testLinkManager.unlinkSelectedTestFrom(assertion.id)}"
+                                           immdediate="true" value="#{messages['net.ihe.gazelle.tm.Unlink']}"
+                                           render="action"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['net.ihe.gazelle.tm.AssertionsId']}</ui:define>
+                        <h:outputText value="#{assertion.assertionId}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['net.ihe.gazelle.tm.Assertions']}</ui:define>
+                        <h:outputText value="#{assertion.predicate.content}"/>
+                    </g:column>
+                    <f:facet name="footer">
+                        <ui:include src="/util/datatableFooter.xhtml">
+                            <ui:param name="dataScrollerId" value="ds"/>
+                            <ui:param name="dataTableId" value="idScheme"/>
+                        </ui:include>
+                    </f:facet>
+                </rich:dataTable>
+            </ui:decorate>
+        </h:panelGroup>
+    </ui:define>
+</ui:composition>

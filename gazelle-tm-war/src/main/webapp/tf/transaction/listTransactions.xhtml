@@ -1,0 +1,170 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tf.menu.TransactionsManagement']}"/>
+    <ui:define name="body">
+        <h:form styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <s:div id="searchDiv">
+                <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                    <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                        <ui:define name="label">#{messages['net.ihe.gazelle.modules.SearchBy']}</ui:define>
+                        <ui:param name="id" value="searchInput"/>
+                        <h:selectOneMenu value="#{transactionManager.selectedSearch}"
+                                         id="searchInput" styleClass="form-control">
+                            <s:selectItems value="#{transactionManager.possibleSearchValues}"
+                                           var="selectedStatus"
+                                           label="#{selectedStatus}"/>
+                            <a4j:ajax event="change" render="transactionList,searchDiv"
+                                      listener="#{transactionManager.resetFilter()}"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                    <s:div rendered="#{transactionManager.selectedSearch.equals('Domains/Integration Profiles')}">
+                        <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                            <ui:param name="id" value="domainInput"/>
+                            <ui:define name="label">#{messages['gazelle.tf.Domain']}</ui:define>
+                            <h:selectOneMenu id="domainInput" styleClass="form-control gzl-form-control"
+                                             value="#{transactionManager.selectedDomain}">
+                                <s:selectItems value="#{transactionManager.possibleDomains}"
+                                               var="selectedStatus"
+                                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                               label="#{selectedStatus.keyword}"/>
+                                <a4j:ajax event="change" render="transactionList,searchDiv" execute="@this"
+                                          listener="#{transactionManager.setSelectedIntegrationProfile(null)}"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                        <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                            <ui:param name="id" value="integrationProfileInput"/>
+                            <ui:define name="label">#{messages['gazelle.tf.IntegrationProfile']}</ui:define>
+                            <h:selectOneMenu id="integrationProfileInput" styleClass="form-control gzl-form-control"
+                                             value="#{transactionManager.selectedIntegrationProfile}">
+                                <s:selectItems value="#{transactionManager.possibleIntegrationProfiles}"
+                                               var="selectedStatus"
+                                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                               label="#{selectedStatus.keyword}"/>
+                                <a4j:ajax event="change" render="transactionList,searchDiv" execute="@this"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </s:div>
+                    <s:div rendered="#{transactionManager.selectedSearch.equals('Actors')}">
+                        <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                            <ui:define name="label">#{messages['net.ihe.gazelle.modules.ActorFROM']}</ui:define>
+                            <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                             value="#{transactionManager.selectedActorFrom}">
+                                <s:selectItems value="#{transactionManager.possibleActorFroms}"
+                                               var="selectedStatus"
+                                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                               label="#{selectedStatus.keyword}"/>
+                                <a4j:ajax event="change" render="transactionList,searchDiv" execute="@this"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                        <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                            <ui:define name="label">#{messages['net.ihe.gazelle.modules.ActorTO']}</ui:define>
+                            <h:selectOneMenu styleClass="form-control gzl-form-control" id="StatusListBox"
+                                             value="#{transactionManager.selectedActorTo}">
+                                <s:selectItems value="#{transactionManager.possibleActorTos}"
+                                               var="selectedStatus"
+                                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                               label="#{selectedStatus.keyword}"/>
+                                <a4j:ajax event="change" render="transactionList,searchDiv" execute="@this"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </s:div>
+
+                    <ui:define name="filter_buttons">
+                        <a4j:commandLink actionListener="#{transactionManager.resetFilter()}"
+                                         title="#{messages['gazelle.users.reset']}" type="submit"
+                                         execute="@this" render="transactionList,searchDiv">
+                            <span class="fa fa-times-circle"/>
+                        </a4j:commandLink>
+                    </ui:define>
+                </ui:decorate>
+            </s:div>
+        </h:form>
+        <h:form id="transactionSearchResultsForm">
+            <s:token allowMultiplePosts="true"/>
+            <h:commandButton styleClass="gzl-btn-green"
+                             value="#{messages['gazelle.tf.transaction.button.AddNewTransaction']}"
+                             action="#{transactionManager.addNewTransactionButton()}"
+                             rendered="#{s:hasPermission('MasterModel', 'edit', null)}"/>
+        </h:form>
+        <div id="transactionManager">
+            <h:form id="transactionManagerForm">
+                <s:token allowMultiplePosts="true"/>
+                <a4j:queue requestDelay="300" ignoreDupResponses="true"/>
+                <rich:dataTable id="transactionList" var="tran" value="#{transactionManager.transactions}"
+                                rows="#{userManagerExtra.selectedUserPreferences.numberOfResultsPerPage}"
+                                render="ds">
+                    <g:column sortBy="#{'id'}" sortOrder="ascending" width="40">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                        #{tran.id}
+                    </g:column>
+                    <g:column filterBy="#{'keyword'}" sortBy="#{'keyword'}" sortOrder="ascending" width="75"
+                              filterEvent="onkeyup">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Keyword']}</ui:define>
+                        #{tran.keyword}
+                    </g:column>
+                    <g:column filterBy="#{'name'}" sortBy="#{'name'}" sortOrder="ascending" filterEvent="onkeyup">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Name']}</ui:define>
+                        #{tran.name}
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.tf.table.Description']}</ui:define>
+                        <h:panelGroup rendered="#{tran.description != null  and !(empty tran.description)}">
+                            <pre style="word-wrap: break-word;word-break:break-all;white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -o-pre-wrap;">
+                                <g:safehtml value="#{tran.description}"/>
+                            </pre>
+                        </h:panelGroup>
+                    </g:column>
+                    <g:column sortBy="#{'transactionStatusType.name'}">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Status']}</ui:define>
+                        #{tran.transactionStatusType.name}
+                    </g:column>
+                    <g:column sortBy="#{'documentSection'}">
+                        <ui:define name="header">#{messages['net.ihe.gazelle.tm.Specification']}</ui:define>
+                        <ui:include src="/tf/transaction/_documentSectionForTransaction_columnAction.xhtml">
+                            <ui:param name="ipParam" value="#{tran}"/>
+                            <ui:param name="controllerParam" value="#{transactionManager}"/>
+                            <ui:param name="formParam" value="transactionManagerForm"/>
+                            <ui:param name="callerPageParam" value="transactionList"/>
+                        </ui:include>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.tf.table.Action']}</ui:define>
+                        <div class="gzl-never-wrap">
+                            <a4j:commandLink action="#{transactionManager.editTransaction(tran, false)}"
+                                             title="#{messages['gazelle.common.button.View']}">
+                                <span class="gzl-icon-search"/>
+                            </a4j:commandLink>
+
+                            <a4j:commandLink action="#{transactionManager.editTransaction(tran, true)}"
+                                             rendered="#{s:hasPermission('MasterModel', 'edit', null)}"
+                                             title="#{messages['gazelle.common.button.Edit']}">
+                                <span class="gzl-icon-pencil"/>
+                            </a4j:commandLink>
+
+                            <a4j:commandLink
+                                    rendered="#{s:hasPermission('MasterModel', 'edit', null)}"
+                                    title="#{messages['gazelle.common.button.Delete']}"
+                                    action="#{transactionManager.showTransactionDeleteSideEffects(tran)}">
+                                <span class="gzl-icon-trash-o"/>
+                            </a4j:commandLink>
+                        </div>
+                    </g:column>
+                    <!-- use util datatable footer, move page argument into util -->
+                    <f:facet name="footer">
+                        <ui:include src="/util/datatableFooter.xhtml">
+                            <ui:param name="dataScrollerId" value="ds"/>
+                            <ui:param name="dataTableId" value="transactionList"/>
+                        </ui:include>
+                    </f:facet>
+                </rich:dataTable>
+                <h:commandLink value="#{messages['gazelle.common.export.ExportAsExcel']}"
+                               action="#{gazelleExcelExporterJboss7.export('transactionManagerForm:transactionList')}"/>
+            </h:form>
+        </div>
+
+    </ui:define>
+</ui:composition>

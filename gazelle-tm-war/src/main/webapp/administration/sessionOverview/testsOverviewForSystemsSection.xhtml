@@ -1,0 +1,170 @@
+<s:div xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+       xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+       xmlns:f="http://java.sun.com/jsf/core"
+       xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <h:form id="systemsInSessionForm" styleClass="form-horizontal">
+        <s:token allowMultiplePosts="true"/>
+        <a4j:queue requestDelay="300" ignoreDupResponses="true"/>
+        <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+            <ui:param name="id" value="SessionTypeListBox"/>
+            <ui:define name="label">#{messages['gazelle.financial.invoice.InstitutionKeyword']}</ui:define>
+            <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text" id="SessionTypeListBox"
+                             value="#{testInstancesOverviewManager.selectedInstitution}">
+                <s:selectItems value="#{testingSessionManager.getInstitutionsForSession()}" var="companyFromList"
+                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                               label="#{companyFromList.keyword}"/>
+                <a4j:ajax event="change" render=" :systemsInSessionForm, :systemsInSessionForm2" execute="@this"/>
+            </h:selectOneMenu>
+            <a4j:commandLink event="click" execute="@this"
+                             render=" :systemsInSessionForm, :systemsInSessionForm2"
+                             actionListener="#{testInstancesOverviewManager.setSelectedInstitution(null)}">
+                <span class="gzl-icon-times"/>
+            </a4j:commandLink>
+        </s:decorate>
+        <h:outputText
+                value="#{testingSessionManager.getInstitutionsForSession().size()} #{messages['gazelle.users.Institutionss']})"/>
+    </h:form>
+    <h:form id="systemsInSessionForm2">
+        <s:div id="systemsDiv">
+            <a4j:queue requestDelay="300" ignoreDupResponses="true"/>
+            <rich:dataTable id="systemsDatatable" var="sis"
+                            value="#{testInstancesOverviewManager.listSystemInSessionsForCompany()}"
+                            rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <g:column>
+                            <h:outputText/>
+                        </g:column>
+                        <g:column>
+                            <h:outputText value="#{messages['gazelle.tests.tests']}"/>
+                        </g:column>
+                    </rich:columnGroup>
+                    <rich:columnGroup>
+                        <g:column rowspan="2" colspan="4">
+                            <h:outputText
+                                    value="#{testInstancesOverviewManager.countSystemInSession()} #{messages['gazelle.systems.SystemPlural']}"/>
+                        </g:column>
+                        <g:column colspan="7">
+                            <h:outputText value="#{messages['gazelle.tests.tests']}"/>
+                        </g:column>
+                        <g:column rowspan="2">
+                            <h:outputText value="#{messages['gazelle.common.Action']}"/>
+                        </g:column>
+                        <g:column breakRowBefore="true">
+                            <h:outputText value="#{messages['gazelle.tm.testing.status.running']}"/>
+                        </g:column>
+                        <g:column>
+                            <h:outputText value="#{messages['gazelle.tm.testing.status.paused']}"/>
+                        </g:column>
+                        <g:column>
+                            <h:outputText value="#{messages['gazelle.tm.testing.status.completed']}"/>
+                        </g:column>
+                        <g:column>
+                            <h:outputText value="#{messages['gazelle.tm.testing.status.partiallyVerified']}"/>
+                        </g:column>
+                        <g:column>
+                            <h:outputText value="#{messages['gazelle.tm.testing.status.failed']}"/>
+                        </g:column>
+                        <g:column>
+                            <h:outputText value="#{messages['gazelle.tm.testing.status.critical']}"/>
+                        </g:column>
+                        <g:column>
+                            <h:outputText value="#{messages['gazelle.tm.testing.status.verified']}"/>
+                        </g:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <g:column>
+                    <ui:define name="header">#{messages['gazelle.financial.invoice.InstitutionKeyword']}
+                    </ui:define>
+                    <h:outputText id="companyDetails"
+                                  value="#{systemManager.displayInstitutionForSystem(sis.system)} "/>
+                </g:column>
+                <g:column sortBy="#{'system.keyword'}" filterBy="#{'system.keyword'}" filterEvent="onkeyup"
+                          sortOrder="ascending">
+                    <ui:define name="header">#{messages['gazelle.testmanagement.object.keyword']}</ui:define>
+                    <g:link target="_blank" value="#{sis}"/>
+                </g:column>
+                <g:column sortBy="#{'system.name'}" filterBy="#{'system.name'}" filterEvent="onkeyup"
+                          sortOrder="ascending">
+                    <ui:define name="header">#{messages['gazelle.testmanagement.object.Name']}</ui:define>
+                    <h:outputText id="sisNameOut" value="#{sis.system.name}" rendered="#{not empty sis.system}"/>
+                </g:column>
+                <g:column sortBy="#{'systemInSessionStatus.keyword'}" filterBy="#{'systemInSessionStatus.keyword'}"
+                          filterEvent="onkeyup" sortOrder="ascending">
+                    <ui:define name="header">#{messages['gazelle.tm.tests.testStatus']}</ui:define>
+                    <h:selectOneMenu styleClass="form-control gzl-form-control" id="systemInSessionStatusListBox"
+                                     style="text-align:center;"
+                                     value="#{sis.systemInSessionStatus}">
+                        <s:selectItems value="#{gazelleDAO.getListSystemInSessionStatus()}"
+                                       var="selectedSystemInSessionStatus"
+                                       noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                       label="#{selectedSystemInSessionStatus.keyword}"/>
+                        <a4j:ajax event="change" execute="@this"
+                                  listener="#{connecthatonTestingManager.updateSystemInSessionStatus(sis)}"/>
+                    </h:selectOneMenu>
+                </g:column>
+                <g:column sortBy="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(sis,'STARTED')}"
+                          sortOrder="ascending">
+                    <h:outputText style="text-align:center;"
+                                  value="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(sis,'STARTED')}"/>
+                </g:column>
+                <g:column sortBy="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(sis,'PAUSED')}"
+                          sortOrder="ascending">
+                    <h:outputText style="text-align:center;"
+                                  value="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(sis,'PAUSED')}"/>
+                </g:column>
+                <g:column sortBy="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(sis,'COMPLETED')}"
+                          sortOrder="ascending">
+                    <h:outputText style="text-align:center;"
+                                  value="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(sis,'COMPLETED')}"/>
+                </g:column>
+                <g:column
+                        sortBy="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(sis,'PARTIALLY_VERIFIED')}"
+                        sortOrder="ascending">
+                    <h:outputText style="text-align:center;"
+                                  value="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(sis,'PARTIALLY_VERIFIED')}"/>
+                </g:column>
+                <g:column sortBy="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(sis,'FAILED')}"
+                          sortOrder="ascending">
+                    <h:outputText style="text-align:center; "
+                                  rendered="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(sis,'FAILED') == 0}"
+                                  value="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(sis,'FAILED')}"/>
+                    <h:outputText style="text-align:center;color:red;font-weight:bold;"
+                                  rendered="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(sis,'FAILED') &gt; 0}"
+                                  value="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(sis,'FAILED')}"/>
+                </g:column>
+                <g:column sortBy="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(sis,'CRITICAL')}"
+                          sortOrder="ascending">
+                    <h:outputText style="text-align:center; "
+                                  rendered="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(sis,'CRITICAL') == 0}"
+                                  value="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(sis,'CRITICAL')}"/>
+                    <h:outputText style="text-align:center;color:red;font-weight:bold;"
+                                  rendered="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(sis,'CRITICAL') &gt; 0}"
+                                  value="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(sis,'CRITICAL')}"/>
+                </g:column>
+                <g:column sortBy="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(sis,'VERIFIED')}"
+                          sortOrder="ascending">
+                    <h:outputText style="text-align:center; color:red;font-weight:bold;"
+                                  rendered="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(sis,'VERIFIED') == 0}"
+                                  value="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(sis,'VERIFIED')}"/>
+                    <h:outputText style="text-align:center;"
+                                  rendered="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(sis,'VERIFIED') &gt; 0}"
+                                  value="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(sis,'VERIFIED')}"/>
+                </g:column>
+                <g:column>
+                    <a4j:commandLink id="commandLinkForSystemSelection" style="text-align:center;"
+                                     value="#{messages['gazelle.common.button.View']}"
+                                     action="#{connecthatonTestingManager.viewSystemInMainConnectathonPage(sis)}"
+                                     execute="@this"/>
+                </g:column>
+                <f:facet name="footer">
+                    <ui:include src="/util/datatableFooter.xhtml">
+                        <ui:param name="dataScrollerId" value="ds"/>
+                        <ui:param name="dataTableId" value="systemsDatatable"/>
+                    </ui:include>
+                </f:facet>
+            </rich:dataTable>
+        </s:div>
+    </h:form>
+</s:div>

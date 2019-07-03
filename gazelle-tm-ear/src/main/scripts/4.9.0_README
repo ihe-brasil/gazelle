@@ -1,0 +1,6 @@
+4.9.0 release introduces two new tables (+ 2 audit tables):
+tf_standard and tf_transaction_standard
+
+it can appear that the audit tables are not automatically created at deployment time, in this case ONLY run the two scripts:
+4.9.0_create_tf_standard_aud.sql
+7.9.0_create_tf_transaction_standard_aud.sql

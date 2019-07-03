@@ -1,0 +1,117 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tm.SimulatorsManagement']}"/>
+    <ui:define name="body">
+        <h:form id="globalForm">
+            <s:token allowMultiplePosts="true"/>
+
+            #{simulatorInSessionManager.setSelectedSimulatorInSession(null)}
+
+            <s:div id="globalDiv">
+                <h:outputText value="#{messages['gazelle.tm.ListOfAllSimulators']}"/>
+                <br/><br/>
+                <rich:dataTable id="testTable" cellspacing="0" rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                                width="700" border="0" var="selectedSimulatorInSession"
+                                value="#{simulatorInSessionManager.getAvailableSimulatorInSession()}"
+
+
+                                render="ds">
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.users.institution.InstitutionName']}</ui:define>
+                        <h:commandLink id="companyDetailsLink"
+                                       action="#{institutionManagerTM.viewInstitutionDetailsFromDatatable (simulatorInSessionManager.displayInstitutionForSystem(selectedSimulatorInSession.system))}"
+                                       value="#{simulatorInSessionManager.displayInstitutionForSystem(selectedSimulatorInSession.system)} "/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">
+                            #{messages['gazelle.tm.SimulatorKeyword']}
+                        </ui:define>
+                        <h:outputText value="#{selectedSimulatorInSession.system.keyword}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.systems.system.SystemName']}
+                            (#{messages['gazelle.systems.system.SystemVersion']})
+                        </ui:define>
+                        #{selectedSimulatorInSession.system.name}
+                        <h:outputText value=" (#{selectedSimulatorInSession.system.version})"
+                                      rendered="#{selectedSimulatorInSession.system.version!=null and  selectedSimulatorInSession.system.version.length()&gt;0}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.systems.system.SystemOwner']}
+                        </ui:define>
+                        <h:outputText value="#{selectedSimulatorInSession.system.ownerUser.username}"/>
+                    </g:column>
+                    <g:column sortBy="#{'lastChanged'}"
+                              sortOrder="ascending" style="text-align:center">
+                        <ui:define name="header">#{messages['gazelle.common.LastChanged']}
+                        </ui:define>
+                        <g:date tooltip="true" value="#{selectedSimulatorInSession.lastChanged}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.tm.testing.URL']}"/>
+                        </ui:define>
+                        <h:outputLink
+                                value="#{simulatorInSessionManager.getUrlOfSimuInSession(selectedSimulatorInSession)}">
+                            #{simulatorInSessionManager.getUrlOfSimuInSession(selectedSimulatorInSession)}
+                        </h:outputLink>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+                        <div class="gzl-never-wrap">
+                            <a4j:commandLink id="simulatorEditSupport"
+                                             action="#{simulatorInSessionManager.editSimulatorInSession(selectedSimulatorInSession)}"
+                                             onRowMouseOver="this.style.cursor='pointer'"
+                                             title="#{messages['gazelle.common.button.Edit']}"
+                                             render="globalDiv">
+                                <span class="gzl-icon-pencil"/>
+                            </a4j:commandLink>
+
+                            <a4j:commandLink id="simulatorDeleteSupport"
+                                             title="#{messages['gazelle.common.button.Delete']}"
+                                             actionListener="#{simulatorInSessionManager.setSelectedSimulatorInSession(selectedSimulatorInSession)}"
+                                             oncomplete="jq162('#SimulatorDeleteConfirmationModalPanel').modal('show');"
+                                             onRowMouseOver="this.style.cursor='pointer'"
+                                             render="globalDiv,SimulatorDeleteConfirmationModalPanel, SimulatorDeleteConfirmationDiv">
+                                <span class="gzl-icon-trash-o"/>
+                            </a4j:commandLink>
+
+                        </div>
+                    </g:column>
+                    <f:facet name="footer">
+                        <ui:include src="/util/datatableFooter.xhtml">
+                            <ui:param name="dataScrollerId" value="ds"/>
+                            <ui:param name="dataTableId" value="testTable"/>
+                        </ui:include>
+                    </f:facet>
+                </rich:dataTable>
+                <div align="right">
+                    <h:commandButton id="addneewsim" value="#{messages['gazelle.tm.AddNewSimulator']}"
+                                     action="#{simulatorInSessionManager.createNewSimulatorInSession()}"
+                                     styleClass="gzl-btn-green" execute="@this"/>
+                </div>
+            </s:div>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="SimulatorDeleteConfirmationModalPanel"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.DeleteSimulator']} #{simulatorInSessionManager.selectedSimulatorInSession.system.keyword}</ui:define>
+                <s:div id="SimulatorDeleteConfirmationDiv">
+                    <p>#{messages['gazelle.tm.DeleteSimulator']} #{simulatorInSessionManager.selectedSimulatorInSession.system.keyword}</p>
+                </s:div>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="SimulatorDeleteConfirmationPanelButton"
+                                       value="#{messages['gazelle.common.button.Delete']}"
+                                       styleClass="gzl-btn-red"
+                                       actionListener="#{simulatorInSessionManager.deleteSelectedSimulatorInSession()}"
+                                       onclick="jq162('#SimulatorDeleteConfirmationModalPanel').modal('hide');"
+                                       render="globalDiv"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,87 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml">
+    <s:div rendered="#{tfHl7MessageProfileManager.displayProfile}">
+        <ui:decorate template="/layout/panels/_panel_title_footer_id.xhtml">
+            <ui:param name="panel_id" value="editProfilePanel"/>
+            <ui:define name="panel_title">#{tfHl7MessageProfileManager.selectedProfile.profileOid}</ui:define>
+            <a4j:region>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.table.profileOid']}</ui:define>
+                    <h:outputText value="#{tfHl7MessageProfileManager.selectedProfile.profileOid}"/>
+                </s:decorate>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.Domain']}</ui:define>
+                    <h:outputText value="#{tfHl7MessageProfileManager.selectedProfile.domain.name}"/>
+                </s:decorate>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.Actor']}</ui:define>
+                    <h:outputText
+                            value="#{tfHl7MessageProfileManager.selectedProfile.actor.name} (#{tfHl7MessageProfileManager.selectedProfile.actor.keyword})"/>
+                </s:decorate>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.table.Transaction']}</ui:define>
+                    <h:outputText value="#{tfHl7MessageProfileManager.selectedProfile.transaction.keyword}"/>
+                </s:decorate>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.Hl7Version']}</ui:define>
+                    <h:outputText value="#{tfHl7MessageProfileManager.selectedProfile.hl7Version}"/>
+                </s:decorate>
+                <s:decorate template="/layout/form/_edit.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.Message']}</ui:define>
+                    <ui:param name="id" value="typeInput"/>
+                    <h:inputText styleClass="form-control" id="typeInput"
+                                 value="#{tfHl7MessageProfileManager.selectedProfile.messageType}"/>
+                </s:decorate>
+                <s:decorate template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.table.messageOrderControlCode']}</ui:define>
+                    <h:inputText styleClass=" form-control"
+                                 value="#{tfHl7MessageProfileManager.selectedProfile.messageOrderControlCode}"/>
+                </s:decorate>
+                <s:div id="affinityDomainDiv">
+                    <s:decorate id="affinityDomainDecorate" template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['gazelle.tf.AffinityDomains']}</ui:define>
+                        <rich:list value="#{tfHl7MessageProfileManager.selectedProfile.affinityDomains}"
+                                   rendered="#{tfHl7MessageProfileManager.selectedProfile.affinityDomains != null}"
+                                   var="ad" type="unordered">
+                            <div class="row">
+                                <h:outputText value="#{ad.labelToDisplay}"/>
+                                <a4j:commandLink event="click" for="deleteADImage" render="affinityDomainDiv"
+                                                 actionListener="#{tfHl7MessageProfileManager.removeAffinityDomain(ad)}">
+                                    <s:span styleClass="gzl-icon-trash-o"/>
+                                </a4j:commandLink>
+
+                            </div>
+                        </rich:list>
+                    </s:decorate>
+                    <s:div id="affinityDomainChoiceDiv">
+                        <a4j:commandButton value="#{messages['gazelle.tf.AddAnAffinityDomain']}" styleClass="gzl-btn-blue"
+                                           actionListener="#{tfHl7MessageProfileManager.setDisplayAffinityDomainList(true)}"
+                                           rendered="#{tfHl7MessageProfileManager.displayAffinityDomainList == false}"
+                                           render="affinityDomainChoiceDiv"/>
+                        <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                         value="#{tfHl7MessageProfileManager.newAffinityDomain}"
+                                         rendered="#{tfHl7MessageProfileManager.displayAffinityDomainList}">
+                            <f:selectItems value="#{tfHl7MessageProfileManager.getAffinityDomainList()}"
+                                           noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"/>
+                            <a4j:ajax event="change" render="affinityDomainDiv"
+                                      listener="#{tfHl7MessageProfileManager.addAffinityDomain()}"/>
+                        </h:selectOneMenu>
+                    </s:div>
+                </s:div>
+            </a4j:region>
+            <ui:define name="panel_footer">
+                <a4j:commandButton value="#{messages['gazelle.common.button.Save']}"
+                                   actionListener="#{tfHl7MessageProfileManager.saveSelectedProfile()}"
+                                   styleClass="gzl-btn-green" render="globalForm,editProfilePanel"/>
+
+                <a4j:commandButton value="#{messages['gazelle.common.button.Cancel']}"
+                                   actionListener="#{tfHl7MessageProfileManager.cancelDisplay()}"
+                                   styleClass="gzl-btn"
+                                   render="globalForm,editProfilePanel"/>
+            </ui:define>
+        </ui:decorate>
+    </s:div>
+</ui:composition>

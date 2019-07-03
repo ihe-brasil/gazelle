@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource-config>
+	<resource class="net.ihe.gazelle.tm.skin.BodyGradient">
+		<name>net.ihe.gazelle.tm.skin.BodyGradient</name>
+	</resource>
+	<resource class="net.ihe.gazelle.tm.skin.MenuListBackground">
+		<name>net.ihe.gazelle.tm.skin.MenuListBackground</name>
+	</resource>
+</resource-config>

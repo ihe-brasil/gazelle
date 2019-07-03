@@ -1,0 +1,81 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core">
+
+    <div class="panel panel-default" style="min-height:#{min_height};">
+        <div class="panel-heading">
+            <h3 class="panel-title">#{messages['net.ihe.gazelle.tm.SaveSearchCriteria']}</h3>
+        </div>
+        <div class="panel-body">
+            <h:panelGroup>
+                <s:div>
+                    <p>
+                        <h:outputText
+                                value="#{messages['net.ihe.gazelle.tm.YouCanAddUpTo4FiltersPresetsForThisPage']}"
+                                rendered="#{!connectathonResult.containCookie() and !connectathonResult.shortcutsIsFull()}"/>
+                        <h:outputText value="#{messages['net.ihe.gazelle.tm.NameOfPreset']} "
+                                      rendered="#{connectathonResult.getPresetName() != null}"/>
+                        <h:outputText value="#{connectathonResult.getPresetName()}"
+                                      rendered="#{connectathonResult.getPresetName() != null}"
+                                      style="font-weight:bold"/>
+                    </p>
+                    <h:outputText
+                            value="#{messages['net.ihe.gazelle.tm.YouHaveAlready4PresetsYouMustDeleteOneBeforeCrea']}"
+                            rendered="#{connectathonResult.shortcutsIsFull()}"/>
+
+                    <h:panelGroup
+                            rendered="#{!connectathonResult.containCookie() and !connectathonResult.shortcutsIsFull()}">
+                        <s:decorate template="/layout/form/_form_field_horizontal_4-8.xhtml">
+                            <ui:param name="id" value="masterModeleditTests"/>
+                            <ui:define name="label">#{messages['net.ihe.gazelle.tm.NameOfPreset']}</ui:define>
+                            <h:inputText id="masterModeleditTests" styleClass=" form-control"
+                                         value="#{connectathonResult.shortcutName}" maxlength="15"/>
+                        </s:decorate>
+                    </h:panelGroup>
+
+                </s:div>
+                <s:div>
+                    <a4j:commandButton id="cbutton" styleClass="gzl-btn-green"
+                                       rendered="#{!connectathonResult.containCookie() and !connectathonResult.shortcutsIsFull()}"
+                                       action="#{connectathonResult.createCookie()}"
+                                       value="#{messages['gazelle.common.button.Save']}" type="submit"/>
+                </s:div>
+            </h:panelGroup>
+            <h:panelGroup>
+                <s:div>
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.CheckABoxToMakeItYourDefaultPage']}"/>
+                    <br/>
+                    <h:selectOneRadio id="objectTypeSelection" layout="spread"
+                                      value="#{connectathonResult.selectedPreset}"
+                                      valueChangeListener="#{connectathonResult.saveNewMainPage}">
+                        <f:selectItems value="#{connectathonResult.getListOfPresets()}"/>
+                        <a4j:ajax event="change" render="#{formId}"/>
+                    </h:selectOneRadio>
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.YouCanGoOnOneOfYourPresets']}"
+                                  rendered="#{connectathonResult.getPresetName() != null}"/>
+                    <rich:list id="listPresetId" value="#{connectathonResult.getAllPresets()}" var="pres"
+                               type="unordered">
+                        <h:outputLink value="#{pres.cookieUrl}">
+                            <h:outputText value="#{pres.cookieName}"/>
+                        </h:outputLink>
+
+                        <a4j:commandLink execute="@this"
+                                         action="#{connectathonResult.deleteSelectedCookie(pres.cookieFullName)}">
+                            <span class="gzl-icon-times-blue"/>
+                        </a4j:commandLink>
+
+                        <h:outputText value=" (#{messages['net.ihe.gazelle.tm.Current']})"
+                                      rendered="#{connectathonResult.getPresetName() != null and connectathonResult.getPresetName().equals(pres.cookieName)}"
+                                      style="font-weight:bold"/>
+                        <h:outputText value=" (#{messages['net.ihe.gazelle.tm.Default']})"
+                                      rendered="#{connectathonResult.getPresetName() != null and pres.encodedCookieUri.equals(connectathonResult.selectedPreset)}"
+                                      style="font-weight:bold"/>
+                    </rich:list>
+                </s:div>
+            </h:panelGroup>
+
+        </div>
+    </div>
+</ui:composition>

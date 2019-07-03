@@ -1,0 +1,29 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <s:decorate template="/layout/display/_display.xhtml">
+        <ui:define name="label">#{messages['gazelle.tm.testing.instance.statusOfTest']}</ui:define>
+        <h:outputText value="#{messages[currentTestInstanceParticipants.testInstance.lastStatus.labelToDisplay]}"
+                      rendered="#{currentTestInstanceParticipants.testInstance.lastStatus != null}"/>
+    </s:decorate>
+    <s:decorate template="/layout/display/_display.xhtml">
+        <ui:define name="label">#{messages['gazelle.tm.testing.instance.file']}</ui:define>
+        <a4j:repeat value="#{currentTestInstanceParticipants.testInstance.fileLogPathReturn}" var="file">
+            <h:outputLink
+                    value="#{applicationPreferenceManager.getApplicationUrl()}testInstanceData/preti/#{file.id}/#{mesaTestManager.getURLValue(file)}"
+                    target="_blank">
+                <h:outputText value="#{file.name}"/>
+
+                <span class="gzl-icon-search"/>
+            </h:outputLink>
+            <br/>
+        </a4j:repeat>
+    </s:decorate>
+    <s:decorate template="/layout/display/_display.xhtml">
+        <ui:define name="label">#{messages['gazelle.tm.testing.instance.comments']}</ui:define>
+    <pre style="white-space: pre-wrap; word-wrap: break-word;">
+      <g:safehtml value="#{currentTestInstanceParticipants.testInstance.descriptionXMLValid}"/>
+    </pre>
+    </s:decorate>
+</ui:composition>

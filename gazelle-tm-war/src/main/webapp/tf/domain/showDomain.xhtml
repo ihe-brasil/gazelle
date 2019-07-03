@@ -1,0 +1,109 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tf.domain.show.Title']}"/>
+    <ui:define name="body">
+        <h:form id="showDomainManagerBeanForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/panels/_panel_title_footer.xhtml">
+                <ui:define name="panel_title">#{messages['gazelle.tf.domain.show.SubTitle']}</ui:define>
+                <s:decorate id="id" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.table.Id']}</ui:define>
+                    #{domainManager.selectedDomain.id}
+                </s:decorate>
+                <s:decorate id="keyword" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.table.Keyword']}</ui:define>
+                    #{domainManager.selectedDomain.keyword}
+                </s:decorate>
+                <s:decorate id="name" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.table.Name']}</ui:define>
+                    #{domainManager.selectedDomain.name}
+                </s:decorate>
+                <s:decorate id="description" template="/layout/display/_display.xhtml">
+                    <ui:define name="label">#{messages['gazelle.tf.table.Description']}</ui:define>
+                    #{domainManager.selectedDomain.description}
+                </s:decorate>
+                <ui:define name="panel_footer">
+                    <h:commandButton styleClass="gzl-btn" id="cancel"
+                                     value="#{messages['gazelle.common.button.Cancel']}"
+                                     action="#{domainManager.listDomains()}" immediate="true"/>
+                    <h:commandButton value="#{messages['gazelle.common.button.Edit']}" styleClass="gzl-btn-blue"
+                                     action="#{domainManager.editDomain()}"
+                                     rendered="#{s:hasPermission('MasterModel', 'edit', null)}"/>
+
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <h:form id="editDomain">
+            <s:token allowMultiplePosts="true"/>
+            <div>
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active">
+                        <a href="#home" aria-controls="home" role="tab"
+                           data-toggle="tab">#{messages['net.ihe.gazelle.tm.Profiles']}</a>
+                    </li>
+                    <li role="presentation">
+                        <a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">#{messages['net.ihe.gazelle.tm.Documents']}
+                            (#{domainManager.selectedDomain.documents.size()})</a></li>
+                </ul>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="home">
+                        <rich:dataTable id="domainManager" var="profile"
+                                        value="#{domainManager.getIntegrationProfilesForDP()}">
+                            <g:column sortBy="#{'id'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                #{profile.id}
+                            </g:column>
+                            <g:column sortBy="#{'keyword'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Keyword']}</ui:define>
+                                #{profile.keyword}
+                            </g:column>
+                            <g:column sortBy="#{'name'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Name']}</ui:define>
+                                #{profile.name}
+                            </g:column>
+                            <g:column sortBy="#{'integrationProfileStatusType.name'}" sortOrder="ascending">
+                                <ui:define name="header">#{messages['gazelle.tf.table.Status']}</ui:define>
+                                #{profile.integrationProfileStatusType.name}
+                            </g:column>
+                            <g:column>
+                                <ui:define name="header">#{messages['gazelle.tf.table.Action']}</ui:define>
+
+                                <div class="gzl-never-wrap">
+                                    <a4j:commandLink
+                                            title="#{messages['gazelle.common.button.View']}"
+                                            action="#{integrationProfileManager.viewIntegrationProfile(profile)}"
+                                            onRowMouseOver="this.style.cursor='pointer'">
+                                        <span class="gzl-icon-search"/>
+                                    </a4j:commandLink>
+                                    <a4j:commandLink
+                                            action="#{integrationProfileManager.editIntegrationProfile(profile)}"
+                                            rendered="#{s:hasPermission('MasterModel', 'edit', null)}"
+                                            title="#{messages['gazelle.common.button.Edit']}"
+                                            onRowMouseOver="this.style.cursor='pointer'">
+                                        <span class="gzl-icon-pencil"/>
+                                    </a4j:commandLink>
+                                </div>
+
+                            </g:column>
+                        </rich:dataTable>
+                        <h:commandButton value="#{messages['gazelle.tf.domain.edit.Link']}"
+                                         styleClass="gzl-btn-green"
+                                         action="#{domainManager.linkDomainProfiles()}"
+                                         rendered="#{s:hasPermission('MasterModel', 'edit', null)}"/>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="profile">
+                        <ui:include src="/tf/documents/_documentsList.xhtml">
+                            <ui:param name="documentsToDisplay"
+                                      value="#{domainManager.getDocuments()}"/>
+                        </ui:include>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

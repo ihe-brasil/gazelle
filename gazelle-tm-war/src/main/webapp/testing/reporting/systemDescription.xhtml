@@ -1,0 +1,55 @@
+
+<!--@formatter:off-->
+
+<f:view xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://jboss.org/schema/seam/pdf" xmlns:g="http://www.ihe.net/gazelle">
+    <!-- params: listSystemInSession - the current system
+                   ts: the testing session -->
+    <p:table columns="3" widthPercentage="100" spacingBefore="10" spacingAfter="20" headerRows="1" footerRows="1">
+        <f:facet name="defaultCell">
+            <p:cell horizontalAlignment="center" verticalAlignment="middle"/>
+        </f:facet>
+        <p:cell colspan="3" backgroundColor="#EEEEEE">
+            <p:paragraph>
+                <g:pdffont size="8">#{messages['net.ihe.gazelle.tm.ThisTestingSessionWasHeldFrom']} <p:text value=" #{dateDisplay.displayDate(ts.beginningSession)}"/> #{messages['gazelle.tm.to']} <p:text value=" #{dateDisplay.displayDate(ts.endingSession)}"/></g:pdffont>
+            </p:paragraph>
+        </p:cell>
+        <!-- table title -->
+        <ui:include src="titleCell.xhtml">
+            <ui:param name="colspan" value="3"/>
+            <ui:param name="title" value="#{ts.description}"/>
+        </ui:include>
+        <!-- table header -->
+        <ui:include src="headerCell.xhtml">
+            <ui:param name="title" value="#{messages['gazelle.systems.is.pdf.SystemName']}"/>
+        </ui:include>
+        <ui:include src="headerCell.xhtml">
+            <ui:param name="title" value="#{messages['gazelle.systems.is.pdf.SystemVersion']}"/>
+        </ui:include>
+        <ui:include src="headerCell.xhtml">
+            <ui:param name="title" value="#{messages['gazelle.systems.system.OwnerUser']}"/>
+        </ui:include>
+        <!-- table content -->
+        <ui:repeat value="#{listSystemInSession}" var="sis">
+            <p:cell colspan="1">
+                <p:paragraph paddingBottom="10">
+                    <p:anchor reference="#{sis.system.keyword}">
+                        <g:pdffont size="8">#{sis.system.name}</g:pdffont>
+                    </p:anchor>
+                </p:paragraph>
+            </p:cell>
+            <p:cell colspan="1">
+                <p:paragraph paddingBottom="10">
+                    <g:pdffont size="8">#{sis.system.version}</g:pdffont>
+                </p:paragraph>
+            </p:cell>
+            <p:cell colspan="1">
+                <p:paragraph paddingBottom="10">
+                    <g:pdffont size="8">#{sis.system.ownerUser.firstname} #{sis.system.ownerUser.lastname}</g:pdffont>
+                </p:paragraph>
+            </p:cell>
+        </ui:repeat>
+    </p:table>
+</f:view>
+
+        <!--@formatter:on-->

@@ -1,0 +1,191 @@
+<s:div xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:h="http://java.sun.com/jsf/html"
+       xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+       xmlns:f="http://java.sun.com/jsf/core"
+       xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <h:panelGroup rendered="#{userPreferencesManager.editUser}">
+        <h:form id="g" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <ui:decorate template="/layout/panels/_panel.xhtml">
+                                <s:decorate id="u"
+                                            template="/layout/form/_form_field_horizontal_4-8.xhtml">
+                                    <ui:define name="label">#{messages['gazelle.users.user.UserUsername']}</ui:define>
+                                    <p class="form-control-static">
+                                        <h:outputText id="userUsernameEdit"
+                                                      value="#{userPreferencesManager.selectedUser.username}"/>
+                                    </p>
+                                </s:decorate>
+                                <s:decorate id="fn"
+                                            template="/layout/form/_form_field_horizontal_4-8.xhtml">
+                                    <ui:param name="id" value="firstNameEdit"/>
+                                    <ui:define name="label">#{messages['gazelle.users.registration.FirstName']}
+                                    </ui:define>
+                                    <h:inputText styleClass=" form-control" id="firstNameEdit"
+                                                 value="#{userPreferencesManager.selectedUser.firstname}"/>
+                                </s:decorate>
+                                <s:decorate id="ln"
+                                            template="/layout/form/_form_field_horizontal_4-8.xhtml">
+                                    <ui:param name="id" value="lastNameEdit"/>
+                                    <ui:define name="label">#{messages['gazelle.users.registration.LastName']}
+                                    </ui:define>
+                                    <h:inputText styleClass=" form-control" id="lastNameEdit"
+                                                 value="#{userPreferencesManager.selectedUser.lastname}"/>
+                                </s:decorate>
+                                <s:decorate id="e"
+                                            template="/layout/form/_form_field_horizontal_4-8.xhtml">
+                                    <ui:param name="id" value="emailEdit"/>
+                                    <ui:define name="label">#{messages['gazelle.users.registration.Email']}</ui:define>
+                                    <h:inputText styleClass=" form-control" id="emailEdit"
+                                                 value="#{userPreferencesManager.selectedUser.email}"/>
+                                </s:decorate>
+                                <s:decorate id="i"
+                                            template="/layout/form/_form_field_horizontal_4-8.xhtml">
+                                    <ui:param name="id" value="institutionEdit"/>
+                                    <ui:define name="label">#{messages['gazelle.users.user.UserInstitution']}
+                                    </ui:define>
+                                    <p class="form-control-static">
+                                        <h:outputText id="institutionEdit"
+                                                      value="#{userPreferencesManager.selectedUser.institution.name}"/>
+                                    </p>
+                                </s:decorate>
+                                <s:decorate id="s"
+                                            template="/layout/form/_form_field_horizontal_4-8.xhtml">
+                                    <ui:param name="id" value="skypeAccount"/>
+                                    <ui:define name="label">#{messages['gazelle.tm.users.SkypeAccount']}</ui:define>
+                                    <h:inputText styleClass=" form-control" id="skypeAccount"
+                                                 value="#{userPreferencesManager.userPreferences.skype}"/>
+                                </s:decorate>
+                                <s:decorate id="t"
+                                            template="/layout/form/_form_field_horizontal_4-8.xhtml">
+                                    <ui:param name="id" value="tableLabel"/>
+                                    <ui:define name="label">#{messages['gazelle.tm.users.TableLabel']}</ui:define>
+                                    <h:inputText styleClass=" form-control" id="tableLabel"
+                                                 value="#{userPreferencesManager.userPreferences.connectathonTable}"/>
+                                </s:decorate>
+
+
+                                <s:decorate id="seq" template="/layout/form/_form_field_horizontal_4-8.xhtml">
+                                    <ui:param name="id" value="sequenceDiagram"/>
+                                    <ui:define name="label">#{messages['gazelle.tm.users.DisplaySequenceDiagram']}
+                                    </ui:define>
+                                    <h:selectBooleanCheckbox styleClass="form-control-static" id="sequenceDiagram"
+                                                             value="#{userPreferencesManager.userPreferences.showSequenceDiagram}"/>
+                                </s:decorate>
+                                <s:decorate id="de"
+                                            template="/layout/form/_form_field_horizontal_4-8.xhtml">
+                                    <ui:param name="id" value="displayEmail"/>
+                                    <ui:define name="label">#{messages['gazelle.tm.users.DisplayEmail']}</ui:define>
+                                    <h:selectBooleanCheckbox styleClass="form-control-static" id="displayEmail"
+                                                             value="#{userPreferencesManager.userPreferences.displayEmail}"/>
+                                </s:decorate>
+
+                                <s:decorate id="dt" template="/layout/form/_form_field_horizontal_4-8.xhtml">
+                                    <ui:param name="id" value="displayTooltips"/>
+                                    <ui:define name="label">#{messages['net.ihe.gazelle.tm.DisplayTooltips']}
+                                    </ui:define>
+                                    <h:selectBooleanCheckbox styleClass="form-control-static" id="displayTooltips"
+                                                             value="#{userPreferencesManager.userPreferences.displayTooltips}"/>
+                                </s:decorate>
+                                <s:decorate id="num"
+                                            template="/layout/form/_form_field_horizontal_4-8.xhtml">
+                                    <ui:define name="label">#{messages['gazelle.common.ResultsPerPage']}</ui:define>
+                                    <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                     id="numberOfResultsPerPageList"
+                                                     value="#{userPreferencesManager.userPreferences.numberOfResultsPerPage}">
+                                        <s:selectItems value="#{dataScrollerMemory.getAllNumberOfResultsPerPage()}"
+                                                       var="pageNumber" label="#{pageNumber}"
+                                                       noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"/>
+                                    </h:selectOneMenu>
+                                </s:decorate>
+
+                                <s:decorate id="spokenLanguageSelection"
+                                            template="/layout/form/_form_field_horizontal_4-8.xhtml">
+                                    <ui:define name="label">#{messages['gazelle.tm.users.SpokenLanguages']}</ui:define>
+                                    <rich:list value="#{userPreferencesManager.spokenLanguages}"
+                                               rendered="#{not empty userPreferencesManager.spokenLanguages}"
+                                               var="sl"
+                                               type="unordered" id="editLangList">
+
+                                        <a4j:commandLink onRowMouseOver="this.style.cursor='pointer'"
+                                                         actionListener="#{userPreferencesManager.removeSpokenLanguage(sl)}"
+                                                         execute="@this" render="spokenLanguageSelection">
+                                            <span class="gzl-icon-trash-o"/>
+                                        </a4j:commandLink>
+                                        <h:outputText value="#{sl}"/>
+
+                                    </rich:list>
+                                    <a4j:commandLink title="#{messages['gazelle.tm.users.AddLanguage']}"
+                                                     actionListener="#{userPreferencesManager.setDisplayLangMenu(true)}"
+                                                     onRowMouseOver="this.style.cursor='pointer'" execute="@this"
+                                                     rendered="#{not userPreferencesManager.displayLangMenu}"
+                                                     render="spokenLanguageSelection">
+                                        <span class="gzl-icon-plus"/>
+                                    </a4j:commandLink>
+                                    <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                     id="spokenLanguageMenuSelection"
+                                                     value="#{userPreferencesManager.selectedLanguage}"
+                                                     rendered="#{userPreferencesManager.displayLangMenu}">
+                                        <f:selectItems value="#{userPreferencesManager.languageList}"/>
+                                        <a4j:ajax event="change" render="spokenLanguageSelection"
+                                                  listener="#{userPreferencesManager.addSpokenLanguage()}"/>
+                                    </h:selectOneMenu>
+                                    <a4j:commandButton styleClass="gzl-btn-green"
+                                                       value="#{messages['gazelle.common.button.Finish']}"
+                                                       actionListener="#{userPreferencesManager.setDisplayLangMenu(false)}"
+                                                       rendered="#{userPreferencesManager.displayLangMenu}"
+                                                       render="spokenLanguageSelection"/>
+                                </s:decorate>
+                            </ui:decorate>
+                        </div>
+
+                        <div class="col-lg-4">
+
+                            <ui:decorate template="/layout/panels/_panel_id.xhtml">
+                                <ui:param name="panel_id" value="photoDiv"/>
+                                <div class="row">
+
+                                    <a4j:commandLink title="#{messages['gazelle.common.button.Refresh']}"
+                                                     oncomplete="location.reload()">
+                                        <span class="fa fa-refresh"/>
+                                    </a4j:commandLink>
+
+                                    <h:graphicImage library="img" id="userPhotoImage"
+                                                    style="max-width:100%;max-height:100%;"
+                                                    value="#{userPreferencesManager.userPreferences.photoUrlNoCache}"/>
+
+                                    <ui:include src="/fineupload.xhtml">
+                                        <ui:param name="id" value="userPhoto"/>
+                                        <ui:param name="idToRerender" value="userPhotoImage"/>
+                                        <ui:param name="beanName" value="userPreferencesManager"/>
+                                        <ui:param name="multiple" value="false"/>
+                                    </ui:include>
+
+                                    <a4j:commandButton styleClass="gzl-btn-red"
+                                                       value="#{messages['gazelle.tm.users.removePhoto']}"
+                                                       actionListener="#{userPreferencesManager.removePhoto()}"
+                                                       render="photoDiv"/>
+
+
+                                </div>
+                            </ui:decorate>
+                        </div>
+                    </div>
+                    <a4j:commandButton styleClass="gzl-btn-green" value="#{messages['gazelle.common.button.Save']}"
+                                       actionListener="#{userPreferencesManager.savePreferences()}"
+                                       render="globalDiv"/>
+                    <a4j:commandButton styleClass="gzl-btn" value="#{messages['gazelle.users.user.ChangePassword']}"
+                                       action="#{userPreferencesManager.changePasswordAction()}" immediate="true"
+                                       execute="@this"/>
+                    <a4j:commandButton styleClass="gzl-btn" value="#{messages['gazelle.common.button.Cancel']}"
+                                       action="#{userPreferencesManager.displayPreviousPage()}" immediate="true"
+                                       bypassUpdates="true"
+                                       execute="@this"/>
+                </div>
+            </div>
+        </h:form>
+    </h:panelGroup>
+</s:div>

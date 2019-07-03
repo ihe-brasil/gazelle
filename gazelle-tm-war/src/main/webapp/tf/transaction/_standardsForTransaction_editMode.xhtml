@@ -1,0 +1,42 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+        <ui:define name="panel_title">#{messages['gazelle.tf.menu.Standards']}</ui:define>
+        <h:form>
+            <s:decorate template="/layout/form/_edit.xhtml" id="editStandardDecorate">
+                <ui:define name="label">#{messages['net.ihe.gazelle.tm.ReferencedStandards']}</ui:define>
+                <a4j:repeat value="#{transactionManager.selectedTransaction.standards}" var="std"
+                            rendered="#{not empty transactionManager.selectedTransaction.standards}">
+                    <h:panelGrid columns="2">
+                        <h:outputLink value="#{std.url}">
+                            <h:outputText value="#{std.name}"/>
+                        </h:outputLink>
+
+                        <a4j:commandLink event="click" execute="@this" render="editStandardDecorate"
+                                         height="18" title="#{messages['net.ihe.gazelle.tm.RemoveThisStandard']}"
+                                         actionListener="#{transactionManager.deleteStandard(std)}">
+                            <span class="gzl-icon-trash-o"/>
+                        </a4j:commandLink>
+
+                    </h:panelGrid>
+                </a4j:repeat>
+                <s:div styleClass="gzl-alert gzl-alert-orange" rendered="#{empty transactionManager.selectedTransaction.standards}">
+                    <span class="gzl-icon-exclamation-triangle"/>
+                    <h:outputText value="#{messages['gazelle.tf.transaction.TransactionWithoutStandard']}"/>
+                </s:div>
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.None']}"
+                              rendered="#{empty transactionManager.selectedTransaction.standards}"/>
+            </s:decorate>
+
+            <h:outputLink title="#{messages['gazelle.tf.selectedActor.profileLinks.Add']}" value="addStandard.seam">
+                <f:param name="transactionId" value="#{transactionManager.selectedTransaction.id}"/>
+                <span class="gzl-icon-plus"/>
+            </h:outputLink>
+        </h:form>
+    </ui:decorate>
+
+</ui:composition>

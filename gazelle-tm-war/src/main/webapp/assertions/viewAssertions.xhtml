@@ -1,0 +1,25 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <s:div>
+        <rich:dataTable rows="#{dataScrollerMemory.numberOfResultsPerPage}" border="0" var="assertion"
+                        value="#{assertions}"
+                         render="ds">
+            <g:column sortBy="#{'assertionId'}">
+                <ui:define name="header">
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.AssertionId']}"/>
+                </ui:define>
+                <h:outputLink value="#{assertion.getPermanentLink()}" target="_blank">
+                    <h:outputText value="#{assertion.assertionId} "/>
+                </h:outputLink>
+            </g:column>
+            <g:column>
+                <ui:define name="header">
+                    <h:outputText value="#{messages['gazelle.tm.mesatests.Description']}"/>
+                </ui:define>
+                <h:outputText value="#{assertion.description}"/>
+            </g:column>
+        </rich:dataTable>
+    </s:div>
+</ui:composition>

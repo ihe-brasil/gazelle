@@ -1,0 +1,177 @@
+<s:div xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+       xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+       xmlns="http://www.w3.org/1999/xhtml">
+    <h:form id="isForm">
+        <s:token allowMultiplePosts="true"/>
+        ${iheImplementationForSystemManager.getAllIHEImplementationsForSystemInSession()}
+
+        <h:outputText rendered="#{empty iheImplementationForSystemManager.iheImplementations}"
+                      value="#{messages['net.ihe.gazelle.tm.YouMustAddImplementationsForYourSystemFirst']}"/>
+
+        <s:decorate template="/layout/display/_display.xhtml">
+            <ui:define name="label">
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.StatusOfIntegrationStatement']}"/>
+            </ui:define>
+            <h:outputText style="color: blue;font-weight: bold;"
+                          value="#{systemInSessionEditor.getSystem().prStatus.details}"/>
+        </s:decorate>
+
+
+        <s:div rendered="#{systemInSessionEditor.getSystem().prStatus.keyword == 'created'}">
+            <h:outputText style="color: blue;font-weight: bold;"
+                          value="#{messages['net.ihe.gazelle.tm.YourIntegrationStatementWillNotBeVisibleUntilYou']}"/>
+        </s:div>
+        <s:div rendered="#{systemInSessionEditor.getSystem().prStatus.keyword == 'published'}">
+            <s:div>
+                <h:outputText style="color: blue;font-weight: bold;"
+                              value="#{messages['net.ihe.gazelle.tm.YourIntegrationStatementIsVisibleButWaitingForVa']}"/>
+            </s:div>
+
+            <s:div>
+                <h:outputText style="color: blue;font-weight: bold;"
+                              value="#{messages['net.ihe.gazelle.tm.IfYouUseTheIntegrationStatementGeneratedItCanBeC']}"/>
+            </s:div>
+        </s:div>
+        <s:div rendered="#{systemInSessionEditor.getSystem().prStatus.keyword == 'verified'}">
+            <h:outputText style="color: blue;font-weight: bold;"
+                          value="#{messages['net.ihe.gazelle.tm.YourIntegrationStatementIsVisibleAndValidated']}"/>
+        </s:div>
+        <s:div rendered="#{systemInSessionEditor.getSystem().prStatus.keyword == 'rejected'}">
+            <s:div>
+                <h:outputText style="color: blue;font-weight: bold;"
+                              value="#{messages['net.ihe.gazelle.tm.YourIntegrationStatementHasBeenRejectedByTheAdmi']}"/>
+            </s:div>
+
+            <s:decorate template="/layout/display/_display.xhtml">
+                <ui:define name="label">
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.AdminIntegrationStatementStatusDate']}"/>
+                </ui:define>
+                <g:date tooltip="true"
+                        value="#{systemInSessionEditor.getSystem().prDateValidatedByAdmin}"/>
+            </s:decorate>
+            <s:decorate template="/layout/display/_display.xhtml">
+                <ui:define name="label">
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.AdminComment']}"/>
+                </ui:define>
+                <h:outputText value="#{systemInSessionEditor.getSystem().prCommentValidatedByAdmin}"/>
+            </s:decorate>
+
+            <h:outputText style="color: blue;font-weight: bold;"
+                          value="#{messages['net.ihe.gazelle.tm.YourIntegrationStatementWillNotBeVisibleUntilYou']}"/>
+        </s:div>
+        <s:div rendered="#{systemInSessionEditor.getSystem().prStatus.keyword == 'unreachable'}">
+            <s:div>
+                <h:outputText style="color: blue;font-weight: bold;"
+                              value="#{messages['net.ihe.gazelle.tm.YourIntegrationStatementHasBeenMarkedAsUnreachab']}"/>
+            </s:div>
+            <s:div>
+                <h:outputText style="color: blue;font-weight: bold;"
+                              value="#{messages['net.ihe.gazelle.tm.YourIntegrationStatementWillNotBeVisibleUntilYou']}"/>
+            </s:div>
+        </s:div>
+        <s:div rendered="#{systemInSessionEditor.getSystem().prStatus.keyword == 'unmatching'}">
+            <s:div>
+                <h:outputText style="color: blue;font-weight: bold;"
+                              value="#{messages['net.ihe.gazelle.tm.YourIntegrationStatementHasBeenMarkedAsUnmatched']}"/>
+            </s:div>
+            <s:div>
+                <h:outputText style="color: blue;font-weight: bold;"
+                              value="#{messages['net.ihe.gazelle.tm.ThisMeansThatTheFileGotAtTheSpecifiedURLDoesntMa']}"/>
+            </s:div>
+        </s:div>
+
+
+        <h:panelGroup rendered="#{not empty iheImplementationForSystemManager.iheImplementations}">
+            <div class="form-horizontal">
+                <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                    <ui:define name="label">#{messages['gazelle.systems.system.ISDate']}</ui:define>
+                    <ui:param name="id" value="cal"/>
+                    <a4j:outputPanel id="calendar" layout="block">
+                        <rich:calendar id="cal"
+                                       value="#{systemInSessionEditor.getSystem().integrationStatementDate}"
+                                       popup="true" showApplyButton="false"
+                                       datePattern="#{dateDisplay.calendarPatternDate}"
+                                       locale="#{dateDisplay.calendarLocale}"
+                                       timeZone="#{dateDisplay.calendarTimeZoneDate}"
+                                       styleClass="form-inline">
+                            <a4j:ajax event="change" render="calendarOffset"/>
+                        </rich:calendar>
+                        <p class="help-block">
+                            <h:outputText id="calendarOffset"
+                                          value="#{applicationPreferenceManager.getTimeZoneOffset(dateDisplay.calendarTimeZoneDateTime, preferencesModifier.values['pr_crawler_start'])}"/>
+                        </p>
+                    </a4j:outputPanel>
+                </s:decorate>
+            </div>
+            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                <ui:define name="panel_title">#{messages['net.ihe.gazelle.CreateupdateIntegrationStatement']}
+                </ui:define>
+                <div id="editIntegrationStatementTabPanel">
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active"><a href="#customMadeId" aria-controls="customMadeId"
+                                                                  role="tab" data-toggle="tab">#{messages['net.ihe.gazelle.CreatedByYourOwn']}</a>
+                        </li>
+                        <li role="presentation"><a href="#generateWithPRId" aria-controls="generateWithPRId"
+                                                   role="tab"
+                                                   data-toggle="tab">#{messages['net.ihe.gazelle.GeneratedByIHEProductRegistry']}</a>
+                        </li>
+                    </ul>
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active" id="customMadeId">
+                            <s:div>
+                                <h:outputText
+                                        value="#{messages['net.ihe.gazelle.tm.YouCanUseYourOwnIntegrationStatementMatchingDecl']}"/>
+                            </s:div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="generateWithPRId">
+                            <s:div>
+                                <h:outputText
+                                        value="#{messages['net.ihe.gazelle.tm.YouCanAlsoGenerateAnIntegrationStatement']}"/>
+                            </s:div>
+
+                            <s:div>
+                                <h:commandButton styleClass="gzl-btn-green"
+                                                 value="#{messages['gazelle.systems.system.GenerateSampleIS']}"
+                                                 action="#{prManager.generatePDF(systemInSessionEditor.systemInSession)}"/>
+                            </s:div>
+                        </div>
+                    </div>
+                </div>
+                <s:div>
+                    <h:outputText
+                            value="#{messages['net.ihe.gazelle.tm.YouNowHaveToPutTheIntegrationStatementcustomOrGe']}"/>
+                </s:div>
+            </ui:decorate>
+
+            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.PublishIntegrationStatement']}
+                </ui:define>
+                <h:outputText
+                        value="#{messages['net.ihe.gazelle.tm.TheIntegrationStatementMustBeAccessibleByTheFoll']}"/>
+                <s:decorate template="/layout/form/_edit.xhtml">
+                    <ui:param name="id" value="isUrlInput"/>
+                    <ui:define name="label">#{messages['gazelle.systems.system.ISURL']}</ui:define>
+                    <s:div>
+                        <h:inputText id="isUrlInput" styleClass=" form-control" maxlength="255" size="150"
+                                     value="#{systemInSessionEditor.getSystem().integrationStatementUrl}"/>
+                        <a4j:commandButton styleClass="gzl-btn-green"
+                                           value="#{messages['net.ihe.gazelle.tm.Publish']}"
+                                           action="#{prManager.publish(systemInSessionEditor.getSystem())}"
+                                           render="isForm"/>
+                    </s:div>
+                </s:decorate>
+            </ui:decorate>
+        </h:panelGroup>
+
+
+        <s:decorate id="historyDecoration" template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.common.History']}</ui:define>
+            <ui:include src="/pr/systemEvents.xhtml">
+                <ui:param name="system" value="#{systemInSessionEditor.getSystem()}"/>
+            </ui:include>
+        </s:decorate>
+    </h:form>
+</s:div>

@@ -1,0 +1,118 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <rich:dataTable id="testTableForSelectedSystem" cellspacing="0" rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                    width="700" rendered="#{connecthatonTestingManager.selectedSystemInSession==null}" border="0"
+                    var="selectedSystemInSession"
+                    value="#{connecthatonTestingManager.getSystemsForSelectedInstitution()}"
+
+                     render="ds">
+        <f:facet name="header">
+            <rich:columnGroup>
+                <g:column>
+                    <h:outputText value="#{messages['gazelle.systems.system.SystemKeyword']}"/>
+                </g:column>
+                <g:column>
+                    <h:outputText value="#{messages['gazelle.tm.testing.status.status']}"/>
+                </g:column>
+                <g:column>
+                    <h:outputText value="#{messages['gazelle.tm.testing.status.verified']}"/>
+                </g:column>
+                <g:column>
+                    <h:outputText value="#{messages['gazelle.tm.testing.status.partiallyVerified']}"/>
+                </g:column>
+                <g:column>
+                    <h:outputText value="#{messages['gazelle.tm.testing.status.critical']}"/>
+                </g:column>
+                <g:column>
+                    <h:outputText value="#{messages['gazelle.tm.testing.status.completed']}"/>
+                </g:column>
+                <g:column>
+                    <h:outputText value="#{messages['gazelle.tm.testing.status.running']}"/>
+                </g:column>
+                <g:column>
+                    <h:outputText value="#{messages['gazelle.tm.testing.status.paused']}"/>
+                </g:column>
+                <g:column>
+                    <h:outputText value="#{messages['gazelle.tm.testing.status.failed']}"/>
+                </g:column>
+                <g:column>
+                    <h:outputText value="#{messages['gazelle.common.Action']}"/>
+                </g:column>
+            </rich:columnGroup>
+        </f:facet>
+        <g:column>
+            <g:link target="_blank" value="#{selectedSystemInSession}"/>
+        </g:column>
+        <g:column>
+            <h:outputText value="#{messages['gazelle.tm.systems.notAccepted']}"
+                          rendered="#{selectedSystemInSession.acceptedToSession == false}"/>
+            <h:selectOneMenu styleClass="form-control gzl-form-control" id="systemInSessionStatusListBox"
+                             style="text-align:center;"
+                             value="#{selectedSystemInSession.systemInSessionStatus}"
+                             rendered="#{selectedSystemInSession.acceptedToSession}">
+                <s:selectItems value="#{gazelleDAO.getListSystemInSessionStatus()}" var="selectedSystemInSessionStatus"
+                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                               label="#{selectedSystemInSessionStatus.keyword}"/>
+                <a4j:ajax event="change" execute="@this"
+                          listener="#{connecthatonTestingManager.updateSystemInSessionStatus(selectedSystemInSession)}"/>
+            </h:selectOneMenu>
+        </g:column>
+        <g:column>
+            <h:outputText style="text-align:center;"
+                          value="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(selectedSystemInSession,'VERIFIED')}"/>
+        </g:column>
+        <g:column>
+            <h:outputText style="text-align:center;"
+                          value="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(selectedSystemInSession,'PARTIALLY_VERIFIED')}"/>
+        </g:column>
+        <g:column>
+            <h:outputText style="text-align:center;"
+                          value="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(selectedSystemInSession,'CRITICAL')}"/>
+        </g:column>
+        <g:column>
+            <h:outputText style="text-align:center;"
+                          value="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(selectedSystemInSession,'COMPLETED')}"/>
+        </g:column>
+        <g:column>
+            <h:outputText style="text-align:center;"
+                          value="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(selectedSystemInSession,'STARTED')}"/>
+        </g:column>
+        <g:column>
+            <h:outputText style="text-align:center;"
+                          value="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(selectedSystemInSession,'PAUSED')}"/>
+        </g:column>
+        <g:column>
+            <h:outputText style="text-align:center;"
+                          value="#{gazelleDAO.getTestInstanceListSizeForSystemInSessionByStatus(selectedSystemInSession,'FAILED')}"/>
+        </g:column>
+        <g:column>
+
+            <div class="gzl-never-wrap">
+
+                <a4j:commandLink event="click" execute="@this" render="globalDiv"
+                                 title="#{messages['gazelle.tm.SelectToFilter']}"
+                                 actionListener="#{connecthatonTestingManager.editFilterForSelectedSystemInSession(selectedSystemInSession)}">
+                    <span class="gzl-icon-filter"/>
+                </a4j:commandLink>
+
+
+                <a4j:commandLink event="click" execute="@this" render="globalDiv"
+                                 title="#{messages['gazelle.tm.ViewAllRelatedTests']}"
+                                 actionListener="#{connecthatonTestingManager.selectSystemInSessionAndViewAllTests(selectedSystemInSession)}">
+                    <span class="gzl-icon-search"/>
+                </a4j:commandLink>
+
+            </div>
+
+        </g:column>
+        <f:facet name="footer">
+            <ui:include src="/util/datatableFooter.xhtml">
+                <ui:param name="dataScrollerId" value="ds"/>
+                <ui:param name="dataTableId" value="testTableForSelectedSystem"/>
+            </ui:include>
+        </f:facet>
+    </rich:dataTable>
+</ui:composition>

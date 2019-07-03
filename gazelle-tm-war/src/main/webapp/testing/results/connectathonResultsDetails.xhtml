@@ -1,0 +1,147 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <table class="table table-striped table-bordered">
+        <thead>
+        <tr>
+            <th colspan="2">
+                <h:outputText value="#{messages['gazelle.tests.test']}"/>
+            </th>
+            <h:panelGroup rendered="#{!gazelleDAO.getSelectedTestingSession().testingSessionClosedForUser()}">
+                <th rowspan="2">
+                    <h:outputText value="#{messages['gazelle.tm.test.Start']}"/>
+                </th>
+            </h:panelGroup>
+            <th rowspan="2">
+                <h:outputText value="#"/>
+            </th>
+            <th rowspan="2">
+                <h:outputText value="#{messages['gazelle.tests.test.testOptionAcronym']}"/>
+            </th>
+            <th rowspan="2">
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.Partners']}"/>
+            </th>
+            <th rowspan="2">
+                <h:outputText value="#{messages['gazelle.tm.testing.status.verified']}"/>
+            </th>
+            <th rowspan="2">
+                <h:outputText value="#{messages['gazelle.tm.PartiallyV']}"/>
+            </th>
+            <th rowspan="2">
+                <h:outputText value="#{messages['gazelle.tm.testing.status.critical']}"/>
+            </th>
+            <th rowspan="2">
+                <h:outputText value="#{messages['gazelle.tm.ToBeV']}"/>
+            </th>
+            <th rowspan="2">
+                <h:outputText value="#{messages['gazelle.tm.testing.status.running']}"/>
+            </th>
+            <th rowspan="2">
+                <h:outputText value="#{messages['gazelle.tm.testing.status.paused']}"/>
+            </th>
+            <th rowspan="2">
+                <h:outputText value="#{messages['gazelle.tm.testing.status.failed']}"/>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <h:outputText value="#{messages['gazelle.tm.monitors.test']}"/>
+            </th>
+            <th>
+                <h:outputText value="#{messages['gazelle.tm.test.MetaTest']}"/>
+            </th>
+        </tr>
+        </thead>
+        <a4j:repeat var="entry"
+                    value="#{details}">
+            <tr>
+                <h:panelGroup rendered="#{!entry.isMetaTest()}">
+                    <td colspan="2">
+                        <h:outputLink target="_blank" value="#{entry.getLink()}"
+                                      rendered="#{not empty entry.getLink()}">
+                            <h:outputText value="#{entry.getTitle()}"/>
+                        </h:outputLink>
+                        <h:outputText value="#{entry.getTitle()}" rendered="#{empty entry.getLink()}"/>
+                    </td>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{entry.isMetaTest()}">
+                    <td>
+                        <h:outputLink target="_blank" value="#{entry.getLink2()}"
+                                      rendered="#{not empty entry.getLink2()}">
+                            <h:outputText value="#{entry.getTitle2()}"/>
+                        </h:outputLink>
+                        <h:outputText value="#{entry.getTitle2()}" rendered="#{empty entry.getLink2()}"/>
+                    </td>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{entry.isMetaTest()}">
+                    <td>
+                        <h:outputLink target="_blank" value="#{entry.getLink()}"
+                                      rendered="#{not empty entry.getLink()}">
+                            <h:outputText value="#{entry.getTitle()}"/>
+                        </h:outputLink>
+                        <h:outputText value="#{entry.getTitle()}" rendered="#{empty entry.getLink()}"/>
+                    </td>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{!gazelleDAO.getSelectedTestingSession().testingSessionClosedForUser()}">
+                    <td>
+                        <s:div rendered="#{!entry.isMetaTest() || (not empty entry.getLink2())}">
+                            <span title="#{messages['gazelle.tm.testing.addTestInstance']}">
+                                <a4j:commandLink action="#{connectathonResult.startTestInstance(entry)}"
+                                                 onRowMouseOver="this.style.cursor='pointer'" immediate="true">
+                                    <span class="gzl-icon-plus"/>
+                                </a4j:commandLink>
+                            </span>
+                        </s:div>
+                    </td>
+                </h:panelGroup>
+                <td>
+                    <h:outputText value="#{entry.getCount()}"/>
+                </td>
+                <td>
+                    <h:outputText value="#{entry.getOpt()}"/>
+                </td>
+                <td>
+                    <ui:include src="/testing/partnersList.xhtml">
+                        <ui:param name="partners" value="#{entry.partners}"/>
+                    </ui:include>
+                </td>
+                <td>
+                    <ui:include src="connectathonResultsInstances.xhtml">
+                        <ui:param name="instances" value="#{entry.getInstances('VERIFIED')}"/>
+                    </ui:include>
+                </td>
+                <td>
+                    <ui:include src="connectathonResultsInstances.xhtml">
+                        <ui:param name="instances" value="#{entry.getInstances('PARTIALLY_VERIFIED')}"/>
+                    </ui:include>
+                </td>
+                <td>
+                    <ui:include src="connectathonResultsInstances.xhtml">
+                        <ui:param name="instances" value="#{entry.getInstances('CRITICAL')}"/>
+                    </ui:include>
+                </td>
+                <td>
+                    <ui:include src="connectathonResultsInstances.xhtml">
+                        <ui:param name="instances" value="#{entry.getInstances('COMPLETED')}"/>
+                    </ui:include>
+                </td>
+                <td>
+                    <ui:include src="connectathonResultsInstances.xhtml">
+                        <ui:param name="instances" value="#{entry.getInstances('STARTED')}"/>
+                    </ui:include>
+                </td>
+                <td>
+                    <ui:include src="connectathonResultsInstances.xhtml">
+                        <ui:param name="instances" value="#{entry.getInstances('PAUSED')}"/>
+                    </ui:include>
+                </td>
+                <td>
+                    <ui:include src="connectathonResultsInstances.xhtml">
+                        <ui:param name="instances" value="#{entry.getInstances('FAILED')}"/>
+                    </ui:include>
+                </td>
+            </tr>
+        </a4j:repeat>
+    </table>
+</ui:composition>

@@ -1,0 +1,137 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.testmanagement.object.Listofannotations']}"/>
+    <ui:define name="body">
+        <h:form id="form">
+            <s:token allowMultiplePosts="true"/>
+            <a4j:queue requestDelay="300" ignoreDupResponses="true"/>
+            <p class="gzl-alert gzl-alert-blue">
+                <span class="gzl-icon-info-circle"/>
+                <h:outputText value="#{messages['gazelle.testmanagement.object.LabelListAnnotations']}"/>
+            </p>
+            <br/>
+            <br/>
+            <s:div id="packagetab">
+                #{dataTableStateHolder.setAscendingOn('objectInstance.name')}
+                <rich:dataTable id="ObjectInstanceAnnotationTable" var="currentObjectInstanceAnnotation"
+                                value="#{annotationManager.getListObjectInstanceAnnotation()}"
+                                rowKeyVar="rowNumber"
+                                rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                    <g:column filterBy="#{'objectInstance.name'}"
+                              filterEvent="onkeyup" sortBy="#{'objectInstance.name'}"
+                              sortOrder="#{dataTableStateHolder.sortOrders['objectInstance.name']}">
+                        <ui:define name="header">#{messages['gazelle.testmanagement.object.Samplesname']}
+                        </ui:define>
+                        <h:outputLink id="viewObjSamplePermanentLink" target="_blank" propagation="none"
+                                      value="#{annotationManager.getSamplePermanentlink(currentObjectInstanceAnnotation.objectInstance)}">
+                            <h:outputText
+                                    value="#{currentObjectInstanceAnnotation.objectInstance.name}"/>
+                        </h:outputLink>
+                    </g:column>
+                    <g:column sortBy="#{'lastChanged'}"
+                              sortOrder="#{dataTableStateHolder.sortOrders['lastChanged']}">
+                        <ui:define name="header">#{messages['gazelle.testmanagement.object.CreationDate']}
+                        </ui:define>
+                        <g:date tooltip="true" value="#{currentObjectInstanceAnnotation.lastChanged}"/>
+                    </g:column>
+                    <g:column filterBy="#{'lastModifierId'}"
+                              filterEvent="onkeyup" sortBy="#{'lastModifierId'}"
+                              sortOrder="#{dataTableStateHolder.sortOrders['lastModifierId']}">
+                        <ui:define name="header">#{messages['gazelle.tm.search.user']}</ui:define>
+                        <h:outputText value="#{currentObjectInstanceAnnotation.lastModifierId}"/>
+                    </g:column>
+                    <g:column
+                              filterBy="#{'annotation.value'}" filterEvent="onkeyup"
+                              sortBy="#{'annotation.value'}"
+                              sortOrder="#{dataTableStateHolder.sortOrders['annotation.value']}">
+                        <ui:define name="header">#{messages['gazelle.testmanagement.object.Annotation']}</ui:define>
+                        <h:outputText value="#{currentObjectInstanceAnnotation.annotation.value}"/>
+                    </g:column>
+                    <g:column width="50">
+                        <ui:define name="header">#{messages['gazelle.testmanagement.object.Action']}</ui:define>
+                        <div class="gzl-never-wrap">
+                            <a4j:commandLink title="#{messages['gazelle.testmanagement.object.DeleteAnnotation']}"
+                                             oncomplete="jq162('#DeleteSelectedObjectInstanceAnnotation').modal('show');"
+                                             actionListener="#{annotationManager.setSelectedObjectInstanceAnnotation(currentObjectInstanceAnnotation)}"
+                                             render=" :deleteForm">
+                                <span class="gzl-icon-trash-o"/>
+                            </a4j:commandLink>
+
+                            <a4j:commandLink title="#{messages['gazelle.common.button.Edit']}"
+                                             oncomplete="jq162('#EditSelectedObjectInstanceAnnotation').modal('show');"
+                                             execute="@this" render=" :CommentSampleFormFC"
+                                             actionListener="#{annotationManager.setSelectedObjectInstanceAnnotation(currentObjectInstanceAnnotation)}">
+                                <span class="gzl-icon-pencil"/>
+                            </a4j:commandLink>
+                        </div>
+                    </g:column>
+                    <f:facet name="footer">
+                        <ui:include src="/util/datatableFooter.xhtml">
+                            <ui:param name="dataScrollerId" value="ds"/>
+                            <ui:param name="dataTableId" value="ObjectInstanceAnnotationTable"/>
+                        </ui:include>
+                    </f:facet>
+                </rich:dataTable>
+            </s:div>
+            <br/>
+            <br/>
+
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Delete selected object instance annotation -->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="deleteForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteSelectedObjectInstanceAnnotation"/>
+                <ui:define name="popup_title">#{messages['gazelle.testmanagement.object.DeleteAnnotation']}</ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="deleteOTbutton"
+                                       value="#{messages['gazelle.testmanagement.object.DeleteThisAnnotation']}"
+                                       styleClass="gzl-btn-red"
+                                       actionListener="#{annotationManager.deleteSelectedAnnotation()}"
+                                       onclick="jq162('#DeleteSelectedObjectInstanceAnnotation').modal('hide');"
+                                       render="ObjectInstanceAnnotationTable,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Edit selected object instance annotation -->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="CommentSampleFormFC">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="EditSelectedObjectInstanceAnnotation"/>
+                <ui:define name="popup_title">#{messages['gazelle.testmanagement.object.EditAnnotation']}</ui:define>
+                <a4j:region id="CommentValueRegFC">
+                    <s:decorate id="CommentValDecorationFC" template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="CommentEditorIdFC"/>
+                        <ui:define name="label">#{messages['gazelle.testmanagement.object.Comment']}
+                        </ui:define>
+                        <h:inputTextarea styleClass=" form-control" id="CommentEditorIdFC"
+                                         value="#{annotationManager.selectedObjectInstanceAnnotation.annotation.value}"
+                                         rows="3" cols="35"/>
+                    </s:decorate>
+                </a4j:region>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="saveCommentbuttonFC"
+                                       value="#{messages['gazelle.common.button.Save']}"
+                                       styleClass="gzl-btn-green"
+                                       actionListener="#{annotationManager.saveModifications()}"
+                                       onclick="jq162('#EditSelectedObjectInstanceAnnotation').modal('hide');"
+                                       render="ObjectInstanceAnnotationTable,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="tableOfContents" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="842" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="84162448-b0f9-4266-89f1-4f54939b2714">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="systemName" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["System 1"]]></defaultValueExpression>
+	</parameter>
+	<field name="testkeyword" class="java.lang.String">
+		<fieldDescription><![CDATA[testKeyword]]></fieldDescription>
+	</field>
+	<field name="pageIndex" class="java.lang.Integer">
+		<fieldDescription><![CDATA[pageIndex]]></fieldDescription>
+	</field>
+	<field name="testname" class="java.lang.String">
+		<fieldDescription><![CDATA[testName]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="19" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="200" height="8" forecolor="#FFFFFF" uuid="287d8ecd-6713-4ba0-a501-d98477b6a30c"/>
+				<textElement textAlignment="Justified">
+					<font size="5"/>
+				</textElement>
+				<text><![CDATA[begining of table content]]></text>
+			</staticText>
+			<textField>
+				<reportElement mode="Opaque" x="0" y="0" width="803" height="19" backcolor="#9999FF" uuid="cfd8b1ea-12c8-4bc5-940a-8c642559d6e4"/>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font size="12" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Table of contents - " + $P{systemName}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<frame>
+				<reportElement stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="803" height="19" backcolor="#CCCCF8" uuid="2c5f0b0c-59af-48a2-ab06-d658f0961d13"/>
+				<box>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<staticText>
+					<reportElement mode="Transparent" x="702" y="0" width="101" height="19" backcolor="#FFFFFF" uuid="abbf1331-f775-4260-a5c5-e39e08d4fba1"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Page]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="283" y="0" width="409" height="19" backcolor="#FFFFFF" uuid="d11c6d66-4204-4b4f-b085-904c16fbdc15"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Test Name]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Transparent" x="0" y="0" width="272" height="19" backcolor="#FFFFFF" uuid="2d439f73-c19a-428b-94f5-d74addce53e2"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Test Keyword]]></text>
+				</staticText>
+			</frame>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="241">
+			<frame>
+				<reportElement stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="803" height="19" backcolor="#FFFFFF" uuid="34d0c2c0-783a-433e-b5b7-d4c7b1f5bc04"/>
+				<box>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textField>
+					<reportElement x="702" y="0" width="101" height="19" uuid="7a272564-580a-48c5-b7b8-11ebfc57e004"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{pageIndex}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="283" y="0" width="409" height="19" uuid="96033d51-8947-40e5-b951-e50618469447"/>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{testname}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="0" width="272" height="19" uuid="36e9d8cd-6973-464e-8486-3fc12c6cc850"/>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{testkeyword}]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</detail>
+</jasperReport>

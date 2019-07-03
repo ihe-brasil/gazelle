@@ -1,0 +1,36 @@
+<s:div xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+       xmlns:s="http://jboss.org/schema/seam/taglib"
+       xmlns:f="http://java.sun.com/jsf/core"
+       xmlns="http://www.w3.org/1999/xhtml">
+    <rich:dataTable var="systemEvent" value="#{system.systemEvents}"
+                    rows="10">
+        <g:column>
+            <ui:define name="header">
+                <h:outputText value="#{messages['gazelle.common.Date']}"/>
+            </ui:define>
+            <g:date tooltip="true" value="#{systemEvent.eventDate}"/>
+        </g:column>
+        <g:column>
+            <ui:define name="header">
+                <h:outputText value="#{messages['gazelle.users.user.UserUsername']}"/>
+            </ui:define>
+            <h:outputText value="#{systemEvent.userName}"/>
+        </g:column>
+        <g:column>
+            <ui:define name="header">
+                <h:outputText value="#{messages['gazelle.systems.session.Type']}"/>
+            </ui:define>
+            <h:outputText value="#{systemEvent.type}"/>
+        </g:column>
+        <g:column>
+            <ui:define name="header">
+                <h:outputText value="#{messages['gazelle.testmanagement.object.Comment']}"/>
+            </ui:define>
+            <h:outputText value="#{systemEvent.comment}"/>
+        </g:column>
+        <f:facet name="footer">
+            <rich:dataScroller maxPages="10" renderIfSinglePage="false"/>
+        </f:facet>
+    </rich:dataTable>
+</s:div>

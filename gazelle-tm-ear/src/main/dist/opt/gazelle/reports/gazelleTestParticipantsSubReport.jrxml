@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.2.2.final using JasperReports Library version 6.2.2  -->
+<!-- 2016-05-20T13:13:25 -->
+<jasperReport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			  xmlns="http://jasperreports.sourceforge.net/jasperreports"
+			  xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+			  name="gazelleTestSubReport_subreport1" pageWidth="803" pageHeight="686" orientation="Landscape"
+			  columnWidth="803" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0"
+			  uuid="bec07d6d-cd04-41ef-a3b0-2aed0abfc0c7">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="test_keyword" class="java.lang.String">
+		<defaultValueExpression><![CDATA["ARI_RPT"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="applicationurl" class="java.lang.String">
+		<defaultValueExpression><![CDATA["https://gazelle.ihe.net/EU-CAT/"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["/Users/epoiseau/workspace/gazelle-tm/gazelle-tm-ear/src/main/dist/opt/gazelle/reports/"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT distinct
+  tm_role_in_test.keyword as tm_role_in_test_keyword,
+  tm_role_in_test.id as tm_role_in_test_id,
+  tm_test_roles.number_of_tests_to_realize,
+  tm_role_in_test.is_role_played_by_a_tool,
+  tm_test_option.keyword as tm_test_option_keyword
+FROM
+  public.tm_test_roles,
+  public.tm_role_in_test,
+  public.tm_test,
+  public.tm_test_option
+WHERE
+  tm_test_roles.role_in_test_id = tm_role_in_test.id AND
+  tm_test.id = tm_test_roles.test_id AND
+  tm_test_option.id = tm_test_roles.test_option_id and tm_test.keyword = $P{test_keyword} ;]]>
+	</queryString>
+	<field name="tm_role_in_test_keyword" class="java.lang.String"/>
+	<field name="tm_role_in_test_id" class="java.lang.Integer"/>
+	<field name="number_of_tests_to_realize" class="java.lang.Integer"/>
+	<field name="is_role_played_by_a_tool" class="java.lang.Boolean"/>
+	<field name="tm_test_option_keyword" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="20">
+			<staticText>
+				<reportElement positionType="Float" mode="Opaque" x="0" y="0" width="803" height="19" isPrintInFirstWholeBand="true" backcolor="#9999FF" uuid="5b47c3cd-bcc0-49ae-8fef-c8facf263a4b"/>
+				<box leftPadding="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Test Participants]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="44" splitType="Stretch">
+			<staticText>
+				<reportElement x="1" y="1" width="137" height="15" uuid="36d02723-cc2d-4ca5-b325-b1b4f8e26d4b"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Role in test  :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="141" y="1" width="230" height="15" uuid="8740097c-111c-419c-857e-149cfb8c7bd5"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_role_in_test_keyword}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="371" y="1" width="49" height="15" uuid="9b704ca5-3728-406c-b5f0-687ecc2f8119"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Option :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="419" y="1" width="68" height="15" uuid="560d0e83-e9b3-48a1-bd65-f8515b29c42b"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_test_option_keyword}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="582" y="1" width="43" height="15" uuid="d0c31257-22d3-4ac4-893f-0f310e49f477"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{number_of_tests_to_realize}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="486" y="1" width="96" height="15" uuid="6214806b-5b3a-48dc-90ea-7bee3b2d7624"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nb of instances :]]></text>
+			</staticText>
+			<subreport>
+				<reportElement stretchType="RelativeToTallestObject" x="100" y="16" width="525" height="22" uuid="0c2778c3-0ac7-4b92-b296-b424e8eb0693"/>
+				<subreportParameter name="role_in_test_id">
+					<subreportParameterExpression><![CDATA[$F{tm_role_in_test_id}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["gazelleTestParticipantsAIPOSubReport.jasper"]]></subreportExpression>
+			</subreport>
+			<line>
+				<reportElement positionType="Float" x="0" y="39" width="802" height="1" uuid="27e79282-d41e-446b-90ed-02f949d38da6"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+		</band>
+	</detail>
+</jasperReport>

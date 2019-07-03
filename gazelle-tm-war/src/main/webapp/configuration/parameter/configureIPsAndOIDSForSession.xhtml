@@ -1,0 +1,62 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tm.configurations.ConfigureIPsAndOIDs']}"/>
+    <ui:define name="body">
+        <!--<h:form id="configForm">-->
+        <!--<s:token allowMultiplePosts="true"/>-->
+
+        <div>
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active">
+                    <a href="#home" aria-controls="home" role="tab"
+                       data-toggle="tab">#{messages['gazelle.tm.configurations.Overview']}</a>
+                </li>
+                <h:panelGroup rendered="#{s:hasRole('admin_role')}">
+                    <li role="presentation">
+                        <a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">#{messages['gazelle.tm.ConfigureIPsAndDNS']}</a>
+                    </li>
+
+                    <li role="presentation">
+                        <a href="#messages" aria-controls="messages" role="tab"
+                           data-toggle="tab">#{messages['gazelle.tm.ConfigureIPsAndPortForProxy']}</a>
+                    </li>
+                </h:panelGroup>
+            </ul>
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="home">
+                    <h:form id="configForm1">
+                        <s:token allowMultiplePosts="true"/>
+                        <f:subview id="subview_12">
+                            <ui:include src="/configuration/parameter/networkConfigurationOverview.xhtml"/>
+                        </f:subview>
+                    </h:form>
+                </div>
+
+                <h:panelGroup rendered="#{s:hasRole('admin_role')}">
+
+                    <div role="tabpanel" class="tab-pane" id="profile">
+                        <h:form id="configForm2">
+                            <s:token allowMultiplePosts="true"/>
+                            <f:subview id="subview_2">
+                                <ui:include src="/configuration/parameter/configureIPRangeAndDNS.xhtml"/>
+                            </f:subview>
+                        </h:form>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="messages">
+                        <h:form id="configForm3">
+                            <s:token allowMultiplePosts="true"/>
+                            <f:subview id="subview_3">
+                                <ui:include src="/configuration/parameter/configureIPAndPortRangeForProxy.xhtml"/>
+                            </f:subview>
+                        </h:form>
+                    </div>
+                </h:panelGroup>
+            </div>
+        </div>
+
+        <!--</h:form>-->
+    </ui:define>
+</ui:composition>

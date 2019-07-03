@@ -1,0 +1,90 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <h:form id="globalform" styleClass="form-horizontal">
+        <s:token allowMultiplePosts="true"/>
+        <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+            <div class="row">
+                <div class="col-lg-6">
+                    <!--  Testing session -->
+                    <ui:include src="/filter/filter.xhtml">
+                        <ui:param name="filter" value="#{oidOverview.filter}"/>
+                        <ui:param name="filterWidth" value="240"/>
+                        <ui:param name="filterId" value="testingSession"/>
+                        <ui:param name="filterName" value="#{messages['gazelle.systems.TestingSession']}"/>
+                        <ui:param name="filterForm" value="globalform,globalform2"/>
+                    </ui:include>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <!--  institution selection -->
+                    <ui:include src="/filter/filter.xhtml">
+                        <ui:param name="filter" value="#{oidOverview.filter}"/>
+                        <ui:param name="filterWidth" value="240"/>
+                        <ui:param name="filterId" value="institution"/>
+                        <ui:param name="filterName" value="#{messages['gazelle.users.Institution']}"/>
+                        <ui:param name="filterForm" value="globalform,globalform2"/>
+                    </ui:include>
+                </div>
+                <div class="col-lg-6">
+                    <!--  system -->
+                    <ui:include src="/filter/filter.xhtml">
+                        <ui:param name="filter" value="#{oidOverview.filter}"/>
+                        <ui:param name="filterWidth" value="240"/>
+                        <ui:param name="filterId" value="system"/>
+                        <ui:param name="filterName"
+                                  value="#{messages['gazelle.configuration.system.system']}"/>
+                        <ui:param name="filterForm" value="globalform,globalform2"/>
+                    </ui:include>
+                </div>
+            </div>
+            <!--  AIPO selection -->
+            <ui:include src="/testing/research/filterAIPO.xhtml">
+                <ui:param name="filter" value="#{oidOverview.filter}"/>
+                <ui:param name="filterForm" value="globalform,globalform2"/>
+            </ui:include>
+            <div class="row">
+                <div class="col-lg-6">
+                    <!--  label -->
+                    <ui:include src="/filter/filter.xhtml">
+                        <ui:param name="filter" value="#{oidOverview.filter}"/>
+                        <ui:param name="filterWidth" value="240"/>
+                        <ui:param name="filterId" value="label"/>
+                        <ui:param name="filterName" value="#{messages['gazelle.tf.table.Label']}"/>
+                        <ui:param name="filterForm" value="globalform,globalform2"/>
+                    </ui:include>
+                </div>
+                <div class="col-lg-6">
+                    <!--  label -->
+                    <ui:include src="/filter/filter.xhtml">
+                        <ui:param name="filter" value="#{oidOverview.filter}"/>
+                        <ui:param name="filterWidth" value="240"/>
+                        <ui:param name="filterId" value="oid"/>
+                        <ui:param name="filterName" value="#{messages['gazelle.tf.OID']}"/>
+                        <ui:param name="filterForm" value="globalform,globalform2"/>
+                    </ui:include>
+                </div>
+            </div>
+            <ui:define name="filter_buttons">
+
+                <a4j:commandLink actionListener="#{oidOverview.filter.clear()}"
+                                 title="#{messages['gazelle.users.reset']}" type="submit"
+                                 execute="@this" render="globalform,globalform2">
+                    <span class="fa fa-times-circle"/>
+                </a4j:commandLink>
+            </ui:define>
+        </ui:decorate>
+
+        <h:outputLink value="#{configurationsOverview.restURL}" target="_blank">
+            <h:outputText
+                    value="#{messages['net.ihe.gazelle.tm.URLForDownloadingConfigurationsAsCSV']}"/>
+        </h:outputLink>
+
+    </h:form>
+    <ui:include src="/configuration/oid/oidList.xhtml">
+        <ui:param name="showActions" value="true"/>
+        <ui:param name="formId" value="globalform2"/>
+    </ui:include>
+</ui:composition>

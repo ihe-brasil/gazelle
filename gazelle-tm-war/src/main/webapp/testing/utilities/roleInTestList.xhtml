@@ -1,0 +1,72 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns="http://www.w3.org/1999/xhtml">
+    <rich:dataTable cellpadding="0" cellspacing="0" rows="6" width="700" border="0" var="currentRoleInTest"
+                    value="#{roleInTestListToDelete}" first="0">
+        <f:facet name="header">
+            <rich:columnGroup>
+                <g:column rowspan="2">
+                    <h:outputText value="#{messages['gazelle.tm.roleInTest.RoleInTestKeyword']}"/>
+                </g:column>
+                <g:column colspan="4">
+                    <h:outputText value="#{messages['gazelle.tm.monitors.TestParticipants']}"/>
+                </g:column>
+                <g:column breakRowBefore="true">
+                    <h:outputText value="#{messages['gazelle.testmanagement.system.label.IP']}"/>
+                </g:column>
+                <g:column>
+                    <h:outputText value="#{messages['gazelle.configuration.system.actorKeyword']}"/>
+                </g:column>
+                <g:column>
+                    <h:outputText value="#{messages['gazelle.tests.test.option']}"/>
+                </g:column>
+                <g:column>
+                    <h:outputText value="#{messages['gazelle.tm.roleInTest.IsTested']}"/>
+                </g:column>
+            </rich:columnGroup>
+        </f:facet>
+        <g:column colspan="5">
+            <h:outputText value="#{currentRoleInTest.keyword}" style="font-size:small;font-weight:bold;"/>
+        </g:column>
+        <g:column breakRowBefore="true" colspan="5"
+                  rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}">
+            <s:div style="text-align:right">
+                <a4j:commandButton actionListener="#{tmCheckListManager.setSelectedRoleInTest(currentRoleInTest)}"
+                                   oncomplete="jq162('#DeleteRoleInTest').modal('show');"
+                                   render=" :formritd"
+                                   value="#{messages['gazelle.tm.DeleteRoleInTest']}..." execute="@this"
+                                   rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}"/>
+            </s:div>
+        </g:column>
+        <rich:collapsibleSubTable var="testParticipant" value="#{currentRoleInTest.testParticipantsList}">
+            <g:column>
+
+                <f:facet name="footer">
+                    <h:outputText
+                            value="#{currentRoleInTest.testParticipantsList.size} #{messages['gazelle.tm.monitors.TestParticipants']}"
+                            style="font-size:x-small;font-style:italic;"/>
+                </f:facet>
+            </g:column>
+            <g:column>
+                <h:outputText
+                        value="#{testParticipant.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.toString()}">
+                </h:outputText>
+            </g:column>
+            <g:column>
+                <h:outputText
+                        value="#{testParticipant.actorIntegrationProfileOption.actorIntegrationProfile.actor.toString()}"/>
+            </g:column>
+            <g:column>
+                <h:outputText
+                        value="#{testParticipant.actorIntegrationProfileOption.integrationProfileOption.keyword}"/>
+            </g:column>
+            <g:column>
+                <h:outputText value="#{testParticipant.tested}"/>
+            </g:column>
+        </rich:collapsibleSubTable>
+        <f:facet name="footer">
+            <rich:dataScroller maxPages="10" renderIfSinglePage="false"/>
+        </f:facet>
+    </rich:dataTable>
+</ui:composition>

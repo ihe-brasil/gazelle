@@ -1,0 +1,154 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:c="http://java.sun.com/jstl/core"
+                xmlns="http://www.w3.org/1999/xhtml" xmlns:rich="http://richfaces.org/rich">
+
+    <s:div id="commentList" rendered="#{logList.size() gt 0}">
+        <ui:decorate template="/layout/panels/_panel.xhtml">
+            <table width="100%" style="table-layout: fixed;">
+                <tr class="ti-row2">
+                    <td width="15%">#{messages['gazelle.common.Date']}</td>
+                    <td width="10%">#{messages['gazelle.tm.users.userInfo']}</td>
+                    <c:if test="#{!onlyFiles}">
+                        <td width="10%">#{messages['gazelle.systems.session.Type']}</td>
+                    </c:if>
+                    <td width="40%">#{messages['net.ihe.gazelle.tm.Data']}</td>
+                    <td width="15%">#{messages['net.ihe.gazelle.tm.Actions']}</td>
+                </tr>
+                <a4j:repeat value="#{logList}" var="tsdWrapper">
+                    <tr>
+                        <td>
+                            <s:div style="overflow: auto;">
+                                <g:date tooltip="true" value="#{tsdWrapper.tsd.lastChanged}"/>
+                            </s:div>
+                        </td>
+                        <td>
+                            <s:div style="overflow: hidden;">
+                                <h:outputText value="#{tsdWrapper.tsd.lastModifierId}"/>
+                            </s:div>
+                        </td>
+                        <c:if test="#{!onlyFiles}">
+                            <td>
+                                <s:div style="overflow: hidden;">
+                                    <h:outputText value="#{messages[tsdWrapper.tsd.typeLabel]}"/>
+                                </s:div>
+                            </td>
+                        </c:if>
+                        <td>
+                            <a4j:outputPanel>
+                                <pre style="width: 100%;">
+                                    <h:outputText value="#{tsdWrapper.getDisplay()}"
+                                                  rendered="#{!testInstanceManager.canUpdateStepsValues(tsdWrapper.tsd)}"/>
+                                    <s:span rendered="#{testInstanceManager.canUpdateStepsValues(tsdWrapper.tsd)}">
+                                        <rich:inplaceInput value="#{tsdWrapper.tsd.value}" inputWidth="90%">
+                                            <a4j:ajax event="blur" render="commentList"
+                                                      listener="#{testInstanceManager.persistTestStepsData(tsdWrapper.tsd)}"/>
+                                        </rich:inplaceInput>
+                                        <h:outputText value=" (#{tsdWrapper.tsd.getComment()})"
+                                                      rendered="#{(tsdWrapper.tsd.getComment() != null) and (not empty tsdWrapper.tsd.getComment())}"/>
+                                    </s:span>
+                                </pre>
+                            </a4j:outputPanel>
+                        </td>
+                        <td>
+                            <a4j:region>
+                                <s:span id="buttons">
+                                    <h:panelGroup rendered="#{testInstanceManager.canDelete(tsdWrapper.tsd)}">
+                                        <a4j:commandLink limitRender="true"
+                                                         title="#{messages['gazelle.testmanagement.object.Comment']}"
+                                                         oncomplete="jq162('#ViewSelectedComment').modal('show');"
+                                                         render="ViewSelectedCommentForm" execute="@this"
+                                                         actionListener="#{testInstanceManager.initSelectedComment(logListOwner, tsdWrapper.tsd)}">
+                                            <span class="gzl-icon-pencil"/>
+                                        </a4j:commandLink>
+                                    </h:panelGroup>
+                                    <s:span rendered="#{!tsdWrapper.tsd.isComment()}">
+                                        <h:outputLink value="#{tsdWrapper.getLink()}" target="_blank"
+                                                      title="#{messages['net.ihe.gazelle.tm.OpenInNewTab']}">
+                                            <span class="gzl-icon-globe"/>
+                                        </h:outputLink>
+                                        <h:panelGroup
+                                                rendered="#{tsdWrapper.tsd.isFile() and not empty applicationPreferenceManager.EVSClientURL}">
+                                            <h:commandLink action="#{tsdWrapper.getValidationLink()}"
+                                                           target="_blank"
+                                                           title="#{messages['net.ihe.gazelle.tm.ValidateUsingEVSClient']}">
+                                                <span class="gzl-icon-play"/>
+                                            </h:commandLink>
+                                        </h:panelGroup>
+                                    </s:span>
+                                    <h:panelGroup rendered="#{not empty applicationPreferenceManager.EVSClientURL}">
+                                        <h:panelGroup
+                                                rendered="#{!tsdWrapper.tsd.dataType.isTLS() and tsdWrapper.tsd.dataType.evsCompliant }">
+                                            <h:outputLink value="#{tsdWrapper.getPermanentLink()}"
+                                                          title="#{messages['net.ihe.gazelle.tm.EVSClient']} #{tsdWrapper.getStatus()}"
+                                                          target="_blank">
+                                                <s:span styleClass="gzl-icon-circle-green"
+                                                        rendered="#{tsdWrapper.statusPassed()}"/>
+                                                <s:span styleClass="gzl-icon-circle-red"
+                                                        rendered="#{tsdWrapper.statusFailed()}"/>
+                                                <s:span styleClass="gzl-icon-circle-blue"
+                                                        rendered="#{!tsdWrapper.statusPassed() and !tsdWrapper.statusFailed() and !tsdWrapper.statusNotPerformed() and !tsdWrapper.notToDo()}"/>
+                                            </h:outputLink>
+                                            <a4j:commandLink limitRender="true"
+                                                             title="#{messages['net.ihe.gazelle.tm.dataType.EVSClient']} #{messages['net.ihe.gazelle.tm.LastCheck']} #{dateDisplay.displayDateTime(tsdWrapper.getLastCheck())}"
+                                                             rendered="#{!tsdWrapper.notToDo()}"
+                                                             actionListener="#{tsdWrapper.refresh()}"
+                                                             render="buttons"
+                                                             execute="@this">
+                                                <span class="gzl-icon-refresh"/>
+                                            </a4j:commandLink>
+                                        </h:panelGroup>
+                                        <h:panelGroup rendered="#{tsdWrapper.tsd.dataType.sample}">
+                                            <h:outputLink value="#{tsdWrapper.getPermanentLink()}"
+                                                          title="#{tsdWrapper.getStatus()}"
+                                                          target="_blank">
+                                                <s:span styleClass="gzl-icon-circle-green"
+                                                        rendered="#{tsdWrapper.sampleExamined() and tsdWrapper.sampleValid()}"/>
+                                                <s:span styleClass="gzl-icon-circle-red"
+                                                        rendered="#{tsdWrapper.sampleExamined() and not tsdWrapper.sampleValid()}"/>
+                                                <s:span styleClass="gzl-icon-circle-blue"
+                                                        rendered="#{not tsdWrapper.sampleExamined()}"/>
+                                            </h:outputLink>
+                                        </h:panelGroup>
+                                        <h:panelGroup
+                                                rendered="#{tsdWrapper.tsd.dataType.isTLS() and tsdWrapper.tsd.dataType.evsCompliant  and not empty applicationPreferenceManager.getTlsURL()}">
+                                            <h:outputLink value="#{tsdWrapper.getPermanentLink()}"
+                                                          title="#{messages['net.ihe.gazelle.tm.dataType.gss']} #{tsdWrapper.getStatus()}"
+                                                          target="_blank">
+                                                <s:span styleClass="gzl-icon-circle-green"
+                                                        rendered="#{tsdWrapper.statusPassed()}"/>
+                                                <s:span styleClass="gzl-icon-circle-red"
+                                                        rendered="#{tsdWrapper.statusFailed()}"/>
+                                                <s:span styleClass="gzl-icon-circle-blue"
+                                                        rendered="#{!tsdWrapper.statusPassed() and !tsdWrapper.statusFailed() and !tsdWrapper.statusNotPerformed() and !tsdWrapper.notToDo()}"/>
+                                            </h:outputLink>
+                                            <a4j:commandLink
+                                                    title="#{messages['net.ihe.gazelle.tm.dataType.gss']} #{messages['net.ihe.gazelle.tm.LastCheck']} #{dateDisplay.displayDateTime(tsdWrapper.getLastCheck())}"
+                                                    actionListener="#{tsdWrapper.refresh()}"
+                                                    render="buttons" limitRender="true"
+                                                    rendered="#{!tsdWrapper.notToDo()}"
+                                                    execute="@this">
+                                                <span class="gzl-icon-refresh"/>
+                                            </a4j:commandLink>
+                                        </h:panelGroup>
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{testInstanceManager.canDelete(tsdWrapper.tsd)}">
+                                        <a4j:region>
+                                            <a4j:commandLink limitRender="true"
+                                                             title="#{messages['gazelle.common.button.Delete']}"
+                                                             oncomplete="jq162('#RemovePanel').modal('show');"
+                                                             actionListener="#{testInstanceManager.initDeleteFor(logListOwner, tsdWrapper.tsd)}"
+                                                             render="RemovePanel" execute="@this">
+                                                <span class="gzl-icon-trash-o"/>
+                                            </a4j:commandLink>
+                                        </a4j:region>
+                                    </h:panelGroup>
+                                </s:span>
+                            </a4j:region>
+                        </td>
+                    </tr>
+                </a4j:repeat>
+            </table>
+        </ui:decorate>
+    </s:div>
+</ui:composition>

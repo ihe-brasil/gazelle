@@ -1,0 +1,32 @@
+<s:div xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+       xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+       xmlns:f="http://java.sun.com/jsf/core"
+       xmlns="http://www.w3.org/1999/xhtml">
+    <rich:dataTable id="documentsListTable" var="document" value="#{documentsToDisplay}" rowKeyVar="rowNumber"
+                    rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                    rendered="#{documentManager.documents.size() &gt; 0}" render="ds">
+        <g:column sortBy="#{'name'}">
+            <ui:define name="header">
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.Documents']}"/>
+            </ui:define>
+            <h:outputText value="#{document.name}"/>
+            <ui:include src="/tf/documents/_documentPdfLink.xhtml">
+                <ui:param name="document" value="#{document}"/>
+                <ui:param name="displayedName" value=" #{messages['net.ihe.gazelle.tm.ViewPdf']}"/>
+            </ui:include>
+            <h:outputText value=" , "/>
+            <h:outputLink id="viewDocumentPermalink" target="_blank"
+                          value="#{documentManager.getDocumentPermalink(document)}"
+                          title="#{messages['net.ihe.gazelle.tm.ViewDocumentDetails']}">
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.More']}..."/>
+            </h:outputLink>
+        </g:column>
+        <f:facet name="footer">
+            <ui:include src="/util/datatableFooter.xhtml">
+                <ui:param name="dataScrollerId" value="ds"/>
+                <ui:param name="dataTableId" value="documentsListTable"/>
+            </ui:include>
+        </f:facet>
+    </rich:dataTable>
+</s:div>

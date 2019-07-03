@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.2.0.final using JasperReports Library version 6.2.0  -->
+<!-- 2016-03-09T22:21:23 -->
+<jasperReport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://jasperreports.sourceforge.net/jasperreports" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="feesStatus_subreport2" pageWidth="300" pageHeight="30" columnWidth="83" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="59af1d3d-ac3a-4968-b321-1fe202c41818">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gazelle Production"/>
+	<parameter name="testingSessionId" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[29]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select *, vendor + comittee + monitor as total from (select count(id) as vendor from tm_connectathon_participant where testing_session_id = $P{testingSessionId} and status_id = 1 ) as vendor,
+(select count(id) as monitor from tm_connectathon_participant where testing_session_id = $P{testingSessionId} and status_id = 2 )as monitor,
+(select count(id) as comittee from tm_connectathon_participant where testing_session_id = $P{testingSessionId} and status_id = 3) as comittee ;]]>
+	</queryString>
+	<field name="total" class="java.lang.Long"/>
+	<field name="vendor" class="java.lang.Long"/>
+	<field name="monitor" class="java.lang.Long"/>
+	<field name="comittee" class="java.lang.Long"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="29" splitType="Prevent">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<textField pattern="">
+				<reportElement x="0" y="0" width="60" height="15" uuid="65d8e297-6c69-4cca-b79b-1114be9584e6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{vendor}
+]]></textFieldExpression>
+			</textField>
+			<textField pattern="€ #,##0">
+				<reportElement x="62" y="0" width="14" height="15" uuid="a81bc477-dbcb-4bca-a9b1-f5e0f8a7e416"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["/"]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement x="77" y="0" width="60" height="15" forecolor="#000000" uuid="b1cfd644-aa9e-4944-aaa0-918e4b5bb7d4">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{monitor}]]></textFieldExpression>
+			</textField>
+			<textField pattern="€ #,##0">
+				<reportElement x="139" y="0" width="14" height="15" uuid="501c6d28-7a5d-4350-ae67-1dc2d3616e7f"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["/"]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement x="155" y="0" width="60" height="15" forecolor="#000000" uuid="c0345690-cdc3-44ca-b61f-a60b8a340703">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{comittee}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="15" width="60" height="14" uuid="6a1d013a-2621-4948-9820-936f2e5c9a71"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Vendor]]></text>
+			</staticText>
+			<textField pattern="€ #,##0">
+				<reportElement x="62" y="15" width="14" height="14" uuid="69918d80-6f61-4ca8-b585-a6d5a2562c2a"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["/"]]></textFieldExpression>
+			</textField>
+			<textField pattern="€ #,##0">
+				<reportElement x="139" y="15" width="14" height="14" uuid="fa1327b1-28c7-427f-871e-ac5095ca3787"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["/"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="155" y="15" width="60" height="14" uuid="5db95434-ce87-43fd-91c4-c6514ec9ed50">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Comittee]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="77" y="15" width="60" height="14" uuid="a61a0bbd-c8d5-453e-a478-e367c4ac1a08"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Monitor]]></text>
+			</staticText>
+			<textField pattern="€ #,##0">
+				<reportElement x="217" y="0" width="14" height="15" uuid="fe019b40-7940-4cf2-9ae4-0c714d30b055"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["/"]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement x="233" y="0" width="60" height="15" forecolor="#000000" uuid="8d9c61af-ee26-4f79-8829-ff3a3df1bb11">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{total}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="233" y="15" width="60" height="14" uuid="6f2a86d3-3d82-4283-a4a2-46889dd85ccc">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<textField pattern="€ #,##0">
+				<reportElement x="217" y="15" width="14" height="14" uuid="19ebf9a8-a718-4dfc-999e-d9ad99a83335"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["/"]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

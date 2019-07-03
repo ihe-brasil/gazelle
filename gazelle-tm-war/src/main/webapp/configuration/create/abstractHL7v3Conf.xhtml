@@ -1,0 +1,25 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <a4j:region id="sendReceivFacilityRegion">
+        <s:decorate template="/layout/form/_edit.xhtml" id="sendReceivFacilityDecorate">
+            <ui:param name="id" value="sendingFacilityInputText"/>
+            <ui:define name="label">#{messages['gazelle.configuration.HL7.DeviceId']}</ui:define>
+            <h:inputText  styleClass=" form-control" id="sendingFacilityInputText"
+                         value="#{systemConfigurationManager.currentConfiguration.sendingReceivingFacility}"
+                         required="true">
+            </h:inputText>
+        </s:decorate>
+    </a4j:region>
+    <a4j:region id="sendReceivAppRegion">
+        <s:decorate template="/layout/form/_edit.xhtml" id="sendReceivAppDecorate">
+            <ui:param name="id" value="sendingApplicationInputText"/>
+            <ui:define name="label">#{messages['gazelle.configuration.HL7.OrganizationId']}</ui:define>
+            <h:inputText  styleClass=" form-control" id="sendingApplicationInputText"
+                         value="#{systemConfigurationManager.currentConfiguration.sendingReceivingApplication}"
+                         required="true">
+            </h:inputText>
+        </s:decorate>
+    </a4j:region>
+</ui:composition>

@@ -1,0 +1,69 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <h:form id="formrCancel">
+        <s:token allowMultiplePosts="true"/>
+        <h:panelGroup rendered="#{partnersManager.isDisplayModal()}">
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="partnerModalPanel"/>
+                <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.Partners']} #{messages['net.ihe.gazelle.tm.WithRole']}
+                    #{partnersManager.selectedRit.getKeyword()}
+                </ui:define>
+                <rich:dataTable value="#{partnersManager.getPartnersList()}" var="varr" rows="15"
+                                render="datascrollerPartners">
+                    <g:column styleClass="#{styleClassColumn}" sortBy="#{'system.keyword'}">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.configuration.system.system']}"/>
+                        </ui:define>
+                        <g:link value="#{varr.system}" detailed="true"/>
+                    </g:column>
+                    <g:column styleClass="#{styleClassColumn}">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.systems.TestingType']}"/>
+                        </ui:define>
+                        <h:outputText value="#{varr.getTestingType()}"/>
+                    </g:column>
+                    <g:column styleClass="#{styleClassColumn}">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.systems.systemInSession.skype']}"/>
+                        </ui:define>
+                        <a href="skype:#{varr.skype}">
+                            <h:outputText value="#{varr.getSkype()}"/>
+                        </a>
+                    </g:column>
+                    <g:column styleClass="#{styleClassColumn}" rendered="#{!partnersManager.internetTesting}">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['gazelle.systems.systemInSession.table']}"/>
+                        </ui:define>
+                        <h:outputText value="#{varr.getTableKeyword()}"/>
+                    </g:column>
+                    <g:column styleClass="#{styleClassColumn}" rendered="#{partnersManager.internetTesting}">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.Mail']}"/>
+                        </ui:define>
+                        <a href="mailto:#{varr.getEmail()}">
+                            <h:outputText value="#{varr.getEmail()}"/>
+                        </a>
+                    </g:column>
+                    <g:column styleClass="#{styleClassColumn}" sortBy="#{'tested'}">
+                        <ui:define name="header">
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.Tested']}"/>
+                        </ui:define>
+                        <s:span styleClass="gzl-icon-checked" rendered="#{varr.tested}"/>
+                        <s:span styleClass="gzl-icon-times" rendered="#{not varr.tested}"/>
+                    </g:column>
+                    <f:facet name="footer">
+                        <rich:dataScroller id="datascrollerPartners"/>
+                    </f:facet>
+                </rich:dataTable>
+                <ui:define name="popup_footer">
+                    <a4j:commandButton id="button" styleClass="gzl-btn"
+                                       value="#{messages['gazelle.tm.Cancel']}"
+                                       onclick="jq162('#partnerModalPanel').modal('hide');"/>
+                </ui:define>
+            </ui:decorate>
+        </h:panelGroup>
+    </h:form>
+</ui:composition>

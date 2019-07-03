@@ -1,0 +1,145 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="//layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tf.HL7v2MessageProfiles']}"/>
+    <ui:define name="body">
+        <h:form id="globalForm" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <a4j:queue requestDelay="300" ignoreDupResponses="true"/>
+            <s:div rendered="#{not tfHl7MessageProfileManager.displayProfile}">
+                <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filterName" value="#{messages['net.ihe.gazelle.tm.AffinityDomain']}"/>
+                                <ui:param name="filterId" value="afDomain"/>
+                                <ui:param name="filter" value="#{tfHl7MessageProfileManager.filter}"/>
+                                <ui:param name="filterForm" value="globalForm"/>
+                            </ui:include>
+                        </div>
+                        <div class="col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filterName" value="#{messages['gazelle.productregistry.system.label.Domain']}"/>
+                                <ui:param name="filterId" value="domain"/>
+                                <ui:param name="filter" value="#{tfHl7MessageProfileManager.filter}"/>
+                                <ui:param name="filterForm" value="globalForm"/>
+                            </ui:include>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filterName" value="#{messages['gazelle.tf.Transaction']}"/>
+                                <ui:param name="filterId" value="transaction"/>
+                                <ui:param name="filter" value="#{tfHl7MessageProfileManager.filter}"/>
+                                <ui:param name="filterForm" value="globalForm"/>
+                            </ui:include>
+                        </div>
+                        <div class="col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filterName" value="#{messages['gazelle.testmanagement.system.label.Actor']}"/>
+                                <ui:param name="filterId" value="actor"/>
+                                <ui:param name="filter" value="#{tfHl7MessageProfileManager.filter}"/>
+                                <ui:param name="filterForm" value="globalForm"/>
+                            </ui:include>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filterName" value="#{messages['gazelle.tm.patient.SharePatientLogger.HL7Version']}"/>
+                                <ui:param name="filterId" value="version"/>
+                                <ui:param name="filter" value="#{tfHl7MessageProfileManager.filter}"/>
+                                <ui:param name="filterForm" value="globalForm"/>
+                            </ui:include>
+                        </div>
+                        <div class="col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filterName" value="#{messages['net.ihe.gazelle.tm.MessageType']}"/>
+                                <ui:param name="filterId" value="type"/>
+                                <ui:param name="filter" value="#{tfHl7MessageProfileManager.filter}"/>
+                                <ui:param name="filterForm" value="globalForm"/>
+                            </ui:include>
+                        </div>
+                    </div>
+                    <ui:define name="filter_buttons">
+                        <a4j:commandLink title="#{messages['gazelle.users.reset']}"
+                                         actionListener="#{tfHl7MessageProfileManager.filter.clear()}"
+                                         render="globalForm">
+                            <span class="fa fa-times-circle"></span>
+                        </a4j:commandLink>
+                    </ui:define>
+                </ui:decorate>
+                #{dataTableStateHolder.setAscendingOn('profileOid')}
+                <rich:dataTable id="profileListTable" rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                                value="#{tfHl7MessageProfileManager.allProfiles}" var="currentProfile"
+                                rendered="#{(tfHl7MessageProfileManager.allProfiles != null)}" render="ds">
+                    <g:column sortBy="#{'profileOid'}" sortOrder="#{dataTableStateHolder.sortOrders['profileOid']}">
+                        <ui:define name="header">#{messages['gazelle.tf.table.profileOid']}</ui:define>
+                        <h:outputLink
+                                value="#{tfHl7MessageProfileManager.gazelleHL7ValidatorURL}/viewProfile.seam?oid=#{currentProfile.profileOid}"
+                                target="_blank">
+                            <h:outputText value="#{currentProfile.profileOid}"/>
+                        </h:outputLink>
+                    </g:column>
+                    <g:column sortBy="#{'domain.name'}"
+                              sortOrder="#{dataTableStateHolder.sortOrders['domain.name']}">
+                        <ui:define name="header">#{messages['gazelle.tf.Domain']}</ui:define>
+                        #{currentProfile.domain.name}
+                    </g:column>
+                    <g:column sortBy="#{'actor.name'}"
+                              sortOrder="#{dataTableStateHolder.sortOrders['actor.name']}">
+                        <ui:define name="header">#{messages['gazelle.tf.Actor']}</ui:define>
+                        #{currentProfile.actor.name}
+                    </g:column>
+                    <g:column sortBy="#{'transaction.keyword'}"
+                              sortOrder="#{dataTableStateHolder.sortOrders['transaction.keyword']}">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Transaction']}</ui:define>
+                        #{currentProfile.transaction.keyword}
+                    </g:column>
+                    <g:column sortBy="#{'hl7Version'}"
+                              sortOrder="#{dataTableStateHolder.sortOrders['hl7Version']}">
+                        <ui:define name="header">#{messages['gazelle.tf.Hl7Version']}</ui:define>
+                        #{messages['gazelle.tf.HL7v']}#{currentProfile.hl7Version}
+                    </g:column>
+                    <g:column sortBy="#{'messageType'}"
+                              sortOrder="#{dataTableStateHolder.sortOrders['messageType']}">
+                        <ui:define name="header">#{messages['gazelle.tf.Message']}</ui:define>
+                        #{currentProfile.messageType}
+                        <h:outputText value=" (#{currentProfile.messageOrderControlCode})"
+                                      rendered="#{not empty currentProfile.messageOrderControlCode}"/>
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.tf.AffinityDomains']}</ui:define>
+                        <rich:list value="#{currentProfile.affinityDomains}"
+                                   rendered="#{currentProfile.affinityDomains != null}" var="ad" type="unordered">
+                            <h:outputText value="#{ad.labelToDisplay}"/>
+                        </rich:list>
+                    </g:column>
+                    <g:column rendered="#{s:hasPermission('MasterModel', 'edit', null)}">
+                        <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+                        <a4j:commandLink event="click" render="globalForm,editProfilePanel"
+                                         actionListener="#{tfHl7MessageProfileManager.editProfile(currentProfile)}">
+                            <span class="gzl-icon-pencil"/>
+                        </a4j:commandLink>
+                    </g:column>
+                    <f:facet name="footer">
+                        <ui:include src="/util/datatableFooter.xhtml">
+                            <ui:param name="dataScrollerId" value="ds"/>
+                            <ui:param name="dataTableId" value="profileListTable"/>
+                        </ui:include>
+                    </f:facet>
+                </rich:dataTable>
+                <h:commandLink value="#{messages['gazelle.common.export.ExportAsExcel']}"
+                               action="#{gazelleExcelExporterJboss7.export('globalForm:profileListTable')}"/>
+
+            </s:div>
+            <f:subview id="subview_22">
+                <ui:include id="include4Edit" src="editMessageProfile.xhtml"/>
+            </f:subview>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

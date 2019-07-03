@@ -1,0 +1,15 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['net.ihe.gazelle.tm.EditDocument']}"/>
+    <ui:define name="body">
+
+        #{documentManager.parseURLParameters("edit")}
+        <h:form id="editForm" rendered="#{ s:hasRole('admin_role') || s:hasRole('tests_editor_role')}">
+            <s:token allowMultiplePosts="true"/>
+            <ui:include src="/tf/documents/_editDocumentForm.xhtml">
+            </ui:include>
+        </h:form>
+    </ui:define>
+</ui:composition>

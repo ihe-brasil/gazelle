@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AssigningAuthorityPerSystem" language="java" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="937"/>
+	<property name="ireport.y" value="10"/>
+	<style name="Title" forecolor="#FFFFFF" fontName="Times New Roman" fontSize="50" isBold="false" pdfFontName="Times-Bold"/>
+	<style name="SubTitle" forecolor="#666666" fontName="Times New Roman" fontSize="18" isBold="false" pdfFontName="Times-Roman"/>
+	<style name="Column header" forecolor="#666666" fontName="Times New Roman" fontSize="14" isBold="true" pdfFontName="Times-Roman"/>
+	<style name="Detail" mode="Transparent" fontName="Times New Roman" pdfFontName="Times-Roman"/>
+	<style name="Row" mode="Transparent" fontName="Times New Roman" pdfFontName="Times-Roman">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style mode="Opaque" backcolor="#F0EFEF"/>
+		</conditionalStyle>
+	</style>
+	<subDataset name="PieChartDataset"/>
+	<queryString>
+		<![CDATA[SELECT
+     tm_patient_assigning_autority."keyword" AS tm_patient_assigning_autority_keyword,
+     tm_patient_assigning_autority."name" AS tm_patient_assigning_autority_name,
+     tm_patient_assigning_autority."root_oid" AS tm_patient_assigning_autority_root_oid,
+     tm_system."keyword" AS tm_system_keyword,
+     tm_system."name" AS tm_system_name
+FROM
+     "public"."tm_patient_assigning_autority" tm_patient_assigning_autority
+INNER JOIN "public"."tm_patient_assigning_authority_sis" tm_patient_assigning_authority_sis ON tm_patient_assigning_autority."id" = tm_patient_assigning_authority_sis."patient_assigning_authority_id"
+INNER JOIN "public"."tm_system_in_session" tm_system_in_session ON tm_patient_assigning_authority_sis."system_in_session_id" = tm_system_in_session."id"
+INNER JOIN "public"."tm_system" tm_system ON tm_system_in_session."system_id" = tm_system."id"
+WHERE tm_patient_assigning_autority."testing_session_id" = 21;]]>
+	</queryString>
+	<field name="tm_patient_assigning_autority_keyword" class="java.lang.String"/>
+	<field name="tm_patient_assigning_autority_name" class="java.lang.String"/>
+	<field name="tm_patient_assigning_autority_root_oid" class="java.lang.String"/>
+	<field name="tm_system_keyword" class="java.lang.String"/>
+	<field name="tm_system_name" class="java.lang.String"/>
+	<group name="tm_patient_assigning_autority_name">
+		<groupExpression><![CDATA[$F{tm_patient_assigning_autority_name}]]></groupExpression>
+		<groupHeader>
+			<band height="37">
+				<frame>
+					<reportElement mode="Opaque" x="0" y="0" width="802" height="24" forecolor="#B89F7D" backcolor="#CCCCFF"/>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="SubTitle" isPrintRepeatedValues="false" x="2" y="1" width="263" height="23" forecolor="#000000" backcolor="#CCCCFF"/>
+						<textElement>
+							<font fontName="Arial" isBold="false" pdfFontName="Helvetica"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{tm_patient_assigning_autority_name}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement style="Detail" positionType="Float" x="265" y="0" width="537" height="24"/>
+						<textElement>
+							<font fontName="Arial" size="18" isBold="false" pdfFontName="Helvetica"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{tm_patient_assigning_autority_root_oid}]]></textFieldExpression>
+					</textField>
+				</frame>
+				<frame>
+					<reportElement x="0" y="23" width="802" height="14" backcolor="#CCCCFF"/>
+					<staticText>
+						<reportElement style="Column header" positionType="Float" x="63" y="0" width="194" height="14" forecolor="#000000" backcolor="#CCCCFF"/>
+						<textElement>
+							<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica"/>
+						</textElement>
+						<text><![CDATA[System Keyword]]></text>
+					</staticText>
+					<staticText>
+						<reportElement style="Column header" positionType="Float" x="257" y="0" width="318" height="14" forecolor="#000000" backcolor="#CCCCFF"/>
+						<textElement>
+							<font fontName="Arial" size="12" isBold="true" pdfFontName="Helvetica"/>
+						</textElement>
+						<text><![CDATA[System Name]]></text>
+					</staticText>
+				</frame>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="6"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band height="555" splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="94" splitType="Stretch">
+			<frame>
+				<reportElement mode="Opaque" x="-20" y="0" width="822" height="65" forecolor="#000000" backcolor="#CCCCFF"/>
+				<staticText>
+					<reportElement style="Title" x="231" y="0" width="578" height="65" forecolor="#000000"/>
+					<textElement textAlignment="Right">
+						<font size="54" isBold="false"/>
+					</textElement>
+					<text><![CDATA[Systems per Assigning Authority]]></text>
+				</staticText>
+			</frame>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="14" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="14" width="802" height="1"/>
+			</line>
+			<frame>
+				<reportElement x="0" y="0" width="802" height="14"/>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement style="Detail" positionType="Float" x="0" y="0" width="257" height="14"/>
+					<textElement>
+						<font fontName="Arial" size="12" isBold="false" pdfFontName="Helvetica"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{tm_system_keyword}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement style="Detail" positionType="Float" x="257" y="0" width="545" height="14"/>
+					<textElement>
+						<font fontName="Arial" size="12" isBold="false" pdfFontName="Helvetica"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{tm_system_name}]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="7" splitType="Stretch">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="3" width="555" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="16" splitType="Stretch">
+			<frame>
+				<reportElement mode="Opaque" x="2" y="0" width="800" height="16" forecolor="#CCCCFF" backcolor="#CCCCFF"/>
+				<textField evaluationTime="Report">
+					<reportElement style="Column header" x="753" y="0" width="40" height="16" forecolor="#FFFFFF"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="12" isBold="false" pdfFontName="Helvetica"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement style="Column header" x="673" y="0" width="80" height="16" forecolor="#FFFFFF"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="12" isBold="false" pdfFontName="Helvetica"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+				</textField>
+				<textField pattern="EEEEE dd MMMMM yyyy">
+					<reportElement style="Column header" x="2" y="0" width="197" height="16" forecolor="#FFFFFF"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="12" isBold="false" pdfFontName="Helvetica"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

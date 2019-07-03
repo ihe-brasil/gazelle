@@ -1,0 +1,396 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <h:form id="#{formId}">
+        <s:token allowMultiplePosts="true"/>
+        <h:commandLink rendered="#{showActions}" value="#{messages['gazelle.common.export.ExportAsExcel']}"
+                       action="#{gazelleExcelExporterJboss7.export(formId.concat(':configurationsTable'))}"/>
+        <rich:dataTable id="configurationsTable" var="abstractConfiguration" rowKeyVar="rowNumber"
+                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" value="#{configurationsOverview.datamodel}"
+                        render="ds">
+            <g:column rendered="#{not configurationsOverview.isSystemSelected()}"
+                      sortBy="#{'configuration.systemInSession.system.keyword'}"
+                      sortOrder="#{datatablestateholder.sortorders['configuration.systeminsession.system.keyword']}">
+                <ui:define name="header">
+                    <h:outputText value="#{messages['gazelle.tm.Sys']}"/>
+                </ui:define>
+                <g:link target="_blank" value="#{abstractConfiguration.configuration.systemInSession.system}"/>
+                <h:outputText value=" / "/>
+                <g:link target="_blank"
+                        value="#{abstractConfiguration.configuration.systemInSession.system.uniqueInstitution}"/>
+            </g:column>
+            <g:column>
+                <ui:define name="header">
+                    <h:outputText value="#{messages['gazelle.systems.systemInSession.table']}"/>
+                </ui:define>
+                <h:outputText value="#{abstractConfiguration.configuration.systemInSession.tableSession.tableKeyword}"/>
+            </g:column>
+            <g:column rendered="#{configurationsOverview.showType}">
+                <ui:define name="header">
+                    <h:outputText value="#{messages['gazelle.systems.session.Type']}"/>
+                </ui:define>
+                <h:outputText value="#{abstractConfiguration.typeLabel}"/>
+            </g:column>
+            <g:column sortBy="#{'configuration.actor.keyword'}"
+                      sortOrder="ascending">
+                <ui:define name="header">
+                    <h:outputText value="#{messages['gazelle.testmanagement.system.label.Actor']}"/>
+                </ui:define>
+                <g:link target="_blank" detailed="true" value="#{abstractConfiguration.configuration.actor}"/>
+            </g:column>
+            <g:column sortBy="#{'configuration.host.hostname'}"
+                      sortOrder="#{datatablestateholder.sortorders['configuration.host.hostname']}">
+                <ui:define name="header">
+                    <h:outputText value="#{messages['gazelle.configuration.network.hostname']}"/>
+                </ui:define>
+                <s:span rendered="#{!configurationsOverview.isEditRights(abstractConfiguration)}">
+                    <h:outputText value="#{abstractConfiguration.configuration.host.hostname}"/>
+                </s:span>
+                <!--<s:span rendered="#{configurationsOverview.isEditRights(abstractConfiguration) and !s:hasRole('admin_role')}">-->
+                <!--<h:selectOneMenu styleClass="form-control gzl-form-control" id="HostListBox"-->
+                <!--value="#{abstractConfiguration.configuration.host}"-->
+                <!--required="true">-->
+                <!--<s:selectItems id="hostnameSelectItems"-->
+                <!--value="#{gazelleDAO.getListOfHostForASystemInSession( abstractConfiguration.configuration.systemInSession   )}"-->
+                <!--var="hostFromList" noSelectionLabel="${messages.PleaseSelect}"-->
+                <!--label="#{hostFromList.hostname}"/>-->
+                <!--<a4j:ajax event="change" render="#{idToRerender}"-->
+                <!--listener="#{systemConfigurationManager.addEditConfiguration(abstractConfiguration)}"-->
+                <!--execute="@this"/>-->
+                <!--</h:selectOneMenu>-->
+                <!--</s:span>-->
+                <s:span rendered="#{configurationsOverview.isEditRights(abstractConfiguration)}">
+                    <h:selectOneMenu styleClass="form-control gzl-form-control" id="HostListBoxForAdmin"
+                                     value="#{abstractConfiguration.configuration.host}"
+                                     required="true">
+                        <s:selectItems id="hostnameSelectItemsForAdmin"
+                                       value="#{gazelleDAO.getListOfHostForASystemInSessionAsAdmin( abstractConfiguration.configuration.systemInSession   )}"
+                                       var="hostFromList" noSelectionLabel="${messages.PleaseSelect}"
+                                       label="#{hostFromList.hostname}"/>
+                        <a4j:ajax event="change" render="#{idToRerender}"
+                                  listener="#{systemConfigurationManager.addEditConfiguration(abstractConfiguration)}"
+                                  execute="@this"/>
+                    </h:selectOneMenu>
+                </s:span>
+
+                <s:span styleClass="gzl-icon-exclamation-triangle"
+                        title="#{messages['net.ihe.gazelle.tm.ThisHostnameIsSharedBetweenMoreThanOneSystemInSe']} #{systemConfigurationManager.displaySystems(abstractConfiguration.configuration.host)}"
+                        rendered="#{abstractConfiguration.configuration.host.isUsedByMoreOneSystemInSession()}"/>
+
+            </g:column>
+            <g:column sortBy="#{'configuration.host.ip'}"
+                      sortOrder="#{datatablestateholder.sortorders['configuration.host.ip']}">
+                <ui:define name="header">
+                    <h:outputText value="#{messages['gazelle.configuration.network.ip']}"/>
+                </ui:define>
+                <h:outputText value="#{abstractConfiguration.configuration.host.ip}"/>
+            </g:column>
+            <g:column rendered="#{configurationsOverview.renderPorts}"
+                      sortBy="#{'port'}">
+                <ui:define name="header">
+                    <h:outputText value="#{messages['gazelle.configuration.system.Port']}"/>
+                </ui:define>
+                <s:div rendered="#{abstractConfiguration.server}">
+                    <s:div rendered="#{!abstractConfiguration.configuration.isSecured}">
+                        <s:span rendered="#{!configurationsOverview.isEditRights(abstractConfiguration)}">
+                            <h:outputText value="#{abstractConfiguration.port}"/>
+                        </s:span>
+                        <s:span rendered="#{configurationsOverview.isEditRights(abstractConfiguration)}">
+                            <rich:inplaceInput value="#{abstractConfiguration.port}" showControls="true" size="16">
+                                <a4j:ajax event="change" render="#{idToRerender}"
+                                          listener="#{systemConfigurationManager.addEditConfiguration(abstractConfiguration)}"/>
+                            </rich:inplaceInput>
+                        </s:span>
+                        <s:span rendered="#{abstractConfiguration.portProxy!=null and not empty abstractConfiguration.port}">
+                            <h:outputText style="color:red;" value="(#{abstractConfiguration.portProxy})"
+                                          title="#{messages['net.ihe.gazelle.tm.ProxyPort']}"/>
+                        </s:span>
+                    </s:div>
+                    <s:div rendered="#{abstractConfiguration.configuration.isSecured}">
+                        <ui:include src="/configuration/list/securedImageAndLink.xhtml">
+                            <ui:param name="configuration" value="#{abstractConfiguration}"/>
+                        </ui:include>
+                        <h:outputText value="#{abstractConfiguration.portSecured}"/>
+                    </s:div>
+                </s:div>
+            </g:column>
+            <g:column sortBy="#{'configuration.isSecured'}"
+                      sortOrder="#{datatablestateholder.sortorders['configuration.issecured']}">
+                <ui:define name="header">
+                    <h:outputText value="#{messages['net.ihe.gazelle.tm.IsSecured']}"/>
+                </ui:define>
+                <s:span rendered="#{!configurationsOverview.isEditRights(abstractConfiguration)}">
+                    <h:outputText value="#{abstractConfiguration.configuration.isSecured}"/>
+                </s:span>
+                <!--input hidden for export-->
+                <h:inputHidden value="#{abstractConfiguration.configuration.isSecured}"
+                               rendered="#{configurationsOverview.isEditRights(abstractConfiguration)}"/>
+                <s:span rendered="#{configurationsOverview.isEditRights(abstractConfiguration)}">
+                    <h:selectBooleanCheckbox styleClass="form-control-static"
+                                             value="#{abstractConfiguration.configuration.isSecured}">
+                        <a4j:ajax event="change" render="#{idToRerender}"
+                                  listener="#{systemConfigurationManager.addEditConfiguration(abstractConfiguration)}"/>
+                    </h:selectBooleanCheckbox>
+                </s:span>
+            </g:column>
+            <g:column rendered="#{configurationsOverview.renderTitle1}">
+                <ui:define name="header">
+                    <h:outputText value="#{configurationsOverview.title1}"/>
+                </ui:define>
+                <s:span rendered="#{!configurationsOverview.isEditRights(abstractConfiguration) and abstractConfiguration.details1!=null and !abstractConfiguration.details1.isEmpty()}">
+                    <h:outputText value="#{abstractConfiguration.details1}" title="#{abstractConfiguration.header1}"/>
+                </s:span>
+                <s:span rendered="#{configurationsOverview.isEditRights(abstractConfiguration) and abstractConfiguration.details1!=null and !abstractConfiguration.details1.isEmpty()}">
+                    <rich:inplaceInput value="#{abstractConfiguration.details1}" showControls="true" size="16"
+                                       disabled="#{abstractConfiguration.details1IsEditable()}">
+                        <a4j:ajax event="change" render="#{idToRerender}"
+                                  listener="#{systemConfigurationManager.addEditConfiguration(abstractConfiguration)}"/>
+                    </rich:inplaceInput>
+                </s:span>
+            </g:column>
+            <g:column rendered="#{configurationsOverview.renderUrl}">
+                <ui:define name="header">
+                    <h:outputText value="#{configurationsOverview.url}"/>
+                </ui:define>
+                <s:span rendered="#{not empty abstractConfiguration.finalURL}">
+                    <s:span rendered="#{abstractConfiguration.finalURL!=null and not empty abstractConfiguration.finalURL}">
+                        <h:outputText value="#{abstractConfiguration.finalURL}"/>
+                    </s:span>
+                </s:span>
+            </g:column>
+            <g:column rendered="#{configurationsOverview.renderTitle2}">
+                <ui:define name="header">
+                    <h:outputText value="#{configurationsOverview.title2}"/>
+                </ui:define>
+                <s:span rendered="#{not empty abstractConfiguration.header2}">
+                    <s:span rendered="#{!configurationsOverview.isEditRights(abstractConfiguration) and abstractConfiguration.details2!=null and !abstractConfiguration.details2.isEmpty()}">
+                        <h:outputText value="#{abstractConfiguration.details2}"
+                                      title="#{abstractConfiguration.header2}"/>
+                    </s:span>
+                    <s:span rendered="#{configurationsOverview.isEditRights(abstractConfiguration) and abstractConfiguration.details2!=null and !abstractConfiguration.details2.isEmpty()}">
+                        <rich:inplaceInput value="#{abstractConfiguration.details2}" showControls="true" size="16"
+                                           disabled="#{abstractConfiguration.details2IsEditable()}">
+                            <a4j:ajax event="change" render="#{idToRerender}"
+                                      listener="#{systemConfigurationManager.addEditConfiguration(abstractConfiguration)}"/>
+                        </rich:inplaceInput>
+                    </s:span>
+                </s:span>
+            </g:column>
+            <g:column>
+                <ui:define name="header">
+                    <h:outputText value="#{messages['gazelle.configuration.system.isApproved']}"/>
+                </ui:define>
+                <s:span rendered="#{abstractConfiguration.configuration.isApproved}">
+                    <span class="gzl-icon-circle-green"/>
+                    <h:outputText value="#{messages['gazelle.common.yes']}" style="font-style:italic"/>
+                </s:span>
+                <s:span rendered="#{!abstractConfiguration.configuration.isApproved}">
+                    <span class="gzl-icon-circle-red"/>
+                    <h:outputText value="#{messages['gazelle.common.no']}" style="font-style:italic"/>
+                </s:span>
+            </g:column>
+            <g:column rendered="#{showActions}">
+                <ui:define name="header">
+                    <h:outputText value="#{messages['gazelle.common.Action']}"/>
+                    <s:span rendered="#{configurationsOverview.isEditRights()}">
+                        <a4j:commandLink title="#{messages['gazelle.tm.DisapproveAllConfigurations']}"
+                                         oncomplete="jq162('#DisapproveAllConfigConfirmationModalPanel').modal('show');"
+                                         render="#{idToRerender}, :DisapproveAllConfigConfirmationForm" execute="@this">
+                            <span class="gzl-icon-not-checked"/>
+                        </a4j:commandLink>
+                        <a4j:commandLink title="#{messages['gazelle.tm.ApproveAllConfigurations']}"
+                                         oncomplete="jq162('#ApproveAllConfigConfirmationModalPanel').modal('show');"
+                                         render="#{idToRerender}, :ApproveAllConfigConfirmationForm" execute="@this">
+                            <span class="gzl-icon-checked"/>
+                        </a4j:commandLink>
+
+                        <s:span rendered="#{configurationsOverview.isEditRights()}">
+                            <a4j:commandLink event="click"
+                                             title="#{messages['gazelle.common.button.Delete']}"
+                                             oncomplete="jq162('#DeleteAllConfigConfirmationModalPanel').modal('show');"
+                                             render="#{idToRerender}, :DeleteAllConfigConfirmationForm" execute="@this">
+                                <span class="gzl-icon-trash-o"/>
+                            </a4j:commandLink>
+                        </s:span>
+                    </s:span>
+
+                </ui:define>
+                <s:span rendered="#{configurationsOverview.isEditRights(abstractConfiguration)}">
+                    <div class="gzl-never-wrap">
+                        <a4j:commandLink id="CommentActionSupport"
+                                         title="#{abstractConfiguration.configuration.comment}"
+                                         rendered="#{abstractConfiguration.configuration.comment != null and !abstractConfiguration.configuration.comment.isEmpty()}"
+                                         actionListener="#{configurationsOverview.setSelectedConfiguration(abstractConfiguration)}"
+                                         onRowMouseOver="this.style.cursor='pointer'"
+                                         oncomplete="jq162('#InfoModalPanel').modal('show');"
+                                         execute="@this"
+                                         render=" :InfoForm">
+                            <span class="gzl-icon-info-circle"/>
+                        </a4j:commandLink>
+                        <a4j:commandLink
+                                actionListener="#{configurationsOverview.unapproveConfiguration(abstractConfiguration)}"
+                                onRowMouseOver="this.style.cursor='pointer'" execute="@this"
+                                title="#{messages['net.ihe.gazelle.tm.Unapprove']}"
+                                rendered="#{abstractConfiguration.configuration.isApproved}"
+                                render="#{idToRerender}">
+                            <span class="gzl-icon-not-checked"/>
+                        </a4j:commandLink>
+
+                        <a4j:commandLink
+                                actionListener="#{configurationsOverview.approveConfiguration(abstractConfiguration)}"
+                                onRowMouseOver="this.style.cursor='pointer'" execute="@this"
+                                title="#{messages['gazelle.common.button.Approve']}"
+                                rendered="#{!abstractConfiguration.configuration.isApproved}"
+                                render="#{idToRerender}">
+                            <span class="gzl-icon-checked"/>
+                        </a4j:commandLink>
+
+                        <a4j:commandLink id="editActionSupport"
+                                         action="#{configurationsOverview.editConfig(abstractConfiguration)}"
+                                         immediate="true" onRowMouseOver="this.style.cursor='pointer'"
+                                         title="#{messages['gazelle.common.button.Edit']}"
+                                         execute="@this">
+
+                            <span class="gzl-icon-pencil"/>
+                        </a4j:commandLink>
+                        <a4j:commandLink
+                                actionListener="#{configurationsOverview.setSelectedConfiguration(abstractConfiguration)}"
+                                oncomplete="jq162('#CopyConfigConfirmationModalPanel').modal('show');"
+                                title="#{messages['gazelle.common.button.Copy']}"
+                                execute="@this"
+                                render="CopyConfigConfirmationModalPanel, :CopyConfigConfirmationModalPanelForm">
+                            <span class="gzl-icon-files-o"/>
+                        </a4j:commandLink>
+                        <a4j:commandLink id="deleteActionSupport" title="#{messages['gazelle.common.button.Delete']}"
+                                         actionListener="#{configurationsOverview.setSelectedConfiguration(abstractConfiguration)}"
+                                         oncomplete="jq162('#DeleteConfigConfirmationModalPanel').modal('show');"
+                                         execute="@this"
+                                         render="DeleteConfigConfirmationModalPanel, :DeleteConfigConfirmationModalPanelForm">
+                            <span class="gzl-icon-trash-o"/>
+                        </a4j:commandLink>
+
+                    </div>
+                </s:span>
+            </g:column>
+            <f:facet name="footer">
+                <ui:include src="/util/datatableFooter.xhtml">
+                    <ui:param name="dataScrollerId" value="ds"/>
+                    <ui:param name="dataTableId" value="configurationsTable"/>
+                </ui:include>
+            </f:facet>
+        </rich:dataTable>
+        <h:commandLink rendered="#{showActions}" value="#{messages['gazelle.common.export.ExportAsExcel']}"
+                       action="#{gazelleExcelExporterJboss7.export(formId.concat(':configurationsTable'))}"/>
+    </h:form>
+    <h:form id="CopyConfigConfirmationModalPanelForm">
+        <s:token allowMultiplePosts="true"/>
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="CopyConfigConfirmationModalPanel"/>
+            <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.ConfirmCopyOfConfiguration']}</ui:define>
+            <p>#{messages['net.ihe.gazelle.tm.DoYouWantToCopyThisConfiguration']} ?</p>
+            <ui:define name="popup_footer">
+                <button type="button" class="gzl-btn" data-dismiss="modal">
+                    #{messages['gazelle.tm.Cancel']}
+                </button>
+                <a4j:commandButton styleClass="gzl-btn-green" value="#{messages['gazelle.common.button.Confirm']}"
+                                   actionListener="#{configurationsOverview.copyConfiguration()}"
+                                   onclick="jq162('#CopyConfigConfirmationModalPanel').modal('hide');"
+                                   execute="@this"
+                                   render="#{idToRerender}, #{formId},filter,buttons,globalform2,globalform"/>
+            </ui:define>
+        </ui:decorate>
+    </h:form>
+    <!-- delete modal panel -->
+    <h:form id="DeleteConfigConfirmationModalPanelForm">
+        <s:token allowMultiplePosts="true"/>
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="DeleteConfigConfirmationModalPanel"/>
+            <ui:define name="popup_title">#{messages['gazelle.tm.ConfigurationDeletion']}</ui:define>
+            <p>#{messages['gazelle.tm.DoYouWantToDeleteThisConfiguration']} ?</p>
+            <ui:define name="popup_footer">
+                <button type="button" class="gzl-btn" data-dismiss="modal">
+                    #{messages['gazelle.tm.Cancel']}
+                </button>
+                <a4j:commandButton styleClass="gzl-btn-red"
+                                   value="#{messages['gazelle.configuration.button.DeleteConfig']}"
+                                   actionListener="#{configurationsOverview.deleteConfiguration()}"
+                                   onclick="jq162('#DeleteConfigConfirmationModalPanel').modal('hide');"
+                                   immediate="true"
+                                   render="#{idToRerender}, #{formId},filter,buttons,globalform2,globalform"/>
+            </ui:define>
+        </ui:decorate>
+    </h:form>
+    <!-- delete all modal panel -->
+    <h:form id="DeleteAllConfigConfirmationForm">
+        <s:token allowMultiplePosts="true"/>
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="DeleteAllConfigConfirmationModalPanel"/>
+            <ui:define name="popup_title">#{messages['gazelle.tm.ConfigurationDeletion']}</ui:define>
+            <p>#{messages['net.ihe.gazelle.tm.DoYouWantToDeleteTheseConfigurations']}</p>
+            <ui:define name="popup_footer">
+                <button type="button" class="gzl-btn" data-dismiss="modal">
+                    #{messages['gazelle.tm.Cancel']}
+                </button>
+                <a4j:commandButton styleClass="gzl-btn-red"
+                                   value="#{messages['gazelle.configuration.button.DeleteConfig']}"
+                                   actionListener="#{configurationsOverview.deleteConfigurations()}"
+                                   onclick="jq162('#DeleteAllConfigConfirmationModalPanel').modal('hide');"
+                                   immediate="true" render="#{idToRerender},filter,buttons,globalform2,globalform"/>
+            </ui:define>
+        </ui:decorate>
+    </h:form>
+    <!-- approve all modal panel -->
+    <h:form id="ApproveAllConfigConfirmationForm">
+        <s:token allowMultiplePosts="true"/>
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="ApproveAllConfigConfirmationModalPanel"/>
+            <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.ApprovalOfTheConfiguration']}</ui:define>
+            <p>#{messages['net.ihe.gazelle.tm.DoYouWantToApproveTheseConfigurations']}</p>
+            <ui:define name="popup_footer">
+                <button type="button" class="gzl-btn" data-dismiss="modal">
+                    #{messages['gazelle.tm.Cancel']}
+                </button>
+                <a4j:commandButton styleClass="gzl-btn-green"
+                                   value="#{messages['gazelle.tm.ApproveAllConfigurations']}"
+                                   actionListener="#{configurationsOverview.approveAll()}"
+                                   onclick="jq162('#ApproveAllConfigConfirmationModalPanel').modal('hide');"
+                                   immediate="true" render="#{idToRerender},filter,buttons,globalform2,globalform"/>
+            </ui:define>
+        </ui:decorate>
+    </h:form>
+    <!-- disapprove all modal panel -->
+    <h:form id="DisapproveAllConfigConfirmationForm">
+        <s:token allowMultiplePosts="true"/>
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="DisapproveAllConfigConfirmationModalPanel"/>
+            <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.DisapprovalOfTheConfiguration']}</ui:define>
+            <p>#{messages['net.ihe.gazelle.tm.DoYouWantToDisapproveTheseConfigurations']}</p>
+            <ui:define name="popup_footer">
+                <button type="button" class="gzl-btn" data-dismiss="modal">
+                    #{messages['gazelle.tm.Cancel']}
+                </button>
+                <a4j:commandButton styleClass="gzl-btn-red"
+                                   value="#{messages['gazelle.tm.DisapproveAllConfigurations']}"
+                                   actionListener="#{configurationsOverview.disapproveAll()}"
+                                   onclick="jq162('#DisapproveAllConfigConfirmationModalPanel').modal('hide');"
+                                   immediate="true" render="#{idToRerender},filter,buttons,globalform2,globalform"/>
+            </ui:define>
+        </ui:decorate>
+    </h:form>
+    <!-- comments modal panel -->
+    <h:form id="InfoForm">
+        <s:token allowMultiplePosts="true"/>
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="InfoModalPanel"/>
+            <ui:define name="popup_title">#{messages['net.ihe.gazelle.tm.CommentOnThisSystem']}</ui:define>
+            <p>#{configurationsOverview.getConfigurationComment()}</p>
+            <ui:define name="popup_footer">
+                <button type="button" class="gzl-btn" data-dismiss="modal">
+                    #{messages['gazelle.tm.Cancel']}
+                </button>
+            </ui:define>
+        </ui:decorate>
+    </h:form>
+</ui:composition>

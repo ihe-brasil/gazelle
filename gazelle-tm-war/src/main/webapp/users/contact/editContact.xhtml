@@ -1,0 +1,221 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+        <ui:param name="panel_id" value="editContactPanel"/>
+        <ui:define name="panel_title">#{messages['gazelle.users.contact.EditContactLabel1']}</ui:define>
+        #{addressManager.retrieveOutjectedVariables() }
+        #{addressManager.displayListAddresses( )}
+        <div>
+            <p>#{messages['gazelle.users.contact.info1']}</p>
+            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                <ui:define name="panel_title">#{messages['gazelle.users.contact.ContactInformation']}</ui:define>
+                <!-- ======================= -->
+                <!-- Contact information section  -->
+                <!-- ======================= -->
+                <s:decorate id="institutionInputTextDecorateSelectOneEditContact"
+                            rendered="#{ s:hasRole('admin_role')  }"
+                            template="/layout/form/_form_field_horizontal_inline.xhtml">
+                    <ui:param name="id" value="SessionTypeListBoxOneEditContact"/>
+                    <ui:define name="label">#{messages['gazelle.users.institution.InstitutionName']}</ui:define>
+                    <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text" id="SessionTypeListBoxOneEditContact"
+                                     value="#{personManager.selectedContact.institution}">
+                        <s:selectItems value="#{gazelleDAO.listAllInstitutions()}" var="companyFromList"
+                                       noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                       label="#{companyFromList.name}"/>
+                        <a4j:ajax event="change" execute="@this" render="editContactPanel"
+                                  listener="#{personManager.outjectInstitutionChoosen()}"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <a4j:region id="institutionRegionViewOutputOneEditContact" rendered="#{ !s:hasRole('admin_role')}">
+                    <s:decorate id="institutionDecorationViewOneEditContact"
+                                template="/layout/form/_form_field_horizontal_inline.xhtml">
+                        <ui:param name="id" value="text"/>
+                        <ui:define name="label">#{messages['gazelle.users.institution.InstitutionName']}</ui:define>
+                        <h:outputText id="text" value="#{personManager.selectedContact.institution.name}"
+                                      styleClass="form-control-static"/>
+                    </s:decorate>
+                </a4j:region>
+                <s:div rendered="#{not empty personManager.selectedContact}">
+                    <ui:include src="/users/contact/editContactLightPanel.xhtml">
+                        <ui:param name="panelLabel" value="#{messages['gazelle.users.contact.ContactInformation']}"/>
+                        <ui:param name="panelId" value="Contact"/>
+                        <ui:param name="contactVariable" value="#{personManager.selectedContact}"/>
+                        <ui:param name="required" value="true"/>
+                        <ui:param name="panel2refresh" value="institutionInputTextDecorate"/>
+                    </ui:include>
+                </s:div>
+                <a4j:repeat id="personFunctionRepeat" value="#{personManager.personFunctionsForSelectedContact}"
+                            var="function">
+                    <a4j:region>
+                        <s:decorate id="functionNameDecorate"
+                                    template="/layout/form/_form_field_horizontal_inline.xhtml">
+                            <ui:param name="id" value="functionSelectBooleanCheckbox"/>
+                            <ui:define name="label">#{messages[function.object2.name]}</ui:define>
+                            <h:selectBooleanCheckbox styleClass="form-control-static" id="functionSelectBooleanCheckbox"
+                                                     value="#{function.object1}">
+                            </h:selectBooleanCheckbox>
+                        </s:decorate>
+                    </a4j:region>
+                </a4j:repeat>
+                <div style="clear: both"><span class="required">*</span>
+                    #{messages['gazelle.common.RequiredFields']}
+                </div>
+            </ui:decorate>
+
+            <!-- ======================= -->
+            <!-- Mailing address section -->
+            <!-- ======================= -->
+
+            <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                <ui:param name="panel_id" value="panelToSelectAddress"/>
+                <ui:define name="panel_title">#{messages['gazelle.users.address.ContactAddress']}</ui:define>
+                <s:div id="addressesPanelGrid">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                                <ui:param name="panel_id" value="selectAddressDeco"/>
+                                <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.SelectedAddress']}</ui:define>
+                                <h:panelGroup
+                                        rendered="#{ personManager.selectedContact.address==null}">
+                                    <p class="gzl-alert gzl-alert-orange">
+                                        #{messages['net.ihe.gazelle.tm.PleaseSelectAContactAddress']}
+                                    </p>
+                                </h:panelGroup>
+                                <s:decorate template="/layout/panels/_panel.xhtml"
+                                            rendered="#{ personManager.selectedContact.address!=null}">
+                                    <ui:include src="/users/address/showAddressPanel.xhtml">
+                                        <ui:param name="addressVariable"
+                                                  value="#{personManager.selectedContact.address}"/>
+                                        <ui:param name="panelId" value="ForShowContactMailingAddress"/>
+                                    </ui:include>
+                                </s:decorate>
+                            </ui:decorate>
+                        </div>
+                        <!--  ************************************************************************ -->
+                        <!--  ALL Addresses panel														-->
+                        <!--  ************************************************************************ -->
+                        <div class="col-lg-6">
+                            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                                <h:panelGroup rendered="#{addressManager.displayAddressPanelForMailing}">
+
+                                    <a4j:repeat var="currentAddress" value="#{addressManager.addresses}">
+                                        <ui:decorate template="/layout/panels/_panel.xhtml">
+                                            <div class="gzl-never-wrap pull-right">
+                                                <a4j:commandLink id="selectAddressLinkForMailing"
+                                                                 value="#{messages['gazelle.common.button.Select']}"
+                                                                 actionListener="#{addressManager.updateSelectedContactAddress(currentAddress)}"
+                                                                 immediate="true"
+                                                                 styleClass="gzl-label gzl-label-grey"
+                                                                 title="#{messages['net.ihe.gazelle.tm.UseThisAddress']}"
+                                                                 render="contactsPage:addressesPanelGrid">
+                                                </a4j:commandLink>
+                                                <a4j:commandLink id="editAddressLinkForMailing"
+                                                                 title="#{messages['gazelle.common.button.Edit']}"
+                                                                 actionListener="#{addressManager.editSelectedAddressFromMailing(currentAddress)}"
+                                                                 immediate="true"
+                                                                 render="panelToSelectAddress">
+                                                    <s:span styleClass="gzl-icon-pencil"/>
+                                                </a4j:commandLink>
+                                                <a4j:commandLink id="deleteAddressLinkForBilling"
+                                                                 title="#{messages['gazelle.common.button.Delete']}"
+                                                                 actionListener="#{addressManager.checkSelectedAddressBeforeDeletingFromMailing( currentAddress ) }"
+                                                                 immediate="true"
+                                                                 render="panelToSelectAddress">
+                                                    <s:span styleClass="gzl-icon-trash-o"/>
+                                                </a4j:commandLink>
+                                            </div>
+
+                                            <ui:include src="/users/address/showAddressPanel.xhtml">
+                                                <ui:param name="addressVariable" value="#{currentAddress}"/>
+                                                <ui:param name="panelId" value="ForShowContactMailingAddress"/>
+                                            </ui:include>
+                                        </ui:decorate>
+                                    </a4j:repeat>
+                                    <h:panelGrid id="AddAddressGridForMailing" columns="4">
+
+                                        <a4j:commandLink id="ImageSupportForMailing"
+                                                         actionListener="#{addressManager.addNewAddressFromMailingPanel()}"
+                                                         immediate="true" render="panelToSelectAddress">
+                                            <span class="gzl-icon-plus"/>
+                                        </a4j:commandLink>
+
+                                        <a4j:commandLink style="color: grey;text-decoration:underline;"
+                                                         id="addAddressLinkForMailing"
+                                                         value="#{messages['gazelle.users.address.ClickHereToAddANewAddress']}"
+                                                         actionListener="#{addressManager.addNewAddressFromMailingPanel()}"
+                                                         immediate="true" render="panelToSelectAddress"/>
+                                    </h:panelGrid>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{addressManager.displayAddEditAddressPanelForMailing}">
+                                    <h2>#{messages['gazelle.users.address.AddAnAddress.Title']}</h2>
+                                    #{messages['gazelle.users.address.AddAnAddress.Info1']}
+                                    <div class="form-horizontal">
+                                        <ui:include src="/users/address/editAddressPanel.xhtml">
+                                            <ui:param name="panelId" value="newAddressOfMailingAddress"/>
+                                            <ui:param name="addressVariable"
+                                                      value="#{addressManager.selectedMailingAddress}"/>
+                                        </ui:include>
+                                    </div>
+                                    <a4j:commandButton id="saveAAddressButtonOfMailingAddress"
+                                                       styleClass="gzl-btn-green"
+                                                       value="#{messages['gazelle.common.button.Save']}"
+                                                       onRowMouseOver="this.style.cursor='pointer'"
+                                                       actionListener="#{addressManager.addAddress(addressManager.selectedMailingAddress)}"
+                                                       render="panelToSelectAddress,addressesPanelGrid"/>
+                                    <a4j:commandButton id="cancelAddressButtonOfMailingAddress"
+                                                       styleClass="gzl-btn"
+                                                       value="#{messages['gazelle.common.button.Cancel']}"
+                                                       onRowMouseOver="this.style.cursor='pointer'"
+                                                       actionListener="#{addressManager.cancelNewAddressFromMailingPanel()}"
+                                                       immediate="true" render="panelToSelectAddress"/>
+                                </h:panelGroup>
+                                <h:panelGroup
+                                        rendered="#{addressManager.displayDeleteConfirmationAddressPanelForMailing}">
+                                    <p>
+                                        <h:outputText id="addressDeleteLabelOutputTextOfMailingAddress"
+                                                      value="#{messages['gazelle.users.address.confirmation.delete.label']}"/>
+                                    </p>
+                                    <ui:include src="/users/address/showAddressPanel.xhtml">
+                                        <ui:param value="#{addressManager.selectedMailingAddress}"
+                                                  name="addressVariable"/>
+                                        <ui:param name="panelId" value="ForDeleteMailingAddress"/>
+                                    </ui:include>
+                                    <div align="right">
+                                        <a4j:commandButton id="deleteButtonConfirmOfMailingAddress"
+                                                           value="#{messages['gazelle.common.button.Delete']}"
+                                                           ignoreDupResponses="true" styleClass="gzl-btn-red"
+                                                           actionListener="#{addressManager.deleteSelectedAddress( addressManager.selectedMailingAddress  )}"
+                                                           render="panelToSelectAddress"/>
+                                        <a4j:commandButton id="cancelButtonConfirmOfMailingAddress"
+                                                           value="#{messages['gazelle.common.button.Cancel']}"
+                                                           immediate="true"
+                                                           actionListener="#{addressManager.displayListAddresses(   )}"
+                                                           styleClass="gzl-btn"
+                                                           render="panelToSelectAddress"/>
+                                    </div>
+                                </h:panelGroup>
+                            </ui:decorate>
+                        </div>
+                    </div>
+                    <!--  ************************************************************************ -->
+                    <!--   END - ALL Addresses panel											-->
+                    <!--  ************************************************************************ -->
+                </s:div>
+            </ui:decorate>
+
+
+            <div>
+                <a4j:commandButton id="save" styleClass="gzl-btn-green"
+                                   value="#{messages['gazelle.common.button.Save']}" ignoreDupResponses="true"
+                                   actionListener="#{personManager.saveContact( )}" render="#{panelsToReRender}"/>
+                <a4j:commandButton id="cancel" styleClass="gzl-btn"
+                                   value="#{messages['gazelle.common.button.Cancel']}" ignoreDupResponses="true"
+                                   actionListener="#{personManager.closeAddEditPanel()}" immediate="true"
+                                   render="#{panelsToReRender}"/>
+            </div>
+        </div>
+    </ui:decorate>
+
+</ui:composition>

@@ -1,0 +1,100 @@
+<!--
+    * Copyright 2008 IHE International (http://www.ihe.net)
+    *
+    * Licensed under the Apache License, Version 2.0 (the "License");
+    * you may not use this file except in compliance with the License.
+    * You may obtain a copy of the License at
+    *
+    * http://www.apache.org/licenses/LICENSE-2.0
+    *
+    * Unless required by applicable law or agreed to in writing, software
+    * distributed under the License is distributed on an "AS IS" BASIS,
+    * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    * See the License for the specific language governing permissions and
+    * limitations under the License.
+-->
+<e:workbook xmlns:e="http://jboss.com/products/seam/excel" xmlns:f="http://java.sun.com/jsf/core">
+    <e:worksheet name="systemInSession" startColumn="0" startRow="0"
+                 value="#{connectathonParticipantManager.connectathonParticipants}" var="participant">
+        <e:header>
+            <f:facet name="left">
+                #{messages['gazelle.tm.ThisDocumentWasMadeOndateAndHastotalpagesPagesIt_2']}.
+            </f:facet>
+            <f:facet name="right">
+                ##{messages['gazelle.users.Time']}#
+            </f:facet>
+        </e:header>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.financial.invoice.InstitutionName']}"/>
+            </f:facet>
+            <e:cell value="#{participant.institutionName}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.users.user.FirstName']}"/>
+            </f:facet>
+            <e:cell value="#{participant.firstname}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.users.user.LastName']}"/>
+            </f:facet>
+            <e:cell value="#{participant.lastname}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.users.user.UserEmail']}"/>
+            </f:facet>
+            <e:cell value="#{participant.email}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.users.connectaton.participants.ParticipantStatus']}"/>
+            </f:facet>
+            <e:cell value="#{participant.connectathonParticipantStatus.name}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.common.Monday']}"/>
+            </f:facet>
+            <e:cell value="#{participant.mondayMeal}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.common.Tuesday']}"/>
+            </f:facet>
+            <e:cell value="#{participant.tuesdayMeal}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.common.Wednesday']}"/>
+            </f:facet>
+            <e:cell value="#{participant.wednesdayMeal}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.common.Thursday']}"/>
+            </f:facet>
+            <e:cell value="#{participant.thursdayMeal}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.common.Friday']}"/>
+            </f:facet>
+            <e:cell value="#{participant.fridayMeal}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.common.VegetarianMeal']}"/>
+            </f:facet>
+            <e:cell value="#{participant.vegetarianMeal}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.users.connectaton.participants.SocialEvent']}"/>
+            </f:facet>
+            <e:cell value="#{participant.socialEvent}"/>
+        </e:column>
+    </e:worksheet>
+</e:workbook>

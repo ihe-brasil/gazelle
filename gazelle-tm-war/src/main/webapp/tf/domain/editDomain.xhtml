@@ -1,0 +1,110 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{domainManager.editTitle}"/>
+    <ui:define name="body">
+
+
+        <h:form id="editDomain">
+            <s:token allowMultiplePosts="true"/>
+
+            <ui:decorate template="/layout/panels/_panel_title_footer.xhtml">
+                <ui:define name="panel_title">#{domainManager.editSubTitle}</ui:define>
+                <s:decorate id="id" template="/layout/display/_display.xhtml"
+                            rendered="#{ not empty domainManager.selectedDomain.id}">
+                    <ui:define name="label">#{messages['gazelle.tf.table.Id']}</ui:define>
+                    <h:outputText value="#{domainManager.selectedDomain.id}"/>
+                </s:decorate>
+                <a4j:region id="keywordRegion">
+                    <s:decorate id="keywordDecoration" template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="keyword"/>
+                        <ui:define name="label">#{messages['gazelle.tf.table.Keyword']}</ui:define>
+                        <h:inputText styleClass=" form-control" id="keyword" size="30"
+                                     required="true"
+                                     value="#{domainManager.selectedDomain.keyword}">
+                            <a4j:ajax event="blur" render="keywordDecoration" execute="@this"
+                                      listener="#{domainManager.isKeywordAvailable()}"/>
+                        </h:inputText>
+                    </s:decorate>
+                </a4j:region>
+                <a4j:region id="nameRegion">
+                    <s:decorate id="nameDecoration" template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="name"/>
+                        <ui:define name="label">#{messages['gazelle.tf.table.Name']}</ui:define>
+                        <h:inputText styleClass=" form-control" id="name" size="60" required="true"
+                                     value="#{domainManager.selectedDomain.name}">
+                            <a4j:ajax event="blur" render="nameDecoration" execute="@this"
+                                      listener="#{domainManager.isNameAvailable()}"/>
+                        </h:inputText>
+                    </s:decorate>
+                </a4j:region>
+                <s:decorate id="descriptionDecoration" template="/layout/form/_edit.xhtml">
+                    <ui:param name="id" value="description"/>
+                    <ui:define name="label">#{messages['gazelle.tf.table.Description']}</ui:define>
+                    <h:inputTextarea styleClass=" form-control" id="description" cols="80" rows="10"
+                                     value="#{domainManager.selectedDomain.description}"/>
+                </s:decorate>
+                <ui:define name="panel_footer">
+                    <h:commandButton id="cancel" styleClass="gzl-btn"
+                                     value="#{messages['gazelle.common.button.Cancel']}"
+                                     action="#{domainManager.listDomains()}"/>
+                    <a4j:commandButton id="save" styleClass="gzl-btn-green"
+                                     value="#{messages['gazelle.common.button.Save']}"
+                                     action="#{domainManager.updateDomain( )}"
+                                     rendered="#{s:hasPermission('MasterModel', 'edit', null)}"/>
+                </ui:define>
+            </ui:decorate>
+            <ui:decorate template="/layout/panels/_panel_title_footer.xhtml">
+                <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.Profiles']}</ui:define>
+                <rich:dataTable id="domainManager" var="profile"
+                                value="#{domainManager.getIntegrationProfilesForDP()}"
+                                rendered="#{domainManager.getShowProfiles()}">
+                    <g:column sortBy="#{'id'}" sortOrder="ascending">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                        #{profile.id}
+                    </g:column>
+                    <g:column sortBy="#{'keyword'}" sortOrder="ascending">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Keyword']}</ui:define>
+                        #{profile.keyword}
+                    </g:column>
+                    <g:column sortBy="#{'name'}" sortOrder="ascending">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Name']}</ui:define>
+                        #{profile.name}
+                    </g:column>
+                    <g:column sortBy="#{'integrationProfileStatusType.name'}" sortOrder="ascending">
+                        <ui:define name="header">#{messages['gazelle.tf.table.Status']}</ui:define>
+                        #{profile.integrationProfileStatusType.name}
+                    </g:column>
+                    <g:column>
+                        <ui:define name="header">#{messages['gazelle.tf.table.Action']}</ui:define>
+
+                        <div class="gzl-never-wrap">
+                            <a4j:commandLink
+                                    title="#{messages['gazelle.common.button.View']}"
+                                    action="#{integrationProfileManager.viewIntegrationProfile(profile)}"
+                                    onRowMouseOver="this.style.cursor='pointer'">
+                                <span class="gzl-icon-search"/>
+                            </a4j:commandLink>
+
+                            <a4j:commandLink
+                                    action="#{integrationProfileManager.editIntegrationProfile(profile)}"
+                                    rendered="#{s:hasPermission('MasterModel', 'edit', null)}"
+                                    title="#{messages['gazelle.common.button.Edit']}"
+                                    onRowMouseOver="this.style.cursor='pointer'">
+                                <span class="gzl-icon-pencil"/>
+                            </a4j:commandLink>
+                        </div>
+
+                    </g:column>
+                </rich:dataTable>
+                <ui:define name="panel_footer">
+                    <h:commandButton value="#{messages['gazelle.tf.domain.edit.Link']}" styleClass="gzl-btn-green"
+                                     action="#{domainManager.linkDomainProfiles()}"
+                                     rendered="#{domainManager.renderLinkProfiles()}"/>
+                </ui:define>
+
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

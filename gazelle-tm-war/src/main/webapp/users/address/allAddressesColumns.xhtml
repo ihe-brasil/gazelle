@@ -1,0 +1,31 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                id="allAddressesDiv#{SuffixForID}">
+    <g:column rendered="#{s:hasRole('admin_role')}">
+        #{varAddressUsed.id}
+    </g:column>
+    <g:column>
+        #{varAddressUsed.address}
+    </g:column>
+    <g:column>
+        #{varAddressUsed.addressLine2}
+    </g:column>
+    <g:column>
+        #{varAddressUsed.zipCode}
+    </g:column>
+    <g:column>
+        #{varAddressUsed.city}
+    </g:column>
+    <g:column>
+        <h:outputText value="#{varAddressUsed.state}" rendered="#{ not empty varAddressUsed.state}"/>
+        <h:outputText value="#{messages['gazelle.users.NA']}" rendered="#{ empty varAddressUsed.state}"/>
+    </g:column>
+    <g:column>
+        #{varAddressUsed.iso3166CountryCode.name}
+    </g:column>
+    <g:column>
+        <center>
+            <h:graphicImage library="img" width="24" height="16" name="#{varAddressUsed.iso3166CountryCode.flagUrl}"/>
+        </center>
+    </g:column>
+</ui:composition>

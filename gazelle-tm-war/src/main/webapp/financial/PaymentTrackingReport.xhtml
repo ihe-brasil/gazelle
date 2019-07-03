@@ -1,0 +1,191 @@
+<!--
+ * Copyright 2008 IHE International (http://www.ihe.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ -->
+<!--  Do not add a doctype it will cause a failure for some browsers as this file is included
+	@author abderrazek boufahja
+-->
+<e:workbook xmlns:e="http://jboss.org/schema/seam/excel" xmlns:f="http://java.sun.com/jsf/core">
+    <e:worksheet name="PaymentTrackingReport" startColumn="0" startRow="0"
+                 value="#{financialManager.getListOfInvoicesAsList()}" var="#{'currentInvoice'}">
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['net.ihe.gazelle.tm.CompanyName']}"/>
+            </f:facet>
+            <e:cell value="#{currentInvoice.institution.name}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['net.ihe.gazelle.tm.CompanyKeyword']}"/>
+            </f:facet>
+            <e:cell value="#{currentInvoice.institution.keyword}"/>
+            <f:facet name="footer">
+                <e:cell value="#{messages['gazelle.tm.Totals']}"/>
+            </f:facet>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="# #{messages['net.ihe.gazelle.tm.OfSystems']}"/>
+            </f:facet>
+            <e:cell value="#{financialManager.numberSystemByInstitution(currentInvoice)}"/>
+            <f:facet name="footer">
+                <e:cell value="#{financialManager.getInvoicesTotals().getNumberOfSystems()}"/>
+            </f:facet>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['net.ihe.gazelle.tm.FeeAmount']}"/>
+            </f:facet>
+            <e:cell value="#{currentInvoice.feesAmount}"/>
+            <f:facet name="footer">
+                <e:cell value="#{financialManager.getInvoicesTotals().getFeeAmount()}"/>
+            </f:facet>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['net.ihe.gazelle.tm.FeesDiscount']}"/>
+            </f:facet>
+            <e:cell value="#{currentInvoice.feesDiscount}"/>
+            <f:facet name="footer">
+                <e:cell value="#{financialManager.getInvoicesTotals().getFeeDiscount()}"/>
+            </f:facet>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['net.ihe.gazelle.tm.FeesPaid']}"/>
+            </f:facet>
+            <e:cell value="#{currentInvoice.feesPaid}"/>
+            <f:facet name="footer">
+                <e:cell value="#{financialManager.getInvoicesTotals().getFeePaid()}"/>
+            </f:facet>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['net.ihe.gazelle.tm.FeesDue']}"/>
+            </f:facet>
+            <e:cell value="#{currentInvoice.feesDue}"/>
+            <f:facet name="footer">
+                <e:cell value="#{financialManager.getInvoicesTotals().getFeeDue()}"/>
+            </f:facet>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['net.ihe.gazelle.tm.ReasonForDiscount']}"/>
+            </f:facet>
+            <e:cell value="#{currentInvoice.reasonsForDiscount}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['net.ihe.gazelle.tm.InvoiceNotes']}"/>
+            </f:facet>
+            <e:cell value="#{currentInvoice.adminInvoiceNotes}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['net.ihe.gazelle.tm.InvoicePaymentDate']}"/>
+            </f:facet>
+            <e:cell value="#{currentInvoice.invoicePaymentDate}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['net.ihe.gazelle.tm.SpecialInstructions']}"/>
+            </f:facet>
+            <e:cell value="#{currentInvoice.specialInstructions}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['net.ihe.gazelle.tm.ContractReceptionDate']}"/>
+            </f:facet>
+            <e:cell value="#{currentInvoice.contractReceivedDate}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['gazelle.tm.Demonstrations']}"/>
+            </f:facet>
+            <e:cell value="#{financialManager.getDemonstrations(currentInvoice)}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['net.ihe.gazelle.tm.FinancialContactName']}"/>
+            </f:facet>
+            <e:cell value="#{financialManager.getBillingContact(currentInvoice).lastname}, #{financialManager.getBillingContact(currentInvoice).firstname}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['net.ihe.gazelle.tm.FinancialContactEmail']}"/>
+            </f:facet>
+            <e:cell value="#{financialManager.getBillingContact(currentInvoice).email}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['net.ihe.gazelle.tm.FinancialContactPhone']}"/>
+            </f:facet>
+            <e:cell value="#{financialManager.getBillingContact(currentInvoice).cellPhone}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['net.ihe.gazelle.tm.FinancialContactTitle']}"/>
+            </f:facet>
+            <e:cell value="#{financialManager.getBillingContact(currentInvoice).title}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['net.ihe.gazelle.tm.MarketingContactName']}"/>
+            </f:facet>
+            <e:cell value="#{financialManager.getPrimaryMarketingContact(currentInvoice).lastname}, #{financialManager.getPrimaryMarketingContact(currentInvoice).firstname}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['net.ihe.gazelle.tm.MarketingContactEmail']}"/>
+            </f:facet>
+            <e:cell value="#{financialManager.getPrimaryMarketingContact(currentInvoice).email}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['net.ihe.gazelle.tm.MarketingContactPhone']}"/>
+            </f:facet>
+            <e:cell value="#{financialManager.getPrimaryMarketingContact(currentInvoice).cellPhone}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['net.ihe.gazelle.tm.MarketingContactTitle']}"/>
+            </f:facet>
+            <e:cell value="#{financialManager.getPrimaryMarketingContact(currentInvoice).title}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['net.ihe.gazelle.tm.TechnicalContactName']}"/>
+            </f:facet>
+            <e:cell value="#{financialManager.getPrimaryTechnicalContact(currentInvoice).lastname}, #{financialManager.getPrimaryTechnicalContact(currentInvoice).firstname}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['net.ihe.gazelle.tm.TechnicalContactEmail']}"/>
+            </f:facet>
+            <e:cell value="#{financialManager.getPrimaryTechnicalContact(currentInvoice).email}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['net.ihe.gazelle.tm.TechnicalContactPhone']}"/>
+            </f:facet>
+            <e:cell value="#{financialManager.getPrimaryTechnicalContact(currentInvoice).cellPhone}"/>
+        </e:column>
+        <e:column>
+            <f:facet name="header">
+                <e:cell value="#{messages['net.ihe.gazelle.tm.TechnicalContactTitle']}"/>
+            </f:facet>
+            <e:cell value="#{financialManager.getPrimaryTechnicalContact(currentInvoice).title}"/>
+        </e:column>
+    </e:worksheet>
+</e:workbook>

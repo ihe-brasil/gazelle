@@ -1,0 +1,6 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <a4j:commandLink value="#{displayedName}" action="#{documentManager.showPDF(document)}" target="Specification">
+        <a4j:ajax event="click" execute="@this"/>
+    </a4j:commandLink>
+</ui:composition>

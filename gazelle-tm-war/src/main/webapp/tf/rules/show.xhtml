@@ -1,0 +1,25 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['net.ihe.gazelle.tm.ViewRule']}"/>
+    <ui:define name="body">
+        <s:decorate template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['gazelle.testmanagement.object.Name']}</ui:define>
+            <h:outputText value="#{rulesManager.editedItem.name}"/>
+        </s:decorate>
+        <s:decorate template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['net.ihe.gazelle.tm.Cause']}</ui:define>
+            <s:decorate template="/tf/rules/criterionView.xhtml">
+                <ui:param name="criterion" value="#{rulesManager.editedItem.cause}"/>
+            </s:decorate>
+        </s:decorate>
+        <s:decorate template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['net.ihe.gazelle.tm.Consequence']}</ui:define>
+            <s:decorate template="/tf/rules/criterionView.xhtml">
+                <ui:param name="criterion" value="#{rulesManager.editedItem.consequence}"/>
+            </s:decorate>
+        </s:decorate>
+    </ui:define>
+</ui:composition>

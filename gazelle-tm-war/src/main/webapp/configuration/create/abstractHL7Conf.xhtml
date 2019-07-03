@@ -1,0 +1,47 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    #{ systemConfigurationManager.initHL7Object(  systemConfigurationManager.currentConfiguration ) }
+
+    <a4j:region id="assigningAuthRegion">
+        <s:decorate template="/layout/form/_edit.xhtml" id="assigningAuthDecorate">
+            <ui:param name="id" value="assigningAuthorityInputText"/>
+            <ui:define name="label">#{messages['gazelle.tm.AssigningAuthority']}</ui:define>
+            <h:inputText styleClass=" form-control" id="assigningAuthorityInputText"
+                         value="#{systemConfigurationManager.currentConfiguration.assigningAuthority}">
+                <a4j:ajax event="change" render="warnDecoration"/>
+            </h:inputText>
+        </s:decorate>
+        <s:decorate id="warnDecoration">
+            <h:outputText styleClass="gzl-text-orange"
+                          value="#{systemConfigurationManager.validateAssigningAuthority(systemConfigurationManager.currentConfiguration.assigningAuthority)}"
+                          rendered="#{systemConfigurationManager.isDisplayHelpOnAssigningAuthority()}"/>
+        </s:decorate>
+
+    </a4j:region>
+
+
+    <s:div rendered="#{false}">
+        <h:panelGrid columns="2" border="0">
+            <a4j:region id="assigningAuthOIDRegion">
+                <s:decorate template="/layout/form/_edit.xhtml" id="assigningAuthOIDDecorate">
+                    <ui:param name="id" value="assigningAuthorityOIDInputText"/>
+                    <ui:define name="label">#{messages['gazelle.configuration.HL7.assigningAuthorityOID']}</ui:define>
+                    <h:inputText styleClass=" form-control" id="assigningAuthorityOIDInputText"
+                                 value="#{systemConfigurationManager.currentConfiguration.assigningAuthorityOID}"
+                                 rendered="#{s:hasRole('admin_role') or s:hasRole('monitor_role') }">
+
+                    </h:inputText>
+                    <h:outputText value="#{messages['gazelle.tm.AssigningAuthorityOIDIsNullItWillBeAutomatically']}"
+                                  rendered="#{!s:hasRole('admin_role') and !s:hasRole('monitor_role') and empty systemConfigurationManager.currentConfiguration.assigningAuthorityOID }"/>
+                </s:decorate>
+            </a4j:region>
+            <a4j:commandButton styleClass="gzl-btn-green" value="#{messages['gazelle.tm.GetAnOid']}"
+                               actionListener="#{systemConfigurationManager.getOIDForConfiguration()}"
+                               rendered="#{s:hasRole('admin_role') or s:hasRole('monitor_role') }"
+                               render="assigningAuthOIDDecorate" execute="@this"/>
+        </h:panelGrid>
+    </s:div>
+</ui:composition>

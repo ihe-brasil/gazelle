@@ -1,0 +1,25 @@
+<ui:composition
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns="http://www.w3.org/1999/xhtml">
+    <h:panelGroup rendered="#{applicationManager.isMasterModel() and !applicationManager.isTestManagement()}">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">#{messages['gazelle.tm.GazelleTechnicalFrameworkAndTests']}</h3>
+            </div>
+            <div class="panel-body">
+                <p>#{messages['gazelle.tm.TheGazelleMasterModelApplicationIsUsedToManageDa']}</p>
+
+                <p>
+                    <ul>
+                        <li>#{messages['gazelle.tm.AddANewDomain']}</li>
+                        <li>#{messages['gazelle.tm.AddANewProfileToAnExistingDomain']}</li>
+                        <li>#{messages['gazelle.tm.DefineNewTestCases']}</li>
+                    </ul>
+                </p>
+                <p>#{messages['gazelle.tm.TheManagersResponsibleForGazelleForIHEInternatio']}.</p>
+            </div>
+        </div>
+    </h:panelGroup>
+</ui:composition>
+

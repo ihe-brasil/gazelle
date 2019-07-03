@@ -1,0 +1,63 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <s:div id="wsTypeDiv">
+        <s:decorate template="/layout/form/_edit.xhtml">
+            <ui:param name="id" value="wstypeListBox"/>
+            <ui:define name="label">#{messages['gazelle.tm.WebServiceType']}</ui:define>
+            <h:selectOneMenu styleClass="form-control gzl-form-control" id="wstypeListBox"
+                             value="#{systemConfigurationManager.currentConfiguration.wsTransactionUsage}"
+                             required="true">
+                <s:selectItems
+                        value="#{systemConfigurationManager.allowedWSTransactionUsagesForCurrentConfiguration()}"
+                        var="wstran" noSelectionLabel="${messages.PleaseSelect}"
+                        label="#{wstran.transaction.keyword}:#{wstran.usage}"/>
+                <a4j:ajax event="change" execute="@this"/>
+            </h:selectOneMenu>
+        </s:decorate>
+    </s:div>
+    <a4j:region id="portRegion"
+                rendered="#{!systemConfigurationManager.currentConfiguration.configuration.isSecured}">
+        <s:decorate template="/layout/form/_edit.xhtml" id="portDecorate">
+            <ui:param name="id" value="wsPortInputText"/>
+            <ui:define name="label">#{messages['gazelle.configuration.system.Port']}</ui:define>
+            <h:inputText styleClass=" form-control" id="wsPortInputText"
+                         value="#{systemConfigurationManager.currentConfiguration.port}"
+                         required="#{!systemConfigurationManager.currentConfiguration.configuration.isSecured}">
+                <a4j:ajax event="blur" render="finalResult"/>
+            </h:inputText>
+        </s:decorate>
+    </a4j:region>
+    <a4j:region id="portSecuredRegion"
+                rendered="#{systemConfigurationManager.currentConfiguration.configuration.isSecured}">
+        <s:decorate template="/layout/form/_edit.xhtml" id="portSecuredDecorate">
+            <ui:param name="id" value="wsPortSecuredInputText"/>
+            <ui:define name="label">#{messages['gazelle.tm.PortSecured']}</ui:define>
+            <h:inputText styleClass=" form-control" id="wsPortSecuredInputText"
+                         value="#{systemConfigurationManager.currentConfiguration.portSecured}"
+                         required="#{systemConfigurationManager.currentConfiguration.configuration.isSecured}">
+                <a4j:ajax event="blur" render="finalResult"/>
+            </h:inputText>
+        </s:decorate>
+    </a4j:region>
+    <a4j:region id="urlRegion">
+        <s:decorate template="/layout/form/_edit.xhtml" id="urlDecorate">
+            <ui:param name="id" value="wsUrlInputText"/>
+            <ui:define name="label">#{messages['gazelle.tm.URLSuffix']}</ui:define>
+            <h:inputText styleClass=" form-control" id="wsUrlInputText"
+                         value="#{systemConfigurationManager.currentConfiguration.url}"
+                         required="true">
+                <a4j:ajax event="blur" render="finalResult"/>
+            </h:inputText>
+        </s:decorate>
+    </a4j:region>
+    <s:div id="finalResult">
+        <h:outputText value="#{messages['gazelle.tm.TheFinalAddressWillBe']} :"/>
+        <br/>
+        <h:outputLink id="wsFinalAddressSentenceOutputText" value="#{systemConfigurationManager.displayFinalURL()}"
+                      target="_blank">
+            <h:outputText value="#{systemConfigurationManager.displayFinalURL()}"/>
+        </h:outputLink>
+    </s:div>
+</ui:composition>

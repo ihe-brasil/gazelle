@@ -1,0 +1,83 @@
+<s:div xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:h="http://java.sun.com/jsf/html"
+       xmlns:s="http://jboss.org/schema/seam/taglib"
+       xmlns:f="http://java.sun.com/jsf/core"
+       xmlns="http://www.w3.org/1999/xhtml">
+    <!-- ==================================== -->
+    <!-- System demonstrations section		  -->
+    <!-- ==================================== -->
+    <h:form id="editSystemDemoForm${panelId}">
+        <s:token allowMultiplePosts="true"/>
+        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+            <ui:define name="panel_title">#{systemDemonstrationManager.selectedSystemInSession.system.name}
+                #{messages['gazelle.systems.system.DemonstrationsPerformedLabel1']}
+            </ui:define>
+            <a4j:repeat id="availableDemonstrationsTable" value="#{systemDemonstrationManager.demonstrations}"
+                        var="pairBoolDemonstration"
+                        rendered="#{systemDemonstrationManager.demonstrations != null}">
+                <h:panelGrid id="actionGridGlobal" columns="6" rendered="#{pairBoolDemonstration.object2 != null}">
+                    <h:selectBooleanCheckbox styleClass="form-control-static" id="checkbox"
+                                             value="#{pairBoolDemonstration.object1}">
+                    </h:selectBooleanCheckbox>
+                    <h:outputText id="output" value="#{pairBoolDemonstration.object2.name}"/>
+
+                    <a4j:commandLink
+                            actionListener="#{demonstrationManager.showSelectedDemonstrationForUser(pairBoolDemonstration.object2)}"
+                            oncomplete="jq162('#editDemoModalPanel').modal('show');"
+                            render="editSystemDemoForm${panelId}, popupGroup2">
+                        <span class="gzl-icon-search"/>
+                    </a4j:commandLink>
+                </h:panelGrid>
+            </a4j:repeat>
+
+            <p/>
+            <h:panelGroup rendered="#{ empty systemDemonstrationManager.demonstrations}">
+
+                <ui:decorate template="/layout/panels/_panel.xhtml">
+                    <span class="gzl-icon-globe"/>
+                    <p/>
+                    <h:outputText id="noSystemLabel"
+                                  value="#{messages['gazelle.systems.system.NoDemonstrationLabel1']}"
+                                  style="font-style:italic"/>
+                    <br/>
+                    <h:outputText id="noSystemLabel2"
+                                  value="#{messages['gazelle.systems.system.NoDemonstrationLabel2']}"
+                                  style="font-style:italic"/>
+                </ui:decorate>
+            </h:panelGroup>
+
+            <br/>
+
+            <p/>
+
+            <div>
+                <a4j:commandButton id="save" styleClass="gzl-btn-orange"
+                                   rendered="#{ not empty systemDemonstrationManager.demonstrations}"
+                                   value="#{messages['gazelle.common.button.Update']}"
+                                   actionListener="#{systemDemonstrationManager.updateDemonstrations(systemInSessionEditor.systemInSession)}"
+                                   render="editSystemDemoForm${panelId}"/>
+                <a4j:commandButton id="cancelEdit" styleClass="gzl-btn"
+                                   value="#{messages['gazelle.common.button.Cancel']}" immediate="true"
+                                   action="#{systemInSessionEditor.viewSystemInSession(systemInSessionEditor.systemInSession,systemInSessionEditor.defaultTab)}"
+                                   execute="@this" onclick="processFormHidden();"/>
+            </div>
+
+        </ui:decorate>
+        <h:panelGroup id="popupGroup2">
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="editDemoModalPanel"/>
+                <ui:define name="popup_title">#{demonstrationManager.selectedDemonstration.name}</ui:define>
+                <f:subview id="subview_2">
+                    <ui:include id="include4Show" src="../demonstration/showDemonstrationData.xhtml"/>
+                </f:subview>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                </ui:define>
+            </ui:decorate>
+        </h:panelGroup>
+        <div style="clear: both"/>
+    </h:form>
+
+</s:div>

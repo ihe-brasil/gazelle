@@ -1,0 +1,25 @@
+<rich:toolbar
+        xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+        xmlns:s="http://jboss.org/schema/seam/taglib"
+        xmlns="http://www.w3.org/1999/xhtml" id="topbarToolbar"
+        styleClass="utility">
+    <rich:toolbarGroup id="topbarRightToolBarGroup" location="right">
+        <!--  See in SampleGazelle for normal login links -->
+        <h:outputText id="welcomeOutputText" value="#{messages['gazelle.common.Welcome']}, #{identity.username} "
+                      rendered="#{identity.loggedIn}"/>
+        <s:link id="loginLink" view="/users/login/login.xhtml" value="#{messages['gazelle.users.registration.Login']}"
+                rendered="#{not identity.loggedIn}"/>
+
+        <!-- CAS - Used if admin enables the CAS in the Application Preferences  -->
+        <s:link id="loginCASLink" view="/users/loginCAS/login.xhtml"
+                value="#{messages['gazelle.users.registration.LoginCAS']}"
+                rendered="#{applicationPreferenceManager.getCASEnabled() and not identity.loggedIn}"/>
+
+        <h:outputText id="separator1" value="  |  " rendered="#{identity.loggedIn}"/>
+        <s:link id="editAccountLink" action="#{userManager.editAccount()}"
+                value="#{messages['gazelle.users.common.MyAccount']}" rendered="#{identity.loggedIn}"/>
+        <h:outputText id="separator2" value="  |  " rendered="#{identity.loggedIn}"/>
+        <s:link id="homeLink" view="/home.xhtml" action="#{identity.logout}"
+                value="#{messages['gazelle.users.registration.Logout']}" rendered="#{identity.loggedIn}"/>
+    </rich:toolbarGroup>
+</rich:toolbar>

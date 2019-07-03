@@ -1,0 +1,80 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['net.ihe.gazelle.tm.IntegrationStatementValidation']}"/>
+    <ui:define name="body">
+        <h:outputScript library="jscript" name="prreview.js"/>
+        <h:form id="validationForm">
+            <s:token allowMultiplePosts="true"/>
+
+            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.IntegrationStatementValidation']}
+                </ui:define>
+                <s:div>
+                    <div class="row">
+                        <div class="col-lg-4">
+
+                            <iframe height="900" scrolling="yes" width="600" id="pdfjs"
+                                    src="/#{applicationPreferenceManager.getApplicationUrlBaseName()}/pdfjs/web/viewer.html?file=/#{applicationPreferenceManager.getApplicationUrlBaseName()}/pr/getIS.seam%3Fid%3D#{prAdmin.selectedSystemInSession.system.id}"></iframe>
+                        </div>
+                        <div class="col-lg-5">
+                            <ui:decorate template="/layout/panels/_panel.xhtml">
+                                <ui:include src="/pr/systemImplementationsInclude.xhtml">
+                                    <ui:param name="system" value="#{prAdmin.selectedSystemInSession.system}"/>
+                                    <ui:param name="forReview" value="true"/>
+                                </ui:include>
+
+                                <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                                    <ui:define name="panel_title">#{messages['gazelle.common.History']}</ui:define>
+                                    <ui:include src="/pr/systemEvents.xhtml">
+                                        <ui:param name="system"
+                                                  value="#{prAdmin.selectedSystemInSession.system}"/>
+                                    </ui:include>
+                                </ui:decorate>
+                            </ui:decorate>
+                        </div>
+                        <div class="col-lg-3">
+                            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                                <ui:define name="panel_title">#{messages['gazelle.tm.tests.testStatus']}</ui:define>
+                                <h:inputTextarea styleClass=" form-control" value="#{prAdmin.currentComment}" rows="14"
+                                                 cols="40">
+                                </h:inputTextarea>
+                                <s:decorate id="currentStatusDecoration" template="/layout/display/_display.xhtml">
+                                    <ui:define name="label">#{messages['net.ihe.gazelle.tm.CurrentStatus']}</ui:define>
+                                    <h:outputText
+                                            value="#{prAdmin.selectedSystemInSession.system.prStatus.details}"/>
+                                </s:decorate>
+                                <s:decorate id="switchToDecoration" template="/layout/display/_display.xhtml">
+                                    <ui:define name="label">#{messages['net.ihe.gazelle.tm.SwitchTo']}</ui:define>
+                                    <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                     value="#{prAdmin.currentStatus}">
+                                        <s:selectItems
+                                                value="#{prAdmin.getPossibleStatusesForSystem(prAdmin.selectedSystemInSession.system)}"
+                                                var="selectedValue" label="#{selectedValue.label}"/>
+                                    </h:selectOneMenu>
+                                </s:decorate>
+                                <s:decorate id="saveAndGoToNextDecoration" template="/layout/display/_display.xhtml">
+                                    <ui:define name="label">#{messages['net.ihe.gazelle.tm.SaveAndGoToNext']}
+                                    </ui:define>
+                                    <a4j:commandButton value="#{messages['gazelle.common.button.Save']}"
+                                                       styleClass="gzl-btn-green" ignoreDupResponses="true"
+                                                       action="#{prAdmin.updateSystemStatus()}"/>
+                                </s:decorate>
+                                <s:decorate id="EditDecoration" template="/layout/display/_display.xhtml">
+                                    <ui:define name="label">#{messages['gazelle.common.button.Edit']}
+                                        #{prAdmin.selectedSystemInSession.system.name}
+                                    </ui:define>
+                                    <h:commandButton styleClass="gzl-btn-blue"
+                                                     value="#{messages['gazelle.common.button.Edit']}"
+                                                     action="#{systemInSessionListManager.viewSystemInSession(prAdmin.selectedSystemInSession)}"/>
+                                </s:decorate>
+                            </ui:decorate>
+                        </div>
+                    </div>
+                </s:div>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

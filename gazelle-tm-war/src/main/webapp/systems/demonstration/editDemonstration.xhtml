@@ -1,0 +1,122 @@
+<s:div xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:h="http://java.sun.com/jsf/html"
+       xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+       xmlns="http://www.w3.org/1999/xhtml">
+    <h:panelGroup rendered="#{demonstrationManager.editDemonstration}">
+        <div class="row">
+            <div class="col-lg-6 col-lg-offset-3">
+                <ui:decorate template="/layout/panels/_panel_title_footer_id.xhtml">
+                    <ui:param name="panel_id" value="editDemonstrationPanel"/>
+                    <ui:define name="panel_title">#{messages['gazelle.systems.demonstration.LabelHeader']}</ui:define>
+                    <h:outputText>#{messages['gazelle.systems.demonstration.Label2']}</h:outputText>
+
+
+                    <s:decorate id="name" template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                        <ui:param name="id" value="name"/>
+                        <ui:define name="label">#{messages['gazelle.systems.demonstration.Name']}</ui:define>
+                        <h:inputText id="name" size="60" value="#{demonstrationManager.selectedDemonstration.name}"
+                                     required="true"
+                                     styleClass="form-control"/>
+                    </s:decorate>
+                    <s:decorate id="descriptionDecoration"
+                                template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                        <ui:param name="id" value="description"/>
+                        <ui:define name="label">#{messages['gazelle.systems.demonstration.Description']}</ui:define>
+                        <h:inputTextarea styleClass=" form-control" id="description"
+                                         value="#{demonstrationManager.selectedDemonstration.description}"
+                                         rows="4" cols="60"/>
+                    </s:decorate>
+                    <s:decorate id="urlDecoration" template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                        <ui:param name="id" value="url"/>
+                        <ui:define name="label">#{messages['gazelle.systems.demonstration.URL']}</ui:define>
+                        <h:inputText id="url" size="60" value="#{demonstrationManager.selectedDemonstration.url}"
+                                     styleClass="form-control"/>
+                    </s:decorate>
+                    <a4j:region id="addressCountryRegion">
+                        <s:decorate id="addressCountryDecoration"
+                                    template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                            <ui:define name="label">#{messages['gazelle.systems.demonstration.country']}</ui:define>
+                            <h:selectOneMenu styleClass="form-control gzl-form-control" id="countryListBox"
+                                             value="#{demonstrationManager.selectedDemonstration.iso3166CountryCode}"
+                                             required="true">
+                                <s:selectItems value="#{gazelleDAO.getPossibleCountries()}" var="countryFromList"
+                                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                               label="#{countryFromList.printableName}"/>
+                                <a4j:ajax event="change" render="addressCountryDecoration${panelId}"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </a4j:region>
+                    <a4j:region id="startDateRegion">
+                        <ui:decorate id="startDateDecoration"
+                                     template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                            <ui:define name="label">#{messages['gazelle.systems.session.StartDate']}</ui:define>
+                            <a4j:outputPanel id="calendarStartDate" layout="block">
+                                <rich:calendar
+                                        value="#{demonstrationManager.selectedDemonstration.beginningDemonstration}"
+                                        popup="true" showApplyButton="false" cellWidth="24px"
+                                        datePattern="#{dateDisplay.calendarPatternDate}"
+                                        locale="#{dateDisplay.calendarLocale}"
+                                        timeZone="#{dateDisplay.calendarTimeZoneDate}" cellHeight="22px"
+                                        styleClass="form-inline">
+                                </rich:calendar>
+                            </a4j:outputPanel>
+                        </ui:decorate>
+                    </a4j:region>
+                    <a4j:region id="endDateRegion">
+                        <ui:decorate id="endDateDecoration"
+                                     template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                            <ui:define name="label">#{messages['gazelle.systems.session.EndDate']}</ui:define>
+                            <a4j:outputPanel id="calendarEndDate" layout="block">
+                                <rich:calendar
+                                        value="#{demonstrationManager.selectedDemonstration.endingDemonstration}"
+                                        popup="true" showApplyButton="false" cellWidth="24px"
+                                        datePattern="#{dateDisplay.calendarPatternDate}"
+                                        locale="#{dateDisplay.calendarLocale}"
+                                        timeZone="#{dateDisplay.calendarTimeZoneDate}" cellHeight="22px"
+                                        styleClass="form-inline">
+                                </rich:calendar>
+                            </a4j:outputPanel>
+                        </ui:decorate>
+                    </a4j:region>
+                    <a4j:region id="activateRegion">
+                        <s:decorate id="activateDecoration"
+                                    template="/layout/form/_form_checkbox_horizontal_3-9.xhtml">
+                            <ui:define name="label">#{messages['gazelle.systems.demonstration.isActivated']}
+                            </ui:define>
+                            <h:selectBooleanCheckbox id="checkbox"
+                                                     value="#{demonstrationManager.selectedDemonstration.active}"/>
+
+                        </s:decorate>
+                    </a4j:region>
+                    <s:div id="testingSessionSelection">
+                        <rich:pickList id="picklistForSelectingSession"
+                                       value="#{demonstrationManager.selectedDemonstration.testingSessions}"
+                                       sourceListWidth="300" targetListWidth="300"
+                                       caption="Link demonstration to testing sessions" listsHeight="250"
+                                       fastOrderControlsVisible="false" fastMoveControlsVisible="true"
+                                       orderControlsVisible="false"
+                                       removeControlLabel="#{messages['net.ihe.gazelle.tm.RemoveTestingSessions']})"
+                                       copyControlLabel="#{messages['net.ihe.gazelle.tm.AddTestingSessions']})">
+                            <s:selectItems value="#{demonstrationManager.availableTestingSessions}" var="ts"
+                                           label="#{ts.description}"/>
+                            <s:convertEntity/>
+                        </rich:pickList>
+                    </s:div>
+
+                    <ui:define name="panel_footer">
+                        <div align="right">
+                            <a4j:commandButton id="cancelEdit" styleClass="gzl-btn"
+                                               value="#{messages['gazelle.common.button.Cancel']}" bypassUpdates="true"
+                                               actionListener="#{demonstrationManager.displayAllDemonstrations()}"
+                                               render="globalDiv"/>
+                            <a4j:commandButton id="saveDemoButton" styleClass="gzl-btn-green"
+                                               value="#{messages['gazelle.common.button.Save']}"
+                                               actionListener="#{demonstrationManager.addDemonstration()}"
+                                               render="globalDiv"/>
+                        </div>
+                    </ui:define>
+                </ui:decorate>
+            </div>
+        </div>
+    </h:panelGroup>
+</s:div>

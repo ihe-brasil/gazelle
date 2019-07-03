@@ -1,0 +1,409 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib">
+    <h:form id="systemSummaryForm" class="form-horizontal">
+        <s:token allowMultiplePosts="true"/>
+
+        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+            <ui:define name="panel_title">#{messages['gazelle.systems.system.DisplaySystemLabel1']}</ui:define>
+            <div id="systemManager">
+                <s:fragment id="systemSummaryFragment">
+                    <!-- Display this when the user is not admin -->
+                    <a4j:region id="institutionRegion">
+                        <ui:decorate id="institutionDecoration"
+                                     template="/layout/display/_display_field_horizontal_3-9.xhtml">
+                            <ui:param name="id" value="institutionDecoration"/>
+                            <ui:define name="label">#{messages['gazelle.users.institution.InstitutionName']}
+                            </ui:define>
+                            <div class="form-control-static">
+                                #{systemManager.displayInstitutionForSystem(systemInSessionEditor.getSystem() )}
+                            </div>
+                        </ui:decorate>
+                    </a4j:region>
+                    <a4j:region id="nameRegion">
+                        <ui:decorate id="nameDecoration" template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                            <ui:param name="id" value="systemName"/>
+                            <ui:param name="required" value="true"/>
+                            <ui:define name="label">#{messages['gazelle.systems.system.SystemName']}</ui:define>
+                            <h:inputText styleClass=" form-control" id="systemName" maxlength="128" size="30"
+                                         value="#{systemInSessionEditor.systemName}"
+                                         required="true"/>
+                        </ui:decorate>
+                    </a4j:region>
+                    <!-- PR system type -->
+                    <a4j:region rendered="#{applicationManager.isProductRegistry()}">
+                        <ui:decorate template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                            <ui:define name="label">#{messages['gazelle.systems.system.SystemType']}</ui:define>
+                            <ui:param name="id" value="systemName"/>
+                            <s:div id="prSystemTypes">
+                                <rich:dataTable value="#{systemInSessionEditor.getSortedTypes()}" var="subType">
+                                    <g:column>
+                                        <h:outputText value="#{subType.selectableLabel}"/>
+                                    </g:column>
+                                    <g:column>
+                                        <a4j:commandLink
+                                                actionListener="#{systemInSessionEditor.removeSubType(subType)}"
+                                                title="#{messages['gazelle.common.button.Remove']}" execute="@this"
+                                                render="prSystemTypes">
+                                            <span class="gzl-icon-times"/>
+                                        </a4j:commandLink>
+                                    </g:column>
+                                </rich:dataTable>
+                                <s:div>
+                                    <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text"
+                                                     id="systemTypeList"
+                                                     value="#{systemInSessionEditor.systemSubtypesPerSystemType}">
+                                        <s:selectItems
+                                                value="#{systemInSessionEditor.possibleSystemSubtypesPerSystemType}"
+                                                var="systemSubtypesPerSystemTypeFromList"
+                                                noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                label="#{systemSubtypesPerSystemTypeFromList.selectableLabel}"/>
+                                        <a4j:ajax event="change" execute="@this" render="prSystemTypes"
+                                                  listener="#{systemInSessionEditor.addSystemSubType()}"/>
+                                    </h:selectOneMenu>
+                                </s:div>
+                            </s:div>
+                        </ui:decorate>
+                    </a4j:region>
+                    <!--  Keyword (system type) Before Registration Deadline -->
+                    <a4j:region id="typeRegionBeforeDeadline"
+                                rendered="#{applicationManager.isTestManagement() and (s:hasRole('admin_role') or (identity.loggedIn and !testingSessionManager.isRegistrationDeadlineExpired()))}">
+                        <ui:decorate id="typeDecorationBeforeDeadline"
+                                     template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                            <ui:param name="required" value="true"/>
+                            <ui:param name="id" value="SystemTypeListBoxBeforeDeadline"/>
+                            <ui:define name="label">#{messages['gazelle.systems.system.SystemType']}</ui:define>
+                            <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text"
+                                             id="SystemTypeListBoxBeforeDeadline"
+                                             value="#{systemInSessionEditor.systemType}"
+                                             required="true">
+                                <s:selectItems value="#{systemInSessionEditor.getPossibleSystemTypes()}"
+                                               var="systemTypeFromList"
+                                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                               label="#{systemTypeFromList.systemTypeKeyword}"/>
+                                <a4j:ajax event="change"
+                                          listener="#{systemInSessionEditor.generateSystemKeyword()}"
+                                          render="keywordDecorationBeforeDeadline" execute="@this"/>
+                            </h:selectOneMenu>
+                        </ui:decorate>
+                    </a4j:region>
+                    <!--  Keyword (keyword name) Before Registration Deadline -->
+                    <a4j:region id="keywordRegionBeforeDeadline"
+                                rendered="#{applicationManager.isTestManagement() and (s:hasRole('admin_role') or (identity.loggedIn and !testingSessionManager.isRegistrationDeadlineExpired()) and not empty systemInSessionEditor.getSystemType())}">
+                        <s:decorate id="keywordDecorationBeforeDeadline"
+                                    template="/layout/form/_form_field_horizontal_inline.xhtml">
+                            <ui:param name="id" value="systemkeywordIn"/>
+                            <ui:define name="label">#{messages['gazelle.systems.system.SystemKeyword']}</ui:define>
+                            <s:span id="keywordEditDiv" styleClass="gzl-never-wrap">
+                                <h:outputText id="systemkeywordEditOut"
+                                              value="#{systemInSessionEditor.getSystemInSessionKeywordBase()}"/>
+                                <s:span id="underscoreOutputCreateSpan">
+                                    <h:outputText id="underscoreOutputCreate"
+                                                  rendered="#{(systemInSessionEditor.getSystemKeywordSuffix().length() &gt; 0) and (not empty systemInSessionEditor.getSystemTypeKeyword())}"
+                                                  value="_"/>
+                                </s:span>
+
+                                <h:inputText styleClass=" form-control" id="systemkeywordIn" maxlength="20"
+                                             size="20"
+                                             value="#{systemInSessionEditor.systemKeywordSuffix}"
+                                             rendered="#{not empty systemInSessionEditor.getSystemType() and not empty systemInSessionEditor.getSystemTypeKeyword()}">
+                                    <a4j:ajax event="keyup" render="underscoreOutputCreateSpan" execute="@this"/>
+                                </h:inputText>
+                            </s:span>
+                        </s:decorate>
+                    </a4j:region>
+                    <!--  Keyword After Registration Deadline -->
+                    <a4j:region id="keywordRegionAfterDeadline"
+                                rendered="#{!s:hasRole('admin_role') and !s:hasRole('project-manager_role') and !s:hasRole('systems_editor_role') and testingSessionManager.isRegistrationDeadlineExpired()}">
+                        <ui:decorate id="keywordDecorationAfterDeadline"
+                                     template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                            <ui:param name="id" value="systemkeywordOutAfterDeadline"/>
+                            <ui:define name="label">#{messages['gazelle.systems.system.SystemKeyword']}</ui:define>
+                            <h:outputText id="systemkeywordOutAfterDeadline"
+                                          value="#{systemInSessionEditor.getSystemKeyword()}"
+                                          rendered="#{!s:hasRole('admin_role') and !s:hasRole('project-manager_role') and !s:hasRole('systems_editor_role') and testingSessionManager.isRegistrationDeadlineExpired()}"/>
+                            <h:panelGroup
+                                    rendered="#{!s:hasRole('admin_role') and !s:hasRole('project-manager_role') and !s:hasRole('systems_editor_role') and testingSessionManager.isRegistrationDeadlineExpired()}">
+                                <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                    <ui:param name="id" value="k"/>
+                                    <ui:param name="placement" value="bottom"/>
+                                    <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                                    <ui:define name="content">
+                                        <div class="gzl-never-wrap">
+                                            #{messages['gazelle.systems.system.keywordHelp1']}
+                                            <a href="mailto:#{gazelleDAO.getSelectedTestingSession().contactEmail}">#{gazelleDAO.getSelectedTestingSession().contactFirstname}
+                                                #{gazelleDAO.getSelectedTestingSession().contactLastname}</a>
+                                            #{messages['gazelle.systems.system.keywordHelp2']}
+                                        </div>
+                                    </ui:define>
+                                </ui:decorate>
+                            </h:panelGroup>
+                        </ui:decorate>
+                    </a4j:region>
+                    <a4j:region id="versionRegion">
+                        <ui:decorate id="versionDecoration" template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                            <ui:param name="id" value="version"/>
+                            <ui:define name="label">#{messages['gazelle.systems.system.SystemVersion']}</ui:define>
+                            <a4j:commandLink id="onBlurVersion" render="versionDecoration" execute="@this"/>
+                            <h:inputText styleClass=" form-control" id="version" maxlength="64" size="30"
+                                         value="#{systemInSessionEditor.systemVersion}"/>
+                        </ui:decorate>
+                    </a4j:region>
+
+                    <a4j:region id="hl7ConformanceStatementUrlRegion">
+                        <s:decorate id="hl7ConformanceStatementUrlEditionDecoration"
+                                    template="/layout/display/_display_field_horizontal_3-9.xhtml">
+                            <ui:define name="label">#{messages['gazelle.systems.system.LinksToHL7Conformance']}
+                                <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                    <ui:param name="id" value="hl7"/>
+                                    <ui:param name="placement" value="bottom"/>
+                                    <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                                    <ui:define name="content">
+                                        <div class="gzl-never-wrap">
+                                            #{messages['gazelle.systems.system.is.help.hl7ConformanceURL1']}
+                                            <br/>
+                                            #{messages['gazelle.systems.system.is.help.hl7ConformanceURL2']}
+                                            <br/>
+                                            #{messages['gazelle.systems.system.is.help.hl7ConformanceURL3']}
+                                            <br/>
+                                            #{messages['gazelle.systems.system.is.help.hl7ConformanceURL4']}
+                                            <br/>
+                                        </div>
+                                    </ui:define>
+                                </ui:decorate>
+                            </ui:define>
+                            <s:div id="hl7P" styleClass="form-control-static">
+                                <h:panelGroup
+                                        rendered="#{not empty systemInSessionEditor.getSystemHL7ConformanceStatementUrl()}">
+                                    <a href="#{systemInSessionEditor.getSystemHL7ConformanceStatementUrl()}"
+                                       target="_blank">#{systemInSessionEditor.getSystemHL7ConformanceStatementUrl()}</a>
+
+                                    <a4j:commandLink id="hl7EditURLImageSupport"
+                                                     oncomplete="jq162('#hl7DocumentsModalPanel').modal('show');"
+                                                     actionListener="#{systemInSessionEditor.initializeNewHL7Url()}"
+                                                     render=":hl7DocumentsForm" execute="@this">
+                                        <span class="gzl-icon-pencil"/>
+                                    </a4j:commandLink>
+                                    <a4j:commandLink id="hl7DeleteURLImageSupport"
+                                                     actionListener="#{systemInSessionEditor.removeHL7URL(systemInSessionEditor.getSystem())}"
+                                                     render="hl7ConformanceStatementUrlEditionDecoration, hl7DocumentsDecoration"
+                                                     execute="@this">
+                                        <span class="gzl-icon-trash-o"/>
+                                    </a4j:commandLink>
+                                </h:panelGroup>
+                                <rich:dataGrid id="hl7DocumentsFilesForSelectedSystemDataGrid" columns="1"
+                                               value="#{systemInSessionEditor.hl7DocumentsFilesForSelectedSystem}"
+                                               var="file" rowKeyVar="row">
+                                    <h:commandLink id="hl7ConformanceUploadsCommandLink"
+                                                   action="#{systemInSessionEditor.showHl7ConformanceStatementFile(file.name)}"
+                                                   value="#{file.name}" target="_blank"/>
+
+                                    <a4j:commandLink id="hl7DeleteUploadsImageSupport"
+                                                     actionListener="#{systemInSessionEditor.removeHL7Document(file)}"
+                                                     render="hl7ConformanceStatementUrlEditionDecoration, hl7DocumentsDecoration"
+                                                     execute="@this">
+
+                                        <span class="gzl-icon-trash-o"/>
+                                    </a4j:commandLink>
+                                </rich:dataGrid>
+                                <a4j:commandLink id="hl7AddURLImageSupport"
+                                                 actionListener="#{systemInSessionEditor.initializeNewHL7Url()}"
+                                                 oncomplete="jq162('#hl7DocumentsModalPanel').modal('show');"
+                                                 render="hl7ConformanceStatementUrlEditionDecoration, :hl7DocumentsForm"
+                                                 execute="@this">
+                                    <span class="gzl-icon-plus"/>
+                                    #{messages['gazelle.systems.system.AddAHL7Document']}
+                                </a4j:commandLink>
+                            </s:div>
+                        </s:decorate>
+                    </a4j:region>
+
+                    <a4j:region id="dicomConformanceStatementUrlRegion">
+                        <s:decorate id="dicomConformanceStatementUrlEditionDecoration"
+                                    template="/layout/display/_display_field_horizontal_3-9.xhtml">
+                            <ui:define name="label">#{messages['gazelle.systems.system.LinksToDicomConformance']}
+                                <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                    <ui:param name="id" value="dicom"/>
+                                    <ui:param name="placement" value="bottom"/>
+                                    <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                                    <ui:define name="content">
+                                        <div class="gzl-never-wrap">
+                                            #{messages['gazelle.systems.system.is.help.dicomConformanceURL1']}
+                                            <br/>
+                                            #{messages['gazelle.systems.system.is.help.dicomConformanceURL2']}
+                                            <br/>
+                                            #{messages['gazelle.systems.system.is.help.dicomConformanceURL3']}
+                                            <br/>
+                                            #{messages['gazelle.systems.system.is.help.dicomConformanceURL4']}
+                                            <br/>
+                                        </div>
+                                    </ui:define>
+                                </ui:decorate>
+                            </ui:define>
+                            <s:div id="dicomP" styleClass="form-control-static">
+                                <h:panelGroup
+                                        rendered="#{not empty systemInSessionEditor.getSystemDicomConformanceStatementUrl()}">
+                                    <a href="#{systemInSessionEditor.getSystemDicomConformanceStatementUrl()}"
+                                       target="_blank">#{systemInSessionEditor.getSystemDicomConformanceStatementUrl()}</a>
+
+                                    <a4j:commandLink id="dicomEditURLImageSupport"
+                                                     oncomplete="jq162('#dicomDocumentsModalPanel').modal('show');"
+                                                     actionListener="#{systemInSessionEditor.initializeNewDicomUrl()}"
+                                                     render=" :dicomDocumentsForm" execute="@this">
+                                        <span class="gzl-icon-pencil"/>
+                                    </a4j:commandLink>
+                                    <a4j:commandLink id="dicomDeleteURLImageSupport"
+                                                     actionListener="#{systemInSessionEditor.removeDicomURL(systemInSessionEditor.getSystem())}"
+                                                     render="dicomConformanceStatementUrlEditionDecoration, dicomDocumentsDecoration"
+                                                     execute="@this">
+                                        <span class="gzl-icon-trash-o"/>
+                                    </a4j:commandLink>
+                                </h:panelGroup>
+                                <rich:dataGrid id="dicomDocumentsFilesForSelectedSystemDataGrid" columns="1"
+                                               value="#{systemInSessionEditor.dicomDocumentsFilesForSelectedSystem}"
+                                               var="file" rowKeyVar="row">
+                                    <h:commandLink id="dicomConformanceUploadsCommandLink"
+                                                   action="#{systemInSessionEditor.showDicomConformanceStatementFile(file.name)}"
+                                                   value="#{file.name}" target="_blank"/>
+
+                                    <a4j:commandLink id="dicomDeleteUploadsImageSupport"
+                                                     actionListener="#{systemInSessionEditor.removeDicomDocument(file)}"
+                                                     render="dicomConformanceStatementUrlEditionDecoration, dicomDocumentsDecoration"
+                                                     execute="@this">
+                                        <span class="gzl-icon-trash-o"/>
+                                    </a4j:commandLink>
+                                </rich:dataGrid>
+
+                                <a4j:commandLink id="dicomAddURLImageSupport"
+                                                 actionListener="#{systemInSessionEditor.initializeNewDicomUrl()}"
+                                                 oncomplete="jq162('#dicomDocumentsModalPanel').modal('show');"
+                                                 render="dicomConformanceStatementUrlEditionDecoration, :dicomDocumentsForm"
+                                                 execute="@this">
+                                    <span class="gzl-icon-plus"/>
+                                    #{messages['gazelle.systems.system.AddADicomDocument']}
+                                </a4j:commandLink>
+                            </s:div>
+                        </s:decorate>
+                    </a4j:region>
+                    <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+                    <!--  END - DICOM conformance statement Decoration						-->
+                    <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+                    <a4j:region id="integrationStatementUrlRegion"
+                                rendered="#{applicationManager.isTestManagement()}">
+                        <ui:decorate id="integrationStatementUrlDecoration"
+                                     template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                            <ui:param name="id" value="integrationStatementUrl"/>
+                            <ui:define name="label">#{messages['gazelle.systems.system.ISURL']}
+                                <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                    <ui:param name="id" value="sta"/>
+                                    <ui:param name="placement" value="bottom"/>
+                                    <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                                    <ui:define name="content">
+                                        <div class="gzl-never-wrap">
+                                            #{messages['gazelle.systems.system.is.help.isURL1']} <br/>
+                                            <br/> #{messages['gazelle.systems.system.is.help.isURL2']}
+                                            <br/> #{messages['gazelle.systems.system.is.help.isURL3']}
+                                            <br/> #{messages['gazelle.systems.system.is.help.isURL6']}
+                                            <br/>
+                                        </div>
+                                    </ui:define>
+                                </ui:decorate>
+                            </ui:define>
+                            <a4j:commandLink id="onblurIntegrationStatementUrl"
+                                             render="integrationStatementUrlDecoration" execute="@this"/>
+                            <h:inputText styleClass=" form-control" id="integrationStatementUrl" maxlength="255"
+                                         size="50"
+                                         value="#{systemInSessionEditor.systemIntegrationStatementUrl}"/>
+
+
+                        </ui:decorate>
+                    </a4j:region>
+                    <a4j:region id="integrationStatementDateRegion"
+                                rendered="#{applicationManager.isTestManagement()}">
+                        <ui:decorate id="integrationStatementDateDecoration"
+                                     template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                            <ui:param name="id" value="calendar"/>
+                            <ui:define name="label">#{messages['gazelle.systems.system.ISDate']}</ui:define>
+                            <a4j:outputPanel id="calendar" layout="block">
+                                <rich:calendar
+                                        value="#{systemInSessionEditor.systemIntegrationStatementDate}"
+                                        popup="true" showApplyButton="false" cellWidth="24px"
+                                        datePattern="#{dateDisplay.calendarPatternDate}"
+                                        locale="#{dateDisplay.calendarLocale}"
+                                        timeZone="#{dateDisplay.calendarTimeZoneDate}" cellHeight="22px"
+                                        style="width:200px">
+                                </rich:calendar>
+                            </a4j:outputPanel>
+                        </ui:decorate>
+                    </a4j:region>
+                    <a4j:region id="ownerRegion"
+                                rendered="#{s:hasRole('admin_role') || s:hasRole('vendor_admin_role') }">
+                        <ui:decorate id="ownerDecoration" template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                            <ui:param name="id" value="OwnerList"/>
+                            <ui:param name="required" value="true"/>
+                            <ui:define name="label">#{messages['gazelle.systems.system.OwnerUser']}</ui:define>
+                            <h:selectOneMenu styleClass="form-control gzl-form-control gzl-select-text" id="OwnerList"
+                                             value="#{systemInSessionEditor.systemOwnerUser}"
+                                             required="true">
+                                <s:selectItems
+                                        value="#{gazelleDAO.listUsersForCompany(gazelleDAO.getInstitutionsForASystem(systemInSessionEditor.getSystem()).get(0))}"
+                                        var="userFromList"
+                                        noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                        label="#{userFromList.firstname} #{userFromList.lastname} (#{userFromList.username})"/>
+                            </h:selectOneMenu>
+                        </ui:decorate>
+                    </a4j:region>
+                    <a4j:region id="registrationStatusRegion"
+                                rendered="#{s:hasRole('admin_role') || (s:hasRole('vendor_admin_role') and systemInSessionEditor.isSystemRegistrationOpened())}">
+                        <ui:decorate id="registrationStatusDecoration"
+                                     template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                            <ui:param name="required" value="true"/>
+                            <ui:param name="id" value="registrationStatusList"/>
+                            <ui:define name="label">#{messages['net.ihe.gazelle.tm.RegistrationStatus']}</ui:define>
+                            <h:selectOneMenu id="registrationStatusList"
+                                             styleClass="form-control gzl-form-control gzl-select-text"
+                                             value="#{systemInSessionEditor.systemRegistrationStatus}"
+                                             required="true">
+                                <s:selectItems value="#{systemInSessionEditor.getRegistrationStatus()}"
+                                               var="registrationStatus"
+                                               noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                               label="#{registrationStatus.friendlyName}"/>
+                            </h:selectOneMenu>
+                        </ui:decorate>
+                    </a4j:region>
+                    <a4j:region id="registrationStatusRegionReadOnly"
+                                rendered="#{!s:hasRole('admin_role') and s:hasRole('vendor_admin_role') and !systemInSessionEditor.isSystemRegistrationOpened()}">
+                        <ui:decorate id="registrationStatusReadOnlyDecoration"
+                                     template="/layout/form/_form_field_horizontal_3-9.xhtml">
+                            <ui:define name="label">#{messages['net.ihe.gazelle.tm.RegistrationStatus']}</ui:define>
+                            <h:outputText value="#{systemInSessionEditor.systemRegistrationStatus}"
+                                          styleClass="#{systemInSessionEditor.getSystemRegistrationStatus().cssStyle}"/>
+                        </ui:decorate>
+                    </a4j:region>
+                    <a4j:region id="testingSessionRegion" rendered="#{applicationManager.isTestManagement()}">
+                        <ui:decorate id="testingSessionDecoration"
+                                     template="/layout/display/_display_field_horizontal_3-9.xhtml">
+                            <ui:define name="label">#{messages['gazelle.systems.testingSession']}</ui:define>
+                            <div class="form-control-static">
+                                <h:outputText
+                                        value="#{systemInSessionEditor.getSystemTestingSessionDescription()}"/>
+                            </div>
+                        </ui:decorate>
+                    </a4j:region>
+                </s:fragment>
+
+                <div id="editSystemSummarySaveSystemDiv">
+                    <a4j:commandButton id="editSystem" styleClass="gzl-btn-orange"
+                                       value="#{messages['gazelle.common.button.Update']}"
+                                       actionListener="#{systemInSessionEditor.editSystem()}"
+                                       render="systemSummaryForm,messageDecoration"/>
+                    <a4j:commandButton id="cancelEdit" styleClass="gzl-btn"
+                                       value="#{messages['gazelle.common.button.Cancel']}"
+                                       immediate="true"
+                                       action="#{systemInSessionEditor.viewSystemInSession(systemInSessionEditor.systemInSession,systemInSessionEditor.defaultTab)}"
+                                       execute="@this" onclick="processFormHidden();"/>
+                </div>
+            </div>
+        </ui:decorate>
+    </h:form>
+</ui:composition>

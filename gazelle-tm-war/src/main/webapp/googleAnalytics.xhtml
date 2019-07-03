@@ -1,0 +1,12 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <!--@formatter:off-->
+    <!-- Google Analytics -->
+    <script>
+        window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+        ga('create', '#{applicationPreferenceManager.getGoogleAnalyticsCode()}', 'auto');
+        ga('send', 'pageview');
+    </script>
+    <script src='https://www.google-analytics.com/analytics.js' async="true"></script>
+    <!--@formatter:on-->
+</ui:composition>

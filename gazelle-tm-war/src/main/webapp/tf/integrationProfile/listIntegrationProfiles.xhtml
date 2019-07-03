@@ -1,0 +1,119 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tf.menu.IntegrationProfilesManagement']}"/>
+    <ui:define name="body">
+        <h:form id="integrationProfileSearchResultsForm" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                <s:decorate template="/layout/form/_form_field_horizontal_inline.xhtml">
+                    <ui:param name="id" value="domainslection"/>
+                    <ui:define name="label">#{messages['gazelle.tf.SelectADomain']}</ui:define>
+                    <h:selectOneMenu id="domainslection" styleClass="form-control gzl-form-control"
+                                     value="#{integrationProfileManager.selectedDomain}">
+                        <s:selectItems value="#{gazelleDAO.getPossibleDomains()}" var="currentDomain"
+                                       noSelectionLabel="#{messages['gazelle.common.PleaseSelectADomain']}"
+                                       label="#{currentDomain.name}"/>
+                        <a4j:ajax event="change" execute="@this" render="integrationProfilesForm"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <h:commandButton styleClass="gzl-btn-green"
+                                 value="#{messages['gazelle.tf.integrationProfile.button.AddNewIntegrationProfile']}"
+                                 action="#{integrationProfileManager.addNewIntegrationProfileButton()}"
+                                 rendered="#{s:hasPermission('MasterModel', 'edit', null)}"/>
+            </ui:decorate>
+        </h:form>
+
+        <h:form id="integrationProfilesForm">
+            <s:token allowMultiplePosts="true"/>
+            <a4j:queue requestDelay="300" ignoreDupResponses="true"/>
+            #{dataTableStateHolder.setAscendingOn('keyword')}
+            <rich:dataTable id="integrationProfilesTable" var="integrationProfile"
+                            rows="#{userManagerExtra.selectedUserPreferences.numberOfResultsPerPage}"
+                            value="#{integrationProfileManager.listOfIntegrationProfilesDataModel()}"
+                            render="ds">
+                <g:column sortBy="#{'id'}" sortOrder="#{dataTableStateHolder.sortOrders['id']}">
+                    <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                    #{integrationProfile.id}
+                </g:column>
+                <g:column sortBy="#{'keyword'}" filterBy="#{'keyword'}" sortOrder="#{dataTableStateHolder.sortOrders['keyword']}"
+                          filterEvent="onkeyup">
+                    <ui:define name="header">#{messages['gazelle.tf.table.Keyword']}</ui:define>
+                    #{integrationProfile.keyword}
+                </g:column>
+                <g:column sortBy="#{'name'}" filterBy="#{'name'}" sortOrder="#{dataTableStateHolder.sortOrders['name']}"
+                          filterEvent="onkeyup">
+                    <ui:define name="header">#{messages['gazelle.tf.table.Name']}</ui:define>
+                    #{integrationProfile.name}
+                </g:column>
+                <g:column>
+                    <ui:define name="header">#{messages['gazelle.tf.table.Description']}</ui:define>
+                    <h:panelGroup rendered="#{integrationProfile.description != null  and !(empty integrationProfile.description)}">
+                        <pre style="word-wrap: break-word;word-break:break-all;white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -o-pre-wrap;">
+                            <g:safehtml value="#{integrationProfile.description}"/>
+                        </pre>
+                    </h:panelGroup>
+                </g:column>
+                <g:column sortBy="#{'integrationProfileStatusType.name'}"
+                          sortOrder="#{dataTableStateHolder.sortOrders['integrationProfileStatusType.name']}">
+                    <ui:define name="header">#{messages['gazelle.tf.table.Status']}</ui:define>
+                    #{integrationProfile.integrationProfileStatusType.name}
+                </g:column>
+                <g:column sortBy="#{'documentSection'}" sortOrder="#{dataTableStateHolder.sortOrders['documentSection']}">
+                    <ui:define name="header">#{messages['net.ihe.gazelle.tm.Specification']}</ui:define>
+                    <ui:include src="/tf/integrationProfile/_documentSectionForIP_columnAction.xhtml">
+                        <ui:param name="ipParam" value="#{integrationProfile}"/>
+                        <ui:param name="controllerParam" value="#{integrationProfileManager}"/>
+                        <ui:param name="formParam" value="integrationProfilesForm"/>
+                        <ui:param name="callerPageParam" value="integrationProfileList"/>
+                    </ui:include>
+                </g:column>
+                <g:column>
+                    <ui:define name="header">#{messages['gazelle.tf.table.Action']}</ui:define>
+                    <div class="gzl-never-wrap">
+                        <a4j:commandLink
+                                title="#{messages['gazelle.common.button.View']}"
+                                action="#{integrationProfileManager.viewIntegrationProfile(integrationProfile)}"
+                                onRowMouseOver="this.style.cursor='pointer'">
+                            <span class="gzl-icon-search"/>
+                        </a4j:commandLink>
+
+                        <a4j:commandLink
+                                action="#{integrationProfileManager.editIntegrationProfile(integrationProfile)}"
+                                rendered="#{s:hasPermission('MasterModel', 'edit', null)}"
+                                title="#{messages['gazelle.common.button.Edit']}"
+                                onRowMouseOver="this.style.cursor='pointer'">
+                            <span class="gzl-icon-pencil"/>
+                        </a4j:commandLink>
+
+                        <a4j:commandLink
+                                rendered="#{s:hasPermission('MasterModel', 'edit', null)}"
+                                title="#{messages['net.ihe.gazelle.tm.DuplicateActor']}"
+                                action="#{integrationProfileManager.duplicateProfile(integrationProfile)}"
+                                onRowMouseOver="this.style.cursor='pointer'">
+                            <span class="gzl-icon-files-o"/>
+                        </a4j:commandLink>
+
+                        <a4j:commandLink rendered="#{s:hasPermission('MasterModel', 'edit', null)}"
+                                         title="#{messages['gazelle.common.button.Delete']}"
+                                         action="#{integrationProfileManager.showIntegrationProfileDeleteSideEffects(integrationProfile)}"
+                                         onRowMouseOver="this.style.cursor='pointer'">
+                            <span class="gzl-icon-trash-o"/>
+                        </a4j:commandLink>
+                    </div>
+                </g:column>
+                <f:facet name="footer">
+                    <ui:include src="/util/datatableFooter.xhtml">
+                        <ui:param name="dataScrollerId" value="ds"/>
+                        <ui:param name="dataTableId" value="integrationProfilesTable"/>
+                    </ui:include>
+                </f:facet>
+            </rich:dataTable>
+            <h:commandLink id="DOWNASCVS" action="#{gazelleExcelExporterJboss7.export('integrationProfilesForm:integrationProfilesTable')}">
+                <h:outputText value="#{messages['gazelle.common.export.ExportAsExcel']}"/>
+            </h:commandLink>
+        </h:form>
+    </ui:define>
+</ui:composition>

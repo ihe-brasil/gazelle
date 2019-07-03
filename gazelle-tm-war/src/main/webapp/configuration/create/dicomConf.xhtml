@@ -1,0 +1,72 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <a4j:region id="AETitleRegion">
+        <s:decorate template="/layout/form/_edit.xhtml" id="AETitleDecorate">
+            <ui:param name="id" value="dicomAETitleInputText"/>
+            <ui:define name="label">#{messages['gazelle.configuration.DICOM.AETitle']}</ui:define>
+            <h:inputText styleClass=" form-control" id="dicomAETitleInputText"
+                         value="#{systemConfigurationManager.currentConfiguration.aeTitle}" required="true">
+
+            </h:inputText>
+        </s:decorate>
+    </a4j:region>
+    <a4j:region id="dicomSopClassRegion">
+        <s:decorate template="/layout/form/_edit.xhtml" id="dicomSopClassDecorate">
+            <ui:define name="label">#{messages['gazelle.configuration.DICOM.SopClass']}</ui:define>
+            #{systemConfigurationManager.setSelectedSopClass(systemConfigurationManager.currentConfiguration.sopClass)}
+            <h:selectOneMenu styleClass="form-control gzl-form-control" id="sopClassList"
+                             value="#{systemConfigurationManager.selectedSopClass}"
+                             rendered="#{systemConfigurationManager.currentConfiguration.id == null}"
+                             required="true">
+                <s:selectItems id="pleaseSelectSopClassItems" value="#{gazelleDAO.listSopClasses()}"
+                               var="sopClassFromList" noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                               label="#{sopClassFromList.keyword}"/>
+                <a4j:ajax event="change"
+                          listener="#{systemConfigurationManager.setSopClassToCurrentConf()}"
+                          render="dicomSopClassDecorate" execute="@this"/>
+            </h:selectOneMenu>
+            <h:selectOneMenu styleClass="form-control gzl-form-control" id="sopClassList2"
+                             value="#{systemConfigurationManager.selectedSopClass}"
+                             rendered="#{systemConfigurationManager.currentConfiguration.id != null}">
+                <s:selectItems id="pleaseSelectSopClassItems2" value="#{gazelleDAO.listSopClasses()}"
+                               var="sopClassFromList" noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                               label="#{sopClassFromList.keyword}"/>
+                <a4j:ajax event="change"
+                          listener="#{systemConfigurationManager.setSopClassToCurrentConf()}"
+                          render="dicomSopClassDecorate" execute="@this"/>
+            </h:selectOneMenu>
+        </s:decorate>
+    </a4j:region>
+    <a4j:region id="dicomTransfertRoleRegion">
+        <s:decorate template="/layout/display/_display.xhtml" id="dicomTransfertRoleDecorate">
+            <ui:param name="id" value="transferRoleOutputText"/>
+            <ui:define name="label">#{messages['gazelle.configuration.DICOM.Role']}</ui:define>
+            <h:outputText id="transferRoleOutputText"
+                          value="#{systemConfigurationManager.currentConfiguration.transferRole}"/>
+        </s:decorate>
+    </a4j:region>
+    <a4j:region id="portRegion"
+                rendered="#{!systemConfigurationManager.currentConfiguration.configuration.isSecured}">
+        <s:decorate template="/layout/form/_edit.xhtml" id="portDecorate">
+            <ui:param name="id" value="dicomPortInputText"/>
+            <ui:define name="label">#{messages['gazelle.configuration.system.Port']}</ui:define>
+            <h:inputText styleClass=" form-control" id="dicomPortInputText"
+                         value="#{systemConfigurationManager.currentConfiguration.port}">
+
+            </h:inputText>
+        </s:decorate>
+    </a4j:region>
+    <a4j:region id="portSecured"
+                rendered="#{systemConfigurationManager.currentConfiguration.configuration.isSecured}">
+        <s:decorate template="/layout/form/_edit.xhtml" id="portSecuredDecorate">
+            <ui:param name="id" value="dicomPortSecuredInputText"/>
+            <ui:define name="label">#{messages['gazelle.tm.PortSecured']}</ui:define>
+            <h:inputText styleClass=" form-control" id="dicomPortSecuredInputText"
+                         value="#{systemConfigurationManager.currentConfiguration.portSecured}">
+
+            </h:inputText>
+        </s:decorate>
+    </a4j:region>
+</ui:composition>

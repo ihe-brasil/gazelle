@@ -1,0 +1,89 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle"
+              value="#{messages['gazelle.tf.ActorIntegrationProfileLinksFor_2']} #{integrationProfileManager.selectedIntegrationProfile.name}"/>
+    <ui:define name="body">
+        <div id="actorIntegrationProfileLinkSideEffectsForIntegrationProfileId">
+            <h:form id="linkActorIntegrationProfileSideEffectsFormId">
+                <s:token allowMultiplePosts="true"/>
+                <h:outputText
+                        value="#{messages['gazelle.tf.RemovalOfActorsCausedTheseConflictsCorrectBeforeContinuingOrCancel']}"/>
+                <h:commandButton id="backToListShuttle" styleClass="gzl-btn"
+                                 value="#{messages['gazelle.tf.Back']}"
+                                 action="#{integrationProfileManager.linkProfileActors(integrationProfileManager.selectedIntegrationProfile)}"
+                                 rendered="#{s:hasPermission('MasterModel', 'edit', null)}"/>
+                <h:commandButton id="cancel" styleClass="gzl-btn"
+                                 value="#{messages['gazelle.common.button.Cancel']}"
+                                 action="#{integrationProfileManager.editIntegrationProfile(integrationProfileManager.selectedIntegrationProfile, integrationProfileManager.getEdit())}"/>
+                <h:commandButton styleClass="gzl-btn-red"
+                                 value="#{messages['gazelle.tf.DeleteAllLinksAndComplete']}"
+                                 action="#{integrationProfileManager.deleteAllDependentAIPOsAndPLs(integrationProfileManager.selectedIntegrationProfile)}"
+                                 rendered="#{s:hasPermission('MasterModel', 'edit', null)}"/>
+                <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                    <ui:define name="panel_title">#{messages['gazelle.tf.ConflictsInProfilelink']}</ui:define>
+                    <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                  rendered="#{integrationProfileManager.linkActorIntegrationProfileDependentPLs.size == 0}"/>
+                    <rich:dataTable id="linkActorIntegrationProfilePLTableId" var="profileLink"
+                                    value="#{integrationProfileManager.linkActorIntegrationProfileDependentPLs}"
+                                    rendered="#{integrationProfileManager.linkActorIntegrationProfileDependentPLs.size &gt; 0}">
+                        <g:column sortBy="#{'actorIntegrationProfile.actor.keyword'}">
+                            <ui:define name="header">#{messages['gazelle.tf.table.Actor']}</ui:define>
+                            <h:commandLink
+                                    value="#{profileLink.actorIntegrationProfile.actor.keyword} - #{profileLink.actorIntegrationProfile.actor.name}"
+                                    action="#{actorManager.editActor(profileLink.actorIntegrationProfile.actor, false)}"/>
+                        </g:column>
+                        <g:column align="left" width="150" sortBy="#{'transaction.keyword'}">
+                            <ui:define name="header">#{messages['gazelle.tf.table.Transaction']}</ui:define>
+                            <h:commandLink value="#{profileLink.transaction.keyword} - #{profileLink.transaction.name}"
+                                           action="#{transactionManager.editTransaction(profileLink.transaction, true)}"/>
+                        </g:column>
+                        <g:column align="center" width="40">
+                            <ui:define name="header">#{messages['gazelle.tf.table.Optionality']}</ui:define>
+                            #{profileLink.transactionOptionType.name}
+                        </g:column>
+                        <g:column width="150">
+                            <ui:define name="header">#{messages['gazelle.tf.table.Action']}</ui:define>
+                            <h:commandButton value="#{messages['gazelle.tf.button.delProfileLink']}"
+                                             styleClass="gzl-btn-red"
+                                             action="#{profileLinksManager.delProfileLink(integrationProfileManager.selectedIntegrationProfile, profileLink)}"/>
+                        </g:column>
+                    </rich:dataTable>
+                </ui:decorate>
+
+
+                <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                    <ui:define name="panel_title">#{messages['gazelle.tf.ConflictsInActorintegrationprofileoption']}
+                    </ui:define>
+                    <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                  rendered="#{integrationProfileManager.linkActorIntegrationProfileDependentAIPOs.size == 0}"/>
+                    <rich:dataTable id="linkActorIntegrationProfileAIPOTableId" var="aipo"
+                                    value="#{integrationProfileManager.linkActorIntegrationProfileDependentAIPOs}"
+                                    rendered="#{integrationProfileManager.linkActorIntegrationProfileDependentAIPOs.size &gt; 0}">
+                        <g:column sortBy="#{'actorIntegrationProfile.actor.keyword'}">
+                            <ui:define name="header">#{messages['gazelle.tf.table.Actor']}</ui:define>
+                            <h:commandLink
+                                    value="#{aipo.actorIntegrationProfile.actor.keyword} - #{aipo.actorIntegrationProfile.actor.name}"
+                                    action="#{actorManager.editActor(aipo.actorIntegrationProfile.actor, false)}"/>
+                        </g:column>
+                        <g:column sortBy="#{'integrationProfileOption.keyword'}">
+                            <ui:define name="header">#{messages['gazelle.tf.table.IntegrationProfileOption']}
+                            </ui:define>
+                            <h:commandLink
+                                    value="#{aipo.integrationProfileOption.keyword} - #{aipo.integrationProfileOption.name}"
+                                    action="#{actorManager.editActor(aipo.integrationProfileOption, false)}"/>
+                        </g:column>
+                        <g:column width="150">
+                            <ui:define name="header">#{messages['gazelle.tf.table.Action']}</ui:define>
+                            <h:commandButton value="#{messages['gazelle.tf.DeleteThisAipoLink']}"
+                                             styleClass="gzl-btn-red"
+                                             action="#{aipoManager.delaipo(integrationProfileManager.selectedIntegrationProfile, aipo)}"/>
+                        </g:column>
+                    </rich:dataTable>
+                </ui:decorate>
+
+            </h:form>
+        </div>
+    </ui:define>
+</ui:composition>

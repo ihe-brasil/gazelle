@@ -1,0 +1,68 @@
+<rich:dataTable xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns="http://www.w3.org/1999/xhtml" id="sessionsRepeat"
+                value="#{gazelleDAO.GetAllActiveSessionsWithoutHidden()}" var="currentTestingSession" rowKeyVar="i">
+
+    <g:column>
+        <h:graphicImage library="img" id="choice1On" value="#{currentTestingSession.logoUrl}" height="40"
+                        rendered="#{currentTestingSession.isLogoIsURL()}"/>
+        <h:graphicImage library="img" id="choice1On2" alt="#{messages['gazelle.tm.Logo']}" height="40"
+                        name="#{currentTestingSession.getLogoUrl()}"
+                        rendered="#{!currentTestingSession.isLogoIsURL()}"/>
+    </g:column>
+    <g:column style="vertical-align: middle;">
+        <h:outputText value="#{currentTestingSession.description}"/>
+        <s:span styleClass="label label-danger" style="margin-left:10px;"
+                rendered="#{currentTestingSession.sessionClosed}">
+            <h:outputText value="#{messages['net.ihe.gazelle.tm.Closed']}"/>
+        </s:span>
+    </g:column>
+    <g:column style="vertical-align: middle;">
+        <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+            <ui:param name="id" value="t#{currentTestingSession.id}"/>
+            <ui:param name="placement" value="bottom"/>
+            <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+            <ui:define name="content">
+                <div>
+                    <b>#{currentTestingSession.description}</b><br/><br/> #{messages['gazelle.tm.IHE']}
+                    #{currentTestingSession.zone}
+                    #{currentTestingSession.year} #{currentTestingSession.zone}
+                    #{currentTestingSession.type} <br/>
+                    #{messages['gazelle.testmanagement.home.connectathon.registrationDeadline']}
+                    <g:date tooltip="true" value="#{currentTestingSession.registrationDeadlineDate}"/>
+                    .
+                    #{messages['gazelle.testmanagement.home.connectathon.afterRegistrationDeadline']}
+                    <br/> <br/>
+                    #{messages['gazelle.testmanagement.session.choice.help.ThisEventWillHelp']}
+                    <g:date tooltip="true" value="#{currentTestingSession.beginningSession}"/>
+                    #{messages['gazelle.testmanagement.session.choice.help.to']}
+                    <g:date tooltip="true"
+                            value="#{currentTestingSession.endingSession}"/>
+                    <br/>
+                </div>
+            </ui:define>
+        </ui:decorate>
+
+
+        <a4j:commandLink id="onRowClick" action="/home.seam"
+                         actionListener="#{userManagerExtra.setSelectedTestingSession(currentTestingSession)}"
+                         render="testingSessionMPForm,topbarToolbarGroupTitleSpan">
+            <s:span styleClass="gzl-icon-circle-green"
+                    rendered="#{userManagerExtra.selectedTestingSession.id == currentTestingSession.id}"/>
+
+            <s:span styleClass="gzl-icon-not-checked"
+                    rendered="#{userManagerExtra.selectedTestingSession.id != currentTestingSession.id}"/>
+
+        </a4j:commandLink>
+
+        <a4j:commandLink id="currentTestingSession_EditSupport"
+                         action="#{testingSessionManager.editTestingSessionActionLink(currentTestingSession)}"
+                         immediate="true"
+                         title="#{messages['gazelle.common.button.Edit']}"
+                         rendered="#{s:hasRole('admin_role')}">
+            <span class="gzl-icon-pencil"/>
+        </a4j:commandLink>
+
+    </g:column>
+</rich:dataTable>

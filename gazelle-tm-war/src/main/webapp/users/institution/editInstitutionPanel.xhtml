@@ -1,0 +1,95 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib">
+    <!-- ========================= -->
+    <!-- Institution informations - Edit section   -->
+    <!-- ========================= -->
+    <s:decorate template="/layout/panels/_panel.xhtml" styleClass="form-horizontal">
+        <!-- Institution Name input box -->
+        <a4j:region id="institutionNameRegion">
+            <s:decorate id="institutionNameDecoration" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="institutionName"/>
+                <ui:define name="label">#{messages['gazelle.users.institution.InstitutionName']}</ui:define>
+                <h:inputText id="institutionName" maxlength="128" size="30" value="#{institutionVariable.name}"
+                             styleClass="form-control" required="true">
+                    <a4j:ajax event="blur" render="institutionNameDecoration"
+                              listener="#{institutionManager.validateInstitutionName(institutionVariable.name, institutionVariable.id)}"/>
+                </h:inputText>
+            </s:decorate>
+        </a4j:region>
+        <!-- Institution Keyword input box -->
+        <a4j:region id="institutionKeywordRegion">
+            <s:decorate id="institutionKeywordDecoration" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="institutionKeyword"/>
+                <ui:define name="label">#{messages['gazelle.users.institution.InstitutionKeyword']}
+                    #{messages['gazelle.users.institution.InstitutionKeywordExample']}
+                </ui:define>
+                <h:inputText id="institutionKeyword" maxlength="20" size="30" value="#{institutionVariable.keyword}"
+                             styleClass="form-control" required="true">
+                    <a4j:ajax event="blur" render="institutionKeywordDecoration"
+                              listener="#{institutionManager.validateInstitutionKeyword(institutionVariable.keyword, institutionVariable.id)}"/>
+                </h:inputText>
+            </s:decorate>
+        </a4j:region>
+        <!-- InstitutionType select box -->
+        <a4j:region id="institutionRegionType">
+            <s:decorate id="institutionTypeDecoration" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="institutionListBox"/>
+                <ui:define name="label"> #{messages['gazelle.users.institution.InstitutionType']}</ui:define>
+                <h:selectOneMenu styleClass="form-control gzl-form-control" id="institutionListBox"
+                                 value="#{institutionVariable.institutionType}"
+                                 required="true">
+                    <s:selectItems value="#{gazelleDAO.listAllInstitutionType()}" var="institutionTypeFromList"
+                                   noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                   label="#{institutionTypeFromList.type}"/>
+                    <a4j:ajax event="change" render="institutionTypeDecoration"/>
+                </h:selectOneMenu>
+            </s:decorate>
+        </a4j:region>
+        <!-- Institution URL input box -->
+        <a4j:region id="institutionURLRegion">
+            <s:decorate id="institutionURLDecoration" template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="institutionURL"/>
+                <ui:define name="label">#{messages['gazelle.users.institution.InstitutionURL']}</ui:define>
+                <h:inputText id="institutionURL" maxlength="255" size="30" value="#{institutionVariable.url}"
+                             required="true" styleClass="form-control">
+                    <a4j:ajax event="blur" render="institutionURLDecoration"/>
+                </h:inputText>
+            </s:decorate>
+        </a4j:region>
+        <!-- IntegrationStatements Repository URL -->
+        <a4j:region id="integrationStatementsRepositoryURLRegion">
+            <s:decorate id="integrationStatementsRepositoryURLDecoration"
+                        template="/layout/form/_form_field_horizontal_inline.xhtml">
+                <ui:param name="id" value="integrationStatementsRepositoryURLId"/>
+                <ui:define name="label">
+                    #{messages['gazelle.users.institution.IntegrationStatementsRepositoryURL']}
+                </ui:define>
+
+                <h:inputText id="integrationStatementsRepositoryURLId" maxlength="255" size="30"
+                             styleClass="form-control"
+                             value="#{institutionVariable.integrationStatementsRepositoryUrl}" required="false">
+                    <a4j:ajax event="blur" render="integrationStatementsRepositoryURLDecoration"/>
+                </h:inputText>
+                <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                    <ui:param name="id" value="intSta"/>
+                    <ui:param name="placement" value="bottom"/>
+                    <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                    <ui:define name="content">
+                        <div class="gzl-never-wrap">
+                            #{messages['gazelle.institutions.institution.integrationStatementsRepositoryURL1']}<br/>
+                            #{messages['gazelle.institutions.institution.integrationStatementsRepositoryURL2']}<br/>
+                            #{messages['gazelle.institutions.institution.integrationStatementsRepositoryURL3']}<br/>
+                        </div>
+                    </ui:define>
+                </ui:decorate>
+
+            </s:decorate>
+        </a4j:region>
+
+        <div style="clear: both"><span class="required">*</span>
+            #{messages['gazelle.common.RequiredFields']}
+        </div>
+    </s:decorate>
+</ui:composition>

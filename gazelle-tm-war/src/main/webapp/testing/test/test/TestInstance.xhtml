@@ -1,0 +1,1183 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle"
+              value="#{messages['gazelle.tests.testInstance.testInstancePageTitle']}-#{testInstanceManager.getTestInstanceIdFromPage()}"/>
+
+    <ui:define name="body">
+        <h:form id="setTestInstanceManagerPageLoadedForm">
+            <s:token allowMultiplePosts="true"/>
+            <a4j:jsFunction name="setTestInstanceManagerPageLoaded"
+                            actionListener="#{testInstanceManager.setPageLoaded(true)}" immediate="true" execute="@this"
+                            limitRender="false"/>
+        </h:form>
+        <!--@formatter:off-->
+        <script type="text/javascript">
+            gazelleAddToBodyOnLoad(function () {
+                setTestInstanceManagerPageLoaded();
+            });
+
+            function showFailModalPanelIfNeed() {
+                var failModal = document
+                        .getElementById("FailExplanationModal");
+                if (failModal != null) {
+                   jq162('#FailExplanationModal').modal('show');
+                   jq162('#FailExplanationModal').on('shown.bs.modal', function() {
+                        document.getElementById("_status:ExplanationDecoration:failExplanationInputText").focus();
+                   });
+                }
+            }
+        </script>
+        <!--@formatter:on-->
+        #{modalPanelManager.setSelectedSystemInSession(null)}
+        #{modalPanelManager.setSelectedInstitution(null)}
+
+        <div class="row">
+            <s:div id="sidebar" styleClass="col-lg-2 scrollspy"
+                   rendered="#{testInstanceManager.isConnectedUserAllowedToEditTestInstance()}">
+
+                <nav id="nav-sidebar" class="gzl-sidebar hidden-xs hidden-sm hidden-md">
+                    <ul id="nav" class="nav">
+                        <h:form id="_nav" styleClass="small">
+                            <h:inputHidden name="testInstanceId" id="testInstanceIdhiddenInput"
+                                           value="#{testInstanceManager.selectedTestInstance.id}"/>
+                            <s:div id="sidebarStatus">
+
+                                <s:div styleClass="form-inline">
+                                    <label style="padding-right: 10px;">#{messages['net.ihe.gazelle.tm.TI']}-
+                                        <g:link target="_blank"
+                                                value="#{testInstanceManager.selectedTestInstance}"/>
+                                        <s:span styleClass="gzl-icon-exclamation-triangle"
+                                                title="#{messages['net.ihe.gazelle.tm.ThisTestInstanceHasBeenAllowedThoughPartnersAreF']}"
+                                                rendered="#{testInstanceManager.selectedTestInstance.containsSameSystemsOrFromSameCompany}"/>
+                                    </label>
+                                    <ui:include src="_testInstanceStatus.xhtml">
+                                        <ui:param name="toRender"
+                                                  value="_meta, _nav,metadata,bottomStatus,testInstanceCommentsPanel,ChangeStatusConfirmationDiv"/>
+                                    </ui:include>
+                                </s:div>
+                            </s:div>
+                            <p>
+                                <strong>#{messages['gazelle.tm.monitors.test']}</strong>
+                                <span>
+                                    <g:link target="_blank"
+                                            value="#{testInstanceManager.selectedTestInstance.getVersionedTest()}"/>
+                                </span>
+                            </p>
+                            <s:div id="sidebarMonitor">
+                                <ui:include src="_testInstanceMonitor.xhtml">
+                                    <ui:param name="toRender"
+                                              value="monitorDiv,testInstanceCommentsPanel,sidebarMonitor"/>
+                                </ui:include>
+                            </s:div>
+                            <s:div id="progressBar" styleClass="progress">
+                                <div class="progress-bar progress-bar-info"
+                                     style="width: #{testInstanceManager.getProgress().getSkippedPercentage()}%;">
+                                    <span title="#{messages['gazelle.tm.test.Skipped']}">#{testInstanceManager.getProgress().getSkipped()}/#{testInstanceManager.getProgress().getNbSteps()}</span>
+                                </div>
+                                <div class="progress-bar progress-bar-success progress-bar-striped"
+                                     style="width: #{testInstanceManager.getProgress().getDonePercentage()}%;">
+                                    <span title="#{messages['gazelle.tm.test.ToBeVerified']}">#{testInstanceManager.getProgress().getDone()}/#{testInstanceManager.getProgress().getNbSteps()}</span>
+                                </div>
+                                <div class="progress-bar progress-bar-danger"
+                                     style="width: #{testInstanceManager.getProgress().getFailedPercentage()}%;">
+                                    <span title="#{messages['gazelle.tm.test.Failed']}">#{testInstanceManager.getProgress().getFailed()}/#{testInstanceManager.getProgress().getNbSteps()}</span>
+                                </div>
+                            </s:div>
+                        </h:form>
+                        <hr/>
+                        <li>
+                            <a href="#metadata">#{messages['gazelle.tm.test.TestInstanceMetaData']}</a>
+                        </li>
+                        <li>
+                            <a href="#description">#{messages['gazelle.tm.mesatests.Description']}</a>
+                        </li>
+                        <li>
+                            <a href="#participants">#{messages['gazelle.tm.test.TestParticipants']}</a>
+                        </li>
+                        <li>
+                            <a href="#steps">#{messages['gazelle.tm.test.TestInstanceSteps']}</a>
+                        </li>
+                        <h:panelGroup rendered="#{testInstanceManager.isConnectedUserAllowedToEditTestInstance()}">
+                            <li>
+                                <a href="#files">#{messages['net.ihe.gazelle.tm.Files']}</a>
+                            </li>
+                        </h:panelGroup>
+                        <li>
+                            <a href="#comments">#{messages['gazelle.tm.test.ChatRoom']}</a>
+                        </li>
+
+                        <a4j:commandButton styleClass="gzl-btn-orange" id="Createissue" limitRender="true"
+                                           value="#{messages['net.ihe.gazelle.tm.ReportAnIssueAboutThisTest']}"
+                                           actionListener="#{testInstanceManager.reportJira()}" execute="@this"
+                                           oncomplete="location.href='#jiraPanelId';$('#jiraPanelId')[0].getElementsByTagName('input')[0].focus();"
+                                           render="jiraPanel"
+                                           rendered="#{applicationManager.getJiraUrl()!= null and !applicationManager.getJiraUrl().isEmpty()}"/>
+                    </ul>
+                    <!--@formatter:off-->
+                    <script>
+                        $(document).ready(function () {
+                            var sidebarTop = $('#nav-sidebar').offset().top;
+                            $(window).bind('scroll', function () {
+                                var navHeight = sidebarTop;
+                                if ($(window).scrollTop() > navHeight) {
+                                    $('nav#nav-sidebar').addClass(' gzl-affix-right');
+                                }
+                                else {
+                                    $('nav#nav-sidebar').removeClass(' gzl-affix-right');
+                                }
+                            });
+                        });
+                    </script>
+                    <!--@formatter:on-->
+                </nav>
+                <!-- end of main navigation -->
+            </s:div>
+            <div class="col-lg-10">
+
+                <s:div id="t" rendered="#{testInstanceManager.isConnectedUserAllowedToEditTestInstance()}">
+
+                    <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                        <ui:param name="panel_id" value="metadata"/>
+
+                        <ui:define name="panel_title">
+                            #{messages['gazelle.tm.test.TestInstanceMetaData']}
+                            #{messages['gazelle.tests.testInstance.testInstancePageTitle']}-#{testInstanceManager.getTestInstanceIdFromPage()}
+                            <s:span styleClass="gzl-icon-exclamation-triangle"
+                                    title="#{messages['net.ihe.gazelle.tm.ThisTestInstanceHasBeenAllowedThoughPartnersAreF']}"
+                                    rendered="#{testInstanceManager.selectedTestInstance.containsSameSystemsOrFromSameCompany}"/>
+                        </ui:define>
+
+                        <h:form id="_meta">
+                            <s:token allowMultiplePosts="true"/>
+                            <a4j:queue/>
+                            <h:inputHidden name="testInstanceId" id="testInstanceIdhiddenInput"
+                                           value="#{testInstanceManager.selectedTestInstance.id}"/>
+                            <a4j:region id="viewTestNameRegion">
+                                <s:decorate id="viewTestNameDecoration" template="/layout/display/_display.xhtml">
+                                    <ui:define name="label">#{messages['gazelle.tm.test.TestName']}</ui:define>
+                                    <h:outputText
+                                            value="#{testInstanceManager.selectedTestInstance.getVersionedTest().name}"/>
+                                </s:decorate>
+                            </a4j:region>
+                            <a4j:region id="viewTestKeywordRegion">
+                                <s:decorate id="viewTestKeywordDecoration"
+                                            template="/layout/display/_display.xhtml">
+                                    <ui:define name="label">#{messages['gazelle.tm.test.TestKeyword']}</ui:define>
+                                    <g:link target="_blank"
+                                            value="#{testInstanceManager.selectedTestInstance.getVersionedTest()}"/>
+                                </s:decorate>
+                            </a4j:region>
+                            <a4j:region id="viewTestInstancePermalinkRegionForTestInstancePage">
+                                <s:decorate id="viewTestInstancePermalinkDecorationForTestInstancePage"
+                                            template="/layout/display/_display.xhtml">
+                                    <ui:define name="label">
+                                        <h:outputText
+                                                value="#{messages['gazelle.tm.testing.test.testInstancePermalink']}"/>
+                                    </ui:define>
+                                    <g:link target="_blank"
+                                            value="#{testInstanceManager.selectedTestInstance}"/>
+                                </s:decorate>
+                            </a4j:region>
+                            <s:div id="monitorDiv">
+                                <ui:include src="_testInstanceMonitor.xhtml">
+                                    <ui:param name="toRender"
+                                              value="monitorDiv,testInstanceCommentsPanel,sidebarMonitor"/>
+                                </ui:include>
+                            </s:div>
+                            <s:div id="statusDiv">
+                                <s:decorate template="/layout/display/_display.xhtml" styleClass="form-inline">
+                                    <ui:define name="label">#{messages['gazelle.tm.test.TestCurrentStatus']}
+                                    </ui:define>
+                                    <ui:include src="_testInstanceStatus.xhtml">
+                                        <ui:param name="toRender"
+                                                  value="_meta,_nav,metadata,bottomStatus,testInstanceCommentsPanel,ChangeStatusConfirmationDiv"/>
+                                    </ui:include>
+                                </s:decorate>
+                            </s:div>
+                            <a4j:region>
+                                <s:decorate template="/layout/display/_display.xhtml">
+                                    <ui:define name="label">
+                                        <h:outputText
+                                                value="#{messages['net.ihe.gazelle.tm.Started']}"/>
+                                    </ui:define>
+                                    <g:date tooltip="true"
+                                            value="#{testInstanceManager.selectedTestInstance.startDate}"/>
+                                </s:decorate>
+                            </a4j:region>
+                            <a4j:region id="viewLastChangedRegion">
+                                <s:decorate id="viewLastChagedDecoration" template="/layout/display/_display.xhtml">
+                                    <ui:define name="label">
+                                        <h:outputText
+                                                value="#{messages['gazelle.common.LastChanged']}"/>
+                                    </ui:define>
+                                    <g:date tooltip="true"
+                                            value="#{testInstanceManager.selectedTestInstance.lastChanged}"/>
+                                </s:decorate>
+                            </a4j:region>
+                            <s:decorate id="tsdec" template="/layout/display/_display.xhtml">
+                                <ui:define name="label">#{messages['gazelle.financial.invoice.TestingSession']}
+                                </ui:define>
+                                <h:outputText id="vitsout"
+                                              value="#{testInstanceManager.selectedTestInstance.testingSession.description}">
+                                </h:outputText>
+                            </s:decorate>
+                        </h:form>
+
+                    </ui:decorate>
+
+                    <ui:decorate template="/layout/panels/_panel_title_fixed_id.xhtml">
+                        <ui:param name="panel_id" value="description"/>
+                        <ui:define name="panel_title">#{messages['gazelle.tm.test.TestDescription']}</ui:define>
+                        <s:div id="testDescriptionDivForTestInstance"
+                               style="height:450px;overflow:auto;background-color:white;">
+                            <g:safehtml
+                                    value="#{testInstanceManager.updateXdstoolsLink(testInstanceManager.selectedTestInstance.getVersionedTest().getContextualDescription().description)}"/>
+                        </s:div>
+                    </ui:decorate>
+
+                    <h:form id="_jira">
+                        <s:token allowMultiplePosts="true"/>
+                        <h:inputHidden name="testInstanceId" id="testInstanceIdhiddenInput"
+                                       value="#{testInstanceManager.selectedTestInstance.id}"/>
+                        <a4j:queue/>
+                        <s:div id="jiraPanel">
+                            <ui:include src="/testing/jira/_jiraForm.xhtml">
+                                <ui:param name="currentBean" value="#{testInstanceManager}"/>
+                                <ui:param name="idsToRender" value="jiraPanel"/>
+                                <ui:param name="test" value="#{testInstanceManager.selectedTestInstance}"/>
+                            </ui:include>
+                        </s:div>
+                    </h:form>
+
+                    <h:form id="_part">
+                        <h:inputHidden name="testInstanceId" id="testInstanceIdhiddenInput"
+                                       value="#{testInstanceManager.selectedTestInstance.id}"/>
+                        <s:token allowMultiplePosts="true"/>
+                        <a4j:queue/>
+                        <div id="participants">
+                            <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                                <ui:param name="panel_id" value="tp"/>
+                                <ui:define name="panel_title">#{messages['gazelle.tm.test.TestParticipants']}
+                                </ui:define>
+                                <rich:dataTable id="testInstanceParticipantsTable" border="0"
+                                                rowClasses="ti-row1, ti-row2"
+                                                var="currentTestInstanceParticipants"
+                                                value="#{testInstanceManager.getTestInstanceParticipantAsSUTListForSelectedTestInstance()}">
+                                    <f:facet name="header">#{messages['gazelle.tm.test.ParticipatingSystems']}
+                                    </f:facet>
+                                    <g:column>
+                                        <ui:define name="header">
+                                            <h:outputText
+                                                    value="#{messages['gazelle.systems.system.SystemKeyword']}"/>
+                                        </ui:define>
+                                        <div class="gzl-never-wrap">
+                                            <g:link target="_blank"
+                                                    value="#{currentTestInstanceParticipants.systemInSessionUser.systemInSession.system}"/>
+                                            <s:span styleClass="gzl-icon-exclamation-triangle"
+                                                    title="#{messages['net.ihe.gazelle.tm.ThisSystemIsSelectedForSeveralRolesInThisTestIns']}"
+                                                    rendered="#{testInstanceManager.showWarningOnSystem(currentTestInstanceParticipants.systemInSessionUser.systemInSession)}"/>
+                                            <a4j:commandLink id="systemConfigSupport" execute="@this"
+                                                             limitRender="true"
+                                                             title="#{messages['gazelle.configuration.systemConfiguration']}"
+                                                             action="#{modalPanelManager.setSelectedSystemInSessionAndActor(currentTestInstanceParticipants.systemInSessionUser.systemInSession, null)}"
+                                                             actionListener="#{systemInSessionViewer.setSystemInSession(currentTestInstanceParticipants.systemInSessionUser.systemInSession)}"
+                                                             oncomplete="jq162('#SystemInSessionConfigurationModalPanel').modal('show');"
+                                                             render="systemConfigurationDiv, filter, formConfigurationsTable, showOIDsForm,showHostsForm,globalform2">
+                                                <span class="gzl-icon-configure"/>
+                                            </a4j:commandLink>
+
+                                            <a4j:commandLink id="systemNotesSupport" execute="@this"
+                                                             limitRender="true"
+                                                             action="#{noteManager.setSelectedSystemInSession(currentTestInstanceParticipants.systemInSessionUser.systemInSession)}"
+                                                             oncomplete="jq162('#systemInSessionNotesModalPanel').modal('show');"
+                                                             render="systemInSessionNotesDiv, notesFormSys">
+                                                            <span title="#{messages['net.ihe.gazelle.tm.CommentsForThisSystem']}"
+                                                                  class="badge">
+                                                                #{currentTestInstanceParticipants.systemInSessionUser.systemInSession.getNotesNumber()}
+                                                            </span>
+                                            </a4j:commandLink>
+
+                                        </div>
+                                    </g:column>
+                                    <g:column>
+                                        <ui:define name="header">
+                                            <h:outputText
+                                                    value="#{messages['gazelle.users.institution.InstitutionName']}"/>
+                                        </ui:define>
+                                        <a4j:repeat
+                                                value="#{gazelleDAO.getInstitutionsForASystem(currentTestInstanceParticipants.systemInSessionUser.systemInSession.system)}"
+                                                var="currentInstitution">
+                                            <h:outputText value="#{currentInstitution.keyword}"/>
+                                            <s:span styleClass="gzl-icon-exclamation-triangle"
+                                                    title="#{messages['net.ihe.gazelle.tm.SeveralSystemsFromThisOrganizationAreInvolvedInT']}"
+                                                    rendered="#{testInstanceManager.showWarningOnInstituion(currentInstitution)}"/>
+                                        </a4j:repeat>
+                                    </g:column>
+                                    <g:column>
+                                        <ui:define name="header">
+                                            <h:outputText
+                                                    value="#{messages['gazelle.systems.system.systemManager']}"/>
+                                        </ui:define>
+                                        <g:link target="_blank"
+                                                value="#{currentTestInstanceParticipants.systemInSessionUser.user}"/>
+                                    </g:column>
+                                    <g:column>
+                                        <ui:define name="header">
+                                            <h:outputText value="#{messages['gazelle.tm.test.RoleInTest']}"/>
+                                        </ui:define>
+                                        <h:outputText
+                                                value="#{currentTestInstanceParticipants.roleInTest.keyword}"/>
+                                    </g:column>
+                                    <g:column>
+                                        <ui:define name="header">
+                                            <h:outputText value="#{messages['gazelle.tf.IntegrationProfile']}"/>
+                                        </ui:define>
+                                        <g:link target="_blank"
+                                                value="#{currentTestInstanceParticipants.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile}"/>
+                                    </g:column>
+                                    <g:column>
+                                        <ui:define name="header">
+                                            <h:outputText value="#{messages['gazelle.tf.Actor']}"/>
+                                        </ui:define>
+                                        <g:link target="_blank"
+                                                value="#{currentTestInstanceParticipants.actorIntegrationProfileOption.actorIntegrationProfile.actor}"/>
+                                    </g:column>
+                                    <g:column>
+                                        <ui:define name="header">
+                                            <h:outputText
+                                                    value="#{messages['gazelle.systems.systemInSession.table']}"/>
+                                        </ui:define>
+                                        <h:outputText
+                                                value="#{currentTestInstanceParticipants.systemInSessionUser.systemInSession.tableSession.tableKeyword}"/>
+                                    </g:column>
+                                </rich:dataTable>
+
+                                <br/>
+                                <s:div id="sequenceDiagramDiv"
+                                       rendered="#{testInstanceManager.canViewSequenceDiagram() and userPreferencesManager.displaySequenceDiagram()}">
+                                    <center>
+                                        <h:graphicImage library="img"
+                                                        value="#{testInstanceManager.selectedTestInstance.sequenceDiagramAsUrl}"
+                                                        title="#{messages['gazelle.tm.SequenceDiagram']}"/>
+                                    </center>
+                                </s:div>
+                            </ui:decorate>
+                        </div>
+                    </h:form>
+
+                    <h:form id="_steps">
+                        <h:inputHidden name="testInstanceId" id="testInstanceIdhiddenInput"
+                                       value="#{testInstanceManager.selectedTestInstance.id}"/>
+                        <s:token allowMultiplePosts="true"/>
+                        <a4j:queue/>
+                        <div id="steps">
+                            <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                                <ui:param name="panel_id" value="tsil"/>
+                                <ui:define name="panel_title">#{messages['gazelle.tm.test.TestInstanceSteps']}
+                                </ui:define>
+                                <rich:dataTable id="testStepsInstanceTable" var="currentTestStepsInstance"
+                                                rowKeyVar="rowNumber"
+                                                value="#{testInstanceManager.rechargeAndGetSortedTestStepsInstance()}">
+                                    <g:column style="vertical-align: middle;" styleClass="strong-border-grey"
+                                              rowspan="3">
+                                        <ui:define name="header">#{messages['gazelle.tm.test.Step']}</ui:define>
+                                        <span class="gzl-label gzl-label-blue">
+                                                <h:outputText
+                                                        value="#{currentTestStepsInstance.getVersionedTestSteps().stepIndex}"/>
+                                            </span>
+                                    </g:column>
+                                    <g:column>
+                                        <ui:define name="header">
+                                            <h:outputText value="#{messages['net.ihe.gazelle.tm.Trans']}"
+                                                          style="font-weight:bold;"/>
+                                        </ui:define>
+                                    </g:column>
+                                    <g:column>
+                                        <ui:define name="header">
+                                            <h:outputText
+                                                    value="#{messages['gazelle.tm.test.Trans']} - #{messages['gazelle.tf.table.mptrans']}"/>
+                                        </ui:define>
+                                        <s:span>
+                                            <g:link target="_blank"
+                                                    value="#{currentTestStepsInstance.getVersionedTestSteps().transaction}"/>
+                                            <s:span rendered="#{testInstanceManager.verifyIfStepsIsSecured(currentTestStepsInstance)}">
+                                                    <span class="gzl-icon-lock"
+                                                          title="#{messages['gazelle.tm.testing.testsDefinition.secured']}"/>
+
+                                            </s:span>
+                                            <h:outputText value=" - "/>
+                                            <h:outputText
+                                                    value="#{currentTestStepsInstance.getVersionedTestSteps().messageType}"/>
+                                        </s:span>
+                                    </g:column>
+                                    <g:column>
+                                        <ui:define name="header">#{messages['gazelle.tm.test.Opt']}</ui:define>
+                                        <h:outputText
+                                                value="#{currentTestStepsInstance.getVersionedTestSteps().testStepsOption.keyword}"/>
+                                    </g:column>
+                                    <g:column style="word-wrap: break-word;word-break:break-all;">
+                                        <ui:define name="header">#{messages['gazelle.tm.test.SendingActor']}
+                                        </ui:define>
+                                        <h:outputText
+                                                value="#{currentTestStepsInstance.systemInSessionInitiator.system.keyword}"/>
+                                        <h:outputText value=" - "/>
+                                        <g:link target="_blank"
+                                                value="#{testInstanceManager.getActorForTestStepsInstanceInitiator(currentTestStepsInstance)}"/>
+                                    </g:column>
+                                    <g:column style="word-wrap: break-word;word-break:break-all;">
+                                        <ui:define name="header">#{messages['gazelle.tm.test.ReceivingActor']}
+                                        </ui:define>
+                                        <h:outputText
+                                                value="#{currentTestStepsInstance.systemInSessionResponder.system.keyword}"/>
+                                        <h:outputText value=" - "/>
+                                        <g:link target="_blank"
+                                                value="#{testInstanceManager.getActorForTestStepsInstanceResponder(currentTestStepsInstance)}"/>
+                                    </g:column>
+                                    <g:column styleClass="strong-border-grey gzl-never-wrap" rowspan="3"
+                                              style="vertical-align: middle;text-align: center;">
+                                        <ui:define name="header">
+                                            <s:div id="stepsStatus">
+                                                <h:outputText
+                                                        value="#{messages['gazelle.tm.testing.instance.status']} "/>
+
+                                                <a4j:commandLink event="click"
+                                                                 render="_status,_comm,_files,progressBar,tsil"
+                                                                 execute="@this" limitRender="true"
+                                                                 rendered="#{testInstanceManager.canMakeDoneAllSteps() and testInstanceManager.isConnectedUserAllowedToEditTestInstance() and !testInstanceManager.selectedTestInstance.testingSession.testingSessionClosedForUser()}"
+                                                                 title="#{messages['gazelle.tm.SetAllStatusToDone']}"
+                                                                 actionListener="#{testInstanceManager.markAllStepsAsDone()}">
+                                                    <s:span styleClass="gzl-icon-verified"/>
+                                                </a4j:commandLink>
+                                                <a4j:commandLink event="click"
+                                                                 render="_status,_comm,_files,progressBar,tsil"
+                                                                 execute="@this" limitRender="true"
+                                                                 rendered="#{testInstanceManager.canMakeActivatedAllSteps() and testInstanceManager.isConnectedUserAllowedToEditTestInstance() and !testInstanceManager.selectedTestInstance.testingSession.testingSessionClosedForUser()}"
+                                                                 title="#{messages['net.ihe.gazelle.tm.ResetAllStatus']}"
+                                                                 actionListener="#{testInstanceManager.markAllStepsAsActivated()}">
+                                                    <span class="gzl-icon-not-checked"/>
+                                                </a4j:commandLink>
+                                            </s:div>
+                                        </ui:define>
+
+                                        <s:div id="stepStatus"
+                                               rendered="#{!currentTestStepsInstance.testStepsInstanceStatus.equals(gazelleDAO.getSTATUS_DISACTIVATED()) and testInstanceManager.isConnectedUserAllowedToEditTestInstance() and !testInstanceManager.selectedTestInstance.testingSession.testingSessionClosedForUser()}">
+                                            <a4j:commandLink limitRender="true"
+                                                             actionListener="#{testInstanceManager.setTestStepsInstanceStatusToFailed(currentTestStepsInstance)}"
+                                                             render="_status,_comm,_files,progressBar,testStepsInstanceTable:@header,testStepsInstanceTable:@footer,stepStatus"
+                                                             rendered="#{!currentTestStepsInstance.testStepsInstanceStatus.equals(gazelleDAO.getSTATUS_FAILED())}"
+                                                             title="#{messages['gazelle.tm.test.Failed']}"
+                                                             execute="@this">
+                                                <span class="gzl-icon-times-blue gzl-icon-2x"/>
+                                            </a4j:commandLink>
+
+                                            <a4j:commandLink limitRender="true"
+                                                             rendered="#{currentTestStepsInstance.testStepsInstanceStatus.equals(gazelleDAO.getSTATUS_FAILED())}"
+                                                             actionListener="#{testInstanceManager.setTestStepsInstanceStatusToActivated(currentTestStepsInstance)}"
+                                                             title="#{messages['gazelle.users.reset']}"
+                                                             render="_status,_comm,_files,progressBar,testStepsInstanceTable:@header,testStepsInstanceTable:@footer,stepStatus"
+                                                             execute="@this">
+                                                <s:span styleClass="gzl-icon-times gzl-icon-2x"/>
+                                            </a4j:commandLink>
+
+                                            <a4j:commandLink limitRender="true"
+                                                             rendered="#{!currentTestStepsInstance.testStepsInstanceStatus.equals(gazelleDAO.getSTATUS_DONE())}"
+                                                             actionListener="#{testInstanceManager.setTestStepsInstanceStatusToDone(currentTestStepsInstance)}"
+                                                             title="#{messages['gazelle.tm.test.ToBeVerified']}"
+                                                             render="_status,_comm,_files,progressBar,testStepsInstanceTable:@header,testStepsInstanceTable:@footer,stepStatus"
+                                                             execute="@this">
+                                                <s:span styleClass="gzl-icon-not-checked gzl-icon-2x"/>
+                                            </a4j:commandLink>
+
+                                            <a4j:commandLink limitRender="true"
+                                                             rendered="#{currentTestStepsInstance.testStepsInstanceStatus.equals(gazelleDAO.getSTATUS_DONE())}"
+                                                             actionListener="#{testInstanceManager.setTestStepsInstanceStatusToActivated(currentTestStepsInstance)}"
+                                                             title="#{messages['gazelle.users.reset']}"
+                                                             render="_status,_comm,_files,progressBar,testStepsInstanceTable:@header,testStepsInstanceTable:@footer,stepStatus"
+                                                             execute="@this">
+                                                <s:span styleClass="gzl-icon-verified gzl-icon-2x"/>
+                                            </a4j:commandLink>
+
+                                            <a4j:commandLink limitRender="true"
+                                                             rendered="#{!currentTestStepsInstance.testStepsInstanceStatus.equals(gazelleDAO.getSTATUS_SKIPPED())}"
+                                                             title="#{messages['net.ihe.gazelle.tm.SkipStep']}"
+                                                             actionListener="#{testInstanceManager.setTestStepsInstanceStatusToSkipped(currentTestStepsInstance)}"
+                                                             render="_status,_comm,_files,progressBar,testStepsInstanceTable:@header,testStepsInstanceTable:@footer,stepStatus"
+                                                             execute="@this">
+                                                <s:span styleClass="gzl-icon-forward gzl-icon-2x"/>
+                                            </a4j:commandLink>
+
+                                            <a4j:commandLink limitRender="true"
+                                                             rendered="#{currentTestStepsInstance.testStepsInstanceStatus.equals(gazelleDAO.getSTATUS_SKIPPED())}"
+                                                             actionListener="#{testInstanceManager.setTestStepsInstanceStatusToActivated(currentTestStepsInstance)}"
+                                                             title="#{messages['gazelle.users.reset']}"
+                                                             render="_status,_comm,_files,progressBar,testStepsInstanceTable:@header,testStepsInstanceTable:@footer,stepStatus"
+                                                             execute="@this">
+                                                <s:span styleClass="gzl-icon-forward-off gzl-icon-2x"/>
+                                            </a4j:commandLink>
+
+                                        </s:div>
+                                        <s:div id="tsIfDone"
+                                               rendered="#{!testInstanceManager.isConnectedUserAllowedToEditTestInstance() or testInstanceManager.selectedTestInstance.testingSession.testingSessionClosedForUser()}">
+                                            <s:span styleClass="gzl-icon-times gzl-icon-2x"
+                                                    title="#{messages['gazelle.tm.test.Failed']}"
+                                                    rendered="#{currentTestStepsInstance.testStepsInstanceStatus.equals(gazelleDAO.getSTATUS_FAILED())}"/>
+
+                                            <s:span styleClass="gzl-icon-checked gzl-icon-2x"
+                                                    title="#{messages['gazelle.tm.test.ToBeVerified']}"
+                                                    rendered="#{currentTestStepsInstance.testStepsInstanceStatus.equals(gazelleDAO.getSTATUS_DONE())}"/>
+
+                                            <s:span styleClass="gzl-icon-forward gzl-icon-2x"
+                                                    title="#{messages['gazelle.tm.test.Skipped']}"
+                                                    rendered="#{currentTestStepsInstance.testStepsInstanceStatus.equals(gazelleDAO.getSTATUS_SKIPPED())}"/>
+
+                                        </s:div>
+
+                                    </g:column>
+                                    <rich:column id="actionscell" styleClass="strong-border-grey gzl-never-wrap" rowspan="3"
+                                                 style="vertical-align: middle; text-align: center;">
+                                        <f:facet name="header">
+                                            <s:div id="stepsValidation">
+                                                <h:outputText
+                                                        value="#{messages['gazelle.tm.test.ValidationStatus']} "/>
+
+                                                <a4j:commandLink event="click" render="_status,_comm,_files,testStepsInstanceTable"
+                                                                 execute="@this" limitRender="true"
+                                                                 rendered="#{testInstanceManager.canValidateAllSteps() and testInstanceManager.isConnectedUserAllowedToValidateSelectedTestInstance()}"
+                                                                 title="#{messages['gazelle.tm.SetAllStatusToVerified']}"
+                                                                 actionListener="#{testInstanceManager.validateAllSteps()}">
+                                                    <s:span styleClass="gzl-icon-verified"/>
+                                                </a4j:commandLink>
+
+                                                <a4j:commandLink event="click" render="_status,_comm,_files,testStepsInstanceTable"
+                                                                 execute="@this" limitRender="true"
+                                                                 rendered="#{testInstanceManager.canResetAllSteps() and testInstanceManager.isConnectedUserAllowedToValidateSelectedTestInstance()}"
+                                                                 title="#{messages['net.ihe.gazelle.tm.ResetAllStatus']}"
+                                                                 actionListener="#{testInstanceManager.resetAllSteps()}">
+                                                    <span class="gzl-icon-not-checked"/>
+                                                </a4j:commandLink>
+
+                                            </s:div>
+                                        </f:facet>
+
+                                        <s:div id="stepValidation"
+                                               rendered="#{!currentTestStepsInstance.testStepsInstanceStatus.equals(gazelleDAO.getSTATUS_DISACTIVATED()) and testInstanceManager.isConnectedUserAllowedToValidateSelectedTestInstance()}">
+                                            <a4j:commandLink limitRender="true"
+                                                             actionListener="#{testInstanceManager.setTestStepsInstanceMonitorStatusToFailed(currentTestStepsInstance)}"
+                                                             render="_status,_comm,_files,testStepsInstanceTable:@header,testStepsInstanceTable:@footer,stepValidation,progressBar"
+                                                             rendered="#{!currentTestStepsInstance.status.name().equals('FAILED')}"
+                                                             title="#{messages['gazelle.tm.test.Failed']}"
+                                                             execute="@this">
+                                                <span class="gzl-icon-times-blue gzl-icon-2x"/>
+                                            </a4j:commandLink>
+
+                                            <a4j:commandLink limitRender="true"
+                                                             actionListener="#{testInstanceManager.setTestStepsInstanceMonitorStatusToStarted(currentTestStepsInstance)}"
+                                                             render="_status,_comm,_files,testStepsInstanceTable:@header,testStepsInstanceTable:@footer,stepValidation,progressBar"
+                                                             rendered="#{currentTestStepsInstance.status.name().equals('FAILED')}"
+                                                             title="#{messages['gazelle.users.reset']}"
+                                                             execute="@this">
+                                                <s:span styleClass="gzl-icon-times gzl-icon-2x"/>
+                                            </a4j:commandLink>
+
+                                            <a4j:commandLink limitRender="true"
+                                                             actionListener="#{testInstanceManager.setTestStepsInstanceMonitorStatusToVerified(currentTestStepsInstance)}"
+                                                             render="_status,_comm,_files,testStepsInstanceTable:@header,testStepsInstanceTable:@footer,stepValidation,progressBar"
+                                                             rendered="#{!currentTestStepsInstance.status.name().equals('VERIFIED')}"
+                                                             title="#{messages['gazelle.tm.test.Verified']}"
+                                                             execute="@this">
+                                                <span class="gzl-icon-not-checked gzl-icon-2x"/>
+                                            </a4j:commandLink>
+
+                                            <a4j:commandLink limitRender="true"
+                                                             actionListener="#{testInstanceManager.setTestStepsInstanceMonitorStatusToStarted(currentTestStepsInstance)}"
+                                                             render="_status,_comm,_files,testStepsInstanceTable:@header,testStepsInstanceTable:@footer,stepValidation,progressBar"
+                                                             rendered="#{currentTestStepsInstance.status.name().equals('VERIFIED')}"
+                                                             title="#{messages['gazelle.users.reset']}"
+                                                             execute="@this">
+                                                <s:span styleClass="gzl-icon-verified gzl-icon-2x"/>
+                                            </a4j:commandLink>
+
+                                        </s:div>
+                                        <s:div id="testStepsInstanceStatusDivIfTestStepsInstanceWasreviwedByMonitor"
+                                               rendered="#{!currentTestStepsInstance.testStepsInstanceStatus.equals(gazelleDAO.getSTATUS_DISACTIVATED()) and !testInstanceManager.isConnectedUserAllowedToValidateSelectedTestInstance()}">
+                                            <s:span styleClass="gzl-icon-times gzl-icon-2x"
+                                                    title="#{messages['gazelle.tm.test.Failed']}"
+                                                    rendered="#{currentTestStepsInstance.status.name().equals('FAILED')}"/>
+
+                                            <s:span styleClass="gzl-icon-checked"
+                                                    title="#{messages['gazelle.tm.test.Verified']}"
+                                                    rendered="#{currentTestStepsInstance.status.name().equals('VERIFIED')}"/>
+
+                                        </s:div>
+
+                                    </rich:column>
+                                    <g:column breakRowBefore="true">
+                                        <h:outputText value="#{messages['net.ihe.gazelle.tm.Desc']}"
+                                                      style="font-weight:bold;"/>
+                                    </g:column>
+                                    <g:column colspan="4">
+                                        <g:safehtml
+                                                value="#{testInstanceManager.updateXdstoolsLink(currentTestStepsInstance.getVersionedTestSteps().description)}"/>
+                                    </g:column>
+                                    <g:column breakRowBefore="true" styleClass="strong-border-grey">
+                                        <h:outputText value="#{messages['net.ihe.gazelle.tm.Logs']}"
+                                                      style="font-weight:bold;"/>
+                                    </g:column>
+                                    <g:column colspan="4" styleClass="strong-border-grey">
+                                        <s:div id="logsTestStepsInstance">
+
+                                            <s:div rendered="#{testInstanceManager.isConnectedUserAllowedToEditTestInstance() and !testInstanceManager.selectedTestInstance.testingSession.testingSessionClosedForUser()}">
+                                                <a4j:region>
+                                                    <s:div style="display:inline-block;"
+                                                           styleClass="gzl-never-wrap">
+                                                        <s:div rendered="#{testInstanceManager.getDataListFor(currentTestStepsInstance).size() eq 0}">
+                                                            <h:outputText
+                                                                    value="#{messages['net.ihe.gazelle.tm.NoCommentFileOrURL']}"/>
+                                                        </s:div>
+
+                                                        <a4j:commandLink execute="@this" limitRender="true"
+                                                                         immediate="true"
+                                                                         render="addItem,addUrl"
+                                                                         title="#{messages['net.ihe.gazelle.tm.AddComment']}"
+                                                                         actionListener="#{testInstanceManager.showAddItems(currentTestStepsInstance)}">
+                                                            <span class="gzl-icon-plus"/>
+                                                        </a4j:commandLink>
+
+
+                                                        <a4j:commandLink execute="@this" limitRender="true"
+                                                                         immediate="true"
+                                                                         render="addItem,addUrl"
+                                                                         title="#{messages['net.ihe.gazelle.tm.AddURL']}"
+                                                                         actionListener="#{testInstanceManager.showAddUrl(currentTestStepsInstance)}">
+                                                                    <span class="gzl-icon-stack">
+                                                                      <span class="gzl-icon-globe gzl-icon-stack-1x"/>
+                                                                      <span class="gzl-icon-plus gzl-icon-stack-1x gzl-icon-stack-bottom-right"/>
+                                                                    </span>
+                                                        </a4j:commandLink>
+
+
+                                                        <div style="display: inline-table;">
+                                                            <ui:include src="/fineupload.xhtml">
+                                                                <ui:param name="id"
+                                                                          value="testStepsInstanceUploads#{currentTestStepsInstance.id}"/>
+                                                                <ui:param name="idToRerender"
+                                                                          value="testStepsInstanceTable,_status,_comm,_files"/>
+                                                                <ui:param name="beanName"
+                                                                          value="testInstanceUploadManager"/>
+                                                                <ui:param name="multiple" value="true"/>
+                                                                <ui:param name="param"
+                                                                          value="#{currentTestStepsInstance.id}"/>
+                                                            </ui:include>
+                                                        </div>
+                                                    </s:div>
+                                                    <s:div id="addItem">
+                                                        <s:div rendered="#{testInstanceManager.isShowingAddItems(currentTestStepsInstance) and testInstanceManager.showUrl==false and testInstanceManager.showComment==true}">
+                                                            <s:div>
+                                                                <h:outputText
+                                                                        value="#{messages['net.ihe.gazelle.tm.AddMessageComment']}"/>
+                                                            </s:div>
+                                                            <s:div>
+                                                                <a4j:region id="commentRegion">
+                                                                    <h:inputTextarea styleClass=" form-control"
+                                                                                     id="commentArea"
+                                                                                     rows="3" cols="50"
+                                                                                     value="#{testInstanceManager.commentToAdd}"
+                                                                                     validator="#{testInstanceManager.validateComment}">
+                                                                    </h:inputTextarea>
+                                                                    <h:message for="commentArea"
+                                                                               style="color:red;"/>
+                                                                    <a4j:commandButton limitRender="true"
+                                                                                       value="#{messages['gazelle.tf.selectedActor.profileLinks.Add']}"
+                                                                                       styleClass="gzl-btn"
+                                                                                       actionListener="#{testInstanceManager.addComment(currentTestStepsInstance)}"
+                                                                                       render="logsTestStepsInstance"/>
+
+                                                                    <ui:decorate
+                                                                            template="/layout/popover/_popover_on_icon.xhtml">
+                                                                        <ui:param name="id"
+                                                                                  value="c#{currentTestStepsInstance.id}"/>
+                                                                        <ui:param name="placement" value="bottom"/>
+                                                                        <ui:param name="icon_class"
+                                                                                  value="gzl-icon-question-circle"/>
+                                                                        <ui:define name="content">
+                                                                            #{messages['net.ihe.gazelle.tm.PleaseEnterYourMessageOrYourComment']}
+                                                                            <br/>#{messages['net.ihe.gazelle.tm.IfYouWantToPostYourLogItIsRecommendedToUploadAFi']}
+                                                                            <br/>#{messages['net.ihe.gazelle.tm.IfYouWantToPostAnURLUseTheOtherButton']}
+                                                                        </ui:define>
+                                                                    </ui:decorate>
+                                                                    <a4j:commandLink execute="@this" limitRender="true"
+                                                                                     immediate="true"
+                                                                                     render="addItem,addUrl"
+                                                                                     title="#{messages['net.ihe.gazelle.assets.Close']}"
+                                                                                     actionListener="#{testInstanceManager.unShow(currentTestStepsInstance)}">
+                                                                        <span class="gzl-icon-times"/>
+                                                                    </a4j:commandLink>
+                                                                </a4j:region>
+                                                            </s:div>
+                                                        </s:div>
+                                                    </s:div>
+                                                    <s:div id="addUrl">
+                                                        <s:div id="URL"
+                                                               rendered="#{testInstanceManager.isShowingAddUrl(currentTestStepsInstance) and testInstanceManager.showUrl==true and testInstanceManager.showComment==false}">
+                                                            <s:div>
+                                                                <h:outputText
+                                                                        value="#{messages['net.ihe.gazelle.tm.AddURL']}"/>
+                                                            </s:div>
+                                                            <s:div>
+                                                                <a4j:region id="urlRegion">
+                                                                    <h:inputTextarea styleClass=" form-control"
+                                                                                     id="urlArea"
+                                                                                     rows="2" cols="80"
+                                                                                     value="#{testInstanceManager.commentToAdd}"
+                                                                                     validator="#{testInstanceManager.validateURL}">
+                                                                    </h:inputTextarea>
+                                                                    <h:message for="urlArea" style="color:red;"/>
+                                                                    <a4j:commandButton limitRender="true"
+                                                                                       value="#{messages['gazelle.tf.selectedActor.profileLinks.Add']}"
+                                                                                       styleClass="gzl-btn"
+                                                                                       actionListener="#{testInstanceManager.addUrl(currentTestStepsInstance)}"
+                                                                                       render="logsTestStepsInstance"/>
+                                                                    <ui:decorate
+                                                                            template="/layout/popover/_popover_on_icon.xhtml">
+                                                                        <ui:param name="id"
+                                                                                  value="u#{currentTestStepsInstance.id}"/>
+                                                                        <ui:param name="placement" value="bottom"/>
+                                                                        <ui:param name="icon_class"
+                                                                                  value="gzl-icon-question-circle"/>
+                                                                        <ui:define name="content">
+
+                                                                            #{messages['net.ihe.gazelle.tm.PleaseEnterYourProxyEVSClientOrSampleURL']}
+                                                                            <br/>#{messages['net.ihe.gazelle.tm.IfYouWantToPostYourLogItIsRecommendedToUploadAFi']}
+                                                                            <br/>#{messages['net.ihe.gazelle.tm.IfYouWantToPostACommentUseTheOtherButton']}
+
+                                                                        </ui:define>
+                                                                    </ui:decorate>
+                                                                    <a4j:commandLink execute="@this" limitRender="true"
+                                                                                     immediate="true"
+                                                                                     render="addItem,addUrl"
+                                                                                     title="#{messages['net.ihe.gazelle.assets.Close']}"
+                                                                                     actionListener="#{testInstanceManager.unShow(currentTestStepsInstance)}">
+                                                                        <span class="gzl-icon-times"/>
+                                                                    </a4j:commandLink>
+                                                                </a4j:region>
+                                                            </s:div>
+                                                        </s:div>
+                                                    </s:div>
+                                                </a4j:region>
+                                            </s:div>
+                                            <h:outputLink target="_blank"
+                                                          rendered="#{testInstanceManager.selectedTestInstance.proxyUsed}"
+                                                          value="#{testInstanceManager.getProxyLink(currentTestStepsInstance)}">
+                                                <h:outputText
+                                                        value="#{messages['gazelle.tm.test.ProxyMessages']}"/>
+                                            </h:outputLink>
+                                            <ui:include src="TestInstanceLogs.xhtml">
+                                                <ui:param name="logList"
+                                                          value="#{testInstanceManager.getDataListFor(currentTestStepsInstance)}"/>
+                                                <ui:param name="logListOwner"
+                                                          value="#{currentTestStepsInstance}"/>
+                                                <ui:param name="onlyFiles" value="#{false}"/>
+                                            </ui:include>
+
+                                        </s:div>
+                                    </g:column>
+                                    <f:facet name="footer">
+                                        <rich:columnGroup>
+                                            <g:column>#{messages['gazelle.tm.test.Step']}</g:column>
+                                            <g:column/>
+                                            <g:column>#{messages['gazelle.tm.test.Trans']}</g:column>
+                                            <g:column>#{messages['gazelle.tm.test.Opt']}</g:column>
+                                            <g:column>#{messages['gazelle.tm.test.SendingActor']}</g:column>
+                                            <g:column>#{messages['gazelle.tm.test.ReceivingActor']}</g:column>
+                                            <g:column>
+                                                <s:div>
+                                                    <h:outputText
+                                                            value="#{messages['gazelle.tm.testing.instance.status']} "/>
+
+                                                    <a4j:commandLink event="click"
+                                                                     render="_status,_comm,_files,progressBar,tsil"
+                                                                     execute="@this" limitRender="true"
+                                                                     rendered="#{testInstanceManager.canMakeDoneAllSteps() and !testInstanceManager.selectedTestInstance.testingSession.testingSessionClosedForUser()}"
+                                                                     title="#{messages['gazelle.tm.SetAllStatusToDone']}"
+                                                                     actionListener="#{testInstanceManager.markAllStepsAsDone()}">
+                                                        <s:span styleClass="gzl-icon-verified"/>
+                                                    </a4j:commandLink>
+                                                    <a4j:commandLink event="click"
+                                                                     render="_status,_comm,_files,progressBar,tsil"
+                                                                     execute="@this" limitRender="true"
+                                                                     rendered="#{testInstanceManager.canMakeActivatedAllSteps() and testInstanceManager.isConnectedUserAllowedToEditTestInstance() and !testInstanceManager.selectedTestInstance.testingSession.testingSessionClosedForUser()}"
+                                                                     title="#{messages['net.ihe.gazelle.tm.ResetAllStatus']}"
+                                                                     actionListener="#{testInstanceManager.markAllStepsAsActivated()}">
+                                                        <span class="gzl-icon-not-checked"/>
+                                                    </a4j:commandLink>
+                                                </s:div>
+
+                                            </g:column>
+                                            <g:column>
+
+                                                <s:div id="validstatfoot">
+                                                    <h:outputText
+                                                            value="#{messages['gazelle.tm.test.ValidationStatus']} "/>
+
+                                                    <a4j:commandLink event="click"
+                                                                     render="_status,_comm,_files,progressBar,tsil"
+                                                                     execute="@this" limitRender="true"
+                                                                     actionListener="#{testInstanceManager.validateAllSteps()}"
+                                                                     rendered="#{testInstanceManager.canValidateAllSteps() and testInstanceManager.isConnectedUserAllowedToValidateSelectedTestInstance()}"
+                                                                     title="#{messages['gazelle.tm.SetAllStatusToVerified']}">
+                                                        <s:span styleClass="gzl-icon-verified"/>
+                                                    </a4j:commandLink>
+
+                                                    <a4j:commandLink event="click"
+                                                                     render="_status,_comm,_files,progressBar,tsil"
+                                                                     execute="@this" limitRender="true"
+                                                                     rendered="#{testInstanceManager.canResetAllSteps() and testInstanceManager.isConnectedUserAllowedToValidateSelectedTestInstance()}"
+                                                                     title="#{messages['gazelle.users.reset']}"
+                                                                     actionListener="#{testInstanceManager.resetAllSteps()}">
+                                                        <span class="gzl-icon-not-checked"/>
+                                                    </a4j:commandLink>
+
+                                                </s:div>
+
+                                            </g:column>
+                                        </rich:columnGroup>
+                                    </f:facet>
+                                </rich:dataTable>
+                                <div align="right">
+                                    <s:div id="bottomStatus">
+                                        <s:decorate template="/layout/display/_display.xhtml"
+                                                    styleClass="form-inline">
+                                            <ui:define name="label">#{messages['gazelle.tm.test.TestCurrentStatus']}
+                                            </ui:define>
+                                            <ui:include src="_testInstanceStatus.xhtml">
+                                                <ui:param name="toRender"
+                                                          value="_meta,_nav,metadata,bottomStatus,testInstanceCommentsPanel,ChangeStatusConfirmationDiv"/>
+                                            </ui:include>
+                                        </s:decorate>
+                                        <h:panelGroup rendered="#{testInstanceManager.canResetSteps()}">
+
+                                            <a4j:commandLink event="click" limitRender="true"
+                                                             render="_status,_comm,_files,tsil,metadata,testInstanceCommentsPanel"
+                                                             title="#{messages['gazelle.tm.test.ResetSteps']}"
+                                                             rendered="#{!testInstanceManager.selectedTestInstance.testingSession.testingSessionClosedForUser()}"
+                                                             execute="@this"
+                                                             actionListener="#{testInstanceManager.resetCurrentTestInstanceSteps()}">
+                                                <span class="gzl-icon-undo"/>
+                                            </a4j:commandLink>
+
+                                        </h:panelGroup>
+                                    </s:div>
+                                </div>
+                            </ui:decorate>
+                        </div>
+                    </h:form>
+                    <rich:collapsiblePanel id="transactionMonitorViewPanel"
+                                           rendered="#{applicationPreferenceManager.isTransactionMonitorEnabled()}"
+                                           switchType="client">
+                        <f:facet name="openMarker">
+                            <h:outputText value="#{messages['gazelle.tm.test.Open']}"/>
+                        </f:facet>
+                        <f:facet name="closeMarker">
+                            <h:outputText value="#{messages['gazelle.tm.test.Close']}"/>
+                        </f:facet>
+                        <f:facet name="header">
+                            <h:panelGroup layout="block">
+                                <h:outputText
+                                        value="#{messages['gazelle.tm.test.proxy.TransactionMonitorViewPanelLabel']}"/>
+                                <h:outputLink
+                                        value="#{applicationPreferenceManager.getTransactionMonitorUrl()}Test/Show/#{testInstanceManager.selectedTestInstance.id}"
+                                        target="transactionmonitor-#{testInstanceManager.selectedTestInstance.id}"
+                                        style="float: right; color: #FFF; margin-right: 10px; text-decoration: none;"
+                                        onclick="if (event.stopPropagation) { event.stopPropagation(); } else { event.cancelBubble = true; }">
+                                    <h:outputText
+                                            value="#{messages['gazelle.tm.test.proxy.OpenInNewTab']}"/>
+                                </h:outputLink>
+                            </h:panelGroup>
+                        </f:facet>
+                        <iframe src="#{applicationPreferenceManager.getTransactionMonitorUrl()}Test/Show/#{testInstanceManager.selectedTestInstance.id}"
+                                style="width: 100%; min-width: 848px; height: 496px; margin: -10px;">
+                        </iframe>
+                    </rich:collapsiblePanel>
+
+                    <h:form id="_files">
+                        <h:inputHidden name="testInstanceId" id="testInstanceIdhiddenInput"
+                                       value="#{testInstanceManager.selectedTestInstance.id}"/>
+                        <s:token allowMultiplePosts="true"/>
+                        <a4j:queue/>
+                        <div id="files">
+                            <a4j:region>
+                                <h:panelGroup rendered="#{testInstanceManager.isConnectedUserAllowedToEditTestInstance()}">
+                                    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                                        <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.Files']}
+                                        </ui:define>
+                                        <s:div id="listTIFiles">
+                                            <ui:include src="TestInstanceLogs.xhtml">
+                                                <ui:param name="logList"
+                                                          value="#{testInstanceManager.getDataListFor(testInstanceManager.selectedTestInstance)}"/>
+                                                <ui:param name="logListOwner"
+                                                          value="#{testInstanceManager.selectedTestInstance}"/>
+                                                <ui:param name="onlyFiles" value="#{true}"/>
+                                            </ui:include>
+                                        </s:div>
+                                        <ui:include src="/fineupload.xhtml">
+                                            <ui:param name="id" value="testInstanceUploads"/>
+                                            <ui:param name="idToRerender" value="listTIFiles"/>
+                                            <ui:param name="beanName" value="testInstanceUploadManager"/>
+                                            <ui:param name="multiple" value="true"/>
+                                            <ui:param name="param"
+                                                      value="#{testInstanceManager.selectedTestInstance.id}"/>
+                                        </ui:include>
+                                    </ui:decorate>
+                                </h:panelGroup>
+                            </a4j:region>
+                        </div>
+                    </h:form>
+
+                    <h:form id="_comm">
+                        <h:inputHidden name="testInstanceId" id="testInstanceIdhiddenInput"
+                                       value="#{testInstanceManager.selectedTestInstance.id}"/>
+                        <s:token allowMultiplePosts="true"/>
+                        <a4j:queue/>
+                        <div id="comments">
+                            <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                                <ui:param name="panel_id" value="testInstanceChatRoom"/>
+                                <ui:define name="panel_title">#{messages['gazelle.tm.test.ChatRoom']}</ui:define>
+                                <a4j:region>
+                                    <div class="row">
+                                        <h:panelGroup
+                                                rendered="#{testInstanceManager.selectedTestInstance.comments!=null}">
+                                            <div class="col-lg-6">
+                                                <ui:decorate template="/layout/panels/_panel_id.xhtml">
+                                                    <ui:param name="panel_id" value="testInstanceCommentsPanel"/>
+                                                    <s:div>
+                                                        <g:safehtml
+                                                                value="#{testInstanceManager.selectedTestInstance.comments}"/>
+                                                    </s:div>
+                                                </ui:decorate>
+                                            </div>
+                                        </h:panelGroup>
+                                        <s:div rendered="#{testInstanceManager.isConnectedUserAllowedToEditTestInstance()}">
+                                            <div class="col-lg-6">
+                                                <a4j:region id="commentsRegion">
+                                                    <h:inputTextarea styleClass="form-control"
+                                                                     value="#{testInstanceManager.commentTobeAdded}"
+                                                                     rows="10"/>
+                                                    <br/>
+                                                    <ul style="list-style: none;">
+                                                        <li>
+                                                            <h:outputText
+                                                                    rendered="#{noteManager.userCanAddMessage()}"
+                                                                    value="#{messages['net.ihe.gazelle.tm.AddThisCommentAlsoInSystemNotesOf']}"/>
+                                                        </li>
+                                                        <ul style="list-style: none;">
+                                                            <a4j:repeat id="testInstanceParticipantsTable2"
+                                                                        var="currentTestInstanceParticipants"
+                                                                        value="#{testInstanceManager.getTestInstanceParticipantsWithSystemsListDistinct()}"
+                                                                        rendered="#{noteManager.userCanAddMessage()}">
+                                                                <li>
+                                                                    <s:decorate
+                                                                            id="internetTestingSessionBoxDecoration"
+                                                                            template="/layout/form/_checkbox.xhtml">
+                                                                        <h:selectBooleanCheckbox
+                                                                                value="#{currentTestInstanceParticipants.systemInSessionUser.systemInSession.addCommentInNotes}">
+                                                                        </h:selectBooleanCheckbox>
+                                                                        <h:outputText
+                                                                                value="#{messages['net.ihe.gazelle.tm.AddThisCommentAlsoInSystemNotesOf']} #{currentTestInstanceParticipants.systemInSessionUser.systemInSession.system.keywordVersion}"/>
+                                                                    </s:decorate>
+                                                                </li>
+
+                                                            </a4j:repeat>
+                                                        </ul>
+                                                    </ul>
+                                                    <br/></a4j:region>
+                                                <div style="text-align: left;">
+                                                    <a4j:commandButton styleClass="gzl-btn" limitRender="true"
+                                                                       execute="commentsRegion"
+                                                                       value="#{messages['gazelle.tm.mesatests.AddComment']}"
+                                                                       actionListener="#{testInstanceManager.addNotesOnSystemAndInTestInstance()}"
+                                                                       render="testInstanceChatRoom,testInstanceParticipantsTable"/>
+                                                </div>
+                                            </div>
+                                        </s:div>
+                                    </div>
+                                </a4j:region>
+                            </ui:decorate>
+                        </div>
+                    </h:form>
+
+                    <h:form id="_status">
+                        <h:inputHidden name="testInstanceId" id="testInstanceIdhiddenInput"
+                                       value="#{testInstanceManager.selectedTestInstance.id}"/>
+                        <s:token allowMultiplePosts="true"/>
+                        <a4j:queue/>
+                        <s:div id="ChangeStatusConfirmationDiv">
+                            <!--  Fail explanation modal panel -->
+                            <s:div id="failll"
+                                   rendered="#{testInstanceManager.selectedStatus.name().equals('FAILED')}">
+
+                                <ui:decorate template="/layout/popup/_popup_title_footer_no_dismiss.xhtml">
+                                    <ui:param name="popup_id" value="FailExplanationModal"/>
+                                    <ui:define name="popup_title">
+                                        <h:outputText value="#{messages['gazelle.tm.test.Explanations']}"/>
+                                    </ui:define>
+                                    <s:decorate id="ExplanationDecoration" template="/layout/form/_edit.xhtml">
+                                        <ui:param name="id" value="failExplanationInputText"/>
+                                        <ui:define name="label">
+                                            #{messages['gazelle.tm.test.ExplanationOfTheFailureOfTheTest']} :
+                                        </ui:define>
+                                        <h:inputTextarea styleClass=" form-control"
+                                                         id="failExplanationInputText"
+                                                         value="#{testInstanceManager.failExplanation}" rows="9"
+                                                         cols="50">
+                                            <a4j:ajax event="keyup" render="butttoexpl"/>
+                                        </h:inputTextarea>
+                                    </s:decorate>
+
+                                    <ui:define name="popup_footer">
+                                        <a4j:commandButton styleClass="gzl-btn" id="butttcans" limitRender="true"
+                                                           value="#{messages['gazelle.common.button.Cancel']}"
+                                                           onclick="jq162('#FailExplanationModal').modal('hide');"
+                                                           actionListener="#{testInstanceManager.setSelectedStatus(testInstanceManager.selectedTestInstance.lastStatus)}"
+                                                           execute="@this"
+                                                           render="_nav,metadata,bottomStatus,ChangeStatusConfirmationDiv"/>
+
+                                        <a4j:commandButton styleClass="gzl-btn-red" id="butttoexpl"
+                                                           limitRender="true"
+                                                           disabled="#{testInstanceManager.failExplanation==null || testInstanceManager.failExplanation.isEmpty()}"
+                                                           value="#{messages['gazelle.common.button.Confirm']}"
+                                                           onclick="jq162('#FailExplanationModal').modal('hide');"
+                                                           actionListener="#{testInstanceManager.updateSelectedTestInstanceStatusToFailed()}"
+                                                           render="_nav,metadata,bottomStatus,testInstanceCommentsPanel,ChangeStatusConfirmationDiv,gazelle-messages"/>
+                                    </ui:define>
+                                </ui:decorate>
+
+                            </s:div>
+                        </s:div>
+                    </h:form>
+                </s:div>
+                <s:div id="notrenderTI"
+                       rendered="#{!testInstanceManager.isConnectedUserAllowedToEditTestInstance()}">
+                    <s:div rendered="#{testInstanceManager.selectedTestInstance != null}">
+                        <h:outputText
+                                value="#{messages['gazelle.testmanagement.testInstance.UserNotAllowed']}"/>
+                    </s:div>
+                    <s:div rendered="#{testInstanceManager.selectedTestInstance == null}">
+                        <h:outputText
+                                value="#{messages['gazelle.testmanagement.testInstance.NoTestInstanceMatch']}"/>
+                    </s:div>
+                </s:div>
+            </div>
+
+        </div>
+        <!-- Modal Panels -->
+        <s:div id="systemConfigurationDiv">
+            <s:div rendered="#{modalPanelManager.isDisplayConfigurationPanel()}">
+                <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                    <ui:param name="popup_id" value="SystemInSessionConfigurationModalPanel"/>
+                    <ui:param name="styleClass2" value="modal-xl"/>
+                    <ui:define name="popup_title">
+                        <h:outputText
+                                value="#{modalPanelManager.selectedSystemInSession.system.keyword} #{messages['gazelle.tm.search.configuration']}"/>
+                    </ui:define>
+                    <ui:include src="/configuration/configurationsForSystem.xhtml">
+                        <ui:param name="selectedSystemInSession"
+                                  value="#{modalPanelManager.selectedSystemInSession}"/>
+                        <ui:param name="selectedActorForConfigs" value="#{modalPanelManager.selectedActor}"/>
+                        <ui:param name="showActions" value="false"/>
+                    </ui:include>
+
+                    <ui:define name="popup_footer">
+                              <span id="cancel" class="gzl-btn"
+                                    onclick="jq162('#SystemInSessionConfigurationModalPanel').modal('hide');">#{messages['gazelle.common.button.Cancel']}</span>
+                    </ui:define>
+                </ui:decorate>
+            </s:div>
+        </s:div>
+
+
+        <s:div id="systemInSessionNotesDiv">
+            <h:panelGroup rendered="#{noteManager.selectedSystemInSession != null}">
+                <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                    <ui:param name="popup_id" value="systemInSessionNotesModalPanel"/>
+                    <ui:param name="styleClass2" value="modal-lg"/>
+                    <ui:define name="popup_title">
+                        <h:outputText
+                                value="#{modalPanelManager.selectedSystemInSession.system.keyword} #{messages['net.ihe.gazelle.tm.Notes']}"/>
+                    </ui:define>
+                    <s:div id="notes">
+                        #{noteManager.reloadSystemInSession()}
+                        <ui:include src="/systems/system/showSystemNotes.xhtml">
+                            <ui:param name="selectedSystemInSession"
+                                      value="#{noteManager.selectedSystemInSession}"/>
+                            <ui:param name="explanationText"
+                                      value="#{messages['net.ihe.gazelle.tm.TheCommentsFromMonitorsOnThisFormWillAppearOnThe']}"/>
+                            <ui:param name="idToRerender" value="notes,testInstanceParticipantsTable"/>
+                            <ui:param name="formId" value="notesFormSys"/>
+                        </ui:include>
+                    </s:div>
+                    <ui:define name="popup_footer">
+                        <span id="canN" class="gzl-btn"
+                              onclick="jq162('#systemInSessionNotesModalPanel').modal('hide');">#{messages['net.ihe.gazelle.assets.Close']}</span>
+                    </ui:define>
+                </ui:decorate>
+            </h:panelGroup>
+        </s:div>
+
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="RemovePanel"/>
+            <ui:define name="popup_title"> #{messages['net.ihe.gazelle.tm.RemoveTestStepValue']}</ui:define>
+
+            <s:div>
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.DoYouWantToDeleteThisItem']}"/>
+            </s:div>
+
+            <ui:define name="popup_footer">
+                <h:form>
+                    <s:token allowMultiplePosts="true"/>
+                    <span id="canDel" class="gzl-btn"
+                          onclick="jq162('#RemovePanel').modal('hide');">#{messages['gazelle.common.button.Cancel']}</span>
+                    <a4j:commandLink actionListener="#{testInstanceManager.deleteTestStepsData()}"
+                                     value="#{messages['gazelle.common.button.Confirm']}"
+                                     limitRender="true"
+                                     onclick="jq162('#RemovePanel').modal('hide');" styleClass="gzl-btn-red"
+                                     render="testStepsInstanceTable,listTIFiles,_files" execute="@this"/>
+                </h:form>
+            </ui:define>
+        </ui:decorate>
+
+
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="ViewSelectedComment"/>
+            <ui:define name="popup_title">
+                <h:outputText value="#{messages['gazelle.tests.testInstance.ViewComments']}"/>
+            </ui:define>
+            <h:form id="ViewSelectedCommentForm">
+                <s:token allowMultiplePosts="true"/>
+                <h:inputTextarea id="commdevInputTextId" rows="15" cols="69"
+                                 value="#{testInstanceManager.selectedComment}"
+                                 styleClass="form-control gzl-isResizableVertical">
+                    <a4j:ajax event="keyup" render="commform" limitRender="true"
+                              listener="#{testInstanceManager.setSelectedCommentWasModified(true)}"/>
+                </h:inputTextarea>
+            </h:form>
+
+            <ui:define name="popup_footer">
+                <h:form id="commform">
+                    <s:token allowMultiplePosts="true"/>
+                    <span id="canCom" class="gzl-btn"
+                          onclick="jq162('#ViewSelectedComment').modal('hide');">#{messages['gazelle.common.button.Cancel']}</span>
+                    <a4j:commandLink id="savemodif" rendered="#{testInstanceManager.selectedCommentWasModified}"
+                                     value="#{messages['gazelle.testmanagement.object.Update']}"
+                                     styleClass="gzl-btn-orange" limitRender="true"
+                                     action="#{testInstanceManager.persistSelectedTSIWithModifiedComment()}"
+                                     onclick="jq162('#ViewSelectedComment').modal('hide');"
+                                     render="testStepsInstanceTable,listTIFiles"/>
+                </h:form>
+
+            </ui:define>
+        </ui:decorate>
+    </ui:define>
+</ui:composition>

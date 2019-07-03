@@ -1,0 +1,69 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['net.ihe.gazelle.tm.EditStandard']}"/>
+    <ui:define name="body">
+        <div class="row">
+            <div class="col-lg-6 col-lg-offset-3">
+                <h:form id="editForm">
+                    <ui:decorate template="/layout/panels/_panel_title_footer_id.xhtml">
+                        <ui:param name="panel_id" value="addPanel"/>
+                        <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.EditStandard']}</ui:define>
+                        <s:decorate id="keywordDecoration" template="/layout/form/_edit.xhtml">
+                            <ui:param name="id" value="keywordInput"/>
+                            <ui:define name="label">#{messages['gazelle.testmanagement.object.keyword']}</ui:define>
+                            <h:inputText id="keywordInput" styleClass=" form-control" value="#{standardManager.selectedStandard.keyword}"
+                                         required="true"
+                                         requiredMessage="The keyword is a mandatory field">
+                                <a4j:ajax event="blur" render="keywordDecoration" execute="@this"/>
+                            </h:inputText>
+                        </s:decorate>
+                        <s:decorate id="nameDecoration" template="/layout/form/_edit.xhtml">
+                            <ui:param name="id" value="nameInput"/>
+                            <ui:define name="label">#{messages['gazelle.testmanagement.object.Name']}</ui:define>
+                            <h:inputText id="nameInput" styleClass=" form-control" value="#{standardManager.selectedStandard.name}"
+                                         required="true"
+                                         requiredMessage="The name is a mandatory field" size="180">
+                                <a4j:ajax event="blur" render="nameDecoration" execute="@this"/>
+                            </h:inputText>
+                        </s:decorate>
+                        <s:decorate template="/layout/form/_edit.xhtml" id="versionDecorate">
+                            <ui:param name="id" value="SystemVersionInput"/>
+                            <ui:define name="label">#{messages['gazelle.systems.system.SystemVersion']}</ui:define>
+                            <h:inputText id="SystemVersionInput" styleClass=" form-control"
+                                         value="#{standardManager.selectedStandard.version}"/>
+                        </s:decorate>
+                        <s:decorate template="/layout/form/_edit.xhtml">
+                            <ui:param name="id" value="urlInput"/>
+                            <ui:define name="label">#{messages['net.ihe.gazelle.tm.dataType.url']}</ui:define>
+                            <h:inputText id="urlInput" styleClass=" form-control" value="#{standardManager.selectedStandard.url}"
+                                         size="180"/>
+                        </s:decorate>
+                        <s:decorate template="/layout/form/_edit.xhtml">
+                            <ui:define name="label">#{messages['net.ihe.gazelle.tm.NetworkCommunicationType_2']}
+                            </ui:define>
+                            <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                             value="#{standardManager.selectedStandard.networkCommunicationType}">
+                                <f:selectItems value="#{standardManager.communicationTypes}"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                        <ui:define name="panel_footer">
+                            <h:outputLink title="#{messages['gazelle.common.button.Cancel']}" value="show.seam"
+                                          styleClass="gzl-btn">
+                                <f:param name="keyword" value="#{standardManager.selectedStandard.keyword}"/>
+                                <h:outputText value="#{messages['gazelle.common.button.Cancel']}"/>
+                            </h:outputLink>
+
+                            <a4j:commandButton id="saveStandardButton" value="#{messages['gazelle.common.button.Save']}"
+                                               styleClass="gzl-btn-green"
+                                               rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}"
+                                               action="#{standardManager.save()}"/>
+                        </ui:define>
+                    </ui:decorate>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

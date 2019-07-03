@@ -1,0 +1,252 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.configuration.Configurations']}"/>
+    <ui:define name="body">
+        <h:panelGroup rendered="#{gazelleDAO.getSelectedTestingSession().testingSessionClosedForUser()}"
+                      style="text-align:left">
+            <h:outputText
+                    value="#{messages['net.ihe.gazelle.tm.ThisTestingSessionIsClosedEditionIsImpossible']}"/>
+        </h:panelGroup>
+        <s:div id="globalDiv">
+            <h:form id="globalform" styleClass="form-horizontal">
+                <s:token allowMultiplePosts="true"/>
+                <h:inputHidden id="filterUrlParameters" name="filterUrlParameters"
+                               value="#{configurationsOverview.filter.urlParameters}"/>
+                <script>
+                    updateUrl("globalform:filterUrlParameters");
+                    $("#globalform\\:filterUrlParameters").bind('change',
+                            function () {
+                                updateUrl("globalform:filterUrlParameters");
+                            });
+                </script>
+                <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <!--  institution selection -->
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter" value="#{configurationsOverview.filterSystems}"/>
+                                <ui:param name="filterWidth" value="240"/>
+                                <ui:param name="filterId" value="institution"/>
+                                <ui:param name="filterName"
+                                          value="#{messages['gazelle.users.institution.InstitutionKeyword']}"/>
+                                <ui:param name="filterForm"
+                                          value="globalform,globalform2,formConfigurationsTable"/>
+                            </ui:include>
+                        </div>
+                        <div class="col-lg-6">
+                            <!--  system -->
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter" value="#{configurationsOverview.filterSystems}"/>
+                                <ui:param name="filterWidth" value="240"/>
+                                <ui:param name="filterId" value="system"/>
+                                <ui:param name="filterName"
+                                          value="#{messages['gazelle.configuration.system.system']}"/>
+                                <ui:param name="filterForm"
+                                          value="globalform,globalform2,formConfigurationsTable"/>
+                            </ui:include>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <!--  actor -->
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter" value="#{configurationsOverview.filter}"/>
+                                <ui:param name="filterWidth" value="240"/>
+                                <ui:param name="filterId" value="actor"/>
+                                <ui:param name="filterName"
+                                          value="#{messages['gazelle.testmanagement.object.Actor']}"/>
+                                <ui:param name="filterForm"
+                                          value="globalform,globalform2,formConfigurationsTable"/>
+                            </ui:include>
+                        </div>
+                        <!--  WS type -->
+                        <div class="col-lg-6">
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter" value="#{configurationsOverview.filter}"/>
+                                <ui:param name="filterWidth" value="240"/>
+                                <ui:param name="filterId" value="wsTransactionUsage"/>
+                                <ui:param name="filterName"
+                                          value="#{messages['net.ihe.gazelle.tm.WSTransactionUsage']}"/>
+                                <ui:param name="filterForm"
+                                          value="globalform,globalform2,formConfigurationsTable"/>
+                            </ui:include>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <!--  type -->
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter" value="#{configurationsOverview.filter}"/>
+                                <ui:param name="filterWidth" value="240"/>
+                                <ui:param name="filterId" value="class"/>
+                                <ui:param name="filterName" value="#{messages['gazelle.systems.session.Type']}"/>
+                                <ui:param name="filterForm"
+                                          value="globalform,globalform2,formConfigurationsTable"/>
+                            </ui:include>
+                        </div>
+                        <div class="col-lg-6">
+                            <!--  approved -->
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter" value="#{configurationsOverview.filter}"/>
+                                <ui:param name="filterWidth" value="120"/>
+                                <ui:param name="filterId" value="approved"/>
+                                <ui:param name="filterName"
+                                          value="#{messages['gazelle.configuration.system.isApproved']}"/>
+                                <ui:param name="filterForm"
+                                          value="globalform,globalform2,formConfigurationsTable"/>
+                            </ui:include>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <!--  secured -->
+                            <ui:include src="/filter/filter.xhtml">
+                                <ui:param name="filter" value="#{configurationsOverview.filter}"/>
+                                <ui:param name="filterWidth" value="120"/>
+                                <ui:param name="filterId" value="secured"/>
+                                <ui:param name="filterName" value="#{messages['net.ihe.gazelle.tm.IsSecured']}"/>
+                                <ui:param name="filterForm"
+                                          value="globalform,globalform2,formConfigurationsTable"/>
+                            </ui:include>
+                        </div>
+                    </div>
+
+                    <ui:define name="filter_buttons">
+                        <a4j:commandLink title="#{messages['gazelle.common.button.Refresh']}"
+                                         render="globalform,globalform2,formConfigurationsTable">
+                            <span class="fa fa-refresh"/>
+                        </a4j:commandLink>
+
+                        <a4j:commandLink actionListener="#{configurationsOverview.clearFilters()}"
+                                         title="#{messages['gazelle.users.reset']}" type="submit"
+                                         execute="@this" render="globalform,globalform2,formConfigurationsTable">
+                            <span class="fa fa-times-circle"/>
+                        </a4j:commandLink>
+                    </ui:define>
+                </ui:decorate>
+            </h:form>
+
+            <h:form id="globalform2">
+                <s:token allowMultiplePosts="true"/>
+                <h:outputLink value="#{configurationsOverview.restURL}" target="_blank">
+                    <h:outputText
+                            value="#{messages['net.ihe.gazelle.tm.URLForDownloadingConfigurationsAsCSV']}"/>
+                </h:outputLink>
+                <s:div rendered="#{configurationsOverview.showActorToConfigsLinks}">
+                    <s:link view="/configuration/list/listConfTypedependingAllAIPO.xhtml"
+                            value="#{messages['gazelle.tm.ClickHereToSeeConfigurationsTypeDependingActors']}"/>
+                </s:div>
+                <a4j:region>
+                    <a4j:commandButton id="buttonAddNewConfiguration" styleClass="gzl-btn-green"
+                                       value="#{messages['gazelle.configuration.system.AddConfiguration']}"
+                                       rendered="#{!gazelleDAO.getSelectedTestingSession().testingSessionClosedForUser()}"
+                                       action="#{configurationsOverview.addConfig()}"
+                                       render="globalform,globalform2,formConfigurationsTable">
+                    </a4j:commandButton>
+                    <a4j:commandButton styleClass="gzl-btn"
+                                       value="#{messages['gazelle.configuration.button.GenerateAllConfigurationsForSession']}..."
+                                       rendered="#{s:hasRole('admin_role') or s:hasRole('testing_session_admin_role')}"
+                                       immediate="true" id="onClickGenerateAllConfiguration"
+                                       oncomplete="jq162('#ConfirmGenerateConfigurationTestingSession').modal('show');"
+                                       execute="@this"
+                                       render="ConfirmGenerateConfigurationTestingSession, :confirmGenerateConfigurationTestingSessionForm"/>
+                    <a4j:commandButton styleClass="gzl-btn"
+                                       value="#{messages['gazelle.configuration.button.GenerateConfigurationsForSelectedCompany']}..."
+                                       rendered="#{not empty configurationsOverview.choosenInstitution and configurationsOverview.editRights and !gazelleDAO.getSelectedTestingSession().testingSessionClosedForUser()}"
+                                       id="clickGenerateConfigurationSelectedCompany" immediate="true"
+                                       oncomplete="jq162('#ConfirmGenerateConfigurationInstitution').modal('show');"
+                                       execute="@this"
+                                       render="ConfirmGenerateConfigurationInstitution, :confirmGenerateConfigurationInstitutionForm"/>
+                    <a4j:commandButton id="generateConfiguration" styleClass="gzl-btn"
+                                       value="#{messages['gazelle.configuration.button.GenerateConfigurationsSelectedSystem']}..."
+                                       rendered="#{not empty configurationsOverview.selectedSystemInSession and configurationsOverview.editRights and !gazelleDAO.getSelectedTestingSession().testingSessionClosedForUser()}"
+                                       oncomplete="jq162('#ConfirmGenerateConfigurationSIS').modal('show');"
+                                       immediate="true" execute="@this"
+                                       render="ConfirmGenerateConfigurationSISForm, :confirmGenerateConfigurationSISForm"/>
+                </a4j:region>
+            </h:form>
+            <ui:include src="/configuration/configurationList.xhtml">
+                <ui:param name="showActions"
+                          value="#{!gazelleDAO.getSelectedTestingSession().testingSessionClosedForUser()}"/>
+                <ui:param name="idToRerender" value="globalDiv,globalform,globalform2"/>
+                <ui:param name="formId" value="formConfigurationsTable"/>
+            </ui:include>
+            <h:form>
+                <s:token allowMultiplePosts="true"/>
+                <h:outputLink value="#{configurationsOverview.restURL}" target="_blank">
+                    <h:outputText
+                            value="#{messages['net.ihe.gazelle.tm.URLForDownloadingConfigurationsAsCSV']}"/>
+                </h:outputLink>
+            </h:form>
+
+
+        </s:div>
+        <h:form id="confirmGenerateConfigurationTestingSessionForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="ConfirmGenerateConfigurationTestingSession"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.GenerateConfigurationForSelectedSession']}
+                </ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.GenerationOfConfigurationsWillBeExecutedInBackgr']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton styleClass="gzl-btn-green"
+                                       value="#{messages['gazelle.common.button.Confirm']}"
+                                       actionListener="#{configurationsOverview.generateConfigurationsForSession()}"
+                                       immediate="true"
+                                       onclick="jq162('#ConfirmGenerateConfigurationTestingSession').modal('hide');"
+                                       render="globalform,globalform2,formConfigurationsTable"
+                                       execute="@this"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+
+        <h:form id="confirmGenerateConfigurationSISForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="ConfirmGenerateConfigurationSIS"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.GenerateConfigurationForSelectedSystem']}
+                </ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.GenerationOfConfigurationsWillBeExecutedInBackgr']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton styleClass="gzl-btn-green"
+                                       value="#{messages['gazelle.common.button.Confirm']}"
+                                       actionListener="#{configurationsOverview.generateConfigurationsForForSystem()}"
+                                       immediate="true"
+                                       onclick="jq162('#ConfirmGenerateConfigurationSIS').modal('hide');"
+                                       render="globalform,globalform2,formConfigurationsTable"
+                                       execute="@this"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+
+        <h:form id="confirmGenerateConfigurationInstitutionForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="ConfirmGenerateConfigurationInstitution"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.GenerateConfigurationForSelectedIntitution']}
+                </ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.GenerationOfConfigurationsWillBeExecutedInBackgr']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton styleClass="gzl-btn-green"
+                                       value="#{messages['gazelle.common.button.Confirm']}"
+                                       actionListener="#{configurationsOverview.generateConfigurationsForCompany()}"
+                                       immediate="true"
+                                       onclick="jq162('#ConfirmGenerateConfigurationInstitution').modal('hide');"
+                                       render="globalform,globalform2,formConfigurationsTable"
+                                       execute="@this"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

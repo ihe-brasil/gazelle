@@ -1,0 +1,40 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle"
+              value="#{messages['net.ihe.gazelle.tm.EditTestDefinitionsOf']} #{editTestDefinitionManager.editedTest.name}"/>
+    <!-- ======================= -->
+    <!-- Test Descriptions section-->
+    <!-- ======================= -->
+    <ui:define name="body">
+        <s:div id="TestDescriptionsManagement"
+               rendered="#{s:hasPermission('TestsDefinitionsAdministrationManager', 'EditTest', null)}">
+
+            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                <ui:define name="panel_title">
+                    #{editTestDefinitionManager.getTranslatedTestDescription().gazelleLanguage.keyword}
+                </ui:define>
+                <g:safehtml value="#{editTestDefinitionManager.getTranslatedTestDescription().description}"/>
+            </ui:decorate>
+
+            <br/>
+
+            <ui:include src="_editTestDescription.xhtml">
+                <ui:param name="testId"
+                          value="#{editTestDefinitionManager.editedTest.id}"/>
+                <ui:param name="editedTestDescription"
+                          value="#{editTestDefinitionManager.editedTestDescription}"/>
+            </ui:include>
+
+            <h:outputLink
+                    value="#{applicationPreferenceManager.getApplicationUrl()}testing/testsDefinition/editTestRoles.seam"
+                    styleClass="gzl-btn"
+                    rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}">
+                <f:param name="id" value="#{editTestDefinitionManager.editedTest.id}"/>
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.NextEditTestRoles']}"/>
+            </h:outputLink>
+        </s:div>
+    </ui:define>
+</ui:composition>

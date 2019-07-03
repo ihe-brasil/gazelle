@@ -1,0 +1,11 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:a4j="http://richfaces.org/a4j" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <a4j:repeat value="#{instances}" var="ti">
+        <div>
+            <g:link value="#{ti}" detailed="false" tooltip="true" target="_blank"/>
+            <s:span styleClass="gzl-icon-exclamation-triangle" title="#{messages['net.ihe.gazelle.tm.ThisTestInstanceHasBeenAllowedThoughPartnersAreF']}"
+                rendered="#{ti.containsSameSystemsOrFromSameCompany}"/>
+        </div>
+    </a4j:repeat>
+</ui:composition>

@@ -1,0 +1,156 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.tm.testing.results.connectathonResults']}"/>
+    <ui:define name="body">
+
+        #{connectathonResult.setMainCatPage(false)}
+        #{dataTableStateHolder.setAscendingOn('id')}
+
+        <h:outputScript library="jscript" name="cat_results.js"/>
+
+        <h:form id="globalform" styleClass="form-horizontal"
+                rendered="#{ ( s:hasPermission('ConnectathonResultManager', 'manageSystemAIPOResultsForAdmin'  )  || s:hasPermission('ConnectathonResultManager', 'manageSystemAIPOResultsForNonAdmin'  )  ) }">
+            <h:inputHidden id="filterUrlParameters" name="filterUrlParameters"
+                           value="#{connectathonResult.filter.urlParameters}"/>
+            <script>
+                updateUrl("globalform:filterUrlParameters");
+                $("#globalform\\:filterUrlParameters").bind('change',
+                    function () {
+                        updateUrl("globalform:filterUrlParameters");
+                    });
+
+
+            </script>
+            <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <!--  Testing session -->
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{connectathonResult.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="testSession"/>
+                            <ui:param name="filterName" value="#{messages['gazelle.systems.TestingSession']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                    <s:div>
+                        <a4j:commandButton actionListener="#{connectathonResult.updateResults()}"
+                                           styleClass="gzl-btn-green"
+                                           value="#{messages['gazelle.tm.UpdateResults']}"
+                                           rendered="#{s:hasPermission('ConnectathonResultManager', 'manageSystemAIPOResultsForAdmin') and not empty connectathonResult.selectedTestingSession}"
+                                           execute="@this" render="globalform"/>
+                        <span class="gzl-icon-question-circle"
+                              title="#{messages['net.ihe.gazelle.tm.ThisWillUpdateTestInstanceParticipantsAndOnEachS']}"/>
+                    </s:div>
+                    <s:div>
+                        <s:div rendered="#{not empty connectathonResult.selectedTestingSession}">
+                            <h:outputText value="#{messages['net.ihe.gazelle.tm.LastUpdate']} : "/>
+                            <g:date tooltip="true"
+                                    value="#{connectathonResult.selectedTestingSession.resultsCompute}"/>
+                        </s:div>
+                    </s:div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <!--  institution selection -->
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{connectathonResult.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="institution"/>
+                            <ui:param name="filterName"
+                                      value="#{messages['gazelle.users.institution.InstitutionKeyword']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                    <div class="col-lg-6">
+                        <!--  system -->
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{connectathonResult.filter}"/>
+                            <ui:param name="filterWidth" value="240"/>
+                            <ui:param name="filterId" value="system"/>
+                            <ui:param name="filterName"
+                                      value="#{messages['gazelle.configuration.system.system']}"/>
+                            <ui:param name="filterForm" value="globalform,sysNotesDiv, :notesForm"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <ui:include src="/testing/research/filterAIPO.xhtml">
+                    <ui:param name="filter" value="#{connectathonResult.filter}"/>
+                    <ui:param name="filterForm" value="globalform"/>
+                </ui:include>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <!--  Status result -->
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{connectathonResult.filter}"/>
+                            <ui:param name="filterWidth" value="120"/>
+                            <ui:param name="filterId" value="statusResult"/>
+                            <ui:param name="filterName"
+                                      value="#{messages['gazelle.tm.testing.results.resultStatus']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                    <div class="col-lg-6">
+                        <!--  Type result -->
+                        <ui:include src="/filter/filter.xhtml">
+                            <ui:param name="filter" value="#{connectathonResult.filter}"/>
+                            <ui:param name="filterWidth" value="120"/>
+                            <ui:param name="filterId" value="testType"/>
+                            <ui:param name="filterName" value="#{messages['gazelle.tm.monitors.TestType']}"/>
+                            <ui:param name="filterForm" value="globalform"/>
+                        </ui:include>
+                    </div>
+                </div>
+                <ui:define name="filter_buttons">
+                    <a4j:commandLink actionListener="#{connectathonResult.filter.modified()}"
+                                     title="#{messages['gazelle.common.button.Refresh']}"
+                                     render="globalform, globalform:depId">
+                        <span class="fa fa-refresh"/>
+                    </a4j:commandLink>
+
+                    <a4j:commandLink actionListener="#{connectathonResult.filter.clear()}"
+                                     title="#{messages['gazelle.users.reset']}" type="submit"
+                                     execute="@this" render="globalform, globalform:depId">
+                        <span class="fa fa-times-circle"/>
+                    </a4j:commandLink>
+                </ui:define>
+            </ui:decorate>
+
+            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                <ui:define name="panel_title">#{messages['gazelle.common.Results']}</ui:define>
+                <a4j:commandButton styleClass="gzl-btn"
+                                   actionListener="#{connectathonResult.closeDetails()}"
+                                   value="#{messages['net.ihe.gazelle.tm.Collapse']}" type="submit"
+                                   execute="@this" render="globalform"/>
+                <a4j:commandButton styleClass="gzl-btn"
+                                   action="#{connectathonReport.getReportUrl(connectathonResult.filter.getRealFilterValue('testSession'),connectathonResult.filter.getRealFilterValue('institution'),connectathonResult.filter.getRealFilterValue('system'))}"
+                                   onclick="setTimeout('gazelleStatusStop();', 4000);setTimeout('location.reload();', 4100)"
+                                   rendered="#{connectathonResult.isShowReport()}"
+                                   value="#{messages['net.ihe.gazelle.tm.DownloadConnectathonReport']}"
+                                   execute="@this" />
+
+                <ui:include src="connectathonResultsList.xhtml"/>
+            </ui:decorate>
+        </h:form>
+        <s:div id="sysNotesDiv">
+            <h:panelGroup rendered="#{connectathonResult.isSystemSelected()}">
+                <ui:include src="/systems/system/showSystemNotes.xhtml">
+                    <ui:param name="twoColumns" value="true"/>
+                    <ui:param name="formId" value="notesForm"/>
+                    <ui:param name="selectedSystemInSession"
+                              value="#{connectathonResult.getSelectedSystem()}"/>
+                    <ui:param name="explanationText"
+                              value="#{messages['net.ihe.gazelle.tm.TheseCommentsAboutThisTestSystemWereEnteredByTec']}"/>
+                    <ui:param name="idToRerender" value="sysNotesDiv"/>
+                </ui:include>
+            </h:panelGroup>
+        </s:div>
+        <ui:include src="/testing/partnersModalPanel.xhtml"/>
+        <ui:include src="/systems/system/validateTFDependenciesPanel.xhtml">
+            <ui:param name="system" value="#{connectathonResult.datamodel}"/>
+            <ui:param name="display" value="false"/>
+        </ui:include>
+    </ui:define>
+</ui:composition>

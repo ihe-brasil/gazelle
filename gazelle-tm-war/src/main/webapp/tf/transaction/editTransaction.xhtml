@@ -1,0 +1,415 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{transactionManager.getEditTitle()}"/>
+    <ui:define name="body">
+
+        <ui:decorate template="/layout/panels/_panel_title.xhtml">
+            <ui:define name="panel_title">#{transactionManager.getEditSubTitle()}</ui:define>
+            <div class="row">
+                <div class="col-lg-8">
+                    <div id="transactionManager">
+                        <h:form id="editTransaction">
+                            <s:token allowMultiplePosts="true"/>
+                            <!-- **********************************************************************************************
+                                 * Panel for edit mode
+                                 ********************************************************************************************** -->
+                            <h:panelGroup rendered="#{transactionManager.getEdit()}">
+                                <ui:decorate template="/layout/panels/_panel_footer.xhtml">
+                                    <s:decorate id="id" template="/layout/display/_display.xhtml"
+                                                rendered="#{ not empty transactionManager.selectedTransaction.id}">
+                                        <ui:define name="label">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                        #{transactionManager.selectedTransaction.id}
+                                    </s:decorate>
+                                    <s:decorate id="keywordDecoration" template="/layout/form/_edit.xhtml">
+                                        <ui:param name="id" value="keyword"/>
+                                        <ui:param name="required" value="true"/>
+                                        <ui:define name="label">#{messages['gazelle.tf.table.Keyword']}</ui:define>
+                                        <h:inputText styleClass=" form-control" id="keyword" size="30"
+                                                     value="#{transactionManager.selectedTransaction.keyword}"/>
+                                    </s:decorate>
+                                    <s:decorate id="nameDecoration" template="/layout/form/_edit.xhtml">
+                                        <ui:param name="id" value="name"/>
+                                        <ui:define name="label">#{messages['gazelle.tf.table.Name']}</ui:define>
+                                        <h:inputText styleClass=" form-control" id="name" size="60"
+                                                     value="#{transactionManager.selectedTransaction.name}"/>
+                                    </s:decorate>
+                                    <s:decorate id="descriptionDecoration" template="/layout/form/_edit.xhtml">
+                                        <ui:param name="id" value="description"/>
+                                        <ui:define name="label">#{messages['gazelle.tf.table.Description']}</ui:define>
+                                        <h:inputTextarea styleClass=" form-control" id="description" cols="80" rows="10"
+                                                         value="#{transactionManager.selectedTransaction.description}"/>
+                                    </s:decorate>
+                                    <s:decorate id="referenceDecoration" template="/layout/form/_edit.xhtml">
+                                        <ui:param name="id" value="reference"/>
+                                        <ui:define name="label">#{messages['gazelle.tf.table.TFReference']}</ui:define>
+                                        <h:inputTextarea styleClass=" form-control" id="reference" cols="80" rows="5"
+                                                         value="#{transactionManager.selectedTransaction.reference}"/>
+                                    </s:decorate>
+                                    <s:decorate id="statusDecoration" template="/layout/form/_edit.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.tf.table.Status']}</ui:define>
+                                        <h:selectOneMenu styleClass="form-control gzl-form-control"
+                                                         id="selectedStatusType"
+                                                         value="#{transactionManager.selectedTransaction.transactionStatusType}">
+                                            <s:selectItems value="#{gazelleDAO.listAllTransactionStatusType()}"
+                                                           var="statusType"
+                                                           noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                                           label="#{statusType.name}"/>
+                                        </h:selectOneMenu>
+                                    </s:decorate>
+                                    <div style="clear: both"><span class="required">*</span>
+                                        #{messages['gazelle.common.RequiredFields']}
+                                    </div>
+                                    <ui:define name="panel_footer">
+                                        <h:commandButton id="cancel2" styleClass="gzl-btn"
+                                                         value="#{messages['gazelle.common.button.Cancel']}"
+                                                         immediate="true"
+                                                         action="#{transactionManager.cancelTransaction()}"/>
+                                        <a4j:commandButton id="save" styleClass="gzl-btn-green"
+                                                           value="#{messages['gazelle.common.button.Save']}"
+                                                           action="#{transactionManager.updateTransaction()}"
+                                                           rendered="#{transactionManager.getEdit()}"/>
+                                        <h:commandButton value="#{messages['gazelle.common.button.View']}"
+                                                         action="#{transactionManager.editTransaction(transactionManager.selectedTransaction,false)}"
+                                                         styleClass="gzl-btn-blue"
+                                                         rendered="#{transactionManager.getEdit()}"/>
+                                    </ui:define>
+                                </ui:decorate>
+                            </h:panelGroup>
+                            <!-- **********************************************************************************************
+                                 * Panel for view mode
+                                 ********************************************************************************************** -->
+                            <h:panelGroup rendered="#{transactionManager.getView()}">
+                                <ui:decorate template="/layout/panels/_panel_footer.xhtml">
+                                    <s:decorate id="vid" template="/layout/display/_display.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                        #{transactionManager.selectedTransaction.id}
+                                    </s:decorate>
+                                    <s:decorate id="vkeywordDecoration" template="/layout/display/_display.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.tf.table.Keyword']}</ui:define>
+                                        #{transactionManager.selectedTransaction.keyword}
+                                    </s:decorate>
+                                    <s:decorate id="vnameDecoration" template="/layout/display/_display.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.tf.table.Name']}</ui:define>
+                                        #{transactionManager.selectedTransaction.name}
+                                    </s:decorate>
+                                    <s:decorate id="vdescriptionDecoration" template="/layout/display/_display.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.tf.table.Description']}</ui:define>
+                                        #{transactionManager.selectedTransaction.description}
+                                    </s:decorate>
+                                    <s:decorate id="vreferenceDecoration" template="/layout/display/_display.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.tf.table.TFReference']}</ui:define>
+                                        #{transactionManager.selectedTransaction.reference}
+                                    </s:decorate>
+                                    <s:decorate id="status" template="/layout/display/_display.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.tf.table.Status']}</ui:define>
+                                        #{transactionManager.selectedTransaction.transactionStatusType.name}
+                                    </s:decorate>
+                                    <s:decorate id="standards" template="/layout/display/_display.xhtml"
+                                                rendered="#{not transactionManager.getEdit()}">
+                                        <ui:define name="label">#{messages['net.ihe.gazelle.tm.ReferencedStandards']}
+                                        </ui:define>
+                                        <rich:list value="#{transactionManager.selectedTransaction.standards}"
+                                                   var="std"
+                                                   type="unordered"
+                                                   rendered="#{not empty transactionManager.selectedTransaction.standards}">
+                                            <h:outputLink value="#{std.url}">
+                                                <h:outputText value="#{std.name}"/>
+                                            </h:outputLink>
+                                        </rich:list>
+                                        <s:div styleClass="gzl-alert gzl-alert-orange" rendered="#{empty transactionManager.selectedTransaction.standards}">
+                                            <span class="gzl-icon-exclamation-triangle"/>
+                                            <h:outputText value="#{messages['gazelle.tf.transaction.TransactionWithoutStandard']}"/>
+                                        </s:div>
+                                    </s:decorate>
+                                    <s:div rendered="#{not transactionManager.getEdit()}">
+                                        <s:decorate id="documentSection" template="/layout/display/_display.xhtml">
+                                            <ui:define name="label">#{messages['net.ihe.gazelle.tm.DocumentSection']}
+                                            </ui:define>
+                                            <s:div rendered="#{not empty transactionManager.selectedTransaction.documentSection}">
+                                                <s:formattedText>
+                                                    <ui:include src="/tf/documents/_documentSection.xhtml">
+                                                        <ui:param name="documentSectionParam"
+                                                                  value="#{transactionManager.selectedTransaction.documentSection}"/>
+                                                        <ui:param name="displayedName"
+                                                                  value="#{transactionManager.selectedTransaction.documentSection.getReferenceTitle()}"/>
+                                                    </ui:include>
+                                                </s:formattedText>
+                                            </s:div>
+                                            <s:div rendered="#{empty transactionManager.selectedTransaction.documentSection}">
+                                                <h:outputText value="#{messages['net.ihe.gazelle.tm.None']}"/>
+                                            </s:div>
+                                        </s:decorate>
+                                    </s:div>
+                                    <ui:define name="panel_footer">
+                                        <h:commandButton id="cancel" styleClass="gzl-btn"
+                                                         value="#{messages['gazelle.common.button.Cancel']}"
+                                                         immediate="true"
+                                                         action="#{transactionManager.cancelTransaction()}"/>
+                                        <h:commandButton id="edit" styleClass="gzl-btn-blue"
+                                                         value="#{messages['gazelle.common.button.Edit']}"
+                                                         actionListener="#{transactionManager.setEdit(true)}"
+                                                         rendered="#{!transactionManager.getEdit() and s:hasPermission('MasterModel', 'edit', null)}"
+                                                         render="transactionManager"/>
+                                    </ui:define>
+                                </ui:decorate>
+                            </h:panelGroup>
+
+                        </h:form>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <s:div rendered="#{transactionManager.getEdit()}">
+                        <h:form id="editSection">
+                            <s:token allowMultiplePosts="true"/>
+                            <ui:include src="/tf/documents/_addDocumentSectionPanel.xhtml">
+                                <ui:param name="documentSectionParam"
+                                          value="#{transactionManager.selectedTransaction.documentSection}"/>
+                                <ui:param name="managerBeanParam" value="#{transactionManager}"/>
+                                <ui:param name="displayActionsParam" value="#{transactionManager.getEdit()}"/>
+                                <ui:param name="formToRefresh" value="editSection"/>
+                            </ui:include>
+                        </h:form>
+                        <br/>
+                        <ui:include src="/tf/transaction/_standardsForTransaction_editMode.xhtml"/>
+                    </s:div>
+                </div>
+            </div>
+        </ui:decorate>
+        <!-- **********************************************************************************************
+             * Tab panel
+             **********************************************************************************************  -->
+        <h:form id="profilesRelatedToTransactionForm">
+            <s:token allowMultiplePosts="true"/>
+            <h:panelGroup rendered="#{transactionManager.renderLinks()}">
+                <div>
+
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active"><a href="#profiles" aria-controls="profiles"
+                                                                  role="tab"
+                                                                  data-toggle="tab">#{messages['gazelle.tf.ProfilesForTransaction']}</a>
+                        </li>
+                        <li role="presentation"><a href="#profileLinks" aria-controls="profileLinks" role="tab"
+                                                   data-toggle="tab">#{messages['gazelle.tf.ProfileLinksForTransaction']}</a>
+                        </li>
+                        <li role="presentation"><a href="#actors" aria-controls="actors" role="tab"
+                                                   data-toggle="tab">#{messages['gazelle.tf.ActorsForTransaction']}</a>
+                        </li>
+                        <li role="presentation"><a href="#transactionLinks" aria-controls="transactionLinks"
+                                                   role="tab"
+                                                   data-toggle="tab">#{messages['gazelle.tf.TransactionLinksForTransaction']}</a>
+                        </li>
+                        <h:panelGroup rendered="#{applicationManager.isAssertionEnabled()}">
+                            <li role="presentation"><a href="#assertions" aria-controls="assertions" role="tab"
+                                                       data-toggle="tab">#{messages['net.ihe.gazelle.tm.Assertions']}</a>
+                            </li>
+                        </h:panelGroup>
+                    </ul>
+
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active" id="profiles">
+                            <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                          rendered="#{transactionManager.ipCount==0}"/>
+                            <rich:dataTable id="transactionProfiles" var="ip"
+                                            value="#{transactionManager.integrationProfilesForTransaction}"
+                                            rendered="#{transactionManager.ipCount&gt;0}">
+                                <g:column sortBy="#{'id'}">
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                    #{ip.id}
+                                </g:column>
+                                <g:column sortBy="#{'keyword'}">
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Keyword']}</ui:define>
+                                    #{ip.keyword}
+                                </g:column>
+                                <g:column sortBy="#{'name'}">
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Name']}</ui:define>
+                                    #{ip.name}
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Description']}</ui:define>
+                                    #{ip.description}
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Action']}</ui:define>
+                                    <div class="gzl-never-wrap">
+
+
+                                        <a4j:commandLink
+                                                title="#{messages['gazelle.common.button.View']}"
+                                                action="#{integrationProfileManager.viewIntegrationProfile(ip)}"
+                                                onRowMouseOver="this.style.cursor='pointer'">
+                                            <span class="gzl-icon-search"/>
+                                        </a4j:commandLink>
+
+
+                                        <h:panelGroup id="panelForEditButtonPanel" styleClass="panelForActionButton"
+                                                      style="width:36px;height:44px;"
+                                                      rendered="#{s:hasPermission('MasterModel', 'edit', null)}">
+
+                                            <a4j:commandLink
+                                                    title="#{messages['gazelle.common.button.Edit']}"
+                                                    action="#{integrationProfileManager.editIntegrationProfile(ip)}"
+                                                    onRowMouseOver="this.style.cursor='pointer'"
+                                                    reRendered="#{transactionManager.getEdit()}">
+                                                <span class="gzl-icon-pencil"/>
+                                            </a4j:commandLink>
+                                        </h:panelGroup>
+                                    </div>
+                                </g:column>
+                            </rich:dataTable>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="profileLinks">
+                            <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                          rendered="#{transactionManager.plCount==0}"/>
+                            <rich:dataTable id="profileLinks" var="pl"
+                                            value="#{transactionManager.getProfileLinkForTransaction()}"
+                                            rendered="#{transactionManager.plCount&gt;0}">
+                                <g:column sortBy="#{'id'}">
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                    <h:outputText value="#{pl.id}"/>
+                                </g:column>
+                                <g:column sortBy="#{'actorIntegrationProfile.actor.keyword'}">
+                                    <ui:define name="header">#{messages['gazelle.tf.actor']}</ui:define>
+                                    <h:commandLink
+                                            value="#{pl.actorIntegrationProfile.actor.keyword} - #{pl.actorIntegrationProfile.actor.name}"
+                                            action="#{actorManager.editActor(pl.actorIntegrationProfile.actor, true)}"/>
+                                </g:column>
+                                <g:column sortBy="#{'actorIntegrationProfile.integrationProfile.keyword'}">
+                                    <ui:define name="header">#{messages['gazelle.tf.IntegrationProfile']}
+                                    </ui:define>
+                                    <h:commandLink
+                                            value="#{pl.actorIntegrationProfile.integrationProfile.keyword} - #{pl.actorIntegrationProfile.integrationProfile.name}"
+                                            action="#{integrationProfileManager.editIntegrationProfile(pl.actorIntegrationProfile.integrationProfile)}"/>
+                                </g:column>
+                                <g:column sortBy="#{'transactionOptionType.name'}">
+                                    <ui:define name="header">#{messages['gazelle.tf.LabelOption']}</ui:define>
+                                    <h:outputText value="#{pl.transactionOptionType.name}"/>
+                                </g:column>
+                                <g:column rendered="#{s:hasPermission('MasterModel', 'edit', null)}">
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Action']}</ui:define>
+
+                                    <a4j:commandLink
+                                            action="#{profileLinksManager.delProfileLink(transactionManager.selectedTransaction, pl)}"
+                                            onRowMouseOver="this.style.cursor='pointer'"
+                                            title="#{messages['gazelle.tf.button.delProfileLink']}">
+                                        <span class="gzl-icon-trash-o"/>
+                                    </a4j:commandLink>
+
+
+                                </g:column>
+                            </rich:dataTable>
+                            <h:commandButton value="#{messages['gazelle.tf.transaction.profileLinks.Add']}"
+                                             styleClass="gzl-btn-green"
+                                             action="#{profileLinksManager.addProfileLinks(transactionManager.selectedTransaction)}"
+                                             rendered="#{s:hasPermission('MasterModel', 'edit', null)}"/>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="actors">
+                            <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                          rendered="#{transactionManager.actorCount==0}"/>
+                            <rich:dataTable id="transactionActors" var="actor"
+                                            value="#{transactionManager.actorsForTransaction}"
+                                            rendered="#{transactionManager.actorCount&gt;0}">
+                                <g:column sortBy="#{'id'}">
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                    <h:outputText value="#{actor.id}"/>
+                                </g:column>
+                                <g:column sortBy="#{'keyword'}">
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Keyword']}</ui:define>
+                                    <h:outputText value="#{actor.keyword}"/>
+                                </g:column>
+                                <g:column sortBy="#{'name'}">
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Name']}</ui:define>
+                                    <h:outputText value="#{actor.name}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Description']}</ui:define>
+                                    <h:outputText value="#{actor.description}"/>
+                                </g:column>
+                                <g:column>
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Action']}</ui:define>
+                                    <div class="gzl-never-wrap">
+                                        <a4j:commandLink
+                                                title="#{messages['gazelle.common.button.View']}"
+                                                action="#{actorManager.editActor(actor, false)}">
+                                            <span class="gzl-icon-search"/>
+                                        </a4j:commandLink>
+
+
+                                        <h:panelGroup rendered="#{s:hasPermission('MasterModel', 'edit', null)}">
+                                            <a4j:commandLink action="#{actorManager.editActor(actor, true)}"
+                                                             title="#{messages['gazelle.common.button.Edit']}"
+                                                             reRendered="#{transactionManager.getEdit()}">
+                                                <span class="gzl-icon-pencil"/>
+                                            </a4j:commandLink>
+                                        </h:panelGroup>
+
+                                    </div>
+                                </g:column>
+                            </rich:dataTable>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="transactionLinks">
+                            <h:outputText value="#{messages['gazelle.common.message.Nonefound']}"
+                                          rendered="#{transactionManager.tlCount==0}"/>
+                            <rich:dataTable id="transactionLinks" var="tl"
+                                            value="#{transactionManager.getTransactionLinksForTransaction()}"
+                                            rendered="#{transactionManager.tlCount&gt;0}">
+                                <g:column sortBy="#{'id'}">
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+                                    <h:outputText value="#{tl.id}"/>
+                                </g:column>
+                                <g:column sortBy="#{'fromActor.keyword'}">
+                                    <ui:define name="header">#{messages['gazelle.tf.fromActorsTab']}</ui:define>
+                                    <h:commandLink rendered="#{s:hasPermission('MasterModel', 'edit', null)}"
+                                                   value="#{tl.fromActor.keyword} - #{tl.fromActor.name}"
+                                                   action="#{actorManager.editActor(tl.fromActor, true)}"/>
+                                    <h:commandLink rendered="#{!s:hasPermission('MasterModel', 'edit', null)}"
+                                                   value="#{tl.fromActor.keyword} - #{tl.fromActor.name}"
+                                                   action="#{actorManager.editActor(tl.fromActor, false)}"/>
+                                </g:column>
+                                <g:column sortBy="#{'toActor.keyword'}">
+                                    <ui:define name="header">#{messages['gazelle.tf.toActorsTab']}</ui:define>
+                                    <h:commandLink value="#{tl.toActor.keyword} - #{tl.toActor.name}"
+                                                   rendered="#{s:hasPermission('MasterModel', 'edit', null)}"
+                                                   action="#{actorManager.editActor(tl.toActor, true)}"/>
+                                    <h:commandLink value="#{tl.toActor.keyword} - #{tl.toActor.name}"
+                                                   rendered="#{!s:hasPermission('MasterModel', 'edit', null)}"
+                                                   action="#{actorManager.editActor(tl.toActor, false)}"/>
+                                </g:column>
+                                <g:column rendered="#{s:hasPermission('MasterModel', 'edit', null)}">
+                                    <ui:define name="header">#{messages['gazelle.tf.table.Action']}</ui:define>
+                                    <h:panelGroup
+                                            rendered="#{s:hasPermission('MasterModel', 'edit', null)}">
+
+                                        <a4j:commandLink
+                                                action="#{tlManager.delTransactionLink(transactionManager.selectedTransaction, tl)}"
+                                                title="#{messages['gazelle.tf.button.delTransactionLink']}">
+                                            <span class="gzl-icon-trash-o"/>
+                                        </a4j:commandLink>
+                                    </h:panelGroup>
+                                </g:column>
+                            </rich:dataTable>
+                            <h:commandButton value="#{messages['gazelle.tf.transactionLinks.add']}"
+                                             styleClass="gzl-btn-green"
+                                             action="#{tlManager.addTransactionLinks(transactionManager.selectedTransaction , 'TRANSACTION')}"
+                                             rendered="#{s:hasPermission('MasterModel', 'edit', null)}"/>
+                        </div>
+                        <h:panelGroup rendered="#{applicationManager.isAssertionEnabled()}">
+                            <div role="tabpanel" class="tab-pane" id="assertions">
+                                <ui:include src="/assertions/viewAssertions.xhtml">
+                                    <ui:param name="assertions"
+                                              value="#{assertionsManager.getTransactionAssertions(transactionManager.selectedTransaction.keyword)}"/>
+                                </ui:include>
+                            </div>
+                        </h:panelGroup>
+                    </div>
+                </div>
+
+            </h:panelGroup>
+        </h:form>
+
+
+    </ui:define>
+</ui:composition>

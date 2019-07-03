@@ -1,0 +1,101 @@
+<s:div xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+       xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+       xmlns:f="http://java.sun.com/jsf/core"
+       xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml" id="tablecol">
+
+    #{objectTypeManager.getListOfObjectTypeByDataModel()}
+
+    <rich:dataTable id="ObjectTypeTable" var="currentObjectType" value="#{objectTypeManager.foundObjectTypes}"
+                    rowKeyVar="rowNumber"
+                    onRowMouseOut="colorListSampleTypeTable();"
+                    rows="#{dataScrollerMemory.numberOfResultsPerPage}" style="word-break:break-word" render="ds">
+        <g:column sortBy="#{'id'}" sortOrder="ascending" styleClass="gzl-never-wrap">
+            <ui:define name="header">#{messages['gazelle.tf.table.Id']}</ui:define>
+            <h:outputText value="#{currentObjectType.id}"/>
+        </g:column>
+        <g:column rendered="#{applicationManager.isTestManagement()}"
+                  styleClass="gzl-never-wrap">
+            <ui:define name="header">#{messages['gazelle.testmanagement.object.ExistingInstance']}</ui:define>
+            <h:outputText id="viewinfObjtyp"
+                          value="#{objectTypeManager.getNumberOfObjectInstanceByObjectType(currentObjectType)} #{messages['gazelle.tm.Instances']}"/>
+        </g:column>
+        <g:column rendered="#{applicationManager.isTestManagement()}"
+                  styleClass="gzl-never-wrap">
+            <ui:define name="header">
+                <h:outputText value="#{messages['net.ihe.gazelle.tm.ExistingInstancebrForThisTestingSession']}"
+                              escape="false"/>
+            </ui:define>
+            <h:commandLink action="/objects/viewObjectList.seam" id="viewinfObjtypForTestingSession"
+                           actionListener="#{objectTypeManager.setSelectedObjectType(currentObjectType)}"
+                           value="#{objectTypeManager.getNumberOfObjectInstanceByObjectTypeForCurrentTestingSession(currentObjectType)} #{messages['gazelle.tm.Instances']}"
+                           immediate="true" execute="@this"/>
+        </g:column>
+        <g:column filterBy="#{'keyword'}" filterEvent="onkeyup" sortBy="#{'keyword'}"
+                  sortOrder="ascending" filterValue="#{dataTableStateHolder.columnFilterValues['keyword']}">
+            <ui:define name="header">#{messages['gazelle.testmanagement.object.ObjectType']}</ui:define>
+            <h:outputText value="#{currentObjectType.keyword}"/>
+        </g:column>
+        <g:column>
+            <ui:define name="header">#{messages['gazelle.testmanagement.object.Description']}</ui:define>
+            <h:outputText value="#{currentObjectType.description}"/>
+        </g:column>
+        <g:column style="height:50;" sortBy="#{'objectTypeStatus.keyword'}" sortOrder="ascending"
+                  filterBy="#{'objectTypeStatus.keyword'}" filterEvent="onkeyup"
+                  filterValue="#{dataTableStateHolder.columnFilterValues['objectTypeStatus.keyword']}">
+            <ui:define name="header">#{messages['gazelle.tm.testing.instance.status']}</ui:define>
+            <h:outputText value="#{currentObjectType.objectTypeStatus.labelToDisplay}"
+                          rendered="#{currentObjectType.objectTypeStatus != null}" style="font-weight:bold;"/>
+        </g:column>
+        <g:column>
+            <ui:define name="header">#{messages['gazelle.testmanagement.object.DefaultDesc']}</ui:define>
+            <g:safehtml value="#{currentObjectType.default_desc}"/>
+        </g:column>
+        <g:column>
+            <ui:define name="header">#{messages['gazelle.testmanagement.object.Instructions']}</ui:define>
+            <g:safehtml value="#{currentObjectType.instructions}"/>
+        </g:column>
+        <g:column>
+            <ui:define name="header">#{messages['gazelle.testmanagement.object.Action']}</ui:define>
+            <div class="gzl-never-wrap">
+
+                <a4j:commandLink id="viewActionImageSupportForObjectType"
+                                 title="#{messages['gazelle.common.button.View']}"
+                                 actionListener="#{objectTypeManager.setSelectedObjectType( currentObjectType ) }"
+                                 oncomplete="jq162('#ViewSelectedObjectType').modal('show');"
+                                 immediate="true"
+                                 render="ViewSelectedObjectTypeDiv" execute="@this">
+                    <span class="gzl-icon-search"/>
+                </a4j:commandLink>
+
+                <a4j:commandLink id="editActionImageSupportForObjectType"
+                                 action="#{objectTypeManager.editObjectType(currentObjectType)}"
+                                 rendered="#{(s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}"
+                                 title="#{messages['gazelle.common.button.Edit']}"
+                                 immediate="true" execute="@this">
+                    <span class="gzl-icon-pencil"/>
+                </a4j:commandLink>
+                <a4j:commandLink id="deleteActionImageSupportForObjectType"
+                                 title="#{messages['gazelle.common.button.Delete']}"
+                                 actionListener="#{objectTypeManager.setSelectedObjectType( currentObjectType ) }"
+                                 oncomplete="jq162('#DeleteSelectedObjectType').modal('show');"
+                                 immediate="true"
+                                 rendered="#{(s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel() and applicationPreferenceManager.isPossibleToDeleteOnGMM() and objectTypeManager.getNumberOfObjectInstanceByObjectType(currentObjectType) == 0}"
+                                 render="DeleteSelectedObjectType, :deleteForm" execute="@this">
+                    <span class="gzl-icon-trash-o"/>
+                </a4j:commandLink>
+
+            </div>
+        </g:column>
+        <f:facet name="footer">
+            <ui:include src="/util/datatableFooter.xhtml">
+                <ui:param name="dataScrollerId" value="ds"/>
+                <ui:param name="dataTableId" value="ObjectTypeTable"/>
+            </ui:include>
+        </f:facet>
+    </rich:dataTable>
+
+    <script type="text/javascript">
+        colorListSampleTypeTable();
+    </script>
+</s:div>

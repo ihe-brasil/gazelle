@@ -1,0 +1,98 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.testmanagement.object.label1']}"/>
+    <ui:define name="header">
+        <h:outputStylesheet library="stylesheet" name="resultStyle.css"/>
+    </ui:define>
+
+    <ui:define name="body">
+        <!--@formatter:off-->
+        <script type="text/javascript">
+            function focusOnCreationSample() {
+                document.getElementById('inputTextForName').focus();
+            }
+
+            function updateTree(node) {
+                node.style.fontWeight = 'bold';
+            }
+
+            function decolorNode(treeId, node) {
+                var tree = document.getElementById(treeId);
+                var listObj = tree.childNodes;
+                for (var i = 0; i &lt; listObj.length; i++) {
+                    //alert(listObj[i].tagName);
+                    if (listObj[i].tagName == "DIV") {
+                        var listLink = listObj[i].getElementsByTagName("a");
+                        for (var j = 0; j &lt; listLink.length; j++) {
+                            listLink[j].style.fontWeight = "normal";
+                        }
+                    }
+                }
+                node.style.fontWeight = "bold";
+            }
+
+        </script>
+        <!--@formatter:on-->
+
+        #{objectManager.initializeAll()}
+        <ui:include src="/objects/objectsDescMain.xhtml"/>
+
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Delete selected object instance-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="confirmationDeleteObjectInstance">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteSelectedObjectInstance"/>
+                <ui:define name="popup_title">#{messages['gazelle.testmanagement.object.DeleteSample']}</ui:define>
+                <p>#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}</p>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="deleteOIbutton"
+                                       value="#{messages['gazelle.testmanagement.object.DeleteThisSample']}"
+                                       styleClass="gzl-btn-red"
+                                       actionListener="#{objectManager.deleteSelectedObjectInstanceFromDataBaseAndUpdateTree()}"
+                                       onclick="jq162('#DeleteSelectedObjectInstance').modal('hide');"
+                                       render=":CreatorsForm, ListInstanceObject,messageDecoration,selectedSamplePanel, CreatorsForm:subview_16:TreeOfSample4Creator,ReadersForm:subview_2:TreeOfSampleForReading"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- create  description of the new object instance-->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="nameForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="ObjectInstanceNaming"/>
+                <ui:define name="popup_title">#{messages['gazelle.testmanagement.object.SampleName']}</ui:define>
+                <a4j:region id="NameRegion">
+                    <s:decorate id="NameOIDecoration" template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="inputTextForName"/>
+                        <ui:define name="label">#{messages['gazelle.testmanagement.object.Name']}
+                        </ui:define>
+                        <h:inputText styleClass=" form-control" id="inputTextForName"
+                                     value="#{objectInstanceManager.selectedObjectInstance.name}"
+                                     size="50" maxlength="250" required="true"
+                                     onload="this.focus();"/>
+                    </s:decorate>
+                </a4j:region>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="nameOIbutton"
+                                       value="#{messages['gazelle.common.button.Confirm']}"
+                                       styleClass="gzl-btn-green"
+                                       action="#{objectInstanceManager.mergeSelectedInstance()}"
+                                       onclick="jq162('#ObjectInstanceNaming').modal('hide');"
+                                       render="messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

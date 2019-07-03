@@ -1,0 +1,1 @@
+INSERT INTO cmn_application_preference (id, class_name, description, preference_name, preference_value) VALUES (nextval('cmn_application_preference_id_seq'), 'java.lang.String', '', 'gazelle_hl7_validator_url', 'http://gazelle.ihe.net/GazelleHL7Validator');

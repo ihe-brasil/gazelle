@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="contactsBasedOnInstitutionIdAndFunctionType" pageWidth="680" pageHeight="802" columnWidth="680" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="c8316c94-35a0-43a9-a521-c252f3ea83a7">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Postgresql"/>
+	<style name="style1" isDefault="true" fontName="Arial"/>
+	<parameter name="institutionId" class="java.lang.Integer"/>
+	<parameter name="functionTypeId" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT DISTINCT
+usr_person.id,
+usr_person."email" AS usr_person_email,
+     usr_person."firstname" AS usr_person_firstname,
+     usr_person."lastname" AS usr_person_lastname,
+     usr_person."personal_fax" AS usr_person_personal_fax,
+     usr_person."personal_phone" AS usr_person_personal_phone,
+     usr_person."cell_phone" AS usr_person_cell_phone,
+     usr_address."city" AS usr_address_city,
+     usr_address."zip_code" AS usr_address_zip_code,
+     usr_address."state" AS usr_address_state,
+     usr_address."phone" AS usr_address_phone,
+     usr_address."fax" AS usr_address_fax,
+     usr_address."address" AS usr_address_address,
+     usr_address."address_line_2" AS usr_address_address_line_2,
+  usr_iso_3166_country_code."printable_name" AS usr_iso_3166_country_code_printable_name
+
+FROM
+  public.usr_person
+  inner join  public.usr_institution on usr_institution.id =  usr_person.institution_id
+  inner join usr_address on usr_address.id = usr_institution.mailing_address_id
+       INNER JOIN  usr_persons_functions on usr_persons_functions."person_id" = usr_person."id"
+  INNER JOIN "public"."usr_iso_3166_country_code" usr_iso_3166_country_code ON usr_address."country" = usr_iso_3166_country_code."iso"
+
+WHERE usr_person.address_id is null and usr_institution.id = $P{institutionId}  AND usr_persons_functions."person_function_id" = $P{functionTypeId}
+
+union
+SELECT DISTINCT
+usr_person.id,
+usr_person."email" AS usr_person_email,
+     usr_person."firstname" AS usr_person_firstname,
+     usr_person."lastname" AS usr_person_lastname,
+     usr_person."personal_fax" AS usr_person_personal_fax,
+     usr_person."personal_phone" AS usr_person_personal_phone,
+     usr_person."cell_phone" AS usr_person_cell_phone,
+     usr_address."city" AS usr_address_city,
+     usr_address."zip_code" AS usr_address_zip_code,
+     usr_address."state" AS usr_address_state,
+     usr_address."phone" AS usr_address_phone,
+     usr_address."fax" AS usr_address_fax,
+     usr_address."address" AS usr_address_address,
+     usr_address."address_line_2" AS usr_address_address_line_2,
+  usr_iso_3166_country_code."printable_name" AS usr_iso_3166_country_code_printable_name
+
+FROM
+  public.usr_person
+  inner join  public.usr_institution on usr_institution.id =  usr_person.institution_id
+  inner join usr_address on usr_address.id = usr_person.address_id
+       INNER JOIN  usr_persons_functions on usr_persons_functions."person_id" = usr_person."id"
+  INNER JOIN "public"."usr_iso_3166_country_code" usr_iso_3166_country_code ON usr_address."country" = usr_iso_3166_country_code."iso"
+
+WHERE usr_person.address_id is not null and usr_institution.id = $P{institutionId}  AND usr_persons_functions."person_function_id" = $P{functionTypeId}]]>
+	</queryString>
+	<field name="id" class="java.lang.Integer"/>
+	<field name="usr_person_email" class="java.lang.String"/>
+	<field name="usr_person_firstname" class="java.lang.String"/>
+	<field name="usr_person_lastname" class="java.lang.String"/>
+	<field name="usr_person_personal_fax" class="java.lang.String"/>
+	<field name="usr_person_personal_phone" class="java.lang.String"/>
+	<field name="usr_person_cell_phone" class="java.lang.String"/>
+	<field name="usr_address_city" class="java.lang.String"/>
+	<field name="usr_address_zip_code" class="java.lang.String"/>
+	<field name="usr_address_state" class="java.lang.String"/>
+	<field name="usr_address_phone" class="java.lang.String"/>
+	<field name="usr_address_fax" class="java.lang.String"/>
+	<field name="usr_address_address" class="java.lang.String"/>
+	<field name="usr_address_address_line_2" class="java.lang.String"/>
+	<field name="usr_iso_3166_country_code_printable_name" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="66" splitType="Prevent">
+			<rectangle radius="10">
+				<reportElement x="3" y="3" width="555" height="60" backcolor="#CCCCCC" uuid="8f603683-f960-4a74-9c08-31fe01a1b866"/>
+				<graphicElement>
+					<pen lineStyle="Double" lineColor="#CCCCCC"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle radius="10">
+				<reportElement x="0" y="0" width="555" height="60" backcolor="#FAFAFA" uuid="cbbb166b-52be-43ec-bab7-900ef1bbb2bc"/>
+			</rectangle>
+			<textField>
+				<reportElement x="68" y="0" width="204" height="20" uuid="d0ae3b1c-c5c4-483e-9861-e9026196c1f8"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{usr_person_firstname}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="68" height="20" uuid="2ac84a5c-504f-4926-9f00-8c8ff9573dab"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Firstname : ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="272" y="0" width="62" height="20" uuid="229f9280-b894-4b40-a659-4231e06aee39"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Lastname : ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="334" y="0" width="221" height="20" uuid="a704a228-f6fb-4695-b4a3-219bbf0ef711"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{usr_person_lastname}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="20" width="68" height="20" uuid="de589ea9-b1fb-4e16-a117-bdd611bdb2bb"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tel : ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="68" y="20" width="172" height="20" uuid="37047360-196a-43ac-9586-ad83cb66a9a3"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{usr_person_personal_phone}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="289" y="40" width="45" height="20" uuid="464f63b3-f89c-443f-a7c1-ca17952f1313"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Fax : ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="334" y="40" width="221" height="20" uuid="2d1b2610-70d5-40fe-aeeb-40a970409db7"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{usr_person_personal_fax}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="12" y="40" width="56" height="20" uuid="5e98151f-7d94-4d22-bdd7-e2a27c157495"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cell  : ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="68" y="40" width="221" height="20" uuid="0debfbcc-18af-4520-be56-7d9963b861ab"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{usr_person_cell_phone}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="289" y="20" width="45" height="20" uuid="7ad1ae2f-a87a-4596-9d1e-2ca3cf5580f1"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Email :]]></text>
+			</staticText>
+			<textField hyperlinkType="Reference">
+				<reportElement x="334" y="20" width="221" height="20" uuid="b0598de6-21a1-4bc0-88a2-03ea2896920e"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{usr_person_email}]]></textFieldExpression>
+				<anchorNameExpression><![CDATA["mailto:" + $F{usr_person_email}]]></anchorNameExpression>
+				<hyperlinkReferenceExpression><![CDATA["mailto:" + $F{usr_person_email}]]></hyperlinkReferenceExpression>
+				<hyperlinkTooltipExpression><![CDATA["mailto:" +$F{usr_person_email}]]></hyperlinkTooltipExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

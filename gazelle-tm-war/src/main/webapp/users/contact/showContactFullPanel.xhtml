@@ -1,0 +1,37 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <p>#{messages['gazelle.users.contact.info1']}</p>
+
+    <p>#{messages['gazelle.users.contact.info2']}</p>
+
+    <p>#{messages['gazelle.users.contact.info3']}</p>
+
+    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+        <ui:define name="panel_title">#{messages['gazelle.users.contact.ContactInformation']}</ui:define>
+        <!-- ======================= -->
+        <!-- Contact informations section			  -->
+        <!-- ======================= -->
+        <ui:include src="/users/contact/showContactLightPanel.xhtml">
+            <ui:param name="panelLabel" value="#{messages['gazelle.users.contact.ContactInformation']}"/>
+            <ui:param name="panelId" value="#{panelId}"/>
+            <ui:param name="contactVariable" value="#{contactVariableIn}"/>
+        </ui:include>
+    </ui:decorate>
+
+
+    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+        <ui:define name="panel_title">#{messages['gazelle.users.address.ContactAddress']}</ui:define>
+        <!-- ======================= -->
+        <!-- Contact address section 					  -->
+        <!-- ======================= -->
+        <ui:include src="/users/address/showAddressPanel.xhtml">
+            <ui:param name="panelLabel" value="#{messages['gazelle.users.address.ContactAddress']}"/>
+            <ui:param name="panelId" value="Address"/>
+            <ui:param name="addressVariable" value="#{addressVariableIn}"/>
+            <ui:param name="countryVariable" value="#{countryVariableIn}"/>
+        </ui:include>
+    </ui:decorate>
+
+
+</ui:composition>

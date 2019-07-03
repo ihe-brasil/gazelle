@@ -1,0 +1,169 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle"
+              value="#{messages['gazelle.tf.transactionOptionType.ListofTransactionOptionTypes']}"/>
+    <ui:define name="body">
+
+        <ui:decorate template="/layout/panels/_panel_id.xhtml">
+            <ui:param name="panel_id" value="searchResultsPanel"/>
+            <div id="transactionOptionTypeManager">
+                <h:form id="transactionOptionTypesForm">
+                    <s:token allowMultiplePosts="true"/>
+                    <a4j:commandButton id="newtot" value="#{messages['gazelle.tf.CreateNewTransactionOptionType']}"
+                                       styleClass="gzl-btn-green"
+                                       actionListener="#{transactionOptionTypeManager.initializeSelectedTransactionOptionType()}"
+                                       oncomplete="jq162('#EditSelectedTransactionOptionType').modal('show');"
+                                       render="EditSelectedTransactionOptionType, :edittotform"
+                                       rendered="#{s:hasPermission('MasterModel', 'edit', null)}"/>
+                    <rich:dataTable id="transactionOptionTypeList" var="transactionOptionType"
+                                    value="#{transactionOptionTypeManager.transactionOptionTypes}"
+                                    rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+                        <g:column sortBy="#{'id'}">
+                            <f:facet name="header">
+                                <h:outputText value="#{messages['gazelle.tf.table.Id']}"/>
+                            </f:facet>
+                            <h:outputText value="#{transactionOptionType.id}"/>
+                        </g:column>
+                        <g:column sortBy="#{'keyword'}">
+                            <f:facet name="header">
+                                <h:outputText value="#{messages['gazelle.tf.table.Keyword']}"/>
+                            </f:facet>
+                            <h:outputText value="#{transactionOptionType.keyword}"/>
+                        </g:column>
+                        <g:column sortBy="#{'name'}">
+                            <f:facet name="header">
+                                <h:outputText value="#{messages['gazelle.tf.table.Name']}"/>
+                            </f:facet>
+                            <h:outputText value="#{transactionOptionType.name}"/>
+                        </g:column>
+                        <g:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{messages['gazelle.tf.table.Description']}"/>
+                            </f:facet>
+                            <h:outputText value="#{transactionOptionType.description}"/>
+                        </g:column>
+                        <g:column rendered="#{s:hasPermission('MasterModel', 'edit', null)}">
+                            <f:facet name="header">
+                                <h:outputText value="#{messages['gazelle.tf.table.Action']}"/>
+                            </f:facet>
+                            <div class="gzl-never-wrap">
+                                <a4j:commandLink event="click"
+                                                 title="#{messages['gazelle.common.button.Edit']}"
+                                                 oncomplete="jq162('#EditSelectedTransactionOptionType').modal('show');"
+                                                 execute="@this"
+                                                 render="EditSelectedTransactionOptionType, :edittotform"
+                                                 actionListener="#{transactionOptionTypeManager.setSelectedTransactionOptionType(transactionOptionType)}">
+                                    <span class="gzl-icon-pencil"/>
+                                </a4j:commandLink>
+
+                                <a4j:commandLink event="click"
+                                                 oncomplete="jq162('#DeleteSelectedTransactionOptionType').modal('show');"
+                                                 render="DeleteSelectedTransactionOptionType, :deleteForm"
+                                                 title="#{messages['gazelle.common.button.Delete']}"
+                                                 actionListener="#{transactionOptionTypeManager.setSelectedTransactionOptionType(transactionOptionType)}">
+                                    <span class="gzl-icon-trash-o"/>
+                                </a4j:commandLink>
+
+                            </div>
+                        </g:column>
+                        <f:facet name="footer">
+                            <ui:include src="/util/datatableFooter.xhtml">
+                                <ui:param name="dataScrollerId" value="ds"/>
+                                <ui:param name="dataTableId" value="transactionOptionTypeList"/>
+                            </ui:include>
+                        </f:facet>
+                    </rich:dataTable>
+                    <h:commandLink value="#{messages['gazelle.common.export.ExportAsExcel']}"
+                                   action="#{gazelleExcelExporterJboss7.export('transactionOptionTypesForm:transactionOptionTypeList')}"/>
+                </h:form>
+            </div>
+
+        </ui:decorate>
+
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Edit selected transaction option type -->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="edittotform">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="EditSelectedTransactionOptionType"/>
+                <ui:define name="popup_title">#{messages['gazelle.tf.EditSelectedTransactionOptionType']}</ui:define>
+                <s:div id="edittotpan"
+                       rendered="#{transactionOptionTypeManager.selectedTransactionOptionType != null}">
+                    <s:decorate template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="keyedit"/>
+                        <ui:define name="label">#{messages['gazelle.tf.table.Keyword']}</ui:define>
+                        <h:inputText styleClass=" form-control" id="keyedit" required="true"
+                                     value="#{transactionOptionTypeManager.selectedTransactionOptionType.keyword}"/>
+                    </s:decorate>
+                    <s:decorate template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="nameedit"/>
+                        <ui:define name="label">#{messages['gazelle.tf.table.Name']}</ui:define>
+                        <h:inputText styleClass=" form-control" id="nameedit"
+                                     value="#{transactionOptionTypeManager.selectedTransactionOptionType.name}"/>
+                    </s:decorate>
+                    <s:decorate template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="descedit"/>
+                        <ui:define name="label">#{messages['gazelle.tf.table.Description']}</ui:define>
+                        <h:inputText styleClass=" form-control" id="descedit"
+                                     value="#{transactionOptionTypeManager.selectedTransactionOptionType.description}"/>
+                    </s:decorate>
+                </s:div>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <h:panelGroup rendered="#{transactionOptionTypeManager.selectedTransactionOptionType != null}">
+                        <a4j:commandButton id="savebuttedit" value="#{messages['gazelle.common.button.Save']}"
+                                           styleClass="gzl-btn-green"
+                                           actionListener="#{transactionOptionTypeManager.saveModifications()}"
+                                           oncomplete="jq162('#EditSelectedTransactionOptionType').modal('hide');"
+                                           render="transactionOptionTypesForm:transactionOptionTypeList"/>
+                    </h:panelGroup>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <!-- Delete selected transaction option type -->
+        <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <h:form id="deleteForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteSelectedTransactionOptionType"/>
+                <ui:define name="popup_title">#{messages['gazelle.tf.DeleteSelectedTransactionOptionType']}</ui:define>
+
+                <h:outputText
+                        value="#{messages['net.ihe.gazelle.tm.AreYouSureYouWantToDoThis']}"
+                        rendered="#{transactionOptionTypeManager.getNumberlistProfileLinkRelatedToSelectedTransactionOptionType()==0}"/>
+                <s:div id="canotdel"
+                       rendered="#{transactionOptionTypeManager.getNumberlistProfileLinkRelatedToSelectedTransactionOptionType()&gt;0}">
+                    <h:outputText
+                            value="#{messages['gazelle.tf.YouCanNotDeleteThisTransactionOptionTypeBecauseI']}."
+                            style="color:#aa0000;"/>
+                    <br/>
+                    <h:outputText
+                            value="#{messages['gazelle.tf.ToDeleteThisTransactionOptionTypeYouHaveToDelete']}."
+                            style="color:#aa0000;"/>
+                </s:div>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <h:panelGroup id="groupId"
+                                  rendered="#{transactionOptionTypeManager.getNumberlistProfileLinkRelatedToSelectedTransactionOptionType()==0}">
+
+                        <a4j:commandButton id="deleteOTbutton"
+                                           value="#{messages['gazelle.tf.DeleteThisTransactionOptionType']}"
+                                           styleClass="gzl-btn-red"
+                                           actionListener="#{transactionOptionTypeManager.deleteSelectedTransactionOptionType()}"
+                                           onclick="jq162('#DeleteSelectedTransactionOptionType').modal('hide');"
+                                           render="transactionOptionTypesForm:transactionOptionTypeList"/>
+                    </h:panelGroup>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+    </ui:define>
+</ui:composition>

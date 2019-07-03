@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version last-->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="invoice_withFeesAndSystems" pageWidth="595" pageHeight="842" columnWidth="515" leftMargin="40" rightMargin="40" topMargin="20" bottomMargin="20" >
+	<property name="ireport.scriptlethandling" value="0"/>
+	<property name="ireport.encoding" value="UTF-8"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Postgresql"/>
+	<import value="net.sf.jasperreports.engine.*"/>
+	<import value="java.util.*"/>
+	<import value="net.sf.jasperreports.engine.data.*"/>
+	<parameter name="companyKeyword" class="java.lang.String">
+		<defaultValueExpression><![CDATA["AGFA"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="testingSessionId" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[15]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+     count(tm_system_in_session."id")AS tm_system_in_session_count,
+     usr_person."firstname" as usr_person_firstname,
+     usr_person."lastname" as usr_person_lastname,
+     usr_institution."name" AS usr_institution_name,
+     usr_address."address" AS usr_address_address,
+     usr_address."address_line_2" AS usr_address_address_line_2,
+     usr_address."city" AS usr_address_city,
+     usr_address."zip_code" AS usr_address_zip_code,
+     usr_address."state" AS usr_address_state,
+     usr_iso_3166_country_code."name" AS usr_iso_3166_country_code_name,
+     tm_invoice."invoice_generation_date" AS tm_invoice_invoice_generation_date,
+     tm_invoice."invoice_number" AS tm_invoice_invoice_number,
+     tm_invoice."vat_amount" AS tm_invoice_vat_amount,
+     tm_invoice."vat_number" AS tm_invoice_vat_number,
+     tm_invoice."vat_country" AS tm_invoice_vat_country,
+     tm_testing_session."vat_percent" AS cmn_application_preference_preference_value,
+     tm_invoice."fees_amount" AS tm_invoice_fees_amount,
+     tm_invoice."fees_discount" AS tm_invoice_fees_discount,
+     tm_invoice."purchase_order" AS tm_invoice_purchase_order
+FROM
+     "public"."usr_institution" usr_institution
+     INNER JOIN "public"."tm_institution_system" tm_institution_system ON usr_institution."id" = tm_institution_system."institution_id"
+     INNER JOIN "public"."tm_system" tm_system ON tm_institution_system."system_id" = tm_system."id"
+     INNER JOIN "public"."tm_invoice" tm_invoice ON tm_institution_system."institution_id" = tm_invoice."institution_id"
+     INNER JOIN "public"."tm_testing_session" tm_testing_session ON tm_invoice."testing_session_id" = tm_testing_session."id"
+     INNER JOIN "public"."tm_system_in_session" tm_system_in_session ON tm_system."id" = tm_system_in_session."system_id" and  tm_system_in_session."testing_session_id" = tm_testing_session."id"
+     INNER JOIN "public"."usr_person" usr_person ON usr_person."institution_id" = tm_invoice."institution_id"
+     INNER JOIN "public"."usr_address" usr_address ON usr_person."address_id" = usr_address."id"
+     INNER JOIN "public"."usr_persons_functions" usr_persons_functions ON usr_person."id" = usr_persons_functions."person_id"
+     INNER JOIN "public"."usr_person_function" usr_person_function ON usr_persons_functions."person_function_id" = usr_person_function."id"
+     INNER JOIN "public"."usr_iso_3166_country_code" usr_iso_3166_country_code ON usr_address."country" = usr_iso_3166_country_code."iso"
+WHERE
+     tm_testing_session."id" = $P{testingSessionId}
+ AND usr_person_function."id" = 998
+ AND usr_institution."keyword" = $P{companyKeyword}
+
+GROUP BY
+     usr_person_firstname,
+     usr_person_lastname,
+     usr_institution.name,
+     usr_address.address,
+     usr_address.address_line_2,
+     usr_address.city,
+     usr_address.zip_code,
+     usr_address.state,
+     usr_iso_3166_country_code.name,
+     tm_invoice.invoice_generation_date,
+     tm_invoice.invoice_number,
+     tm_invoice.vat_amount,
+     tm_invoice.fees_amount,
+     tm_invoice_vat_number,
+     tm_invoice_vat_country,
+     cmn_application_preference_preference_value,
+     tm_invoice_fees_discount,
+     tm_invoice_purchase_order]]>
+	</queryString>
+	<field name="tm_system_in_session_count" class="java.lang.Long">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="usr_person_firstname" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="usr_person_lastname" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="usr_institution_name" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="usr_address_address" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="usr_address_address_line_2" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="usr_address_city" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="usr_address_zip_code" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="usr_address_state" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="usr_iso_3166_country_code_name" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tm_invoice_invoice_generation_date" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tm_invoice_invoice_number" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tm_invoice_vat_amount" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tm_invoice_vat_number" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tm_invoice_vat_country" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="cmn_application_preference_preference_value" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tm_invoice_fees_amount" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tm_invoice_fees_discount" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tm_invoice_purchase_order" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<background>
+		<band/>
+	</background>
+	<title>
+		<band height="58">
+			<staticText>
+				<reportElement  x="62" y="11" width="256" height="35"/>
+				<textElement>
+					<font size="26" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Europe aisbl]]></text>
+			</staticText>
+			<image hyperlinkType="Reference">
+				<reportElement  positionType="Float" x="0" y="0" width="83" height="36"/>
+				<imageExpression><![CDATA["ihe.gif"]]></imageExpression>
+				<anchorNameExpression><![CDATA["IHE Europe Web"]]></anchorNameExpression>
+				<hyperlinkReferenceExpression><![CDATA["http://www.ihe-europe.net"]]></hyperlinkReferenceExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="226">
+			<textField isBlankWhenNull="false">
+				<reportElement  key="textField" mode="Opaque" x="283" y="17" width="232" height="19"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{usr_institution_name}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement  key="textField" mode="Opaque" x="289" y="194" width="226" height="20"/>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_invoice_invoice_generation_date}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00" isBlankWhenNull="true">
+				<reportElement  key="textField" mode="Opaque" x="0" y="121" width="230" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Invoice # : CAT2012-"+$F{tm_invoice_invoice_number}.toString()]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement  key="textField" mode="Opaque" x="283" y="36" width="232" height="83"/>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{usr_person_firstname} +  " " + $F{usr_person_lastname}+ " \n" +$F{usr_address_address}  + " \n" +$F{usr_address_address_line_2}  + " \n"  +  $F{usr_address_zip_code} + " - " + $F{usr_address_city}  + " \n"  + $F{usr_iso_3166_country_code_name}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement  x="230" y="194" width="59" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Brussels, ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement  x="0" y="141" width="121" height="20">
+					<printWhenExpression><![CDATA[($F{tm_invoice_purchase_order}.length() > 0) ? Boolean.TRUE:Boolean.FALSE]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Purchase Order # :]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement  key="textField" mode="Opaque" x="121" y="141" width="230" height="20">
+					<printWhenExpression><![CDATA[($F{tm_invoice_purchase_order}.length() > 0) ? Boolean.TRUE:Boolean.FALSE]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font size="12" isBold="true" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_invoice_purchase_order}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="46">
+			<staticText>
+				<reportElement  x="0" y="12" width="555" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[IHE in Europe Participation Fee for European Connect-a-thon 2011]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="349">
+			<textField isBlankWhenNull="false">
+				<reportElement  key="textField" mode="Opaque" x="-137" y="-547" width="247" height="27"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Participation Fee for "+ ($F{tm_system_in_session_count}).toString() + " system(s) (1)"]]></textFieldExpression>
+			</textField>
+			<textField pattern="EUR #,##0.00" isBlankWhenNull="false">
+				<reportElement  key="textField" mode="Opaque" x="289" y="0" width="197" height="27"/>
+				<textElement textAlignment="Right">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_invoice_fees_amount}.subtract( $F{tm_invoice_fees_discount} )]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement  key="textField" mode="Opaque" x="42" y="54" width="247" height="27"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["TOTAL to be paid :"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement  x="2" y="154" width="553" height="20">
+					<printWhenExpression><![CDATA[$F{tm_invoice_vat_amount}.compareTo(new BigDecimal(0)) > 0?Boolean.FALSE:Boolean.TRUE]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font size="9" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[(1) Service exempt from VAT - Art. 44 §2 11° of the Belgian VAT-code - Art. 13 of the 6° European VAT Directive]]></text>
+			</staticText>
+			<staticText>
+				<reportElement  x="42" y="204" width="236" height="20"/>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Bank :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement  x="42" y="224" width="236" height="20"/>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Bank Account :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement  x="280" y="204" width="236" height="20"/>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[ING, rue du Trone 14-16, 1000 Brussels]]></text>
+			</staticText>
+			<staticText>
+				<reportElement  x="42" y="264" width="236" height="20"/>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[BIC :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement  x="42" y="244" width="236" height="20"/>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[IBAN :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement  x="42" y="184" width="236" height="20"/>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Account holder :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement  x="280" y="225" width="236" height="20"/>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[363-0429257-72]]></text>
+			</staticText>
+			<staticText>
+				<reportElement  x="280" y="244" width="236" height="20"/>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[BE38 3630 4292 5772]]></text>
+			</staticText>
+			<staticText>
+				<reportElement  x="280" y="264" width="236" height="20"/>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[BBRUBEBB]]></text>
+			</staticText>
+			<staticText>
+				<reportElement  x="0" y="324" width="515" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Settlement required within 10 days - all charges on payer's account]]></text>
+			</staticText>
+			<textField>
+				<reportElement  x="280" y="184" width="236" height="20"/>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["IHE Europe aisbl"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement  x="42" y="284" width="236" height="20">
+					<printWhenExpression><![CDATA[($F{tm_invoice_vat_country}.length() > 1 && $F{tm_invoice_vat_number}.length() > 0) ?Boolean.TRUE:Boolean.FALSE]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[VAT Number :]]></text>
+			</staticText>
+			<textField>
+				<reportElement  x="280" y="284" width="236" height="20">
+					<printWhenExpression><![CDATA[($F{tm_invoice_vat_country}.length() > 1 && $F{tm_invoice_vat_number}.length() > 0) ?Boolean.TRUE:Boolean.FALSE]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_invoice_vat_country}+"-"+$F{tm_invoice_vat_number}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EUR #,##0.00" isBlankWhenNull="false">
+				<reportElement  key="textField" mode="Opaque" x="289" y="27" width="197" height="27">
+					<printWhenExpression><![CDATA[$F{tm_invoice_vat_amount}.compareTo(new BigDecimal(0)) > 0?Boolean.TRUE:Boolean.FALSE]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_invoice_vat_amount}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement  x="42" y="27" width="247" height="27">
+					<printWhenExpression><![CDATA[$F{tm_invoice_vat_amount}.compareTo(new BigDecimal(0)) > 0?Boolean.TRUE:Boolean.FALSE]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[VAT 21 % :]]></text>
+			</staticText>
+			<textField pattern="EUR #,##0.00" isBlankWhenNull="false">
+				<reportElement  key="textField" mode="Opaque" x="289" y="54" width="197" height="27"/>
+				<textElement textAlignment="Right">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tm_invoice_fees_amount}.subtract( $F{tm_invoice_fees_discount} ).add($F{tm_invoice_vat_amount})]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00" isBlankWhenNull="false">
+				<reportElement  key="textField" mode="Opaque" x="42" y="0" width="247" height="27"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Participation fees for " +$F{tm_system_in_session_count} +" system(s) :"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement  x="42" y="27" width="247" height="27">
+					<printWhenExpression><![CDATA[$F{tm_invoice_vat_amount}.compareTo(new BigDecimal(0)) > 0?Boolean.FALSE:Boolean.TRUE]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Amount exempt from VAT (1) ]]></text>
+			</staticText>
+			<textField pattern="EUR #,##0.00" isBlankWhenNull="false">
+				<reportElement  key="textField" mode="Opaque" x="289" y="27" width="197" height="27">
+					<printWhenExpression><![CDATA[$F{tm_invoice_vat_amount}.compareTo(new BigDecimal(0)) > 0?Boolean.FALSE:Boolean.TRUE]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new BigDecimal(0)]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band/>
+	</columnFooter>
+	<pageFooter>
+		<band height="108">
+			<textField>
+				<reportElement  x="0" y="95" width="515" height="12"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Tel: +32 (0) 2 706 89 60 | Fax: +32 (0) 2 706 89 69 | www.ihe-europe.net | ING 363-0429257-72 | VAT-BE-0898.675.997 RLP Brussels"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement  x="0" y="82" width="515" height="12" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA["IHE Europe aisbl | Diamant Building, Bd A. Reyerslaan 80, 1030 Brussels - Belgium"]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,361 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['net.ihe.gazelle.tm.StartTestInstance']}"/>
+    <ui:define name="body">
+        #{startTestInstance.initTestInstanceParticipantsManagement()}
+
+        <h:panelGroup
+                rendered="#{startTestInstance.selectedTestInstanceParticipants.id == null}">
+            <s:decorate id="messageDecoration">
+                <h:messages globalOnly="true" errorClass="gzl-text-red" warnClass="gzl-text-orange"
+                            infoClass="gzl-text-green"/>
+            </s:decorate>
+
+            <ui:decorate template="/layout/panels/_panel_title_footer_id.xhtml">
+
+                <ui:param name="panel_id" value="testConfigPanel"/>
+                <ui:define name="panel_title">
+                    <h:outputText
+                            value="#{startTestInstance.selectedTestInstanceParticipants.testInstance.test.keyword} #{messages['gazelle.tm.search.configuration']}"/>
+                </ui:define>
+                <h:form id="globalForm">
+                    <s:token allowMultiplePosts="true"/>
+                    <rich:dataTable id="testConfigTable" cellspacing="0" width="700" border="0"
+                                    var="selectedTestRoles"
+                                    value="#{gazelleDAO.getTestRolesListForATest(startTestInstance.selectedTestInstanceParticipants.testInstance.test)}">
+                        <f:facet name="header">
+                            <rich:columnGroup>
+                                <g:column rowspan="2">
+                                    <h:outputText value="#{messages['gazelle.configuration.DICOM.Role']}"/>
+                                </g:column>
+                                <g:column colspan="7">
+                                    <h:outputText value="#{messages['gazelle.tm.monitors.Systems']}"/>
+                                </g:column>
+                                <g:column breakRowBefore="true">
+                                    <h:outputText
+                                            value="#{messages['gazelle.users.institution.InstitutionName']}"/>
+                                </g:column>
+                                <g:column>
+                                    <h:outputText
+                                            value="#{messages['gazelle.systems.system.SystemKeyword']}"/>
+                                </g:column>
+                                <g:column>
+                                    <h:outputText value="#{messages['gazelle.tf.IntegrationProfile']}"/>
+                                </g:column>
+                                <g:column>
+                                    <h:outputText value="#{messages['gazelle.tf.Actor']}"/>
+                                </g:column>
+                                <g:column>
+                                    <h:outputText
+                                            value="#{messages['gazelle.systems.systemInSession.table']}"/>
+                                </g:column>
+                                <g:column>
+                                    <h:outputText value="#{messages['gazelle.common.Action']}"/>
+                                </g:column>
+                            </rich:columnGroup>
+                        </f:facet>
+                        <g:column colspan="7">
+                            <div class="gzl-never-wrap">
+
+                                <s:span styleClass="gzl-icon-exclamation-triangle gzl-icon-2x"
+                                        title="#{messages['gazelle.tm.invoice.Warning']}"
+                                        rendered="#{startTestInstance.getTestParticipantSystemsByTestRoles(selectedTestRoles).size()==0 and selectedTestRoles.cardMin==0}"/>
+
+                                <s:span styleClass="gzl-icon-ban gzl-color-light-red"
+                                        rendered="#{(selectedTestRoles.cardMin &gt; 0)  and (startTestInstance.getTestParticipantSystemsByTestRoles(selectedTestRoles).size() &lt; selectedTestRoles.cardMin)}"/>
+
+                                <s:span styleClass="gzl-icon-checked gzl-icon-2x"
+                                        rendered="#{(startTestInstance.getTestParticipantSystemsByTestRoles(selectedTestRoles).size()&gt;0) and !(startTestInstance.getTestParticipantSystemsByTestRoles(selectedTestRoles).size() &lt; selectedTestRoles.cardMin)}"/>
+
+
+                                <h:outputText
+                                        value="#{selectedTestRoles.roleInTest.keyword} [#{selectedTestRoles.cardMin},#{selectedTestRoles.cardMax}]"/>
+
+                                <ui:decorate template="/layout/popover/_popover_on_icon.xhtml">
+                                    <ui:param name="id" value="part#{selectedTestRoles.id}"/>
+                                    <ui:param name="placement" value="bottom"/>
+                                    <ui:param name="icon_class" value="gzl-icon-question-circle"/>
+                                    <ui:param name="trigger" value="focus"/>
+                                    <ui:define name="content">
+                                        <div id="participants#{selectedTestRoles.id}">
+                                            <s:div>
+                                                <h:outputText
+                                                        value="#{messages['gazelle.tm.test.NoParticipantsForThisRole']}"
+                                                        rendered="#{selectedTestRoles.roleInTest.testParticipantsList.size()==0 }"/>
+                                            </s:div>
+
+                                            <div style="max-height: 300px; overflow: auto;">
+                                                <rich:dataTable id="roleInTestTable" cellpadding="0" cellspacing="0"
+                                                                width="700"
+                                                                border="0" var="currentTestParticipant"
+                                                                value="#{roleInTestManager.getTestParticipantsForTestRole(selectedTestRoles)}"
+                                                                rendered="#{roleInTestManager.testParticipantsForTestRole.size()!=0 }"
+                                                                first="0">
+                                                    <f:facet name="header">
+                                                        <rich:columnGroup>
+                                                            <g:column>
+                                                                <h:outputText
+                                                                        value="#{messages['gazelle.testmanagement.system.label.IP']}"/>
+                                                            </g:column>
+                                                            <g:column>
+                                                                <h:outputText
+                                                                        value="#{messages['gazelle.configuration.system.actorKeyword']}"/>
+                                                            </g:column>
+                                                            <g:column>
+                                                                <h:outputText
+                                                                        value="#{messages['gazelle.tests.test.option']}"/>
+                                                            </g:column>
+                                                            <g:column>
+                                                                <h:outputText
+                                                                        value="#{messages['gazelle.tm.test.IsTested']}"/>
+                                                            </g:column>
+                                                        </rich:columnGroup>
+                                                    </f:facet>
+                                                    <g:column>
+                                                        <h:outputText
+                                                                value="#{currentTestParticipant.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.toString()}">
+                                                        </h:outputText>
+                                                    </g:column>
+                                                    <g:column>
+                                                        <h:outputText
+                                                                value="#{currentTestParticipant.actorIntegrationProfileOption.actorIntegrationProfile.actor.toString()}"/>
+                                                    </g:column>
+                                                    <g:column>
+                                                        <h:outputText
+                                                                value="#{currentTestParticipant.actorIntegrationProfileOption.integrationProfileOption.keyword}"/>
+                                                    </g:column>
+                                                    <g:column>
+                                                        <h:outputText value="#{currentTestParticipant.tested}"/>
+                                                    </g:column>
+                                                </rich:dataTable>
+                                            </div>
+                                        </div>
+                                    </ui:define>
+                                </ui:decorate>
+                            </div>
+                            <s:div id="panelForAddButtonPanel"
+                                   rendered="#{startTestInstance.getTestParticipantSystemsByTestRoles(selectedTestRoles).size() &lt; selectedTestRoles.cardMax}">
+
+                                <a4j:commandLink id="editParticipatingSystemsSupport"
+                                                 title="#{messages['gazelle.tm.test.AddParticipants']}"
+                                                 action="#{startTestInstance.editTestParticipantsForATestRoles(selectedTestRoles)}"
+                                                 execute="@this"
+                                                 oncomplete="jq162('html,body').animate({scrollTop: jq162('#globalForm\\:button11').offset().top},600);"
+                                                 render=":globalForm, :footerForm">
+                                    <span class="gzl-icon-plus"/>
+                                </a4j:commandLink>
+
+
+                            </s:div>
+
+                        </g:column>
+                        <rich:collapsibleSubTable var="currentRoleInTestSystemInSession"
+                                                  columnHeaderClass="participantTableHeader"
+                                                  value="#{startTestInstance.getTestParticipantSystemsByTestRoles(selectedTestRoles)}">
+                            <g:column>
+
+                                <f:facet name="footer">
+                                    <h:outputText
+                                            value="#{startTestInstance.getTestParticipantSystemsByTestRoles(selectedTestRoles).size()} #{messages['gazelle.users.connectaton.participants.Participants']}"
+                                            style="font-size:x-small;font-style:italic;"/>
+                                </f:facet>
+                            </g:column>
+                            <g:column>
+                                <a4j:repeat
+                                        value="#{gazelleDAO.getInstitutionsForASystem(currentRoleInTestSystemInSession.systemInSession.system)}"
+                                        var="currentInstitution">
+                                    <h:outputText value="#{currentInstitution.keyword}"
+                                                  title="#{currentInstitution.name}"/>
+                                </a4j:repeat>
+                            </g:column>
+                            <g:column>
+                                <g:link value="#{currentRoleInTestSystemInSession.systemInSession.system}"
+                                        target="_blank"/>
+                            </g:column>
+                            <g:column>
+                                <h:outputText
+                                        value="#{startTestInstance.getIntegrationProfileByRoleInTestBySystemInSession(currentRoleInTestSystemInSession.systemInSession,currentRoleInTestSystemInSession.roleInTest).keyword}"/>
+                            </g:column>
+                            <g:column>
+                                <h:outputText
+                                        value="#{startTestInstance.getActorByRoleInTestBySystemInSession(currentRoleInTestSystemInSession.systemInSession,currentRoleInTestSystemInSession.roleInTest).keyword}"/>
+                            </g:column>
+                            <g:column>
+                                <h:outputText
+                                        value="#{currentRoleInTestSystemInSession.systemInSession.tableSession.tableKeyword}"/>
+                            </g:column>
+                            <g:column>
+                                <a4j:commandLink id="testParticipantDeleteActionSupport"
+                                                 actionListener="#{startTestInstance.removeSystemInSessionFromTestParticipants(currentRoleInTestSystemInSession)}"
+                                                 onRowMouseOver="this.style.cursor='pointer'"
+                                                 rendered="#{!(currentRoleInTestSystemInSession.systemInSession.equals(startTestInstance.selectedTestInstanceParticipants.systemInSessionUser.systemInSession) and currentRoleInTestSystemInSession.roleInTest.equals(startTestInstance.selectedTestInstanceParticipants.roleInTest))}"
+                                                 render=":globalForm, :footerForm">
+                                    <span class="gzl-icon-trash-o"/>
+                                </a4j:commandLink>
+
+
+                            </g:column>
+                        </rich:collapsibleSubTable>
+                    </rich:dataTable>
+                    <br/>
+                    <s:div id="editParticipatingSystemsPanel"
+                           rendered="#{startTestInstance.showEditParticipantsPanel}">
+                        <h:panelGrid columns="2" columnClasses="gridContent">
+
+                            <ui:decorate template="/layout/panels/_panel_title.xhtml">
+                                <ui:define name="panel_title">
+                                    #{messages['gazelle.tm.SelectPartnerSystemsForTheRole']} :
+                                    #{startTestInstance.selectedTestRoles.roleInTest.keyword}
+                                </ui:define>
+                                <a4j:region id="viewMinCardRegion">
+                                    <s:decorate id="viewMinCardDecoration"
+                                                template="/layout/display/_display.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.tm.test.CardMin']}</ui:define>
+                                        <h:outputText id="viewMinCard"
+                                                      value="#{startTestInstance.selectedTestRoles.cardMin}">
+                                        </h:outputText>
+                                    </s:decorate>
+                                    <s:decorate id="viewMaxCardDecoration"
+                                                template="/layout/display/_display.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.tm.test.CardMax']}</ui:define>
+                                        <h:outputText id="viewMaxCard"
+                                                      value="#{startTestInstance.selectedTestRoles.cardMax}">
+                                        </h:outputText>
+                                    </s:decorate>
+                                    <s:decorate id="editParticipantsDecoration"
+                                                template="/layout/display/_display.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.tm.monitors.Systems']}
+                                        </ui:define>
+                                        <rich:pickList copyAllVisible="false" removeAllVisible="false"
+                                                       value="#{startTestInstance.systemInSessionList}"
+                                                       sourceListWidth="200px" targetListWidth="200px">
+                                            <s:selectItems
+                                                    value="#{startTestInstance.getSystemsListByTestRoles(startTestInstance.selectedTestRoles)}"
+                                                    var="selectedSystemInSession"
+                                                    label="#{selectedSystemInSession.system.keyword}"/>
+                                            <s:convertEntity></s:convertEntity>
+                                        </rich:pickList>
+                                    </s:decorate>
+                                </a4j:region>
+                                <a4j:region id="editSimulatorsParticipantsRegion"
+                                            rendered="#{(startTestInstance.getSimulatorsByTestRoles(startTestInstance.selectedTestRoles)!=null) and (startTestInstance.selectedTestInstanceParticipants.testInstance.test.orchestrable)}">
+                                    <s:decorate id="editSimulatorsParticipantsDecoration"
+                                                template="/layout/form/_edit.xhtml">
+                                        <ui:define name="label">#{messages['gazelle.tm.test.Simulators']}
+                                        </ui:define>
+                                        <rich:pickList copyAllVisible="false" removeAllVisible="false"
+                                                       value="#{startTestInstance.simulatorInSessionList}"
+                                                       sourceListWidth="200px" targetListWidth="200px">
+                                            <s:selectItems
+                                                    value="#{startTestInstance.getSimulatorsByTestRoles(startTestInstance.selectedTestRoles)}"
+                                                    var="selectedSimulatorInSession"
+                                                    label="#{selectedSimulatorInSession.system.keyword}"/>
+                                            <s:convertEntity></s:convertEntity>
+                                        </rich:pickList>
+                                    </s:decorate>
+                                </a4j:region>
+                                <div align="right">
+                                    <a4j:commandButton id="button11" styleClass="gzl-btn-green"
+                                                       value="#{messages['gazelle.tm.test.AddSelectedPartners']}"
+                                                       actionListener="#{startTestInstance.addSelectedSystemInSessionListForSelectedRole()}"
+                                                       render=":globalForm, :footerForm, messageDecoration"/>
+                                </div>
+                            </ui:decorate>
+
+
+                            <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+                                <ui:param name="panel_id" value="testedPartnersForSelectedRolePanel"/>
+
+                                <rich:dataTable id="testedPartnersForSelectedRoleDataTable"
+                                                value="#{startTestInstance.getTestInstanceParticipantsForSelectedSISForSelectedRoleInTest()}"
+                                                var="currentTestInstanceParticipants"
+                                                rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds"
+                                                columnClasses="center" border="0" first="0">
+                                    <f:facet name="header">
+                                        <h:outputText
+                                                value="#{messages['gazelle.tm.test.ExistingTestInstancesForTheSameRole']}"/>
+                                    </f:facet>
+                                    <g:column style="text-align:right" sortOrder="ascending"
+                                              sortBy="#{'testInstance.id'}">
+                                        <ui:define name="header">
+                                            <h:outputText
+                                                    value="#{messages['gazelle.tm.test.TestInstanceId']}"/>
+                                        </ui:define>
+                                        <h:outputLink target="_blank" propagation="none"
+                                                      value="#{testInstanceManager.getTestInstancePermalink(currentTestInstanceParticipants.testInstance)}">
+                                            <h:outputText value="#{currentTestInstanceParticipants.testInstance.id}"
+                                            />
+                                        </h:outputLink>
+                                    </g:column>
+                                    <g:column style="text-align:left" sortOrder="ascending"
+                                              sortBy="#{'systemInSessionUser.systemInSession.system.keyword'}">
+                                        <ui:define name="header">
+                                            <h:outputText
+                                                    value="#{messages['gazelle.tm.monitors.SystemKeyword']}"/>
+                                        </ui:define>
+                                        <h:outputText
+                                                value="#{currentTestInstanceParticipants.systemInSessionUser.systemInSession.system.keyword}"
+                                        />
+                                    </g:column>
+                                    <g:column style="text-align:left" sortOrder="ascending"
+                                              sortBy="#{messages[currentTestInstanceParticipants.testInstance.lastStatus.labelToDisplay]}">
+                                        <ui:define name="header">
+                                            <h:outputText
+                                                    value="#{messages['gazelle.tm.testing.instance.status']}"/>
+                                        </ui:define>
+                                        <h:outputText
+                                                value="#{messages[currentTestInstanceParticipants.testInstance.lastStatus.labelToDisplay]}"
+                                        />
+                                    </g:column>
+                                    <f:facet name="footer">
+                                        <ui:include src="/util/datatableFooter.xhtml">
+                                            <ui:param name="dataScrollerId" value="ds"/>
+                                            <ui:param name="dataTableId"
+                                                      value="testedPartnersForSelectedRoleDataTable"/>
+                                        </ui:include>
+                                    </f:facet>
+
+                                </rich:dataTable>
+
+                            </ui:decorate>
+
+                        </h:panelGrid>
+                    </s:div>
+                    <s:div rendered="#{startTestInstance.testInstanceShallBeForced()}"
+                           styleClass="gzl-alert gzl-alert-orange">
+                        <s:span styleClass="gzl-icon-exclamation-triangle"/>
+                        <h:outputText
+                                value="#{messages['net.ihe.gazelle.tm.ThisTestInstanceIsConfiguredToBeExecutedBySystem']}"
+                                rendered="#{s:hasRole('admin_role') or s:hasRole('testing_session_admin_role')}"/>
+                        <h:outputText
+                                value="#{messages['net.ihe.gazelle.tm.YouHaveSelectedPartnersFromTheSameCompanyOrASyst']}"
+                                rendered="#{not (s:hasRole('admin_role') or s:hasRole('testing_session_admin_role'))}"/>
+                    </s:div>
+                </h:form>
+                <ui:define name="panel_footer">
+                    <div align="right">
+                        <h:form id="footerForm">
+                            <s:token allowMultiplePosts="true"/>
+                            <s:span styleClass="gzl-icon-play-black gzl-icon-2x"
+                                    rendered="#{!startTestInstance.checkTestInstanceFeasibility() and !startTestInstance.showEditParticipantsPanel}"/>
+                            <s:div id="startTestInstanceDiv"
+                                   rendered="#{startTestInstance.checkTestInstanceFeasibility() and !startTestInstance.showEditParticipantsPanel}">
+
+                                <a4j:commandLink oncomplete="this.disabled=false;" execute="@this"
+                                                 action="#{startTestInstance.startTestInstance()}"
+                                                 immediate="true" onbegin="this.disabled=true;"
+                                                 type="submit"
+                                                 title="#{messages['net.ihe.gazelle.tm.StartTestInstance']}">
+                                    <span class="gzl-icon-play gzl-icon-2x "/>
+                                </a4j:commandLink>
+                            </s:div>
+                        </h:form>
+                    </div>
+                </ui:define>
+            </ui:decorate>
+        </h:panelGroup>
+    </ui:define>
+</ui:composition>

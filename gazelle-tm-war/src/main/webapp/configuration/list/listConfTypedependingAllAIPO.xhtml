@@ -1,0 +1,519 @@
+<ui:composition xmlns:a4j="http://richfaces.org/a4j" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:g="http://www.ihe.net/gazelle"
+                xmlns:rich="http://richfaces.org/rich" xmlns:s="http://jboss.org/schema/seam/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['gazelle.configuration.Configurations']}"/>
+    <ui:define name="body">
+        <h:outputScript library="jscript" name="disable_input_spinner_mouse_wheel.js"/>
+
+        <h:form id="listConfigs" rendered="#{identity.loggedIn}" styleClass="form-horizontal">
+            <s:token allowMultiplePosts="true"/>
+            <s:div id="divTableOfConfMappedAndFilter">
+
+                <ui:decorate template="/layout/panels/_panel_filter_criteria.xhtml">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <ui:include src="/testing/research/filterAIPOForConfig.xhtml">
+                                <ui:param name="filter"
+                                          value="#{configurationTypeMappingWithAIPOManager.foundConfigurationTypeMappedWithAIPODataModels.filter}"/>
+                                <ui:param name="filterForm" value="listConfigs"/>
+                            </ui:include>
+                        </div>
+                    </div>
+                    <ui:define name="filter_buttons">
+                        <a4j:commandLink
+                                actionListener="#{configurationTypeMappingWithAIPOManager.foundConfigurationTypeMappedWithAIPODataModels.filter.clear()}"
+                                title="#{messages['gazelle.users.reset']}" type="submit"
+                                execute="@this" render="listConfigs">
+                            <span class="fa fa-times-circle"/>
+                        </a4j:commandLink>
+                    </ui:define>
+                </ui:decorate>
+                <s:div>
+                    <a4j:commandButton actionListener="#{configurationTypeMappingWithAIPOManager.addMissing()}"
+                                       styleClass="gzl-btn-green"
+                                       value="#{messages['net.ihe.gazelle.tm.AddMissingProfiles']}"
+                                       render="listConfigs"/>
+                </s:div>
+                <br/>
+                <s:div id="divTableList">
+                    #{configurationTypeMappingWithAIPOManager.foundConfigurationTypeMappedWithAIPODataModels.resetCache()}
+                    <rich:dataTable var="confMappedWithAIPO" id="tableList"
+                                    value="#{ configurationTypeMappingWithAIPOManager.foundConfigurationTypeMappedWithAIPODataModels}"
+                                    rows="#{dataScrollerMemory.numberOfResultsPerPage}"
+                                    render="ds">
+                        <g:column
+                                sortBy="#{'actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.keyword'}"
+                                sortOrder="#{datatablestateholder.sortorders['actorintegrationprofileoption.actorintegrationprofile.integrationprofile.keyword']}">
+                            <ui:define name="header"> #{messages['gazelle.tm.IntegrationProfile']}</ui:define>
+                            <h:outputText
+                                    value="#{confMappedWithAIPO.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.keyword}"/>
+                        </g:column>
+                        <g:column sortBy="#{'actorIntegrationProfileOption.actorIntegrationProfile.actor.keyword'}"
+                                  sortOrder="#{datatablestateholder.sortorders['actorintegrationprofileoption.actorintegrationprofile.actor.keyword']}">
+                            <ui:define name="header"> #{messages['gazelle.testmanagement.system.label.Actor']}
+                            </ui:define>
+                            <h:outputText
+                                    value="#{confMappedWithAIPO.actorIntegrationProfileOption.actorIntegrationProfile.actor.keyword}"/>
+                        </g:column>
+                        <g:column>
+                            <ui:define name="header"> #{messages['gazelle.tm.IntegrationProfileOption']}</ui:define>
+                            <h:outputText
+                                    value="#{confMappedWithAIPO.actorIntegrationProfileOption.integrationProfileOption.keyword}"/>
+                        </g:column>
+                        <g:column>
+                            <ui:define name="header">
+                                #{messages['gazelle.configuration.Configurations']}
+                            </ui:define>
+                            <a4j:repeat var="currentConf" value="#{confMappedWithAIPO.listOfConfigurationTypes}">
+                                <s:div id="currentConfType">
+
+                                    <a4j:commandLink event="click"
+                                                     rendered="#{s:hasPermission('MasterModel', 'edit', null)}"
+                                                     title="#{messages['gazelle.tm.DeleteThisConfigurationType']}"
+                                                     oncomplete="jq162('#DeleteSelectedConfType').modal('show');"
+                                                     execute="@this"
+                                                     actionListener="#{configurationTypeMappingWithAIPOManager.selectConfMappedWithAIPOAndConfigurationType(confMappedWithAIPO,currentConf)}"
+                                                     render=":deletefrm">
+                                        <span class="gzl-icon-trash-o"/>
+                                    </a4j:commandLink>
+
+
+                                    <a4j:commandLink event="click"
+                                                     oncomplete="jq162('#panelOfUsageModalPanel').modal('show');"
+                                                     execute="@this" render=" :panelOfUsageForm"
+                                                     title="#{messages['gazelle.tm.ShowUsage']}"
+                                                     actionListener="#{configurationTypeMappingWithAIPOManager.setSelectedConfigurationType(currentConf)}">
+                                        <span class="gzl-icon-search"/>
+                                    </a4j:commandLink>
+
+
+                                    <h:outputText value="#{currentConf.configurationType.typeName}-"/>
+                                    <h:outputText
+                                            value="#{configurationTypeMappingWithAIPOManager.displayConfigurationType(currentConf)}"/>
+
+                                </s:div>
+                            </a4j:repeat>
+                        </g:column>
+                        <g:column rendered="#{s:hasPermission('MasterModel', 'edit', null)}">
+                            <ui:define name="header">
+                                <s:div>
+                                    <h:outputText value="#{messages['gazelle.common.Action']}"/>
+                                    <a4j:commandLink event="click"
+                                                     title="#{messages['gazelle.tm.AddForAll']}"
+                                                     oncomplete="jq162('#AddConfigurationType').modal('show');"
+                                                     rendered="#{s:hasPermission('MasterModel', 'edit', null)}"
+                                                     execute="@this" render=" :addATypeForm"
+                                                     actionListener="#{configurationTypeMappingWithAIPOManager.addForThisSelection()}">
+                                        <span class="gzl-icon-plus"/>
+                                    </a4j:commandLink>
+
+                                </s:div>
+                            </ui:define>
+                            <a4j:commandLink
+                                    actionListener="#{configurationTypeMappingWithAIPOManager.setSelectedConfigurationTypeMappedAndInitConfType(confMappedWithAIPO)}"
+                                    value="#{messages['gazelle.tf.selectedActor.profileLinks.Add']}"
+                                    oncomplete="jq162('#AddConfigurationType').modal('show');" execute="@this"
+                                    render=" :addATypeForm"/>
+
+                        </g:column>
+                        <f:facet name="footer">
+                            <ui:include src="/util/datatableFooter.xhtml">
+                                <ui:param name="dataScrollerId" value="ds"/>
+                                <ui:param name="dataTableId" value="tableList"/>
+                            </ui:include>
+                        </f:facet>
+                    </rich:dataTable>
+                </s:div>
+            </s:div>
+        </h:form>
+        <h:form id="panelOfUsageForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="panelOfUsageModalPanel"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.UsageOfConfigurationType']}
+                    #{configurationTypeMappingWithAIPOManager.selectedConfigurationType.configurationType.typeName}
+                    #{configurationTypeMappingWithAIPOManager.displayConfigurationType(configurationTypeMappingWithAIPOManager.selectedConfigurationType)}
+                </ui:define>
+                <s:div id="panelOfUsageDiv"
+                       rendered="#{configurationTypeMappingWithAIPOManager.selectedConfigurationType != null}">
+                    <rich:dataTable var="confMappedWithAIPO" id="tableListWhereUsed"
+                                    value="#{ configurationTypeMappingWithAIPOManager.getListOfConfigurationTypeWhereSelectConfTypeUsed() }"
+                                    rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds2">
+                        <g:column
+                                sortBy="#{'actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.keyword'}"
+                                sortOrder="#{dataTableStateHolder.sortOrders['actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.keyword']}">
+                            <ui:define name="header"> #{messages['gazelle.tm.IntegrationProfile']}</ui:define>
+                            <h:outputText
+                                    value="#{confMappedWithAIPO.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.keyword}"/>
+                        </g:column>
+                        <g:column
+                                sortBy="#{'actorIntegrationProfileOption.actorIntegrationProfile.actor.keyword'}"
+                                sortOrder="#{dataTableStateHolder.sortOrders['actorIntegrationProfileOption.actorIntegrationProfile.actor.keyword']}">
+                            <ui:define name="header"> #{messages['gazelle.testmanagement.system.label.Actor']}
+                            </ui:define>
+                            <h:outputText
+                                    value="#{confMappedWithAIPO.actorIntegrationProfileOption.actorIntegrationProfile.actor.keyword}"/>
+                        </g:column>
+                        <g:column>
+                            <ui:define name="header"> #{messages['gazelle.tm.IntegrationProfileOption']}</ui:define>
+                            <h:outputText
+                                    value="#{confMappedWithAIPO.actorIntegrationProfileOption.integrationProfileOption.keyword}"/>
+                        </g:column>
+                        <f:facet name="footer">
+                            <ui:include src="/util/datatableFooter.xhtml">
+                                <ui:param name="dataScrollerId" value="ds2"/>
+                                <ui:param name="dataTableId" value="tableListWhereUsed"/>
+                            </ui:include>
+                        </f:facet>
+                    </rich:dataTable>
+                </s:div>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <h:form id="addATypeForm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="AddConfigurationType"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.UsageOfConfigurationType']}
+                    <s:span id="titleDiv"
+                            rendered="#{configurationTypeMappingWithAIPOManager.selectedConfigurationType != null}">
+                        #{configurationTypeMappingWithAIPOManager.selectedConfigurationType.configurationType.typeName}
+                        #{configurationTypeMappingWithAIPOManager.displayConfigurationType(configurationTypeMappingWithAIPOManager.selectedConfigurationType)}
+                    </s:span>
+                </ui:define>
+                <s:div id="subDivAddAType"
+                       rendered="#{configurationTypeMappingWithAIPOManager.selectedConfigurationType != null}">
+                    <div>
+                        <h:outputText style="font-size:small;font-weight:bold;"
+                                      value="#{messages['gazelle.tm.AddingAConfigurationTypeFor']} :"/>
+                    </div>
+                    <div>
+                        <h:outputText style="font-size:small;font-weight:bold;"
+                                      value="#{messages['gazelle.tf.IntegrationProfile']} : "
+                                      rendered="#{ not empty configurationTypeMappingWithAIPOManager.selectedConfigurationTypeMapped }"/>
+                        <h:outputText
+                                value="#{configurationTypeMappingWithAIPOManager.selectedConfigurationTypeMapped.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.keyword}-#{configurationTypeMappingWithAIPOManager.selectedConfigurationTypeMapped.actorIntegrationProfileOption.actorIntegrationProfile.integrationProfile.name}"
+                                rendered="#{ not empty configurationTypeMappingWithAIPOManager.selectedConfigurationTypeMapped }"/>
+                    </div>
+                    <div>
+                        <h:outputText style="font-size:small;font-weight:bold;"
+                                      value="#{messages['gazelle.testmanagement.system.label.Actor']} : "
+                                      rendered="#{ not empty configurationTypeMappingWithAIPOManager.selectedConfigurationTypeMapped }"/>
+                        <h:outputText
+                                value="#{ configurationTypeMappingWithAIPOManager.selectedConfigurationTypeMapped.actorIntegrationProfileOption.actorIntegrationProfile.actor.name}"
+                                rendered="#{ not empty configurationTypeMappingWithAIPOManager.selectedConfigurationTypeMapped }"/>
+                    </div>
+                    <div>
+                        <h:outputText style="font-size:small;font-weight:bold;"
+                                      value="#{messages['gazelle.tf.LabelOption']} : "
+                                      rendered="#{ not empty configurationTypeMappingWithAIPOManager.selectedConfigurationTypeMapped }"/>
+                        <h:outputText
+                                value="#{ configurationTypeMappingWithAIPOManager.selectedConfigurationTypeMapped.actorIntegrationProfileOption.integrationProfileOption.name}"
+                                rendered="#{ not empty configurationTypeMappingWithAIPOManager.selectedConfigurationTypeMapped }"/>
+                    </div>
+                    <div>
+                        <h:outputText style="font-size:small;font-weight:bold;"
+                                      value="#{messages['gazelle.tf.IntegrationProfile']} : "
+                                      rendered="#{  empty configurationTypeMappingWithAIPOManager.selectedConfigurationTypeMapped and not empty configurationTypeMappingWithAIPOManager.selectedIntegrationProfile  }"/>
+                        <h:outputText
+                                value="#{configurationTypeMappingWithAIPOManager.selectedIntegrationProfile.keyword}-#{configurationTypeMappingWithAIPOManager.selectedIntegrationProfile.name}"
+                                rendered="#{  empty configurationTypeMappingWithAIPOManager.selectedConfigurationTypeMapped and not empty configurationTypeMappingWithAIPOManager.selectedIntegrationProfile  }"/>
+                    </div>
+                    <div>
+                        <h:outputText style="font-size:small;font-weight:bold;"
+                                      value="#{messages['gazelle.testmanagement.system.label.Actor']} : "
+                                      rendered="#{  empty configurationTypeMappingWithAIPOManager.selectedConfigurationTypeMapped and not empty  configurationTypeMappingWithAIPOManager.selectedActor }"/>
+                        <h:outputText
+                                value="#{ configurationTypeMappingWithAIPOManager.selectedActor}"
+                                rendered="#{  empty configurationTypeMappingWithAIPOManager.selectedConfigurationTypeMapped and not empty  configurationTypeMappingWithAIPOManager.selectedActor }"/>
+                    </div>
+                    <div>
+                        <h:outputText
+                                value="#{messages['net.ihe.gazelle.tm.AllSelectedAIPO']}"
+                                rendered="#{  empty configurationTypeMappingWithAIPOManager.selectedConfigurationTypeMapped and empty  configurationTypeMappingWithAIPOManager.selectedActor and empty configurationTypeMappingWithAIPOManager.selectedIntegrationProfile }"/>
+                    </div>
+                    <s:decorate template="/layout/form/_edit.xhtml">
+                        <ui:define name="label">#{messages['gazelle.tm.ConfigurationType']}</ui:define>
+                        <h:selectOneMenu styleClass="form-control gzl-form-control" id="TypeConfListBox"
+                                         value="#{configurationTypeMappingWithAIPOManager.selectedConfigurationType.configurationType}"
+                                         required="true">
+                            <s:selectItems id="TypeConfSelectItems"
+                                           value="#{gazelleDAO.GetAllConfigurationType()}"
+                                           var="confTypeFromList" noSelectionLabel="${messages.PleaseSelect}"
+                                           label="#{confTypeFromList.typeName}"/>
+                            <a4j:ajax event="change"
+                                      listener="#{configurationTypeMappingWithAIPOManager.changeTypeOfConfig()}"
+                                      render="subDivAddAType,spinnerScript,buttonsDiv" execute="@this"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                    <h:panelGroup id="portsId">
+                        <s:div rendered="#{configurationTypeMappingWithAIPOManager.selectedConfigurationType.configurationType.typeName != 'DICOM SCU' ||
+                     (configurationTypeMappingWithAIPOManager.selectedConfigurationType.sopClass.keyword != null and
+                     configurationTypeMappingWithAIPOManager.selectedConfigurationType.sopClass.keyword=='STORAGE COMMITMENT')}">
+                            <s:decorate template="/layout/form/_edit.xhtml"
+                                        rendered="#{!empty configurationTypeMappingWithAIPOManager.selectedConfigurationType.configurationType and configurationTypeMappingWithAIPOManager.divPortNonSecuredDisplayed}">
+                                <ui:define name="label">#{messages['gazelle.tm.PortNonSecure']}</ui:define>
+                                <ui:param name="id" value="portNonSecureInput"/>
+                                <rich:inputNumberSpinner id="portNonSecureInput"
+                                                         value="#{configurationTypeMappingWithAIPOManager.selectedConfigurationType.portNonSecure}"
+                                                         required="false" minValue="80" maxValue="65535"
+                                                         rendered="#{!empty configurationTypeMappingWithAIPOManager.selectedConfigurationType.configurationType and configurationTypeMappingWithAIPOManager.divPortNonSecuredDisplayed}">
+                                    <a4j:ajax event="blur" execute="@this"/>
+                                </rich:inputNumberSpinner>
+                                <rich:message for="portNonSecureInput" style="color:red;font-size:x-small;">
+                                    <f:facet name="errorMarker">
+                                        <span class="gzl-icon-times-circle"/>
+                                    </f:facet>
+                                </rich:message>
+                            </s:decorate>
+                            <s:decorate template="/layout/form/_edit.xhtml"
+                                        rendered="#{!empty configurationTypeMappingWithAIPOManager.selectedConfigurationType.configurationType and configurationTypeMappingWithAIPOManager.divPortSecuredDisplayed}">
+                                <ui:param name="id" value="portSecureInput"/>
+                                <ui:define name="label">#{messages['gazelle.tm.PortSecure']}</ui:define>
+                                <rich:inputNumberSpinner id="portSecureInput"
+                                                         value="#{configurationTypeMappingWithAIPOManager.selectedConfigurationType.portSecure}"
+                                                         required="false" minValue="1024" maxValue="65535"
+                                                         rendered="#{!empty configurationTypeMappingWithAIPOManager.selectedConfigurationType.configurationType and configurationTypeMappingWithAIPOManager.divPortSecuredDisplayed}">
+                                    <a4j:ajax event="blur" execute="@this"/>
+                                </rich:inputNumberSpinner>
+                                <rich:message for="portSecureInput" style="color:red;font-size:x-small;">
+                                    <f:facet name="errorMarker">
+                                        <span class="gzl-icon-times-circle"/>
+                                    </f:facet>
+                                </rich:message>
+                            </s:decorate>
+                        </s:div>
+                    </h:panelGroup>
+                    <s:decorate template="/layout/form/_edit.xhtml"
+                                rendered="#{!empty configurationTypeMappingWithAIPOManager.selectedConfigurationType.configurationType and configurationTypeMappingWithAIPOManager.divSopClassDisplayed}">
+                        <ui:param name="id" value="sopClassList"/>
+                        <ui:define name="label">#{messages['gazelle.tm.SopClass']}</ui:define>
+                        <h:selectOneMenu styleClass="form-control gzl-form-control" id="sopClassList"
+                                         value="#{configurationTypeMappingWithAIPOManager.selectedConfigurationType.sopClass}"
+                                         required="true"
+                                         rendered="#{!empty configurationTypeMappingWithAIPOManager.selectedConfigurationType.configurationType and configurationTypeMappingWithAIPOManager.divSopClassDisplayed}">
+                            <s:selectItems id="pleaseSelectSopClassItems" value="#{gazelleDAO.listSopClasses()}"
+                                           var="sopClassFromList"
+                                           noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                           label="#{sopClassFromList.keyword}"/>
+                            <a4j:ajax event="change" execute="@this"
+                                      render="subDivAddAType,spinnerScript,buttonsDiv,portsId"
+                                      listener="#{configurationTypeMappingWithAIPOManager.changeTypeOfConfig()}"/>
+                        </h:selectOneMenu>
+                        <rich:message for="sopClassList" style="color:red;font-size:x-small;">
+                            <f:facet name="errorMarker">
+                                <span class="gzl-icon-times-circle"/>
+                            </f:facet>
+                        </rich:message>
+                    </s:decorate>
+                    <s:decorate template="/layout/form/_edit.xhtml"
+                                rendered="#{!empty configurationTypeMappingWithAIPOManager.selectedConfigurationType.configurationType and configurationTypeMappingWithAIPOManager.divTransportLayerDisplayed}">
+                        <ui:define name="label">#{messages['gazelle.tm.TransportLayer']}</ui:define>
+                        <ui:param name="id" value="transportLayerList"/>
+                        <h:selectOneMenu styleClass="form-control gzl-form-control" id="transportLayerList"
+                                         value="#{configurationTypeMappingWithAIPOManager.selectedConfigurationType.transportLayer}"
+                                         required="true"
+                                         rendered="#{!empty configurationTypeMappingWithAIPOManager.selectedConfigurationType.configurationType and configurationTypeMappingWithAIPOManager.divTransportLayerDisplayed}">
+                            <s:selectItems id="pleaseSelectTransportLayerItems"
+                                           value="#{gazelleDAO.listTransportLayer()}"
+                                           var="transportLayerFromList"
+                                           noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                           label="#{transportLayerFromList.keyword}"/>
+                            <a4j:ajax event="change" execute="@this"/>
+                        </h:selectOneMenu>
+                        <rich:message for="transportLayerList" style="color:red;font-size:x-small;">
+                            <f:facet name="errorMarker">
+                                <span class="gzl-icon-times-circle"/>
+                            </f:facet>
+                        </rich:message>
+                    </s:decorate>
+                    <s:decorate template="/layout/form/_edit.xhtml"
+                                rendered="#{!empty configurationTypeMappingWithAIPOManager.selectedConfigurationType.configurationType and configurationTypeMappingWithAIPOManager.divWSTypeDisplayed}">
+                        <ui:define name="label">#{messages['gazelle.tm.WsTransactionUsage']}</ui:define>
+                        <ui:param name="id" value="wstypeListBox"/>
+                        <h:selectOneMenu styleClass="form-control gzl-form-control" id="wstypeListBox"
+                                         value="#{configurationTypeMappingWithAIPOManager.selectedConfigurationType.wsTRansactionUsage}"
+                                         required="true"
+                                         rendered="#{!empty configurationTypeMappingWithAIPOManager.selectedConfigurationType.configurationType and configurationTypeMappingWithAIPOManager.divWSTypeDisplayed}">
+                            <s:selectItems
+                                    value="#{configurationTypeMappingWithAIPOManager.allowedWSTransactionUsages()}"
+                                    var="wstran" noSelectionLabel="${messages.PleaseSelect}"
+                                    label="#{wstran.transaction.keyword}:#{wstran.usage}"/>
+                            <a4j:ajax event="change" execute="@this"/>
+                        </h:selectOneMenu>
+                        <rich:message for="wstypeListBox" style="color:red;font-size:x-small;">
+                            <f:facet name="errorMarker">
+                                <span class="gzl-icon-times-circle"/>
+                            </f:facet>
+                        </rich:message>
+                    </s:decorate>
+
+
+                    <s:decorate template="/layout/form/_edit.xhtml"
+                                rendered="#{!empty configurationTypeMappingWithAIPOManager.selectedConfigurationType.configurationType and configurationTypeMappingWithAIPOManager.divTransactionDescriptionDisplayed}">
+                        <ui:define name="label">#{messages['net.ihe.gazelle.tm.TransactionDescription']}</ui:define>
+                        <ui:param name="id" value="TransactionDescriptionInput"/>
+                        <h:inputText styleClass=" form-control" id="transactionDescriptionInput"
+                                     value="#{configurationTypeMappingWithAIPOManager.selectedConfigurationType.transactionDescription}"
+                                     required="true">
+                            <a4j:ajax event="blur" execute="@this"/>
+                        </h:inputText>
+                    </s:decorate>
+
+
+                    <s:decorate template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="commentInput"/>
+                        <ui:define name="label">#{messages['gazelle.testmanagement.object.Comment']}</ui:define>
+                        <h:inputText styleClass=" form-control" id="commentInput"
+                                     value="#{configurationTypeMappingWithAIPOManager.selectedConfigurationType.comment}"
+                                     required="false">
+                            <a4j:ajax event="blur" execute="@this"/>
+                        </h:inputText>
+                    </s:decorate>
+                </s:div>
+                <ui:define name="popup_footer">
+                    <s:div id="buttonsDiv">
+                        <button type="button" class="gzl-btn" data-dismiss="modal">
+                            #{messages['gazelle.tm.Cancel']}
+                        </button>
+                        <a4j:commandButton id="AddAConfTypeButton" value="#{messages['gazelle.common.button.Save']}"
+                                           styleClass="gzl-btn-green"
+                                           actionListener="#{configurationTypeMappingWithAIPOManager.addConfigurationTypeToSelectedConfTypeAIPO()}"
+                                           onclick="jq162('#AddConfigurationType').modal('hide');"
+                                           rendered="#{!empty configurationTypeMappingWithAIPOManager.selectedConfigurationType.configurationType and !empty configurationTypeMappingWithAIPOManager.selectedConfigurationTypeMapped and (configurationTypeMappingWithAIPOManager.selectedConfigurationType.id == null)}"
+                                           render="listConfigs,messageDecoration"/>
+                        <a4j:commandButton id="AddAConfTypeButtonForAll"
+                                           value="#{messages['gazelle.tm.AddForSelection']}"
+                                           styleClass="gzl-btn-green"
+                                           actionListener="#{configurationTypeMappingWithAIPOManager.addConfigurationTypeToSelectedConfTypeAIPOToAllSelection()}"
+                                           onclick="jq162('#AddConfigurationType').modal('hide');"
+                                           rendered="#{!empty configurationTypeMappingWithAIPOManager.selectedConfigurationType.configurationType and empty configurationTypeMappingWithAIPOManager.selectedConfigurationTypeMapped}"
+                                           render="listConfigs,messageDecoration"/>
+                    </s:div>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <h:form id="deletefrm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="DeleteSelectedConfType"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.DeleteSelectedConfigurationType']}</ui:define>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="deletecrtbutton"
+                                       value="#{messages['gazelle.tm.DeleteThisConfigurationType_2']}"
+                                       styleClass="gzl-btn-red"
+                                       actionListener="#{configurationTypeMappingWithAIPOManager.removeTypeSelectedFromListSelected()}"
+                                       onclick="jq162('#DeleteSelectedConfType').modal('hide');"
+                                       render="listConfigs,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <h:form id="dmodefrm">
+            <s:token allowMultiplePosts="true"/>
+            <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+                <ui:param name="popup_id" value="ModifySelectedConfType"/>
+                <ui:define name="popup_title">#{messages['gazelle.tm.ModifySelectedConfigurationType']}</ui:define>
+                <h:panelGroup id="delpanel"
+                              rendered="#{configurationTypeMappingWithAIPOManager.selectedConfigurationType != null}">
+                    <s:decorate template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['gazelle.tm.ConfigurationType']}</ui:define>
+                        <h:outputText
+                                value="#{configurationTypeMappingWithAIPOManager.selectedConfigurationType.configurationType.typeName}">
+                        </h:outputText>
+                    </s:decorate>
+                    <s:decorate template="/layout/form/_edit.xhtml"
+                                rendered="#{configurationTypeMappingWithAIPOManager.divPortNonSecuredDisplayed}">
+                        <ui:param name="id" value="PortNonSecureInput"/>
+                        <ui:define name="label">#{messages['gazelle.tm.PortNonSecure_2']}</ui:define>
+                        <h:inputText id="PortNonSecureInput" styleClass=" form-control"
+                                     value="#{configurationTypeMappingWithAIPOManager.selectedConfigurationType.portNonSecure}">
+                        </h:inputText>
+                    </s:decorate>
+                    <s:decorate template="/layout/form/_edit.xhtml"
+                                rendered="#{configurationTypeMappingWithAIPOManager.divPortSecuredDisplayed}">
+                        <ui:param name="id" value="PortSecureInput"/>
+                        <ui:define name="label">#{messages['gazelle.tm.PortSecure']}</ui:define>
+                        <h:inputText id="PortSecureInput" styleClass=" form-control"
+                                     value="#{configurationTypeMappingWithAIPOManager.selectedConfigurationType.portSecure}">
+                        </h:inputText>
+                    </s:decorate>
+                    <s:decorate template="/layout/display/_display.xhtml"
+                                rendered="#{configurationTypeMappingWithAIPOManager.divSopClassDisplayed}">
+                        <ui:define name="label">#{messages['gazelle.tm.SoapClass']}</ui:define>
+                        <h:selectOneMenu styleClass="form-control gzl-form-control" id="sopClassList"
+                                         value="#{configurationTypeMappingWithAIPOManager.selectedConfigurationType.sopClass}"
+                                         required="true">
+                            <s:selectItems id="pleaseSelectSopClassItems" value="#{gazelleDAO.listSopClasses()}"
+                                           var="sopClassFromList"
+                                           noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                           label="#{sopClassFromList.keyword}"/>
+                            <a4j:ajax event="change" execute="@this"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                    <s:decorate template="/layout/display/_display.xhtml"
+                                rendered="#{configurationTypeMappingWithAIPOManager.divWSTypeDisplayed}">
+                        <ui:define name="label">#{messages['gazelle.tm.WebserviceType']}</ui:define>
+                        <h:selectOneMenu styleClass="form-control gzl-form-control" id="wstypeListBox"
+                                         value="#{configurationTypeMappingWithAIPOManager.selectedConfigurationType.webServiceType}"
+                                         required="true">
+                            <s:selectItems id="wstypeSelectItems" value="#{gazelleDAO.listAllWebServices()}"
+                                           var="wsTypeFromList" noSelectionLabel="${messages.PleaseSelect}"
+                                           label="#{wsTypeFromList.profile.keyword}"/>
+                            <a4j:ajax event="change" execute="@this"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                    <s:decorate template="/layout/form/_edit.xhtml"
+                                rendered="#{configurationTypeMappingWithAIPOManager.divTransportLayerDisplayed}">
+                        <ui:param name="id" value="transportLayerList"/>
+                        <ui:define name="label">#{messages['gazelle.tm.TransportLayer']}</ui:define>
+                        <h:selectOneMenu styleClass="form-control gzl-form-control" id="transportLayerList"
+                                         value="#{configurationTypeMappingWithAIPOManager.selectedConfigurationType.transportLayer}"
+                                         required="true">
+                            <s:selectItems id="pleaseSelectTransportLayerItems"
+                                           value="#{gazelleDAO.listTransportLayer()}" var="transportLayerFromList"
+                                           noSelectionLabel="#{messages['gazelle.common.PleaseSelect']}"
+                                           label="#{transportLayerFromList.keyword}"/>
+                            <a4j:ajax event="change" execute="@this"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                    <s:decorate template="/layout/form/_edit.xhtml">
+                        <ui:param name="id" value="CommentInput"/>
+                        <ui:define name="label">#{messages['gazelle.testmanagement.object.Comment']}</ui:define>
+                        <h:inputText id="CommentInput" styleClass=" form-control"
+                                     value="#{configurationTypeMappingWithAIPOManager.selectedConfigurationType.comment}">
+                        </h:inputText>
+                    </s:decorate>
+                </h:panelGroup>
+                <ui:define name="popup_footer">
+                    <button type="button" class="gzl-btn" data-dismiss="modal">
+                        #{messages['gazelle.tm.Cancel']}
+                    </button>
+                    <a4j:commandButton id="modallconf"
+                                       value="#{messages['gazelle.tm.ModifyForAllConfigurations']}"
+                                       styleClass="gzl-btn-orange"
+                                       actionListener="#{configurationTypeMappingWithAIPOManager.modifySelectedConfigurationTypeInAllConfiguration()}"
+                                       onclick="jq162('#ModifySelectedConfType').modal('hide');"
+                                       rendered="#{!empty configurationTypeMappingWithAIPOManager.selectedConfigurationType.configurationType and !empty configurationTypeMappingWithAIPOManager.selectedConfigurationTypeMapped and (configurationTypeMappingWithAIPOManager.selectedConfigurationType.id != null)}"
+                                       render="listConfigs,messageDecoration"/>
+                </ui:define>
+            </ui:decorate>
+        </h:form>
+        <!--@formatter:off-->
+        <s:span id="spinnerScript">
+            <script>
+                disable_input_spinner_mouse_wheel('#{rich:clientId('portNonSecureInput')}');
+                disable_input_spinner_mouse_wheel('#{rich:clientId('portSecureInput')}');
+            </script>
+        </s:span>
+        <!--@formatter:on-->
+    </ui:define>
+</ui:composition>

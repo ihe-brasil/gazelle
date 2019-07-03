@@ -1,0 +1,85 @@
+<ui:composition xmlns:g="http://www.ihe.net/gazelle" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:rich="http://richfaces.org/rich"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <h:form id="#{formId}">
+        <s:token allowMultiplePosts="true"/>
+        <rich:dataTable id="oidstdatatab" var="currentOSA" value="#{oidOverview.listOSA}" rowKeyVar="rowNumber"
+
+
+                        rows="#{dataScrollerMemory.numberOfResultsPerPage}" render="ds">
+            <g:column sortBy="#{'systemInSession.system.keyword'}" sortOrder="ascending">
+                <ui:define name="header">#{messages['gazelle.configuration.system.system']}</ui:define>
+                <g:link target="_blank" value="#{currentOSA.systemInSession.system}"/>
+            </g:column>
+            <g:column sortBy="#{'oidRequirement.label'}">
+                <ui:define name="header">#{messages['gazelle.tf.table.Label']}</ui:define>
+                <h:outputText value="#{currentOSA.oidRequirement.label}"/>
+            </g:column>
+            <g:column sortBy="#{'oid'}">
+                <ui:define name="header">#{messages['gazelle.tf.OID']}</ui:define>
+                <h:outputText value="#{currentOSA.OIDValue}"/>
+            </g:column>
+            <g:column
+                    rendered="#{showActions and (s:hasRole('admin_role') || s:hasRole('testing_session_admin_role'))}">
+                <ui:define name="header">#{messages['gazelle.common.Action']}</ui:define>
+
+                <a4j:commandLink event="click"
+                                 oncomplete="jq162('#EditOSAPanel').modal('show');" immediate="true"
+                                 render="confForm" execute="@this" title="#{messages['gazelle.tm.EditThisOID']}"
+                                 actionListener="#{oidOverview.setSelectedOIDSystemAssignement(currentOSA)}">
+                    <span class="gzl-icon-pencil"/>
+                </a4j:commandLink>
+
+
+            </g:column>
+            <f:facet name="footer">
+                <ui:include src="/util/datatableFooter.xhtml">
+                    <ui:param name="dataScrollerId" value="ds"/>
+                    <ui:param name="dataTableId" value="oidstdatatab"/>
+                </ui:include>
+            </f:facet>
+        </rich:dataTable>
+
+        <h:commandLink rendered="#{showActions}" immediate="true"
+                       value="#{messages['gazelle.common.export.ExportAsExcel']}"
+                       action="#{gazelleExcelExporterJboss7.export('globalform2:oidstdatatab')}"/>
+
+    </h:form>
+    <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+    <!-- Edit OSA Panel -->
+    <!--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+    <h:form id="confForm" rendered="#{showActions}">
+        <s:token allowMultiplePosts="true"/>
+        <ui:decorate template="/layout/popup/_popup_title_footer.xhtml">
+            <ui:param name="popup_id" value="EditOSAPanel"/>
+            <ui:define name="popup_title">#{messages['gazelle.tm.EditOIDSystemAssignment']}</ui:define>
+            <s:decorate id="lafbsdec" template="/layout/display/_display.xhtml">
+                <ui:define name="label">#{messages['gazelle.configuration.system.system']}</ui:define>
+                <h:outputText value="#{oidOverview.selectedOIDSystemAssignement.systemInSession.system.keyword}"/>
+            </s:decorate>
+            <s:decorate id="ladgbdec" template="/layout/display/_display.xhtml">
+                <ui:define name="label">#{messages['gazelle.tf.table.Label']}</ui:define>
+                <h:outputText value="#{oidOverview.selectedOIDSystemAssignement.oidRequirement.label}"/>
+            </s:decorate>
+            <s:decorate id="oidlabdec" template="/layout/form/_edit.xhtml">
+                <ui:param name="id" value="oilabinp"/>
+                <ui:define name="label">#{messages['gazelle.tf.OID']}</ui:define>
+                <h:inputText styleClass=" form-control" id="oilabinp" size="40"
+                             value="#{oidOverview.selectedOIDSystemAssignement.oid}">
+                </h:inputText>
+            </s:decorate>
+            <ui:define name="popup_footer">
+                <button type="button" class="gzl-btn" data-dismiss="modal">
+                    #{messages['gazelle.tm.Cancel']}
+                </button>
+                <a4j:commandButton id="savbut" value="#{messages['gazelle.tm.SaveModifications']}"
+                                   styleClass="gzl-btn-green"
+                                   actionListener="#{oidOverview.saveSelectedOIDSystemAssignement()}"
+                                   onclick="jq162('#EditOSAPanel').modal('hide');"
+                                   render="#{formId}"/>
+            </ui:define>
+        </ui:decorate>
+    </h:form>
+</ui:composition>

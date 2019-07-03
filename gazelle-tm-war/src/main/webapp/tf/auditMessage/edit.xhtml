@@ -1,0 +1,47 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml" template="/layout/template.xhtml">
+    <ui:param name="pageNameTitle" value="#{messages['net.ihe.gazelle.tm.EditAuditMessage']}"/>
+    <ui:define name="body">
+        <div class="row">
+            <div class="col-lg-6">
+                <h:form id="editForm">
+                    <ui:decorate template="/layout/panels/_panel_title_footer_id.xhtml">
+                        <ui:param name="panel_id" value="addPanel"/>
+                        <ui:define name="panel_title">#{messages['net.ihe.gazelle.tm.EditAuditMessage']}</ui:define>
+                        <ui:include src="_editAttributes.xhtml">
+                            <ui:param name="selectedAuditMessage" value="#{auditMessageManager.currentAuditMessage}"/>
+                        </ui:include>
+                        <ui:define name="panel_footer">
+                            <h:outputLink title="#{messages['gazelle.common.button.Cancel']}" value="show.seam"
+                                          styleClass="gzl-btn">
+                                <f:param name="id" value="#{auditMessageManager.currentAuditMessage.id}"/>
+                                <h:outputText value="#{messages['gazelle.common.button.Cancel']}"/>
+                            </h:outputLink>
+                            <a4j:commandButton id="saveAuditMessagePanelButton"
+                                               value="#{messages['gazelle.common.button.Save']}"
+                                               styleClass="gzl-btn-green"
+                                               rendered="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}"
+                                               action="#{auditMessageManager.save()}"/>
+                        </ui:define>
+                    </ui:decorate>
+                </h:form>
+            </div>
+            <div class="col-lg-6">
+                <h:form id="editSection">
+                    <s:token allowMultiplePosts="true"/>
+                    <ui:include src="/tf/documents/_addDocumentSectionPanel.xhtml">
+                        <ui:param name="documentSectionParam"
+                                  value="#{auditMessageManager.currentAuditMessage.documentSection}"/>
+                        <ui:param name="managerBeanParam" value="#{auditMessageManager}"/>
+                        <ui:param name="displayActionsParam"
+                                  value="#{( s:hasRole('admin_role') || s:hasRole('tests_editor_role')) and applicationManager.isMasterModel()}"/>
+                        <ui:param name="formToRefresh" value="editSection"/>
+                    </ui:include>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

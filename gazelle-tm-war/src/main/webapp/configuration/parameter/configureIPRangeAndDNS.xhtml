@@ -1,0 +1,117 @@
+<s:div xmlns:ui="http://java.sun.com/jsf/facelets"
+       xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+       xmlns:s="http://jboss.org/schema/seam/taglib"
+       xmlns="http://www.w3.org/1999/xhtml">
+
+    #{oidsAndIPParamForSessionManager.initializeNetworkConfiguration()}
+
+    <ui:decorate template="/layout/panels/_panel_title_id.xhtml">
+        <ui:param name="panel_id" value="editNetworkConfigurationPanel"/>
+        <ui:define name="panel_title">#{messages['gazelle.tm.configurations.ConfigureIPsAndDNS']}</ui:define>
+        <a4j:region id="ipRangeBeginningRegion">
+            <s:decorate id="ipRangeBeginningDecoration" template="/layout/form/_edit.xhtml">
+                <ui:param name="id" value="ipRangeInputBeg"/>
+                <ui:define name="label">#{messages['gazelle.systems.session.networkConfig.ipRangeBeginning']}
+                </ui:define>
+                <h:inputText id="ipRangeInputBeg" styleClass=" form-control" size="15" required="true"
+                             value="#{oidsAndIPParamForSessionManager.networkConfigurationForTestingSession.ipRangeLow}">
+                    <a4j:ajax event="blur" execute="@this" render="ipRangeBeginningDecoration"/>
+                </h:inputText>
+            </s:decorate>
+        </a4j:region>
+        <a4j:region id="ipRangeEndRegion">
+            <s:decorate id="ipRangeEndDecoration" template="/layout/form/_edit.xhtml">
+                <ui:param name="id" value="ipRangeEndInput"/>
+                <ui:define name="label">#{messages['gazelle.systems.session.networkConfig.ipRangeEnd']}</ui:define>
+                <h:inputText id="ipRangeEndInput" styleClass=" form-control" size="15" required="true"
+                             value="#{oidsAndIPParamForSessionManager.networkConfigurationForTestingSession.ipRangeHigh}">
+                    <a4j:ajax event="blur" execute="@this" render="ipRangeEndDecoration"/>
+                </h:inputText>
+            </s:decorate>
+        </a4j:region>
+        <s:div id="numberOfAddress" style="border:none;">
+            <s:decorate id="numberOfAddressDecoration" template="/layout/display/_display.xhtml">
+                <ui:define name="label">#{messages['gazelle.systems.session.networkConfig.numberOfAddress']}</ui:define>
+                <h:outputText value="#{oidsAndIPParamForSessionManager.getNumberOfIpsAvailable()}"/>
+            </s:decorate>
+        </s:div>
+        <a4j:region id="subnetRegion">
+            <s:decorate id="subnetDecoration" template="/layout/form/_edit.xhtml">
+                <ui:param name="id" value="subnetInput"/>
+                <ui:define name="label">#{messages['gazelle.systems.session.networkConfig.subnet']}</ui:define>
+                <h:inputText id="subnetInput" styleClass=" form-control" size="15" required="true"
+                             value="#{oidsAndIPParamForSessionManager.networkConfigurationForTestingSession.subnetMask}">
+                    <a4j:ajax event="blur" execute="@this" render="subnetDecoration"/>
+                </h:inputText>
+            </s:decorate>
+        </a4j:region>
+        <a4j:region id="networkDomainRegion">
+            <s:decorate id="networkDomainDecoration" template="/layout/form/_edit.xhtml">
+                <ui:param name="id" value="domainNameInput"/>
+                <ui:define name="label">#{messages['gazelle.systems.session.networkConfig.DomainName']}</ui:define>
+                <h:inputText id="domainNameInput" styleClass=" form-control" size="15" required="true"
+                             value="#{oidsAndIPParamForSessionManager.networkConfigurationForTestingSession.domainName}">
+                    <a4j:ajax event="blur" execute="@this" render="networkDomainDecoration"/>
+                </h:inputText>
+
+                (#{messages['gazelle.tm.IeIheeuropenet']})
+
+            </s:decorate>
+        </a4j:region>
+        <a4j:region id="dnsIpRegion">
+            <s:decorate id="dnsIpDecoration" template="/layout/form/_edit.xhtml">
+                <ui:param name="id" value="dnsIPInput"/>
+                <ui:define name="label">#{messages['gazelle.systems.session.networkConfig.dnsIP']}</ui:define>
+                <h:inputText id="dnsIPInput" styleClass=" form-control" size="15" required="true"
+                             value="#{oidsAndIPParamForSessionManager.networkConfigurationForTestingSession.ipDns}">
+                    <a4j:ajax event="blur" execute="@this" render="dnsIpDecoration"/>
+                </h:inputText>
+            </s:decorate>
+        </a4j:region>
+        <s:decorate id="descriptionAdminDecoration" template="/layout/form/_edit.xhtml">
+            <ui:param name="id" value="dnsHeaderInput"/>
+            <ui:define name="label">#{messages['gazelle.systems.session.networkConfig.dnsHeader']}</ui:define>
+            <h:inputTextarea id="dnsHeaderInput" styleClass=" form-control"
+                             value="#{oidsAndIPParamForSessionManager.networkConfigurationForTestingSession.dnsHeader}"
+                             rows="32" cols="60">
+                <a4j:ajax event="blur" execute="@this" render="descriptionAdminDecoration"/>
+            </h:inputTextarea>
+
+            <h:outputLink id="generateDNSFileLink"
+                          value="#{applicationPreferenceManager.getApplicationUrl()}configuration/dns.seam"
+                          target="_blank">
+                <h:outputText value="#{messages['gazelle.common.button.DownloadDNSFile']}"/>
+            </h:outputLink>
+        </s:decorate>
+        <s:decorate id="reverseHeaderDecoration" template="/layout/form/_edit.xhtml">
+            <ui:param name="id" value="reverseHeaderInput"/>
+            <ui:define name="label">#{messages['gazelle.systems.session.networkConfig.reverseHeader']}</ui:define>
+            <h:inputTextarea id="reverseHeaderInput" styleClass=" form-control"
+                             value="#{oidsAndIPParamForSessionManager.networkConfigurationForTestingSession.reverseHeader}"
+                             rows="32" cols="60">
+                <a4j:ajax event="blur" execute="@this" render="reverseHeaderDecoration"/>
+            </h:inputTextarea>
+
+            <h:outputLink id="generateReverseFileLink"
+                          value="#{applicationPreferenceManager.getApplicationUrl()}configuration/reverse.seam"
+                          target="_blank">
+                <h:outputText value="#{messages['gazelle.common.button.DownloadReverseFile']}"/>
+            </h:outputLink>
+        </s:decorate>
+        <s:decorate id="hostsHeaderDecoration" template="/layout/display/_display.xhtml">
+            <ui:define name="label">#{messages['net.ihe.gazelle.tm.HostsFile']}</ui:define>
+
+            <h:outputLink id="generateHostsFileLink"
+                          value="#{applicationPreferenceManager.getApplicationUrl()}configuration/hosts.seam"
+                          target="_blank">
+                <h:outputText value="#{messages['gazelle.common.button.DownloadHostsFile']}"/>
+            </h:outputLink>
+        </s:decorate>
+        <a4j:commandButton styleClass="gzl-btn-green"
+                           actionListener="#{oidsAndIPParamForSessionManager.saveNetworkConfigurationForTestingSession()}"
+                           value="#{messages['gazelle.systems.session.networkConfig.saveNetworkConf']}"
+                           render="editNetworkConfigurationPanel" execute="@this"/>
+    </ui:decorate>
+
+
+</s:div>

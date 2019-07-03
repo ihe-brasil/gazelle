@@ -1,0 +1,84 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.org/schema/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:decorate template="/layout/panels/_panel_title.xhtml">
+        <ui:define name="panel_title">#{monitor.user.firstname} #{monitor.user.lastname}</ui:define>
+        <ui:param name="styleClass" value="panel-default monitorPanelStyle"/>
+        <div class="row">
+            <div class="col-md-3 col-sm-3">
+                <div class="thumbnail">
+                    <h:graphicImage library="img"
+                                    value="#{userPreferencesManager.getPreferencesForUser(monitor.user).photoUrl}"
+                                    id="monitorPhoto"/>
+                </div>
+            </div>
+            <div class="col-md-9 col-sm-9">
+                <div class="caption">
+                    <s:decorate id="username" template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['gazelle.users.user.UserUsername']}</ui:define>
+                        <h:outputText value="#{monitor.user.username}"/>
+                    </s:decorate>
+                    <s:decorate id="emailDecorationView" template="/layout/display/_display.xhtml"
+                                rendered="#{userPreferencesManagerBean.getPreferencesForUser(monitor.user).displayEmail == true || s:hasRole('admin_role') || s:hasRole('testing_session_admin_role') || userManagerBean.canViewEmailAddress(monitor.user)}">
+                        <ui:define name="label">#{messages['gazelle.users.registration.Email']}</ui:define>
+                        <h:outputText id="emailView" value="#{monitor.user.email}"/>
+                    </s:decorate>
+                    <s:decorate id="institutionDecorationView" template="/layout/display/_display.xhtml">
+                        <ui:define name="label">#{messages['gazelle.users.user.UserInstitution']}</ui:define>
+                        <h:outputText id="instituionView" value="#{monitor.user.institution.name}"/>
+                    </s:decorate>
+                    <s:decorate id="skypeDecorationView" template="/layout/display/_display.xhtml"
+                                rendered="#{userPreferencesManager.getPreferencesForUser(monitor.user).skype != null}">
+                        <ui:define name="label">#{messages['gazelle.tm.users.SkypeAccount']}</ui:define>
+                        <h:outputText id="skypeAccount"
+                                      value="#{userPreferencesManager.getPreferencesForUser(monitor.user).skype}"/>
+                    </s:decorate>
+                    <s:decorate id="tableDecorationView" template="/layout/display/_display.xhtml"
+                                rendered="#{userPreferencesManager.getPreferencesForUser(monitor.user).connectathonTable != null and (!s:hasRole('admin_role') and !s:hasRole('testing_session_admin_role'))}">
+                        <ui:define name="label">#{messages['gazelle.tm.users.TableLabel']}</ui:define>
+                        <h:outputText id="table"
+                                      value="#{userPreferencesManager.getPreferencesForUser(monitor.user).connectathonTable}"/>
+                    </s:decorate>
+                    <s:decorate id="tableDecorationView2" template="/layout/display/_display.xhtml"
+                                rendered="#{userPreferencesManager.getPreferencesForUser(monitor.user).connectathonTable != null and (s:hasRole('admin_role') || s:hasRole('testing_session_admin_role'))}">
+                        <ui:define name="label">#{messages['gazelle.tm.users.TableLabel']}</ui:define>
+                        <rich:inplaceInput id="tableEdit"
+                                           value="#{userPreferencesManager.getPreferencesForUser(monitor.user).connectathonTable}"
+                                           showControls="true" inputWidth="600">
+                            <a4j:ajax event="change" render="tableDecorationView2"
+                                      listener="#{userPreferencesManager.savePreferences()}"/>
+                        </rich:inplaceInput>
+                    </s:decorate>
+                    <s:decorate id="langDecorate" template="/layout/display/_display.xhtml"
+                                rendered="#{not empty userPreferencesManager.getPreferencesForUser(monitor.user).spokenLanguages}">
+                        <ui:define name="label">#{messages['gazelle.tm.users.SpokenLanguages']}</ui:define>
+                        <ul>
+                            <ui:repeat
+                                    value="#{userPreferencesManager.getSpokenLanguagesAsList(userPreferencesManager.getPreferencesForUser(monitor.user).spokenLanguages)}"
+                                    var="v">
+                                <li style="display: inline">
+                                    <h:outputText value="#{v}"/>
+                                </li>
+                            </ui:repeat>
+                        </ul>
+                    </s:decorate>
+                    <a4j:commandLink
+                            value="#{monitor.testList.size()} #{messages['gazelle.tm.monitors.nbTestsAssigned']}"
+                            actionListener="#{monitorSearchFilter.showTestsForMonitor(monitor)}"
+                            oncomplete="jq162('#TestList').modal('show');"
+                            render=" :TestListForm"/>
+
+                    <h:commandLink id="printActionButton"
+                                   title="#{messages['net.ihe.gazelle.tm.PrintAssignedTests']}"
+                                   actionListener="#{monitorInSessionAdministrationManager.downloadSelectedTestsAsPdf(monitor)}"
+                                   rendered="#{monitor.testList.size() &gt; 0}">
+                        <span class="gzl-icon-pdf"/>
+                    </h:commandLink>
+                </div>
+            </div>
+        </div>
+    </ui:decorate>
+
+</ui:composition>
